@@ -5,6 +5,7 @@ import type { AppDispatch, RootState } from "../../../redux/store/store";
 import { setTaskwiseData } from "../../../redux/slices/taskwiseSlice";
 import { setTotalDays, setTotalDaysWorked } from "../../../redux/slices/progressSlice";
 import { setDaywiseData } from "../../../redux/slices/daywiseSlice";
+import { daysNums, weekLetters } from "../../../staticData";
 
 type CompType = {
   rows: number;
@@ -258,15 +259,5 @@ const DailyCalanderTaskSheet = ({ rows, setRows, rowLimit }: CompType) => {
     </div>
   );
 };
-
-const weekLetters = ["S", "M", "T", "W", "T", "F", "S"];
-
-const daysNums = [
-  1, 2, 3, 4, 5, 6, 7,
-  8, 9, 10, 11, 12, 13, 14,
-  15, 16, 17, 18, 19, 20, 21,
-  22, 23, 24, 25, 26, 27, 28,
-  29, 30, 31,
-];
 
 export default DailyCalanderTaskSheet;

@@ -26,7 +26,7 @@ const MonthProgressSideSection = ({ rows }: { rows: number }) => {
           <div className="w-[40%] border-r border-gray-300 flex items-center gap-3 px-1">
             <span className="w-[10%] text-[8px]">{taskwiseData?.[index]?.progress}%</span>
             <div className="w-[90%]">
-              <div className="h-5 bg-[#B2CBD7]" style={{ width: `${taskwiseData?.[index]?.progress}%` }}></div>
+              <div className="h-5 bg-headerBg" style={{ width: `${taskwiseData?.[index]?.progress}%` }}></div>
             </div>
           </div>
           <p className="w-[30%] px-2 p-1 text-center">{taskwiseData?.[index]?.count} / 31</p>

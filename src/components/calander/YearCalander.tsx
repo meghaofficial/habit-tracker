@@ -1,0 +1,36 @@
+import { useState } from "react"
+import { months } from "../../staticData"
+import MonthCalander from "./MonthCalander";
+import { useNavigate } from "react-router-dom";
+import { RxExternalLink } from "react-icons/rx";
+
+const YearCalander = () => {
+
+  const [selectedMon, setSelectedMon] = useState<string>("Jan");
+  const [currYear, setCurrYear] = useState(2026);
+  const navigate = useNavigate();
+
+  return (
+    <>
+      <div className="h-screen flex">
+        <div className="w-[30%] bg-[#3F52B4] h-full flex flex-col items-center justify-center">
+          <p className="font-bold text-white text-[80px] mb-5">{currYear}</p>
+          <div className="grid grid-cols-4 text-white gap-6 google-sans">
+            {Object.keys(months).map((m, index) => (
+              <span key={index} className={`cursor-pointer text-center p-2 rounded-lg ${selectedMon === m && 'bg-[#FFA34B]'}`} onClick={() => setSelectedMon(m)}>{m}</span>
+            ))}
+          </div>
+        </div>
+        <div className="w-[70%] overflow-y-auto">
+          <div className="flex items-center justify-center">
+            <p className="p-3 text-[40px] font-extrabold playfair-display">{months?.[selectedMon]}</p>
+            <RxExternalLink className="cursor-pointer" onClick={() => navigate(`/${selectedMon}`)} />
+          </div>
+          <MonthCalander year={currYear} month={Object.keys(months).indexOf(selectedMon)} />
+        </div>
+      </div>
+    </>
+  )
+}
+
+export default YearCalander

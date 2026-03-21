@@ -2,25 +2,13 @@ import { useEffect, useState } from "react";
 import Gauge from "./Gauge";
 import { useSelector } from "react-redux";
 import type { RootState } from "../../../redux/store/store";
-
-const months: Record<string, string> = {
-  Jan: "January",
-  Feb: "February",
-  Mar: "March",
-  Apr: "April",
-  May: "May",
-  June: "June",
-  July: "July",
-  Aug: "August",
-  Sep: "September",
-  Oct: "October",
-  Nov: "November",
-  Dec: "December"
-};
+import { months } from "../../../staticData";
+import { useParams } from "react-router-dom";
 
 const MonthHeader = () => {
 
   const [currMon, setCurrMon] = useState("");
+  const { month } = useParams();
   const [currYear, setCurrYear] = useState(0);
   const [subscriptionUpto, setSubscriptionUpto] = useState(4); //years
   const [totalYears, setTotalYears] = useState<number[]>([]);
@@ -28,9 +16,9 @@ const MonthHeader = () => {
 
   useEffect(() => {
     const date = new Date();
-    setCurrMon(Object.keys(months)[date.getMonth()]);
+    setCurrMon(month || "");
     setCurrYear(date.getFullYear());
-  }, []);
+  }, [month]);
 
   useEffect(() => {
     if (subscriptionUpto !== undefined && subscriptionUpto !== null) {
@@ -75,15 +63,15 @@ const MonthHeader = () => {
           </div>
         </div>
         {/* mid */}
-        <div className="h-full">
-          {/* <span className="text-[10px] tracking-wider font-light">DAILY PERCENTAGE PROGRESS</span> */}
+        <div className="h-full relative -top-10">
+          <span className="text-[10px] tracking-wider font-light">DAILY PERCENTAGE PROGRESS</span>
         </div>
         <div className="relative border border-mutedLavender bg-lightPink flex items-center justify-center gap-5 p-2 px-7">
           <div className="flex items-center justify-center flex-col w-18">
             <span className="tracking-wider text-xs">PROGRESS</span>
-            <span className="text-electricBlue">{progress?.progressPercent}%</span>
+            <span className="text-headerText font-semibold mt-1">{progress?.progressPercent}%</span>
           </div>
-          <span className="absolute right-13 text-xs">{progress?.totalDaysWorked}/{progress?.totalDays}</span>
+          <span className="absolute right-13 text-xs text-[#AB6466] font-semibold">{progress?.totalDaysWorked} / {progress?.totalDays}</span>
           <div className="flex items-center justify-center h-25 w-20 bg-transparent">
             <Gauge value={0.2} />
           </div>
