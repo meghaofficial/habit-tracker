@@ -46,4 +46,14 @@
     --color-magentaHaze: #7D4497;
     --color-regalPurple: #671D67;
     --color-darkPlum: #401E5B;
+
+    /* New Color Codes */
+    --color-backg: #FFFCF9;
+    --color-headerText: #587988;
+    --color-progressBg: #FFF5F2;
+    --color-headerBg: #B2CBD7;
+    --color-lightPink: #FFF5F2;
+    --color-subHeaderBg: #EBC2B9;
+    --color-subHeaderText: #BF787B;
+    --color-smHeaderBg: #F8E2DD;
   }

@@ -6,7 +6,7 @@ function App() {
 
   return (
     <>
-      <div className='bg-gray-100/50 h-full min-h-screen p-6'>
+      <div className='bg-backg h-full min-h-screen p-6'>
         <MonthHeader />
         <MonthMainComponent />
       </div>

@@ -7,7 +7,7 @@ type ProgressState = {
 };
 
 const initialState: ProgressState = {
-  totalDays: 620,
+  totalDays: 0,
   totalDaysWorked: 0,
   progressPercent: 0
 };
@@ -31,6 +31,7 @@ const progressSlice = createSlice({
       );
     },
 
+    // Replace entire state
     setProgressData: (state, action: PayloadAction<ProgressState>) => {
       return action.payload;
     }

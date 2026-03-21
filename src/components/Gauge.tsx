@@ -10,32 +10,33 @@ const Gauge = ({ value }: GaugeType) => {
   const chartOptions: ApexOptions = {
     chart: {
       type: 'radialBar',
-      offsetY: -10,
+      offsetY: 0,
       sparkline: {
         enabled: true // Removes extra padding/margins
       }
     },
     plotOptions: {
       radialBar: {
-        startAngle: -135,
-        endAngle: 135,
+        // startAngle: -135,
+        // endAngle: 135,
         hollow: {
-          size: '70%',
+          size: '40%',
         },
         track: {
-          background: "#e7e7e7",
+          background: "#F3F3F3",
           strokeWidth: '97%',
         },
         dataLabels: {
           name: {
-            show: true,
+            show: false,
             color: '#116B6B', // midnightTeal from your palette
-            offsetY: 20,
+            offsetY: 0,
             fontSize: '10px'
           },
           value: {
-            offsetY: -15,
-            fontSize: '20px',
+            show: false,
+            offsetY: 20,
+            fontSize: '10px',
             color: '#102444', // navyVoid from your palette
             formatter: (val) => `${val}%`
           }
@@ -44,7 +45,7 @@ const Gauge = ({ value }: GaugeType) => {
     },
     fill: {
       type: 'solid',
-      colors: ['#74CDD1'], // tropicalAqua from your palette
+      colors: ['#A8DF8E'], 
     },
     stroke: {
       lineCap: 'round' // Makes the ends of the bar rounded
@@ -60,7 +61,7 @@ const Gauge = ({ value }: GaugeType) => {
         options={chartOptions}
         series={series}
         type="radialBar"
-        height={100}
+        height={110}
       />
     </div>
   );

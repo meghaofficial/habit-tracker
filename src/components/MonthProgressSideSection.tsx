@@ -6,36 +6,30 @@ const MonthProgressSideSection = ({ rows }: { rows: number }) => {
   const taskwiseData = useSelector(
     (state: RootState) => state.taskwiseData
   );
-
-  const calculatePercent = (index: number) => {
-    const total = 31;
-    const workedTill = taskwiseData[index]?.count || 0;
-    return Math.floor((workedTill / total) * 100);
-  }
-  // const totalWorkedTill = useMemo(() => {
-  //   return Object.values(taskwiseData).reduce((sum, val) => sum + val, 0);
-  // }, [taskwiseData]);
+  const progress = useSelector((state: RootState) => state.progress);
 
   return (
     <div className="border">
-      <div className="flex flex-col items-center justify-center w-full bg-orchidPetal border-b border-black p-3.5">
-        <p className="smText text-white text-center" style={{ fontWeight: "bolder" }}>PROGRESS</p>
-        {/* <p className="text-[12px] text-white text-center">{totalWorkedTill} / 620</p> */}
+      <div className="flex flex-col items-center justify-center w-full text-subHeaderText bg-subHeaderBg border-b border-black p-3.5">
+        <p className="smText text-center" style={{ fontWeight: "bolder" }}>PROGRESS</p>
+        <p className="text-[12px] font-semibold text-center">{progress?.totalDaysWorked} / {progress?.totalDays}</p>
       </div>
-      <p className="smText p-[8.5px] text-center bg-mauveShadow border-b border-orchidPetal flex items-center" style={{ fontWeight: "bold" }}>
-        <span className="w-[30%]">GOAL</span>
-        <span className="w-[40%]">PERCENTAGE</span>
-        <span className="w-[30%]">COUNT</span>
+      <p className="text-center bg-smHeaderBg border-b border-subHeaderText flex items-center text-[8px]" style={{ fontWeight: "bold" }}>
+        <span className="py-[9.5px] tracking-widest w-[30%] text-center">GOAL</span>
+        <span className="py-[9.5px] tracking-widest w-[40%] text-center">PERCENTAGE</span>
+        <span className="py-[9.5px] tracking-widest w-[30%] text-center">COUNT</span>
       </p>
       {/* task input */}
       {Array.from({ length: rows }).map((_, index) => (
-        <div className="text-[12px] flex items-center gap-2 border-b border-gray-300" key={index}>
+        <div className="text-[12px] flex items-center border-b border-gray-300" key={index}>
           <input type="text" className="outline-none w-[30%] h-full px-2 p-1 border-r border-gray-300" title="value" />
-          <div className="w-[40%] border-r border-gray-300 flex items-center pe-1 gap-1">
-            <span>{calculatePercent(index)}%</span>
-            <div className="h-5 bg-electricBlue rounded" style={{ width: `${calculatePercent(index)}%` }}></div>
+          <div className="w-[40%] border-r border-gray-300 flex items-center gap-3 px-1">
+            <span className="w-[10%] text-[8px]">{taskwiseData?.[index]?.progress}%</span>
+            <div className="w-[90%]">
+              <div className="h-5 bg-[#B2CBD7]" style={{ width: `${taskwiseData?.[index]?.progress}%` }}></div>
+            </div>
           </div>
-          {/* <p className="w-[30%] px-2 p-1 text-center">{taskwiseData[index] || 0} / 31</p> */}
+          <p className="w-[30%] px-2 p-1 text-center">{taskwiseData?.[index]?.count} / 31</p>
         </div>
       ))}
     </div>

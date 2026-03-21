@@ -20,7 +20,7 @@ const taskwiseSlice = createSlice({
       return action.payload;
     },
 
-    // Update a single row
+    // Update a single row - currently not in use
     updateTaskCount: (
       state,
       action: PayloadAction<{ rowIndex: number; count: number }>
