@@ -20,34 +20,6 @@
   }
 
   @theme {
-    /* Row 1: Mint & Deep Teal */
-    --color-mintMist: #D6EEEB;
-    --color-mintGlass: #C7E4D9;
-    --color-oceanFoam: #86D0C6;
-    --color-tropicalAqua: #74CDD1;
-    --color-caribbeanBlue: #00BCAD;
-    --color-deepTeal: #1294A7;
-    --color-midnightTeal: #116B6B;
-
-    /* Row 2: Sky & Royal Navy */
-    --color-paleSky: #C1E9FC;
-    --color-powderBlue: #95DAEE;
-    --color-summerSky: #6ACDE5;
-    --color-brightCyan: #00B6D3;
-    --color-electricBlue: #0085BD;
-    --color-royalIndigo: #2A348E;
-    --color-navyVoid: #102444;
-
-    /* Row 3: Lavender & Deep Plum */
-    --color-periwinkleLight: #C0BBDE;
-    --color-mutedLavender: #9990BA;
-    --color-orchidPetal: #D498C6;
-    --color-mauveShadow: #C679B4;
-    --color-magentaHaze: #7D4497;
-    --color-regalPurple: #671D67;
-    --color-darkPlum: #401E5B;
-
-    /* New Color Codes */
     --color-backg: #FFFCF9;
     --color-headerText: #587988;
     --color-progressBg: #FFF5F2;

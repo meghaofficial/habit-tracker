@@ -1,5 +1,5 @@
 import { useSelector } from "react-redux";
-import type { RootState } from "../store/store";
+import type { RootState } from "../../../redux/store/store";
 
 const MonthProgressSideSection = ({ rows }: { rows: number }) => {
 

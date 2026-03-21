@@ -1,15 +1,11 @@
 import './App.css'
-import MonthHeader from './components/MonthHeader'
-import MonthMainComponent from './components/MonthMainComponent'
+import TaskDashboardLayout from './components/dashboard/TaskDashboardLayout'
 
 function App() {
 
   return (
     <>
-      <div className='bg-backg h-full min-h-screen p-6'>
-        <MonthHeader />
-        <MonthMainComponent />
-      </div>
+      <TaskDashboardLayout />
     </>
   )
 }

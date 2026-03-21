@@ -1,10 +1,10 @@
 import { useEffect, useState } from "react";
 import CustomCheckbox from "./CustomCheckbox";
 import { useDispatch, useSelector } from "react-redux";
-import type { AppDispatch, RootState } from "../store/store";
-import { setTaskwiseData } from "../slices/taskwiseSlice";
-import { setTotalDays, setTotalDaysWorked } from "../slices/progressSlice";
-import { setDaywiseData } from "../slices/daywiseSlice";
+import type { AppDispatch, RootState } from "../../../redux/store/store";
+import { setTaskwiseData } from "../../../redux/slices/taskwiseSlice";
+import { setTotalDays, setTotalDaysWorked } from "../../../redux/slices/progressSlice";
+import { setDaywiseData } from "../../../redux/slices/daywiseSlice";
 
 type CompType = {
   rows: number;
@@ -171,7 +171,7 @@ const DailyCalanderTaskSheet = ({ rows, setRows, rowLimit }: CompType) => {
                       key={dayIndex}
                       checked={checkboxData[key] ?? false}
                       onChange={() => toggleCheckbox(key)}
-                      color="tropicalAqua"
+                      color="headerBg"
                       size={10}
                     />
                   );
@@ -189,7 +189,7 @@ const DailyCalanderTaskSheet = ({ rows, setRows, rowLimit }: CompType) => {
                     key={dayIndex}
                     checked={checkboxData[key] ?? false}
                     onChange={() => toggleCheckbox(key)}
-                    color="tropicalAqua"
+                    color="headerBg"
                     size={10}
                   />
                 );

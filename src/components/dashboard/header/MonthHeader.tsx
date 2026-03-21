@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import Gauge from "./Gauge";
 import { useSelector } from "react-redux";
-import type { RootState } from "../store/store";
+import type { RootState } from "../../../redux/store/store";
 
 const months: Record<string, string> = {
   Jan: "January",

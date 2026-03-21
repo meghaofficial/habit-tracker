@@ -11,7 +11,7 @@ type CheckboxProps = {
 const CustomCheckbox: React.FC<CheckboxProps> = ({
   checked,
   onChange,
-  color = "blue-500",
+  color = "#B2CBD7",
   size = 20,
   label
 }) => {
