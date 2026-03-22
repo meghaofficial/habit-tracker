@@ -8,7 +8,13 @@ type TaskData = {
 
 type TaskwiseState = Record<number, TaskData>;
 
-const initialState: TaskwiseState = {};
+const initialState: TaskwiseState = {
+  0: {
+    task: "",
+    count: 0,
+    progress: 0,
+  },
+};
 
 const taskwiseSlice = createSlice({
   name: "taskwiseData",
@@ -20,38 +26,50 @@ const taskwiseSlice = createSlice({
       return action.payload;
     },
 
-    // Update a single row
+    addRow: (state) => {
+      const newIndex = Object.keys(state).length;
+      state[newIndex] = {
+        task: "",
+        count: 0,
+        progress: 0,
+      };
+    },
+
     updateTaskCount: (
       state,
-      action: PayloadAction<{ checkboxData: Record<string, boolean> }>,
+      action: PayloadAction<{
+        checkboxData: Record<string, boolean>;
+        totalD: number;
+      }>,
     ) => {
-      const { checkboxData } = action.payload;
-
-      // 1. Reset counts
+      const { checkboxData, totalD } = action.payload;
       Object.keys(state).forEach((row) => {
-        state[Number(row)].count = 0;
+        if (state[Number(row)]) {
+          state[Number(row)].count = 0;
+        }
       });
-
-      // 2. Count checked boxes
       Object.entries(checkboxData).forEach(([key, value]) => {
         if (!value) return;
-
         const rowIndex = Number(key.split("-")[0]);
+        if (!state[rowIndex]) return;
         state[rowIndex].count += 1;
       });
-
-      // 3. Calculate progress
       Object.keys(state).forEach((row) => {
         const count = state[Number(row)].count;
-        state[Number(row)].progress = Math.floor((count / 31) * 100);
-        // NOTE: You have 31 checkboxes (4*7 + 3 = 31), not 30
+        state[Number(row)].progress =
+          totalD > 0 ? Math.floor((count / totalD) * 100) : 0;
       });
     },
 
     // updating task - PENDING
+    updateTask: (
+      state,
+      action: PayloadAction<{ checkboxData: Record<string, boolean> }>,
+    ) => {},
   },
 });
 
-export const { setTaskwiseData, updateTaskCount } = taskwiseSlice.actions;
+export const { setTaskwiseData, addRow, updateTaskCount } =
+  taskwiseSlice.actions;
 
 export default taskwiseSlice.reducer;

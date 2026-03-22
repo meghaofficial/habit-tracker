@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 import CustomCheckbox from "./CustomCheckbox";
 import { useDispatch, useSelector } from "react-redux";
 import type { AppDispatch, RootState } from "../../../redux/store/store";
-import { setTaskwiseData } from "../../../redux/slices/taskwiseSlice";
+import { addRow, updateTaskCount } from "../../../redux/slices/taskwiseSlice";
 import { setTotalDays, setTotalDaysWorked } from "../../../redux/slices/progressSlice";
 import { setDaywiseData } from "../../../redux/slices/daywiseSlice";
 import { daysNums, months, weekLetters } from "../../../staticData";
@@ -25,33 +25,11 @@ const DailyCalanderTaskSheet = ({ rows, setRows, rowLimit }: CompType) => {
     (state: RootState) => state.daywiseData
   );
   const { year, month } = useParams<{ year: string; month: string }>();
+  const [totalD, setTotalD] = useState(0);
+  const [firstDay, setFirstDay] = useState<number>(0);
+  const progress = useSelector((state: RootState) => state.progress);
 
-  // setting up task wise data - (taskwiseSlice)
-  // useEffect(() => {
-  //   const result: Record<number, { task: string; count: number; progress: number }> = {};
-  //   for (let i = 0; i < rows; i++) {
-  //     result[i] = { task: "", count: 0, progress: 0 };
-  //   }
-  //   Object.entries(checkboxData).forEach(([key, value]) => {
-  //     if (!value) return;
-
-  //     const rowIndex = Number(key.split("-")[0]);
-  //     result[rowIndex].count += 1;
-  //   });
-  //   Object.keys(result).forEach((row) => {
-  //     const count = result[Number(row)].count;
-  //     result[Number(row)].progress = Math.floor((count / 30) * 100);
-  //   });
-  //   dispatch(setTaskwiseData(result));
-  // }, [checkboxData, rows, dispatch]);
-
-  useEffect(() => {
-    const result: Record<number, { task: string; count: number; progress: number }> = {};
-    for (let i = 0; i < rows; i++) {
-      result[i] = { task: "", count: 0, progress: 0 };
-    }
-    dispatch(setTaskwiseData(result));
-  }, [rows]);
+  // console.log("test", taskwiseData);
 
   // setting up total days worked - (progressSlice)
   useEffect(() => {
@@ -59,12 +37,6 @@ const DailyCalanderTaskSheet = ({ rows, setRows, rowLimit }: CompType) => {
       .reduce((sum, row) => sum + row.count, 0);
     dispatch(setTotalDaysWorked(totalWorked));
   }, [taskwiseData, dispatch]);
-
-  // setting up total days - (progressSlice)
-  useEffect(() => {
-    const res = rows * 31;
-    dispatch(setTotalDays(res));
-  }, [rows]);
 
   // setting up day wise data - (daywiseSlice)
   useEffect(() => {
@@ -87,21 +59,24 @@ const DailyCalanderTaskSheet = ({ rows, setRows, rowLimit }: CompType) => {
   }, [checkboxData, rows, dispatch]);
 
   const toggleCheckbox = (key: string) => {
-    setCheckboxData((prev) => ({
-      ...prev,
-      [key]: !prev[key],
-    }));
+    setCheckboxData((prev) => {
+      const updated = {
+        ...prev,
+        [key]: !prev[key],
+      };
+      dispatch(updateTaskCount({ checkboxData: updated, totalD }));
+      return updated;
+    });
   };
-
-  const [totalD, setTotalD] = useState(0);
-  const [firstDay, setFirstDay] = useState<number>(0);
 
   useEffect(() => {
     const res = getDaysInMonth(Number(year), Object.keys(months).indexOf(month || ""));
+    dispatch(setTotalDays(res*(rows)));
     setTotalD(res);
     const firstDayNo = getFirstDayOfMonth(Number(year), Object.keys(months).indexOf(month || ""));
     setFirstDay(firstDayNo);
-  }, [month]);
+  }, [month, rows, progress]);
+
 
   return (
     <div className="flex flex-col w-full relative">
@@ -225,11 +200,16 @@ const DailyCalanderTaskSheet = ({ rows, setRows, rowLimit }: CompType) => {
         ))}
       </div>
 
+
       {/* Add Row Button */}
       {rows < rowLimit && (
         <button
           className="border border-black/50 cursor-pointer mt-3 smText p-1.5"
-          onClick={() => setRows((prev) => prev + 1)}
+          // onClick={() => setRows((prev) => prev + 1)}
+          onClick={() => {
+            setRows((prev) => prev + 1)
+            dispatch(addRow())
+          }}
         >
           ADD ROW +
         </button>

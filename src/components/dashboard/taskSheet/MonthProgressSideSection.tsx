@@ -1,8 +1,12 @@
 import { useSelector } from "react-redux";
 import type { RootState } from "../../../redux/store/store";
+import { getDaysInMonth } from "../../../helper";
+import { useParams } from "react-router-dom";
+import { months } from "../../../staticData";
 
 const MonthProgressSideSection = ({ rows }: { rows: number }) => {
 
+  const { year, month } = useParams<{ year: string, month: string }>()
   const taskwiseData = useSelector(
     (state: RootState) => state.taskwiseData
   );
@@ -29,7 +33,8 @@ const MonthProgressSideSection = ({ rows }: { rows: number }) => {
               <div className="h-5 bg-headerBg" style={{ width: `${taskwiseData?.[index]?.progress}%` }}></div>
             </div>
           </div>
-          <p className="w-[30%] px-2 p-1 text-center">{taskwiseData?.[index]?.count} / 31</p>
+          <p className="w-[30%] px-2 p-1 text-center">{taskwiseData?.[index]?.count} / {getDaysInMonth(Number(year), Object.keys(months).indexOf(month || ""))
+          }</p>
         </div>
       ))}
     </div>
