@@ -2,6 +2,7 @@ import { Route, Routes } from 'react-router-dom'
 import './App.css'
 import YearCalander from './components/calander/YearCalander'
 import TaskDashboardLayout from './components/dashboard/TaskDashboardLayout'
+import PageNotFound from './components/shared/PageNotFound'
 
 function App() {
 
@@ -9,7 +10,8 @@ function App() {
     <>
       <Routes>
         <Route path='/' element={<YearCalander />} />
-        <Route path='/:month' element={<TaskDashboardLayout />} />
+        <Route path='/:year/:month' element={<TaskDashboardLayout />} />
+        <Route path='/*' element={<PageNotFound />} />
       </Routes>
     </>
   )

@@ -1,4 +1,4 @@
-import { useState } from "react"
+import { useEffect, useState } from "react"
 import { months } from "../../staticData"
 import MonthCalander from "./MonthCalander";
 import { useNavigate } from "react-router-dom";
@@ -9,6 +9,12 @@ const YearCalander = () => {
   const [selectedMon, setSelectedMon] = useState<string>("Jan");
   const [currYear, setCurrYear] = useState(2026);
   const navigate = useNavigate();
+
+  // useEffect(() => {
+  //   const date = new Date();
+  //   const m = date.getMonth();
+  //   setSelectedMon(Object.keys(months)[m]);
+  // }, []);
 
   return (
     <>
@@ -24,7 +30,7 @@ const YearCalander = () => {
         <div className="w-[70%] overflow-y-auto">
           <div className="flex items-center justify-center">
             <p className="p-3 text-[40px] font-extrabold playfair-display">{months?.[selectedMon]}</p>
-            <RxExternalLink className="cursor-pointer" onClick={() => navigate(`/${selectedMon}`)} />
+            <RxExternalLink className="cursor-pointer" onClick={() => navigate(`/${currYear}/${selectedMon}`)} />
           </div>
           <MonthCalander year={currYear} month={Object.keys(months).indexOf(selectedMon)} />
         </div>

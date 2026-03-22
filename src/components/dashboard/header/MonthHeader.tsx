@@ -8,16 +8,15 @@ import { useParams } from "react-router-dom";
 const MonthHeader = () => {
 
   const [currMon, setCurrMon] = useState("");
-  const { month } = useParams();
+  const { year, month } = useParams<{ year: string, month: string }>();
   const [currYear, setCurrYear] = useState(0);
   const [subscriptionUpto, setSubscriptionUpto] = useState(4); //years
   const [totalYears, setTotalYears] = useState<number[]>([]);
   const progress = useSelector((state: RootState) => state.progress);
 
   useEffect(() => {
-    const date = new Date();
     setCurrMon(month || "");
-    setCurrYear(date.getFullYear());
+    if (year) setCurrYear(+year);
   }, [month]);
 
   useEffect(() => {

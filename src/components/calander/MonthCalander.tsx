@@ -1,16 +1,11 @@
 import { useEffect, useState } from "react";
 import { week } from "../../staticData";
+import { getDaysInMonth, getFirstDayOfMonth } from "../../helper";
 
 const MonthCalander = ({ year, month }: { year: number; month: number }) => {
 
   const [totalD, setTotalD] = useState(0);
   const [firstDay, setFirstDay] = useState<number>(0);
-
-  const getDaysInMonth = (year: number, month: number) =>
-    new Date(year, month + 1, 0).getDate();
-
-  const getFirstDayOfMonth = (year: number, month: number) =>
-  new Date(year, month, 1).getDay();
 
   useEffect(() => {
     const res = getDaysInMonth(year, month);

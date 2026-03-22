@@ -5,7 +5,9 @@ import type { AppDispatch, RootState } from "../../../redux/store/store";
 import { setTaskwiseData } from "../../../redux/slices/taskwiseSlice";
 import { setTotalDays, setTotalDaysWorked } from "../../../redux/slices/progressSlice";
 import { setDaywiseData } from "../../../redux/slices/daywiseSlice";
-import { daysNums, weekLetters } from "../../../staticData";
+import { daysNums, months, weekLetters } from "../../../staticData";
+import { useParams } from "react-router-dom";
+import { getFirstDayOfMonth } from "../../../helper";
 
 type CompType = {
   rows: number;
@@ -22,6 +24,7 @@ const DailyCalanderTaskSheet = ({ rows, setRows, rowLimit }: CompType) => {
   const daywiseData = useSelector(
     (state: RootState) => state.daywiseData
   );
+  const { year, month } = useParams<{ year: string; month: string }>();
 
   // setting up task wise data - (taskwiseSlice)
   useEffect(() => {
@@ -75,14 +78,21 @@ const DailyCalanderTaskSheet = ({ rows, setRows, rowLimit }: CompType) => {
     dispatch(setDaywiseData(result));
   }, [checkboxData, rows, dispatch]);
 
-  // console.log("daywiseData", daywiseData)
-
   const toggleCheckbox = (key: string) => {
     setCheckboxData((prev) => ({
       ...prev,
       [key]: !prev[key],
     }));
   };
+
+  const [firstDay, setFirstDay] = useState<number>(0);
+
+  useEffect(() => {
+    const firstDayNo = getFirstDayOfMonth(Number(year), Object.keys(months).indexOf(month || ""));
+    setFirstDay(firstDayNo);
+  }, [month]);
+
+  console.log("firstDay", firstDay)
 
   return (
     <div className="flex flex-col w-full relative">
@@ -104,15 +114,15 @@ const DailyCalanderTaskSheet = ({ rows, setRows, rowLimit }: CompType) => {
               key={weekIndex}
               className="flex items-center justify-evenly w-[22%] text-center"
             >
-              {weekLetters.map((wl, dayIndex) => (
-                <p key={dayIndex}>{wl}</p>
-              ))}
+              {Array.from({ length: 7+firstDay }).slice(firstDay, 7+firstDay).map((_, index) => (
+              <p key={index}>{weekLetters[(index+firstDay)%7]}</p>
+            ))}
             </div>
           ))}
 
           <div className="flex items-center justify-evenly w-[12%] text-center">
-            {weekLetters.slice(0, 3).map((wl, index) => (
-              <p key={index}>{wl}</p>
+            {Array.from({ length: 3+firstDay }).slice(firstDay, 3+firstDay).map((_, index) => (
+              <p key={index}>{weekLetters[(index+firstDay)%7]}</p>
             ))}
           </div>
         </div>
@@ -144,7 +154,6 @@ const DailyCalanderTaskSheet = ({ rows, setRows, rowLimit }: CompType) => {
           </div>
 
           <div className="flex items-center justify-evenly w-[12%] text-center">
-            <p>28</p>
             <p>29</p>
             <p>30</p>
             <p>31</p>
@@ -229,9 +238,9 @@ const DailyCalanderTaskSheet = ({ rows, setRows, rowLimit }: CompType) => {
                 return (
                   <div key={dayIndex}>
                     <div className={`h-10 w-2.5 flex items-end`}>
-                      <div className={`w-2.5 bg-headerBg`} style={{ height: `${daywiseData?.[idx-1]?.progress || 0}%` }}></div>
+                      <div className={`w-2.5 bg-headerBg`} style={{ height: `${daywiseData?.[idx - 1]?.progress || 0}%` }}></div>
                     </div>
-                    <span className="text-[6px]">{daywiseData?.[idx-1]?.progress || 0}%</span>
+                    <span className="text-[6px]">{daywiseData?.[idx - 1]?.progress || 0}%</span>
                   </div>
                 );
               })}
@@ -246,9 +255,9 @@ const DailyCalanderTaskSheet = ({ rows, setRows, rowLimit }: CompType) => {
               return (
                 <div key={dayIndex}>
                   <div className={`h-10 w-2.5 flex items-end`}>
-                      <div className={`w-2.5 bg-headerBg`} style={{ height: `${daywiseData?.[idx-1]?.progress || 0}%` }}></div>
-                    </div>
-                  <span className="text-[6px]">{daywiseData?.[idx-1]?.progress || 0}%</span>
+                    <div className={`w-2.5 bg-headerBg`} style={{ height: `${daywiseData?.[idx - 1]?.progress || 0}%` }}></div>
+                  </div>
+                  <span className="text-[6px]">{daywiseData?.[idx - 1]?.progress || 0}%</span>
                 </div>
               );
             })}
