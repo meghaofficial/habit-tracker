@@ -29,3 +29,11 @@ export const week: Record<number, string> = {
   5: "Fri",
   6: "Sat",
 };
+
+export const weekColors: string[] = [
+  "#FFF9C4",
+  "#FFF176",
+  "#DCE775",
+  "#AED581",
+  "#66BB6A"
+];

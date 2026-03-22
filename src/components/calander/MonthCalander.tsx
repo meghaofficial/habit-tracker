@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { week } from "../../staticData";
+import { week, weekColors } from "../../staticData";
 import { getDaysInMonth, getFirstDayOfMonth } from "../../helper";
 
 const MonthCalander = ({ year, month }: { year: number; month: number }) => {
@@ -15,18 +15,18 @@ const MonthCalander = ({ year, month }: { year: number; month: number }) => {
   }, [month]);
 
   return (
-    <>
+    <div className="px-1">
       <div className="grid grid-cols-7 google-sans text-[12px] mt-2 text-gray-400">
         {Object.values(week).map((w, index) => (
           <span key={index} className="text-center">{w}</span>
         ))}
       </div>
-      <div className="grid grid-cols-7 google-sans mt-2">
-        {Array.from({ length: totalD+firstDay }).map((_, index) => (
-          <span key={index} className="text-center p-5">{index+1 > firstDay ? index+1-firstDay : ""}</span>
+      <div className="grid grid-cols-7 google-sans mt-2 gap-1">
+        {Array.from({ length: totalD + firstDay }).map((_, index) => (
+          <span key={index} className={`text-center p-5`} style={{ backgroundColor: index + 1 > firstDay ? weekColors[Math.floor((index-firstDay) / 7)] : "" }}>{index + 1 > firstDay ? index + 1 - firstDay : ""}</span>
         ))}
       </div>
-    </>
+    </div>
   )
 }
 

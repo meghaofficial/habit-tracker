@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react"
-import { months } from "../../staticData"
+import { months, weekColors } from "../../staticData"
 import MonthCalander from "./MonthCalander";
 import { useNavigate } from "react-router-dom";
 import { RxExternalLink } from "react-icons/rx";
@@ -28,9 +28,16 @@ const YearCalander = () => {
           </div>
         </div>
         <div className="w-[70%] overflow-y-auto">
-          <div className="flex items-center justify-center">
+          <div className="flex items-center justify-center relative">
             <p className="p-3 text-[40px] font-extrabold playfair-display">{months?.[selectedMon]}</p>
             <RxExternalLink className="cursor-pointer" onClick={() => navigate(`/${currYear}/${selectedMon}`)} />
+            <div className="absolute right-1 flex items-center gap-1">
+              {Array.from({ length: 5 }).map((_, index) => (
+                <div className="rounded p-1 flex items-center justify-center cursor-pointer shadow" style={{ backgroundColor: weekColors[index] }}>
+                  <span className="text-[8px]">W{index+1}</span>
+                </div>
+              ))}
+            </div>
           </div>
           <MonthCalander year={currYear} month={Object.keys(months).indexOf(selectedMon)} />
         </div>
