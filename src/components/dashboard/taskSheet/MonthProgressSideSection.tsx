@@ -10,7 +10,7 @@ const MonthProgressSideSection = ({ rows }: { rows: number }) => {
 
   return (
     <div className="border">
-      <div className="flex flex-col items-center justify-center w-full text-subHeaderText bg-subHeaderBg border-b border-black p-3.5">
+      <div className="flex flex-col items-center justify-center w-full text-subHeaderText bg-subHeaderBg border-b p-3.5">
         <p className="smText text-center" style={{ fontWeight: "bolder" }}>PROGRESS</p>
         <p className="text-[12px] font-semibold text-center">{progress?.totalDaysWorked} / {progress?.totalDays}</p>
       </div>

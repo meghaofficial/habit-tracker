@@ -1,4 +1,7 @@
 const MonthSideSection = ({ rows }: { rows: number }) => {
+
+  const handleChange = (value: string) => {}
+
   return (
     <>
       <div className="border">

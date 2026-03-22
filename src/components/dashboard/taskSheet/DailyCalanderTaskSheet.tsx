@@ -7,7 +7,7 @@ import { setTotalDays, setTotalDaysWorked } from "../../../redux/slices/progress
 import { setDaywiseData } from "../../../redux/slices/daywiseSlice";
 import { daysNums, months, weekLetters } from "../../../staticData";
 import { useParams } from "react-router-dom";
-import { getFirstDayOfMonth } from "../../../helper";
+import { getDaysInMonth, getFirstDayOfMonth } from "../../../helper";
 
 type CompType = {
   rows: number;
@@ -27,23 +27,31 @@ const DailyCalanderTaskSheet = ({ rows, setRows, rowLimit }: CompType) => {
   const { year, month } = useParams<{ year: string; month: string }>();
 
   // setting up task wise data - (taskwiseSlice)
-  useEffect(() => {
-    const result: Record<number, { count: number; progress: number }> = {};
-    for (let i = 0; i < rows; i++) {
-      result[i] = { count: 0, progress: 0 };
-    }
-    Object.entries(checkboxData).forEach(([key, value]) => {
-      if (!value) return;
+  // useEffect(() => {
+  //   const result: Record<number, { task: string; count: number; progress: number }> = {};
+  //   for (let i = 0; i < rows; i++) {
+  //     result[i] = { task: "", count: 0, progress: 0 };
+  //   }
+  //   Object.entries(checkboxData).forEach(([key, value]) => {
+  //     if (!value) return;
 
-      const rowIndex = Number(key.split("-")[0]);
-      result[rowIndex].count += 1;
-    });
-    Object.keys(result).forEach((row) => {
-      const count = result[Number(row)].count;
-      result[Number(row)].progress = Math.floor((count / 30) * 100);
-    });
+  //     const rowIndex = Number(key.split("-")[0]);
+  //     result[rowIndex].count += 1;
+  //   });
+  //   Object.keys(result).forEach((row) => {
+  //     const count = result[Number(row)].count;
+  //     result[Number(row)].progress = Math.floor((count / 30) * 100);
+  //   });
+  //   dispatch(setTaskwiseData(result));
+  // }, [checkboxData, rows, dispatch]);
+
+  useEffect(() => {
+    const result: Record<number, { task: string; count: number; progress: number }> = {};
+    for (let i = 0; i < rows; i++) {
+      result[i] = { task: "", count: 0, progress: 0 };
+    }
     dispatch(setTaskwiseData(result));
-  }, [checkboxData, rows, dispatch]);
+  }, [rows]);
 
   // setting up total days worked - (progressSlice)
   useEffect(() => {
@@ -85,14 +93,15 @@ const DailyCalanderTaskSheet = ({ rows, setRows, rowLimit }: CompType) => {
     }));
   };
 
+  const [totalD, setTotalD] = useState(0);
   const [firstDay, setFirstDay] = useState<number>(0);
 
   useEffect(() => {
+    const res = getDaysInMonth(Number(year), Object.keys(months).indexOf(month || ""));
+    setTotalD(res);
     const firstDayNo = getFirstDayOfMonth(Number(year), Object.keys(months).indexOf(month || ""));
     setFirstDay(firstDayNo);
   }, [month]);
-
-  console.log("firstDay", firstDay)
 
   return (
     <div className="flex flex-col w-full relative">
@@ -100,11 +109,13 @@ const DailyCalanderTaskSheet = ({ rows, setRows, rowLimit }: CompType) => {
 
         {/* Week Header */}
         <div className="bg-headerBg text-headerText font-semibold p-2 text-[10px] tracking-wider flex items-center w-full">
-          <p className="w-[22%] text-center">WEEK 1</p>
-          <p className="w-[22%] text-center">WEEK 2</p>
-          <p className="w-[22%] text-center">WEEK 3</p>
-          <p className="w-[22%] text-center">WEEK 4</p>
-          <p className="w-[12%] text-center">WEEK 5</p>
+          <p className={`${totalD > 28 ? 'w-[22%]' : 'w-[25%]'} text-center`}>WEEK 1</p>
+          <p className={`${totalD > 28 ? 'w-[22%]' : 'w-[25%]'} text-center`}>WEEK 2</p>
+          <p className={`${totalD > 28 ? 'w-[22%]' : 'w-[25%]'} text-center`}>WEEK 3</p>
+          <p className={`${totalD > 28 ? 'w-[22%]' : 'w-[25%]'} text-center`}>WEEK 4</p>
+          {totalD > 28 && (
+            <p className={`w-[12%] text-center`}>WEEK 5</p>
+          )}
         </div>
 
         {/* Week Letters */}
@@ -112,52 +123,55 @@ const DailyCalanderTaskSheet = ({ rows, setRows, rowLimit }: CompType) => {
           {Array.from({ length: 4 }).map((_, weekIndex) => (
             <div
               key={weekIndex}
-              className="flex items-center justify-evenly w-[22%] text-center"
+              className={`flex items-center justify-evenly ${totalD > 28 ? 'w-[22%]' : 'w-[25%]'} text-center`}
             >
-              {Array.from({ length: 7+firstDay }).slice(firstDay, 7+firstDay).map((_, index) => (
-              <p key={index}>{weekLetters[(index+firstDay)%7]}</p>
-            ))}
+              {Array.from({ length: 7 + firstDay }).slice(firstDay, 7 + firstDay).map((_, index) => (
+                <p key={index}>{weekLetters[(index + firstDay) % 7]}</p>
+              ))}
             </div>
           ))}
-
-          <div className="flex items-center justify-evenly w-[12%] text-center">
-            {Array.from({ length: 3+firstDay }).slice(firstDay, 3+firstDay).map((_, index) => (
-              <p key={index}>{weekLetters[(index+firstDay)%7]}</p>
-            ))}
-          </div>
+          {totalD > 28 && (
+            <div className="flex items-center justify-evenly w-[12%] text-center">
+              {Array.from({ length: totalD - 28 }, (_, i) => 29 + i).map((_, index) => (
+                <p key={index}>{weekLetters[(index + firstDay) % 7]}</p>
+              ))}
+            </div>
+          )}
         </div>
 
         {/* Date Numbers */}
         <div className="bg-[#F8FDFF] p-2 text-[10px] tracking-wider flex items-center w-full border-b border-headerBg">
-          <div className="flex items-center justify-evenly w-[22%] text-center">
+          <div className={`flex items-center justify-evenly ${totalD > 28 ? 'w-[22%]' : 'w-[25%]'} text-center`}>
             {daysNums.slice(0, 7).map((d, index) => (
               <p key={index}>{d}</p>
             ))}
           </div>
 
-          <div className="flex items-center justify-evenly w-[22%] text-center">
+          <div className={`flex items-center justify-evenly ${totalD > 28 ? 'w-[22%]' : 'w-[25%]'} text-center`}>
             {daysNums.slice(7, 14).map((d, index) => (
               <p key={index}>{d}</p>
             ))}
           </div>
 
-          <div className="flex items-center justify-evenly w-[22%] text-center">
+          <div className={`flex items-center justify-evenly ${totalD > 28 ? 'w-[22%]' : 'w-[25%]'} text-center`}>
             {daysNums.slice(14, 21).map((d, index) => (
               <p key={index}>{d}</p>
             ))}
           </div>
 
-          <div className="flex items-center justify-evenly w-[22%] text-center">
+          <div className={`flex items-center justify-evenly ${totalD > 28 ? 'w-[22%]' : 'w-[25%]'} text-center`}>
             {daysNums.slice(21, 28).map((d, index) => (
               <p key={index}>{d}</p>
             ))}
           </div>
 
-          <div className="flex items-center justify-evenly w-[12%] text-center">
-            <p>29</p>
-            <p>30</p>
-            <p>31</p>
-          </div>
+          {totalD > 28 && (
+            <div className="flex items-center justify-evenly w-[12%] text-center">
+              {Array.from({ length: totalD - 28 }, (_, i) => 29 + i).map((num) => (
+                <p key={num}>{num} </p>
+              ))}
+            </div>
+          )}
         </div>
 
         {/* Checkbox Rows */}
@@ -171,7 +185,7 @@ const DailyCalanderTaskSheet = ({ rows, setRows, rowLimit }: CompType) => {
             {Array.from({ length: 4 }).map((_, weekIndex) => (
               <div
                 key={weekIndex}
-                className="flex items-center justify-evenly w-[22%] text-center"
+                className={`flex items-center justify-evenly ${totalD > 28 ? 'w-[22%]' : 'w-[25%]'} text-center`}
               >
                 {Array.from({ length: 7 }).map((_, dayIndex) => {
                   const key = `${rowIndex}-${weekIndex}-${dayIndex}`;
@@ -189,22 +203,23 @@ const DailyCalanderTaskSheet = ({ rows, setRows, rowLimit }: CompType) => {
               </div>
             ))}
 
-            {/* Week 5 (3 days) */}
-            <div className="flex items-center justify-evenly w-[12%] text-center">
-              {Array.from({ length: 4 }).map((_, dayIndex) => {
-                const key = `${rowIndex}-4-${dayIndex}`;
-
-                return (
-                  <CustomCheckbox
-                    key={dayIndex}
-                    checked={checkboxData[key] ?? false}
-                    onChange={() => toggleCheckbox(key)}
-                    color="headerBg"
-                    size={10}
-                  />
-                );
-              })}
-            </div>
+            {/* Week 5 */}
+            {totalD > 28 && (
+              <div className="flex items-center justify-evenly w-[12%] text-center">
+                {Array.from({ length: totalD - 28 }, (_, i) => 29 + i).map((num, dayIndex) => {
+                  const key = `${rowIndex}-4-${dayIndex}`;
+                  return (
+                    <CustomCheckbox
+                      key={dayIndex}
+                      checked={checkboxData[key] ?? false}
+                      onChange={() => toggleCheckbox(key)}
+                      color="headerBg"
+                      size={10}
+                    />
+                  )
+                })}
+              </div>
+            )}
 
           </div>
         ))}
@@ -230,7 +245,7 @@ const DailyCalanderTaskSheet = ({ rows, setRows, rowLimit }: CompType) => {
           {Array.from({ length: 4 }).map((_, weekIndex) => (
             <div
               key={weekIndex}
-              className="flex items-center justify-evenly w-[22%] text-center"
+              className={`flex items-center justify-evenly ${totalD > 28 ? 'w-[22%]' : 'w-[25%]'} text-center`}
             >
               {Array.from({ length: 7 }).map((_, dayIndex) => {
                 const i1 = weekIndex * 7;
@@ -248,20 +263,22 @@ const DailyCalanderTaskSheet = ({ rows, setRows, rowLimit }: CompType) => {
           ))}
 
           {/* Week 5 (3 days) */}
-          <div className="flex items-center justify-evenly w-[12%] text-center">
-            {Array.from({ length: 4 }).map((_, dayIndex) => {
-              const i1 = 4 * 7;
-              const idx = dayIndex + i1 + 1;
-              return (
-                <div key={dayIndex}>
-                  <div className={`h-10 w-2.5 flex items-end`}>
-                    <div className={`w-2.5 bg-headerBg`} style={{ height: `${daywiseData?.[idx - 1]?.progress || 0}%` }}></div>
+          {totalD > 28 && (
+            <div className="flex items-center justify-evenly w-[12%] text-center">
+              {Array.from({ length: totalD - 28 }, (_, i) => 29 + i).map((_, dayIndex) => {
+                const i1 = 4 * 7;
+                const idx = dayIndex + i1 + 1;
+                return (
+                  <div key={dayIndex}>
+                    <div className={`h-10 w-2.5 flex items-end`}>
+                      <div className={`w-2.5 bg-headerBg`} style={{ height: `${daywiseData?.[idx - 1]?.progress || 0}%` }}></div>
+                    </div>
+                    <span className="text-[6px]">{daywiseData?.[idx - 1]?.progress || 0}%</span>
                   </div>
-                  <span className="text-[6px]">{daywiseData?.[idx - 1]?.progress || 0}%</span>
-                </div>
-              );
-            })}
-          </div>
+                );
+              })}
+            </div>
+          )}
 
         </div>
       </div>

@@ -2,6 +2,7 @@ import { Navigate, useParams } from "react-router-dom";
 import MonthHeader from "./header/MonthHeader"
 import MonthMainComponent from "./taskSheet/MonthMainComponent"
 import { months } from "../../staticData";
+import AnalysisLayout from "./analysis/AnalysisLayout";
 
 const TaskDashboardLayout = () => {
 
@@ -16,6 +17,7 @@ const TaskDashboardLayout = () => {
       <div className='bg-backg h-full min-h-screen p-6'>
         <MonthHeader />
         <MonthMainComponent />
+        <AnalysisLayout />
       </div>
     </>
   )
