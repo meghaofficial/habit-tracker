@@ -3,18 +3,32 @@ import { months, weekColors } from "../../staticData"
 import MonthCalander from "./MonthCalander";
 import { useNavigate } from "react-router-dom";
 import { RxExternalLink } from "react-icons/rx";
+import { useDispatch, useSelector } from "react-redux";
+import type { RootState } from "../../redux/store/store";
 
 const YearCalander = () => {
 
-  const [selectedMon, setSelectedMon] = useState<string>("Jan");
-  const [currYear, setCurrYear] = useState(2026);
+  const [selectedMon, setSelectedMon] = useState<string>("");
+  const [currYear, setCurrYear] = useState(0);
   const navigate = useNavigate();
+  const dispatch = useDispatch();
+
+  const monthlyData = useSelector(
+    (state: RootState) => state.monthlyData
+  );
+
+  useEffect(() => {
+    const date = new Date();
+    const y = date.getFullYear();
+    const m = date.getMonth();
+    setSelectedMon(Object.keys(months)[m]);
+    setCurrYear(y);
+  }, []);
 
   // useEffect(() => {
-  //   const date = new Date();
-  //   const m = date.getMonth();
-  //   setSelectedMon(Object.keys(months)[m]);
-  // }, []);
+  //   if (currYear === 0) return;
+  //   dispatch(setYear({ year: currYear.toString() }));
+  // }, [currYear]);
 
   return (
     <>
@@ -34,7 +48,7 @@ const YearCalander = () => {
             <div className="absolute right-1 flex items-center gap-1">
               {Array.from({ length: 5 }).map((_, index) => (
                 <div className="rounded p-1 flex items-center justify-center cursor-pointer shadow" style={{ backgroundColor: weekColors[index] }}>
-                  <span className="text-[8px]">W{index+1}</span>
+                  <span className="text-[8px]">W{index + 1}</span>
                 </div>
               ))}
             </div>

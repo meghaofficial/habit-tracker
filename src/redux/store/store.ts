@@ -1,13 +1,13 @@
 import { configureStore } from "@reduxjs/toolkit";
 import taskwiseReducer from "../slices/taskwiseSlice";
-import progressReducer from "../slices/progressSlice";
 import daywiseReducer from "../slices/daywiseSlice";
+import monthlyReducer from "../slices/monthlySlice";
 
 export const store = configureStore({
   reducer: {
     taskwiseData: taskwiseReducer,
-    progress: progressReducer,
-    daywiseData: daywiseReducer
+    daywiseData: daywiseReducer,
+    monthlyData: monthlyReducer
   }
 });
 

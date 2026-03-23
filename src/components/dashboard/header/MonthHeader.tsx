@@ -12,7 +12,9 @@ const MonthHeader = () => {
   const [currYear, setCurrYear] = useState(0);
   const [subscriptionUpto, setSubscriptionUpto] = useState(4); //years
   const [totalYears, setTotalYears] = useState<number[]>([]);
-  const progress = useSelector((state: RootState) => state.progress);
+  const monthlyData = useSelector(
+    (state: RootState) => state.monthlyData
+  );
 
   useEffect(() => {
     setCurrMon(month || "");
@@ -68,11 +70,11 @@ const MonthHeader = () => {
         <div className="relative border border-mutedLavender bg-lightPink flex items-center justify-center gap-5 p-2 px-7">
           <div className="flex items-center justify-center flex-col w-18">
             <span className="tracking-wider text-xs">PROGRESS</span>
-            <span className="text-headerText font-semibold mt-1">{progress?.progressPercent}%</span>
+            <span className="text-headerText font-semibold mt-1">{year && month && monthlyData[year][month].progress.progressPercent}%</span>
           </div>
-          <span className="absolute right-13 text-xs text-[#AB6466] font-semibold">{progress?.totalDaysWorked} / {progress?.totalDays}</span>
+          <span className="absolute right-13 text-xs text-[#AB6466] font-semibold">{year && month && monthlyData[year][month].progress.totalDaysWorked} / {year && month && monthlyData[year][month].overallTotalDays}</span>
           <div className="flex items-center justify-center h-25 w-20 bg-transparent">
-            <Gauge value={0.2} />
+            <Gauge value={year && month ? monthlyData[year][month].progress.progressPercent : 0} />
           </div>
         </div>
       </div>

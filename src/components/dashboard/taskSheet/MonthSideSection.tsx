@@ -1,6 +1,21 @@
+import { useDispatch, useSelector } from "react-redux"
+import type { RootState } from "../../../redux/store/store";
+import { useParams } from "react-router-dom";
+import { updateTaskName } from "../../../redux/slices/monthlySlice";
+import { useEffect } from "react";
+
 const MonthSideSection = ({ rows }: { rows: number }) => {
 
-  const handleChange = (value: string) => {}
+  const dispatch = useDispatch();
+  const monthlyData = useSelector(
+    (state: RootState) => state.monthlyData
+  );
+  const { year, month } = useParams();
+
+  const handleChange = (row: number, value: string) => {
+    if (!month || !year) return;
+    dispatch(updateTaskName({ year, month, taskNo: row, taskName: value }));
+  }
 
   return (
     <>
@@ -11,7 +26,7 @@ const MonthSideSection = ({ rows }: { rows: number }) => {
         {Array.from({ length: rows }).map((_, index) => (
           <div className="text-[12px] px-2 p-1 flex items-center gap-2 border-b border-gray-300" key={index}>
             <span>{index + 1}</span>
-            <input type="text" className="outline-none w-full" title="value" />
+            <input type="text" className="outline-none w-full" title="value" value={year && month ? monthlyData[year][month].taskwise[index].task : ""} onChange={(e) => handleChange(index, e.target.value)} />
           </div>
         ))}
       </div>

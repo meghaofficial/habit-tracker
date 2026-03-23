@@ -1,11 +1,5 @@
 import { createSlice, type PayloadAction } from "@reduxjs/toolkit";
-
-type DayData = {
-  count: number;
-  progress: number;
-};
-
-type DaywiseState = Record<number, DayData>;
+import type { DaywiseState } from "../../types";
 
 const initialState: DaywiseState = {};
 

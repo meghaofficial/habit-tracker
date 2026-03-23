@@ -2,12 +2,10 @@ import { useEffect, useState } from "react";
 import CustomCheckbox from "./CustomCheckbox";
 import { useDispatch, useSelector } from "react-redux";
 import type { AppDispatch, RootState } from "../../../redux/store/store";
-import { addRow, updateTaskCount } from "../../../redux/slices/taskwiseSlice";
-import { setTotalDays, setTotalDaysWorked } from "../../../redux/slices/progressSlice";
-import { setDaywiseData } from "../../../redux/slices/daywiseSlice";
-import { daysNums, months, weekLetters } from "../../../staticData";
+import { addRow } from "../../../redux/slices/taskwiseSlice";
+import { daysNums, weekLetters } from "../../../staticData";
 import { useParams } from "react-router-dom";
-import { getDaysInMonth, getFirstDayOfMonth } from "../../../helper";
+import { updateDaywiseCount, updateTaskCount, updateTotalTasks } from "../../../redux/slices/monthlySlice";
 
 type CompType = {
   rows: number;
@@ -18,64 +16,34 @@ type CompType = {
 const DailyCalanderTaskSheet = ({ rows, setRows, rowLimit }: CompType) => {
   const [checkboxData, setCheckboxData] = useState<Record<string, boolean>>({});
   const dispatch = useDispatch<AppDispatch>();
-  const taskwiseData = useSelector(
-    (state: RootState) => state.taskwiseData
-  );
-  const daywiseData = useSelector(
-    (state: RootState) => state.daywiseData
-  );
   const { year, month } = useParams<{ year: string; month: string }>();
   const [totalD, setTotalD] = useState(0);
   const [firstDay, setFirstDay] = useState<number>(0);
-  const progress = useSelector((state: RootState) => state.progress);
 
-  // console.log("test", taskwiseData);
-
-  // setting up total days worked - (progressSlice)
-  useEffect(() => {
-    const totalWorked = Object.values(taskwiseData)
-      .reduce((sum, row) => sum + row.count, 0);
-    dispatch(setTotalDaysWorked(totalWorked));
-  }, [taskwiseData, dispatch]);
-
-  // setting up day wise data - (daywiseSlice)
-  useEffect(() => {
-    const result: Record<number, { count: number; progress: number }> = {};
-    for (let i = 0; i <= 31; i++) {
-      result[i] = { count: 0, progress: 0 };
-    }
-    Object.entries(checkboxData).forEach(([key, value]) => {
-      if (!value) return;
-
-      const weekIndex = Number(key.split("-")[1]) * 7;
-      const dayIndex = Number(key.split("-")[2]) + weekIndex + 1;
-      result[dayIndex - 1].count += 1;
-    });
-    Object.keys(result).forEach((col) => {
-      const count = result[Number(col)].count;
-      result[Number(col)].progress = Math.floor((count / rows) * 100);
-    });
-    dispatch(setDaywiseData(result));
-  }, [checkboxData, rows, dispatch]);
+  const monthlyData = useSelector(
+    (state: RootState) => state.monthlyData
+  );
 
   const toggleCheckbox = (key: string) => {
+    if (!year || !month) return;
     setCheckboxData((prev) => {
       const updated = {
         ...prev,
         [key]: !prev[key],
       };
-      dispatch(updateTaskCount({ checkboxData: updated, totalD }));
+      dispatch(updateTaskCount({ year, month, checkboxData: updated }));
       return updated;
     });
+    const i1 = Number(key?.split("-")[1]) * 7;
+    const day = Number(key?.split("-")[2]) + i1 + 1;
+    dispatch(updateDaywiseCount({ year, month, day, isMarked: !checkboxData?.[key] }))
   };
 
   useEffect(() => {
-    const res = getDaysInMonth(Number(year), Object.keys(months).indexOf(month || ""));
-    dispatch(setTotalDays(res*(rows)));
-    setTotalD(res);
-    const firstDayNo = getFirstDayOfMonth(Number(year), Object.keys(months).indexOf(month || ""));
-    setFirstDay(firstDayNo);
-  }, [month, rows, progress]);
+    if (!month || !year) return;
+    setTotalD(monthlyData[year][month].totalDaysInMonth);
+    setFirstDay(monthlyData[year][month].firstDay);
+  }, [month, year]);
 
 
   return (
@@ -205,10 +173,17 @@ const DailyCalanderTaskSheet = ({ rows, setRows, rowLimit }: CompType) => {
       {rows < rowLimit && (
         <button
           className="border border-black/50 cursor-pointer mt-3 smText p-1.5"
-          // onClick={() => setRows((prev) => prev + 1)}
           onClick={() => {
             setRows((prev) => prev + 1)
             dispatch(addRow())
+            if (!year || !month) return;
+            dispatch(
+              updateTotalTasks({
+                year,
+                month,
+                totalRows: rows + 1
+              })
+            );
           }}
         >
           ADD ROW +
@@ -233,9 +208,9 @@ const DailyCalanderTaskSheet = ({ rows, setRows, rowLimit }: CompType) => {
                 return (
                   <div key={dayIndex}>
                     <div className={`h-10 w-2.5 flex items-end`}>
-                      <div className={`w-2.5 bg-headerBg`} style={{ height: `${daywiseData?.[idx - 1]?.progress || 0}%` }}></div>
+                      <div className={`w-2.5 bg-headerBg`} style={{ height: `${year && month && monthlyData[year][month].daywise[idx].progress}%` }}></div>
                     </div>
-                    <span className="text-[6px]">{daywiseData?.[idx - 1]?.progress || 0}%</span>
+                    <span className="text-[6px]">{year && month && Math.floor(monthlyData[year][month].daywise[idx].progress)}%</span>
                   </div>
                 );
               })}
@@ -251,9 +226,9 @@ const DailyCalanderTaskSheet = ({ rows, setRows, rowLimit }: CompType) => {
                 return (
                   <div key={dayIndex}>
                     <div className={`h-10 w-2.5 flex items-end`}>
-                      <div className={`w-2.5 bg-headerBg`} style={{ height: `${daywiseData?.[idx - 1]?.progress || 0}%` }}></div>
+                      <div className={`w-2.5 bg-headerBg`} style={{ height: `${year && month && monthlyData[year][month].daywise[idx].progress}%` }}></div>
                     </div>
-                    <span className="text-[6px]">{daywiseData?.[idx - 1]?.progress || 0}%</span>
+                    <span className="text-[6px]">{year && month && Math.floor(monthlyData[year][month].daywise[idx].progress)}%</span>
                   </div>
                 );
               })}

@@ -1,10 +1,5 @@
 import { createSlice, type PayloadAction } from "@reduxjs/toolkit";
-
-type ProgressState = {
-  totalDays: number;
-  totalDaysWorked: number;
-  progressPercent: number;
-};
+import type { ProgressState } from "../../types";
 
 const initialState: ProgressState = {
   totalDays: 0,

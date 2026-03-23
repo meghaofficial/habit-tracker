@@ -1,12 +1,5 @@
 import { createSlice, type PayloadAction } from "@reduxjs/toolkit";
-
-type TaskData = {
-  task?: string;
-  count: number;
-  progress: number;
-};
-
-type TaskwiseState = Record<number, TaskData>;
+import type { TaskwiseState } from "../../types";
 
 const initialState: TaskwiseState = {
   0: {
