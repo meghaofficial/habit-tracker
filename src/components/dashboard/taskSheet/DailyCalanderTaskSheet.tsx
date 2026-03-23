@@ -2,7 +2,6 @@ import { useEffect, useState } from "react";
 import CustomCheckbox from "./CustomCheckbox";
 import { useDispatch, useSelector } from "react-redux";
 import type { AppDispatch, RootState } from "../../../redux/store/store";
-import { addRow } from "../../../redux/slices/taskwiseSlice";
 import { daysNums, weekLetters } from "../../../staticData";
 import { useParams } from "react-router-dom";
 import { updateDaywiseCount, updateTaskCount, updateTotalTasks } from "../../../redux/slices/monthlySlice";
@@ -175,7 +174,6 @@ const DailyCalanderTaskSheet = ({ rows, setRows, rowLimit }: CompType) => {
           className="border border-black/50 cursor-pointer mt-3 smText p-1.5"
           onClick={() => {
             setRows((prev) => prev + 1)
-            dispatch(addRow())
             if (!year || !month) return;
             dispatch(
               updateTotalTasks({

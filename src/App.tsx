@@ -12,22 +12,6 @@ function App() {
 
   const dispatch = useDispatch();
 
-  const [currYear, setCurrYear] = useState(0);
-  const monthlyData = useSelector(
-    (state: RootState) => state.monthlyData
-  );
-
-  useEffect(() => {
-    const date = new Date();
-    const y = date.getFullYear();
-    setCurrYear(y);
-  }, []);
-
-  // useEffect(() => {
-  //   if (currYear === 0) return;
-  //   dispatch(setYear({ year: currYear.toString() }));
-  // }, [currYear]);
-
   const date = new Date();
   dispatch(setYear({ year: date.getFullYear().toString() }));
 

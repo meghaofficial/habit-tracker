@@ -4,11 +4,6 @@ type DayData = {
 };
 export type DaywiseState = Record<number, DayData>;
 
-type TaskData = {
-  task?: string;
-  count: number;
-  progress: number;
-};
 export type TaskwiseState = Record<number, TaskData>;
 
 export type ProgressState = {
@@ -42,4 +37,9 @@ export type MonthData = {
   daywise: DaywiseState;
   taskwise: TaskwiseState;
   progress: ProgressState;
+};
+export type TaskData = {
+  task?: string;
+  count: number;
+  progress: number;
 };

@@ -11,14 +11,12 @@ type DayData = {
   progress: number;
 };
 type DaywiseState = Record<number, DayData>;
-type TaskwiseState = Record<
-  number,
-  {
-    task?: string;
-    count: number;
-    progress: number;
-  }
->;
+type TaskData = {
+  task?: string;
+  count: number;
+  progress: number;
+};
+type TaskwiseState = Record<number, TaskData>;
 
 type MonthData = {
   firstDay: number;
@@ -99,8 +97,10 @@ const monthlySlice = createSlice({
       const curr = state[year][month];
       curr.totalTasks = totalRows;
       curr.overallTotalDays = totalRows * curr.totalDaysInMonth;
-      curr.progress.progressPercent =
-        Math.floor((curr.progress.totalDaysWorked / (totalRows * curr.totalDaysInMonth)) * 100);
+      curr.progress.progressPercent = Math.floor(
+        (curr.progress.totalDaysWorked / (totalRows * curr.totalDaysInMonth)) *
+          100,
+      );
       curr.taskwise[totalRows - 1] = {
         task: "",
         count: 0,
@@ -155,14 +155,24 @@ const monthlySlice = createSlice({
       curr.daywise[day].progress =
         (curr.daywise[day].count / curr.totalTasks) * 100;
       curr.progress.totalDaysWorked += 1;
-      curr.progress.progressPercent = Math.floor(((curr.progress.totalDaysWorked)/curr.overallTotalDays) * 100);
+      curr.progress.progressPercent = Math.floor(
+        (curr.progress.totalDaysWorked / curr.overallTotalDays) * 100,
+      );
     },
-    updateTaskName: (state, action: PayloadAction<{ year: string, month: string, taskNo: number, taskName: string }>) => {
+    updateTaskName: (
+      state,
+      action: PayloadAction<{
+        year: string;
+        month: string;
+        taskNo: number;
+        taskName: string;
+      }>,
+    ) => {
       const { year, month, taskNo, taskName } = action.payload;
       if (!year || !month) return;
       const curr = state[year][month];
       curr.taskwise[taskNo].task = taskName;
-    }
+    },
   },
 });
 
@@ -171,7 +181,7 @@ export const {
   updateTotalTasks,
   updateTaskCount,
   updateDaywiseCount,
-  updateTaskName
+  updateTaskName,
 } = monthlySlice.actions;
 
 export default monthlySlice.reducer;

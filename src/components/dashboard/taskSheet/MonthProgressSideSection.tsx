@@ -5,7 +5,7 @@ import { useParams } from "react-router-dom";
 const MonthProgressSideSection = ({ rows }: { rows: number }) => {
 
   const { year, month } = useParams<{ year: string, month: string }>();
-    const monthlyData = useSelector(
+  const monthlyData = useSelector(
     (state: RootState) => state.monthlyData
   );
 
