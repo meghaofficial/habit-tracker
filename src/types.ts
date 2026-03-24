@@ -22,3 +22,8 @@ export type MonthData = {
   taskwise: TaskwiseState;
   progress: ProgressState;
 };
+
+export type TargetType = {
+  goal: string;
+  isDone: boolean;
+}

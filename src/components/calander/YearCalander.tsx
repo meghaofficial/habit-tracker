@@ -25,11 +25,6 @@ const YearCalander = () => {
     setCurrYear(y);
   }, []);
 
-  // useEffect(() => {
-  //   if (currYear === 0) return;
-  //   dispatch(setYear({ year: currYear.toString() }));
-  // }, [currYear]);
-
   return (
     <>
       <div className="h-screen flex">
@@ -47,7 +42,7 @@ const YearCalander = () => {
             <RxExternalLink className="cursor-pointer" onClick={() => navigate(`/${currYear}/${selectedMon}`)} />
             <div className="absolute right-1 flex items-center gap-1">
               {Array.from({ length: 5 }).map((_, index) => (
-                <div className="rounded p-1 flex items-center justify-center cursor-pointer shadow" style={{ backgroundColor: weekColors[index] }}>
+                <div className="rounded p-1 flex items-center justify-center cursor-pointer shadow" style={{ backgroundColor: weekColors[index] }} onClick={() => navigate(`/week-${index+1}`)}>
                   <span className="text-[8px]">W{index + 1}</span>
                 </div>
               ))}
