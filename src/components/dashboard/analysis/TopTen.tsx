@@ -21,7 +21,7 @@ const TopTen = () => {
         acc[index] = value;
         return acc;
       }, {} as typeof curr.taskwise);
-      
+
     Object.values(sorted).length > 5 ?
       setTop(Object.values(sorted).slice(0, 5)) : setTop(Object.values(sorted));
   }, [monthlyData]);
@@ -36,6 +36,7 @@ const TopTen = () => {
         </p>
         {/* task input */}
         {top?.length > 0 && top?.map((d, index) => (
+          d.task &&
           <div className="text-[10px] flex items-center border-b border-gray-300" key={index}>
             <p className="w-[70%] px-1 border-r border-gray-300 text-center">
               {d.task}

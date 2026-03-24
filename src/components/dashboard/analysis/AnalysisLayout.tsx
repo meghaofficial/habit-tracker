@@ -1,14 +1,22 @@
+import MonthlyTarget from "./MonthlyTarget"
 import TopTen from "./TopTen"
 
 const AnalysisLayout = () => {
   return (
     <>
-     <div className="flex mt-5">
+     <div className="flex mt-5 gap-3">
+      <div className="w-[40%]">
+        <MonthlyTarget />
+      </div>
       <div className="w-[20%]">
         <TopTen />
       </div>
-      <div className="w-[60%]"></div>
-      <div className="w-[20%]"></div>
+      <div className="w-[20%]">
+        {/* <TopTen /> */}
+      </div>
+      <div className="w-[20%]">
+        {/* <TopTen /> */}
+      </div>
     </div> 
     </>
   )

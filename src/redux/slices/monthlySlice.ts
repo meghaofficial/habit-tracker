@@ -1,32 +1,8 @@
 import { createSlice, type PayloadAction } from "@reduxjs/toolkit";
 import { months } from "../../staticData";
 import { getDaysInMonth, getFirstDayOfMonth } from "../../helper";
+import type { DaywiseState, MonthData } from "../../types";
 
-type ProgressState = {
-  totalDaysWorked: number;
-  progressPercent: number;
-};
-type DayData = {
-  count: number;
-  progress: number;
-};
-type DaywiseState = Record<number, DayData>;
-type TaskData = {
-  task?: string;
-  count: number;
-  progress: number;
-};
-type TaskwiseState = Record<number, TaskData>;
-
-type MonthData = {
-  firstDay: number;
-  overallTotalDays: number;
-  totalDaysInMonth: number;
-  totalTasks: number; // total no of rows
-  daywise: DaywiseState;
-  taskwise: TaskwiseState;
-  progress: ProgressState;
-};
 
 type RootState = {
   [year: string]: {
