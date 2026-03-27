@@ -3,26 +3,22 @@ import { months, weekColors } from "../../staticData"
 import MonthCalander from "./MonthCalander";
 import { useNavigate } from "react-router-dom";
 import { RxExternalLink } from "react-icons/rx";
-import { useDispatch, useSelector } from "react-redux";
-import type { RootState } from "../../redux/store/store";
 
 const YearCalander = () => {
 
   const [selectedMon, setSelectedMon] = useState<string>("");
   const [currYear, setCurrYear] = useState(0);
+  const [todayDate, setTodayDate] = useState(1);
   const navigate = useNavigate();
-  const dispatch = useDispatch();
-
-  const monthlyData = useSelector(
-    (state: RootState) => state.monthlyData
-  );
 
   useEffect(() => {
     const date = new Date();
     const y = date.getFullYear();
     const m = date.getMonth();
+    const d = date.getDate();
     setSelectedMon(Object.keys(months)[m]);
     setCurrYear(y);
+    setTodayDate(d);
   }, []);
 
   return (
@@ -42,13 +38,13 @@ const YearCalander = () => {
             <RxExternalLink className="cursor-pointer" onClick={() => navigate(`/${currYear}/${selectedMon}`)} />
             <div className="absolute right-1 flex items-center gap-1">
               {Array.from({ length: 5 }).map((_, index) => (
-                <div className="rounded p-1 flex items-center justify-center cursor-pointer shadow" style={{ backgroundColor: weekColors[index] }} onClick={() => navigate(`/week-${index+1}`)}>
+                <div key={index} className="rounded p-1 flex items-center justify-center cursor-pointer shadow" style={{ backgroundColor: weekColors[index] }} onClick={() => navigate(`/week-${index+1}`)}>
                   <span className="text-[8px]">W{index + 1}</span>
                 </div>
               ))}
             </div>
           </div>
-          <MonthCalander year={currYear} month={Object.keys(months).indexOf(selectedMon)} />
+          <MonthCalander year={currYear} month={Object.keys(months).indexOf(selectedMon)} todayDate={todayDate} />
         </div>
       </div>
     </>

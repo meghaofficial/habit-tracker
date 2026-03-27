@@ -1,9 +1,11 @@
 import { configureStore } from "@reduxjs/toolkit";
 import monthlyReducer from "../slices/monthlySlice";
+import dateDataReducer from "../slices/dateDataSlice";
 
 export const store = configureStore({
   reducer: {
-    monthlyData: monthlyReducer
+    monthlyData: monthlyReducer,
+    dateData: dateDataReducer
   }
 });
 

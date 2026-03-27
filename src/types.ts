@@ -26,4 +26,27 @@ export type MonthData = {
 export type TargetType = {
   goal: string;
   isDone: boolean;
-}
+};
+
+export const statusColors: Record<string, { dot: string; bg: string }> = {
+  default: {
+    dot: "#9CA3AF",
+    bg: "#F3F4F6",
+  },
+  important: {
+    dot: "#EF4444",
+    bg: "#FEE2E2",
+  },
+  event: {
+    dot: "#3B82F6",
+    bg: "#DBEAFE",
+  },
+  achievement: {
+    dot: "#22C55E",
+    bg: "#DCFCE7",
+  },
+  sick: {
+    dot: "#A855F7",
+    bg: "#F3E8FF",
+  },
+};
