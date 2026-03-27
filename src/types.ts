@@ -21,6 +21,7 @@ export type MonthData = {
   daywise: DaywiseState;
   taskwise: TaskwiseState;
   progress: ProgressState;
+  checkboxKeys: string[],
 };
 
 export type TargetType = {

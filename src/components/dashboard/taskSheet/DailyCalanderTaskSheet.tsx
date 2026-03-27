@@ -4,7 +4,7 @@ import { useDispatch, useSelector } from "react-redux";
 import type { AppDispatch, RootState } from "../../../redux/store/store";
 import { daysNums, weekLetters } from "../../../staticData";
 import { useParams } from "react-router-dom";
-import { updateDaywiseCount, updateTaskCount, updateTotalTasks } from "../../../redux/slices/monthlySlice";
+import { addCheckboxKey, removeCheckboxKey, updateDaywiseCount, updateTaskCount, updateTotalTasks } from "../../../redux/slices/monthlySlice";
 
 type CompType = {
   rows: number;
@@ -25,6 +25,9 @@ const DailyCalanderTaskSheet = ({ rows, setRows, rowLimit }: CompType) => {
 
   const toggleCheckbox = (key: string) => {
     if (!year || !month) return;
+    const isCurrentlyChecked = checkboxData?.[key] ?? false;
+    const newValue = !isCurrentlyChecked;
+
     setCheckboxData((prev) => {
       const updated = {
         ...prev,
@@ -35,7 +38,12 @@ const DailyCalanderTaskSheet = ({ rows, setRows, rowLimit }: CompType) => {
     });
     const i1 = Number(key?.split("-")[1]) * 7;
     const day = Number(key?.split("-")[2]) + i1 + 1;
-    dispatch(updateDaywiseCount({ year, month, day, isMarked: !checkboxData?.[key] }))
+    dispatch(updateDaywiseCount({ year, month, day, isMarked: !checkboxData?.[key] }));
+    if (newValue) {
+      dispatch(addCheckboxKey({ year, month, cbk: key }));
+    } else {
+      dispatch(removeCheckboxKey({ year, month, cbk: key }));
+    }
   };
 
   useEffect(() => {
@@ -43,6 +51,14 @@ const DailyCalanderTaskSheet = ({ rows, setRows, rowLimit }: CompType) => {
     setTotalD(monthlyData[year][month].totalDaysInMonth);
     setFirstDay(monthlyData[year][month].firstDay);
   }, [month, year]);
+
+  useEffect(() => {
+    if (monthlyData){
+      if (month && year){
+        setRows(monthlyData[year][month].totalTasks)
+      }
+    }
+  }, [monthlyData]);
 
 
   return (
@@ -135,7 +151,11 @@ const DailyCalanderTaskSheet = ({ rows, setRows, rowLimit }: CompType) => {
                   return (
                     <CustomCheckbox
                       key={dayIndex}
-                      checked={checkboxData[key] ?? false}
+                      checked={
+                        year && month
+                          ? monthlyData[year][month].checkboxKeys.includes(key)
+                          : checkboxData[key] ?? false
+                      }
                       onChange={() => toggleCheckbox(key)}
                       color="headerBg"
                       size={10}
@@ -153,7 +173,11 @@ const DailyCalanderTaskSheet = ({ rows, setRows, rowLimit }: CompType) => {
                   return (
                     <CustomCheckbox
                       key={dayIndex}
-                      checked={checkboxData[key] ?? false}
+                      checked={
+                        year && month
+                          ? monthlyData[year][month].checkboxKeys.includes(key)
+                          : checkboxData[key] ?? false
+                      }
                       onChange={() => toggleCheckbox(key)}
                       color="headerBg"
                       size={10}

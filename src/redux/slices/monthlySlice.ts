@@ -3,7 +3,6 @@ import { months } from "../../staticData";
 import { getDaysInMonth, getFirstDayOfMonth } from "../../helper";
 import type { DaywiseState, MonthData } from "../../types";
 
-
 type RootState = {
   [year: string]: {
     [month: string]: MonthData;
@@ -47,6 +46,7 @@ const monthlySlice = createSlice({
           totalDaysWorked: 0,
           progressPercent: 0,
         },
+        checkboxKeys: [],
       });
 
       if (!state[year]) {
@@ -149,6 +149,27 @@ const monthlySlice = createSlice({
       const curr = state[year][month];
       curr.taskwise[taskNo].task = taskName;
     },
+    addCheckboxKey: (state, action) => {
+      const { year, month, cbk } = action.payload;
+      if (!year || !month) return;
+
+      const curr = state[year][month];
+
+      if (!curr.checkboxKeys.includes(cbk)) {
+        curr.checkboxKeys.push(cbk);
+      }
+    },
+    removeCheckboxKey: (state, action) => {
+      const { year, month, cbk } = action.payload;
+      if (!year || !month) return;
+
+      const curr = state[year][month];
+
+      const index = curr.checkboxKeys.indexOf(cbk);
+      if (index !== -1) {
+        curr.checkboxKeys.splice(index, 1);
+      }
+    },
   },
 });
 
@@ -158,6 +179,8 @@ export const {
   updateTaskCount,
   updateDaywiseCount,
   updateTaskName,
+  addCheckboxKey,
+  removeCheckboxKey,
 } = monthlySlice.actions;
 
 export default monthlySlice.reducer;
