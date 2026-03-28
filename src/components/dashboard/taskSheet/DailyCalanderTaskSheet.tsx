@@ -4,7 +4,8 @@ import { useDispatch, useSelector } from "react-redux";
 import type { AppDispatch, RootState } from "../../../redux/store/store";
 import { daysNums, weekLetters } from "../../../staticData";
 import { useParams } from "react-router-dom";
-import { addCheckboxKey, removeCheckboxKey, updateDaywiseCount, updateTaskCount, updateTotalTasks } from "../../../redux/slices/monthlySlice";
+import { addCheckboxKey, deleteRow, removeCheckboxKey, updateDaywiseCount, updateTaskwiseCount, updateTotalTasks } from "../../../redux/slices/monthlySlice";
+import { LuMinus } from "react-icons/lu";
 
 type CompType = {
   rows: number;
@@ -13,7 +14,6 @@ type CompType = {
 };
 
 const DailyCalanderTaskSheet = ({ rows, setRows, rowLimit }: CompType) => {
-  const [checkboxData, setCheckboxData] = useState<Record<string, boolean>>({});
   const dispatch = useDispatch<AppDispatch>();
   const { year, month } = useParams<{ year: string; month: string }>();
   const [totalD, setTotalD] = useState(0);
@@ -25,25 +25,38 @@ const DailyCalanderTaskSheet = ({ rows, setRows, rowLimit }: CompType) => {
 
   const toggleCheckbox = (key: string) => {
     if (!year || !month) return;
-    const isCurrentlyChecked = checkboxData?.[key] ?? false;
-    const newValue = !isCurrentlyChecked;
 
-    setCheckboxData((prev) => {
-      const updated = {
-        ...prev,
-        [key]: !prev[key],
-      };
-      dispatch(updateTaskCount({ year, month, checkboxData: updated }));
-      return updated;
-    });
-    const i1 = Number(key?.split("-")[1]) * 7;
-    const day = Number(key?.split("-")[2]) + i1 + 1;
-    dispatch(updateDaywiseCount({ year, month, day, isMarked: !checkboxData?.[key] }));
+    const isChecked = monthlyData[year][month].checkboxKeys.includes(key);
+    const newValue = !isChecked;
+
+    const parts = key.split("-");
+    const weekIndex = Number(parts[parts.length - 2]);
+    const dayIndex = Number(parts[parts.length - 1]);
+    const day = weekIndex * 7 + dayIndex + 1;
+
     if (newValue) {
       dispatch(addCheckboxKey({ year, month, cbk: key }));
     } else {
       dispatch(removeCheckboxKey({ year, month, cbk: key }));
     }
+
+    dispatch(updateTaskwiseCount({
+      year,
+      month,
+      checkboxData: {
+        ...Object.fromEntries(
+          monthlyData[year][month].checkboxKeys.map(k => [k, true])
+        ),
+        [key]: newValue
+      }
+    }));
+
+    dispatch(updateDaywiseCount({
+      year,
+      month,
+      day,
+      isMarked: newValue
+    }));
   };
 
   useEffect(() => {
@@ -53,13 +66,12 @@ const DailyCalanderTaskSheet = ({ rows, setRows, rowLimit }: CompType) => {
   }, [month, year]);
 
   useEffect(() => {
-    if (monthlyData){
-      if (month && year){
-        setRows(monthlyData[year][month].totalTasks)
+    if (monthlyData) {
+      if (month && year) {
+        setRows(monthlyData[year][month].totalTasks);
       }
     }
   }, [monthlyData]);
-
 
   return (
     <div className="flex flex-col w-full relative">
@@ -133,11 +145,16 @@ const DailyCalanderTaskSheet = ({ rows, setRows, rowLimit }: CompType) => {
         </div>
 
         {/* Checkbox Rows */}
-        {Array.from({ length: rows }).map((_, rowIndex) => (
+        {year && month && monthlyData[year][month].taskwise.map((task, rowIndex) => (
           <div
-            key={rowIndex}
-            className="p-2 flex items-center w-full border-b border-gray-300"
+            key={task.taskID}
+            className="p-2 flex items-center w-full border-b border-gray-300 relative"
           >
+            {rowIndex > 0 && (
+              <div className="absolute -right-2 cursor-pointer border rounded border-gray-400 text-gray-400 bg-white" onClick={() => month && year && dispatch(deleteRow({ year, month, rowID: task?.taskID }))}>
+                <LuMinus size={15} />
+              </div>
+            )}
 
             {/* Weeks 1–4 */}
             {Array.from({ length: 4 }).map((_, weekIndex) => (
@@ -146,7 +163,8 @@ const DailyCalanderTaskSheet = ({ rows, setRows, rowLimit }: CompType) => {
                 className={`flex items-center justify-evenly ${totalD > 28 ? 'w-[22%]' : 'w-[25%]'} text-center`}
               >
                 {Array.from({ length: 7 }).map((_, dayIndex) => {
-                  const key = `${rowIndex}-${weekIndex}-${dayIndex}`;
+                  // const key = `${rowIndex}-${weekIndex}-${dayIndex}`;
+                  const key = `${task?.taskID}-${weekIndex}-${dayIndex}`
 
                   return (
                     <CustomCheckbox
@@ -154,7 +172,7 @@ const DailyCalanderTaskSheet = ({ rows, setRows, rowLimit }: CompType) => {
                       checked={
                         year && month
                           ? monthlyData[year][month].checkboxKeys.includes(key)
-                          : checkboxData[key] ?? false
+                          : false
                       }
                       onChange={() => toggleCheckbox(key)}
                       color="headerBg"
@@ -169,14 +187,15 @@ const DailyCalanderTaskSheet = ({ rows, setRows, rowLimit }: CompType) => {
             {totalD > 28 && (
               <div className="flex items-center justify-evenly w-[12%] text-center">
                 {Array.from({ length: totalD - 28 }, (_, i) => 29 + i).map((num, dayIndex) => {
-                  const key = `${rowIndex}-4-${dayIndex}`;
+                  // const key = `${rowIndex}-4-${dayIndex}`;
+                  const key = `${task?.taskID}-4-${dayIndex}`
                   return (
                     <CustomCheckbox
                       key={dayIndex}
                       checked={
                         year && month
                           ? monthlyData[year][month].checkboxKeys.includes(key)
-                          : checkboxData[key] ?? false
+                          : false
                       }
                       onChange={() => toggleCheckbox(key)}
                       color="headerBg"

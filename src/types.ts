@@ -1,9 +1,11 @@
 export type TaskData = {
+  taskID: string;
   task?: string;
   count: number;
   progress: number;
 };
-type TaskwiseState = Record<number, TaskData>;
+// type TaskwiseState = Record<number, TaskData>;
+type TaskwiseState = TaskData[];
 type ProgressState = {
   totalDaysWorked: number;
   progressPercent: number;

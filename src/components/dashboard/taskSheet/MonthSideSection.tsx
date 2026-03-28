@@ -2,7 +2,6 @@ import { useDispatch, useSelector } from "react-redux"
 import type { RootState } from "../../../redux/store/store";
 import { useParams } from "react-router-dom";
 import { updateTaskName } from "../../../redux/slices/monthlySlice";
-import { useEffect } from "react";
 
 const MonthSideSection = ({ rows }: { rows: number }) => {
 
@@ -12,9 +11,9 @@ const MonthSideSection = ({ rows }: { rows: number }) => {
   );
   const { year, month } = useParams();
 
-  const handleChange = (row: number, value: string) => {
+  const handleChange = (id: string, value: string) => {
     if (!month || !year) return;
-    dispatch(updateTaskName({ year, month, taskNo: row, taskName: value }));
+    dispatch(updateTaskName({ year, month, taskID: id, taskName: value }));
   }
 
   return (
@@ -23,10 +22,10 @@ const MonthSideSection = ({ rows }: { rows: number }) => {
         <p className="smText text-subHeaderText p-5.5 text-center border-b border-black bg-subHeaderBg" style={{ fontWeight: "bolder" }}>DAILY HABITS</p>
         <p className="smText p-[8.5px] text-center bg-smHeaderBg border-b border-subHeaderText" style={{ fontWeight: "bold" }}>HABITS</p>
         {/* task input */}
-        {Array.from({ length: rows }).map((_, index) => (
+        {month && year && monthlyData[year][month]?.taskwise?.map((task, index) => (
           <div className="text-[12px] px-2 p-1 flex items-center gap-2 border-b border-gray-300" key={index}>
             <span>{index + 1}</span>
-            <input type="text" className="outline-none w-full" title="value" value={year && month ? monthlyData[year][month].taskwise[index].task : ""} onChange={(e) => handleChange(index, e.target.value)} />
+            <input type="text" className="outline-none w-full" title="value" value={year && month ? task?.task : ""} onChange={(e) => handleChange(task?.taskID, e.target.value)} />
           </div>
         ))}
       </div>
