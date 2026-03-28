@@ -38,30 +38,35 @@ const MonthCalander = ({ year, month, todayDate }: { year: number; month: number
   }
 
   return (
-    <div className="px-1">
+    <div className="px-1.5">
       <div className="grid grid-cols-7 google-sans text-[12px] mt-2 text-gray-400">
         {Object.values(week).map((w, index) => (
           <span key={index} className="text-center">{w}</span>
         ))}
       </div>
-      <div className="grid grid-cols-7 google-sans mt-2 gap-1">
+      <div className="grid grid-cols-7 google-sans mt-2 gap-1.5">
         {Array.from({ length: totalD + firstDay }).map((_, index) => (
           <div
             key={index}
-            className='text-center p-5 relative'
-            style={{ backgroundColor: index + 1 > firstDay ? weekColors[Math.floor((index - firstDay) / 7)] : "" }}
+            className={`text-center p-5 relative rounded-md ${todayDate === index+1-firstDay && 'bg-[#4b5d8b] text-white'}`}
+            style={{ backgroundColor: todayDate !== index+1-firstDay && index + 1 > firstDay ? weekColors[Math.floor((index - firstDay) / 7)] : "" }}
             onClick={() => {
               setOpen(prev => !prev);
               setActiveDate(index + 1 > firstDay ? index + 1 - firstDay : -1);
             }}
           >
-            <div className='h-2 w-2 rounded-full absolute top-2 left-2' style={{ backgroundColor: getStatusColor(index + 1 > firstDay ? index + 1 - firstDay : null)?.color }} title={getStatusColor(index + 1 > firstDay ? index + 1 - firstDay : null)?.status}></div>
-            <span style={{
+            <div className='h-2 w-2 rounded-full absolute top-2 left-2' 
+            style={{ backgroundColor: getStatusColor(index + 1 > firstDay ? index + 1 - firstDay : null)?.color }} 
+            title={getStatusColor(index + 1 > firstDay ? index + 1 - firstDay : null)?.status} />
+<div className="flex items-center justify-center flex-col">
+            <span className={``} style={{
               fontSize: todayDate === index + 1 - firstDay ? '20px' : '',
               fontWeight: todayDate === index + 1 - firstDay ? 'bold' : ''
             }}>
               {index + 1 > firstDay ? index + 1 - firstDay : ""}
             </span>
+            {/* <span className="text-2xl">&#128512;</span> */}
+            </div>
           </div>
         ))}
       </div>
