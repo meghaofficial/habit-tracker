@@ -1,31 +1,59 @@
-  /* background-color: #242424; */
-  @import "tailwindcss";
+@import "tailwindcss";
+@custom-variant light (&:is(.light, .light *)); 
 
-  .playfair-display {
-    font-family: "Playfair Display", serif;
-    font-optical-sizing: auto;
-    font-style: normal;
+@layer base {
+  :root {
+    color-scheme: dark; /* Tells browser the default is dark */
   }
+  :root.light {
+    color-scheme: light; /* Updates browser UI when light is active */
+  }
+}
 
-  .google-sans {
-    font-family: "Google Sans", sans-serif;
-    font-optical-sizing: auto;
-    font-style: normal;
-    font-variation-settings:
-      "GRAD" 0;
-  }
+.playfair-display {
+  font-family: "Playfair Display", serif;
+  font-optical-sizing: auto;
+  font-style: normal;
+}
 
-  body {
-    overflow-x: hidden;
-  }
+.google-sans {
+  font-family: "Google Sans", sans-serif;
+  font-optical-sizing: auto;
+  font-style: normal;
+  font-variation-settings: "GRAD" 0;
+}
 
-  @theme {
-    --color-backg: #FFFCF9;
-    --color-headerText: #587988;
-    --color-progressBg: #FFF5F2;
-    --color-headerBg: #B2CBD7;
-    --color-lightPink: #FFF5F2;
-    --color-subHeaderBg: #EBC2B9;
-    --color-subHeaderText: #BF787B;
-    --color-smHeaderBg: #F8E2DD;
-  }
+body {
+  overflow-x: hidden;
+}
+
+@theme {
+  --color-darkBg: #0f172a;
+  --color-darkText: #ffffff;
+  --color-darkSubText: #cbd5f5;
+  --color-darkPrimary: #6366f1;
+  --color-darkCard: #1e293b;
+  --color-darkBox: #334155;
+  --color-darkSuccess: #22c55e;
+  --color-darkBorder: #1e293b;
+
+  --color-lightBg: #f8fafc;
+  --color-lightText: #0f172a;
+  --color-lightSubText: #475569;
+  --color-lightPrimary: #4f46e5;
+  --color-lightCard: #ffffff;
+  --color-lightBox: #e2e8f0;
+  --color-lightSuccess: #16a34a;
+  --color-lightBorder: #e2e8f0;
+
+
+
+  --color-backg: #fffcf9;
+  --color-headerText: #587988;
+  --color-progressBg: #fff5f2;
+  --color-headerBg: #b2cbd7;
+  --color-lightPink: #fff5f2;
+  --color-subHeaderBg: #ebc2b9;
+  --color-subHeaderText: #bf787b;
+  --color-smHeaderBg: #f8e2dd;
+}

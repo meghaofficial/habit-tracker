@@ -8,6 +8,8 @@ import { useEffect, useState } from 'react'
 import { setYear } from './redux/slices/monthlySlice'
 import type { RootState } from './redux/store/store'
 import WeeklyLayout from './components/dashboardWeek/WeeklyLayout'
+import Demo from './components/home/Demo'
+import HomePage from './components/home/Homepage'
 
 function App() {
 
@@ -19,9 +21,11 @@ function App() {
   return (
     <>
       <Routes>
-        <Route path='/' element={<YearCalander />} />
+        <Route path='/' element={<HomePage />} />
+        <Route path='/demo' element={<Demo />} />
+        {/* <Route path='/' element={<YearCalander />} />
         <Route path='/:year/:month' element={<TaskDashboardLayout />} />
-        <Route path='/:week' element={<WeeklyLayout />} />
+        <Route path='/:week' element={<WeeklyLayout />} /> */}
         <Route path='/*' element={<PageNotFound />} />
       </Routes>
     </>
