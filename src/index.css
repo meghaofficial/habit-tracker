@@ -27,6 +27,13 @@ body {
   overflow-x: hidden;
 }
 
+.MuiChartsLegend-label{
+  color: white;
+}
+tspan{
+  color: white !important;
+}
+
 @theme {
   --color-darkBg: #0f172a;
   --color-darkText: #ffffff;

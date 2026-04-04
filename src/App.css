@@ -3,3 +3,11 @@
   letter-spacing: 2px;
   font-weight: lighter;
 }
+
+.hide-scrollbar {
+  &::-webkit-scrollbar {
+    display: none;
+  }
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+}

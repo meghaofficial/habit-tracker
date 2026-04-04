@@ -38,3 +38,31 @@ export const weekColors: string[] = [
   "#a6c2ce",
   "#90b3c2"
 ];
+
+export const plans = [
+  {
+    title: "1 Month",
+    price: "Free",
+    desc: "Valid for the current month only, regardless of remaining days."
+  },
+  {
+    title: "3 Months",
+    price: "₹50",
+    desc: "Covers current month + next 2 months."
+  },
+  {
+    title: "6 Months",
+    price: "₹80",
+    desc: "Covers current month + next 5 months."
+  },
+  {
+    title: "12 Months",
+    price: "₹150",
+    desc: "Covers current month + next 11 months."
+  },
+  {
+    title: "Current Year",
+    price: "₹20/month",
+    desc: "Pay ₹20 per month for the remaining months of the current year (including this month)."
+  }
+];
