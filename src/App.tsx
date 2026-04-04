@@ -8,9 +8,9 @@ import { useEffect, useState } from 'react'
 import { setYear } from './redux/slices/monthlySlice'
 import type { RootState } from './redux/store/store'
 import WeeklyLayout from './components/dashboardWeek/WeeklyLayout'
-import Demo from './components/home/Demo'
+import Demo from './components/pages/Demo'
 import Dashboard from './components/pages/Dashboard'
-import HomePage from './components/home/HomePage'
+import HomePage from './components/pages/HomePage'
 
 function App() {
 

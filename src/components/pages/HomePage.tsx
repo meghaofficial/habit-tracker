@@ -52,6 +52,16 @@ const HomePage = () => {
     };
   }, [open]);
 
+    useEffect(() => {
+    const savedTheme = localStorage.getItem("theme");
+    if (savedTheme === "dark") {
+      setDark(true);
+    }
+    else {
+      setDark(false)
+    }
+  }, []);
+
   return (
     <>
       <div className="min-h-screen">

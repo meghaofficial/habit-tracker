@@ -15,7 +15,9 @@ type CompType = {
 
 const DailyCalanderTaskSheet = ({ rows, setRows, rowLimit }: CompType) => {
   const dispatch = useDispatch<AppDispatch>();
-  const { year, month } = useParams<{ year: string; month: string }>();
+  // const { year, month } = useParams<{ year: string; month: string }>();
+  const year = "2026";
+  const month = "Apr";
   const [totalD, setTotalD] = useState(0);
   const [firstDay, setFirstDay] = useState<number>(0);
 
@@ -145,7 +147,7 @@ const DailyCalanderTaskSheet = ({ rows, setRows, rowLimit }: CompType) => {
         </div>
 
         {/* Checkbox Rows */}
-        {year && month && monthlyData[year][month].taskwise.map((task, rowIndex) => (
+        {year && month && monthlyData[year][month]?.taskwise.map((task, rowIndex) => (
           <div
             key={task.taskID}
             className="p-2 flex items-center w-full border-b border-gray-300 relative"
