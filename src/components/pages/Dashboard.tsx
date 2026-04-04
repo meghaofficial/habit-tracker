@@ -54,6 +54,8 @@ const Dashboard = () => {
               <span className={`cursor-pointer hover:text-darkText light:hover:text-lightText ${activeTab === 'track' ? 'text-darkText light:text-lightText' : 'text-gray-500'}`} onClick={() => setActiveTab("track")}>Monthly Habit</span>
               <span>|</span>
               <span className={`cursor-pointer hover:text-darkText light:hover:text-lightText ${activeTab === 'analysis' ? 'text-darkText light:text-lightText' : 'text-gray-500'}`} onClick={() => setActiveTab("analysis")}>Analysis</span>
+              <span>|</span>
+              <span className={`cursor-pointer hover:text-darkText light:hover:text-lightText ${activeTab === 'history' ? 'text-darkText light:text-lightText' : 'text-gray-500'}`} onClick={() => setActiveTab("history")}>History</span>
             </div>
           </div>
           <div className="flex items-center gap-4">
@@ -83,7 +85,8 @@ const Dashboard = () => {
           </div>
         </div>
 
-        {activeTab === "analysis" ? <AnalysisMainComponent /> : <TrackMainComponent />}
+        {activeTab === "track" && <TrackMainComponent />}
+        {activeTab === "analysis" && <AnalysisMainComponent />}
 
       </div>
     </>

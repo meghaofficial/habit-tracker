@@ -1,9 +1,7 @@
 import { useEffect, useState } from "react";
-import CustomCheckbox from "./CustomCheckbox";
 import { useDispatch, useSelector } from "react-redux";
 import type { AppDispatch, RootState } from "../../../redux/store/store";
 import { daysNums, weekLetters } from "../../../staticData";
-import { useParams } from "react-router-dom";
 import { addCheckboxKey, deleteRow, removeCheckboxKey, updateDaywiseCount, updateTaskwiseCount, updateTotalTasks } from "../../../redux/slices/monthlySlice";
 import { LuMinus } from "react-icons/lu";
 
@@ -15,7 +13,6 @@ type CompType = {
 
 const DailyCalanderTaskSheet = ({ rows, setRows, rowLimit }: CompType) => {
   const dispatch = useDispatch<AppDispatch>();
-  // const { year, month } = useParams<{ year: string; month: string }>();
   const year = "2026";
   const month = "Apr";
   const [totalD, setTotalD] = useState(0);
@@ -77,10 +74,10 @@ const DailyCalanderTaskSheet = ({ rows, setRows, rowLimit }: CompType) => {
 
   return (
     <div className="flex flex-col w-full relative">
-      <div className="border w-full">
+      <div className="w-full">
 
         {/* Week Header */}
-        <div className="bg-headerBg text-headerText font-semibold p-2 text-[10px] tracking-wider flex items-center w-full">
+        <div className="font-semibold p-2 text-[10px] tracking-wider flex items-center w-full border-b border-gray-500">
           <p className={`${totalD > 28 ? 'w-[22%]' : 'w-[25%]'} text-center`}>WEEK 1</p>
           <p className={`${totalD > 28 ? 'w-[22%]' : 'w-[25%]'} text-center`}>WEEK 2</p>
           <p className={`${totalD > 28 ? 'w-[22%]' : 'w-[25%]'} text-center`}>WEEK 3</p>
@@ -91,7 +88,7 @@ const DailyCalanderTaskSheet = ({ rows, setRows, rowLimit }: CompType) => {
         </div>
 
         {/* Week Letters */}
-        <div className="bg-[#DFEEF5] p-2 text-[10px] flex items-center w-full">
+        <div className="p-2 text-[10px] flex items-center w-full border-b border-gray-500">
           {Array.from({ length: 4 }).map((_, weekIndex) => (
             <div
               key={weekIndex}
@@ -112,7 +109,7 @@ const DailyCalanderTaskSheet = ({ rows, setRows, rowLimit }: CompType) => {
         </div>
 
         {/* Date Numbers */}
-        <div className="bg-[#F8FDFF] p-2 text-[10px] tracking-wider flex items-center w-full border-b border-headerBg">
+        <div className="p-2 text-[10px] tracking-wider flex items-center w-full border-b border-headerBg">
           <div className={`flex items-center justify-evenly ${totalD > 28 ? 'w-[22%]' : 'w-[25%]'} text-center`}>
             {daysNums.slice(0, 7).map((d, index) => (
               <p key={index}>{d}</p>
@@ -165,21 +162,12 @@ const DailyCalanderTaskSheet = ({ rows, setRows, rowLimit }: CompType) => {
                 className={`flex items-center justify-evenly ${totalD > 28 ? 'w-[22%]' : 'w-[25%]'} text-center`}
               >
                 {Array.from({ length: 7 }).map((_, dayIndex) => {
-                  // const key = `${rowIndex}-${weekIndex}-${dayIndex}`;
                   const key = `${task?.taskID}-${weekIndex}-${dayIndex}`
 
                   return (
-                    <CustomCheckbox
-                      key={dayIndex}
-                      checked={
-                        year && month
-                          ? monthlyData[year][month].checkboxKeys.includes(key)
-                          : false
-                      }
-                      onChange={() => toggleCheckbox(key)}
-                      color="headerBg"
-                      size={10}
-                    />
+                    <>
+                      <span key={key} className={`h-4 w-4 rounded cursor-pointer ${monthlyData[year][month].checkboxKeys.includes(key) ? 'bg-darkSuccess light:bg-lightSuccess' : 'bg-darkBox light:bg-lightBox'}`} onClick={() => toggleCheckbox(key)}></span>
+                    </>
                   );
                 })}
               </div>
@@ -189,20 +177,9 @@ const DailyCalanderTaskSheet = ({ rows, setRows, rowLimit }: CompType) => {
             {totalD > 28 && (
               <div className="flex items-center justify-evenly w-[12%] text-center">
                 {Array.from({ length: totalD - 28 }, (_, i) => 29 + i).map((num, dayIndex) => {
-                  // const key = `${rowIndex}-4-${dayIndex}`;
                   const key = `${task?.taskID}-4-${dayIndex}`
                   return (
-                    <CustomCheckbox
-                      key={dayIndex}
-                      checked={
-                        year && month
-                          ? monthlyData[year][month].checkboxKeys.includes(key)
-                          : false
-                      }
-                      onChange={() => toggleCheckbox(key)}
-                      color="headerBg"
-                      size={10}
-                    />
+                    <span className={`h-4 w-4 rounded cursor-pointer ${monthlyData[year][month].checkboxKeys.includes(key) ? 'bg-darkSuccess light:bg-lightSuccess' : 'bg-darkBox light:bg-lightBox'}`} onClick={() => toggleCheckbox(key)}></span>
                   )
                 })}
               </div>
@@ -216,7 +193,7 @@ const DailyCalanderTaskSheet = ({ rows, setRows, rowLimit }: CompType) => {
       {/* Add Row Button */}
       {rows < rowLimit && (
         <button
-          className="border border-black/50 cursor-pointer mt-3 smText p-1.5"
+          className="cursor-pointer smText p-1.5"
           onClick={() => {
             setRows((prev) => prev + 1)
             if (!year || !month) return;
@@ -234,7 +211,7 @@ const DailyCalanderTaskSheet = ({ rows, setRows, rowLimit }: CompType) => {
       )}
 
       {/* Day wise (column wise progress) */}
-      <div className="absolute flex gap-2 w-full justify-center -top-22">
+      <div className="absolute flex gap-2 w-full justify-center -top-28">
         <div
           className="p-2 flex items-center w-full"
         >
@@ -250,8 +227,8 @@ const DailyCalanderTaskSheet = ({ rows, setRows, rowLimit }: CompType) => {
                 const idx = dayIndex + i1 + 1;
                 return (
                   <div key={dayIndex}>
-                    <div className={`h-10 w-2.5 flex items-end`}>
-                      <div className={`w-2.5 bg-headerBg`} style={{ height: `${year && month && monthlyData[year][month].daywise[idx].progress}%` }}></div>
+                    <div className={`h-14 w-2.5 flex items-end bg-darkBg rounded-t-[3px]`}>
+                      <div className={`w-2.5 bg-darkSuccess light:bg-lightSuccess rounded-t-[3px]`} style={{ height: `${year && month && monthlyData[year][month].daywise[idx].progress}%` }}></div>
                     </div>
                     <span className="text-[6px]">{year && month && Math.floor(monthlyData[year][month].daywise[idx].progress)}%</span>
                   </div>
@@ -268,8 +245,8 @@ const DailyCalanderTaskSheet = ({ rows, setRows, rowLimit }: CompType) => {
                 const idx = dayIndex + i1 + 1;
                 return (
                   <div key={dayIndex}>
-                    <div className={`h-10 w-2.5 flex items-end`}>
-                      <div className={`w-2.5 bg-headerBg`} style={{ height: `${year && month && monthlyData[year][month].daywise[idx].progress}%` }}></div>
+                    <div className={`h-14 w-2.5 flex items-end bg-darkBg rounded-t-[3px]`}>
+                      <div className={`w-2.5 bg-darkSuccess light:bg-lightSuccess rounded-t-[3px]`} style={{ height: `${year && month && monthlyData[year][month].daywise[idx].progress}%` }}></div>
                     </div>
                     <span className="text-[6px]">{year && month && Math.floor(monthlyData[year][month].daywise[idx].progress)}%</span>
                   </div>

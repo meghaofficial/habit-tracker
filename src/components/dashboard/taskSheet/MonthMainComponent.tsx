@@ -11,7 +11,7 @@ const MonthMainComponent = () => {
     <>
       <div className="flex gap-3 mt-4">
         <div className="w-[20%]">
-          <MonthSideSection rows={rows} />
+          <MonthSideSection />
         </div>
         <div className="w-[60%]">
           <DailyCalanderTaskSheet rows={rows} setRows={setRows} rowLimit={rowLimit} />

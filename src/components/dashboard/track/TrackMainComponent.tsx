@@ -1,6 +1,10 @@
 import { useState } from "react"
 import { ProgressPie } from "../../charts/ProgressPie";
 import DailyCalanderTaskSheet from "../taskSheet/DailyCalanderTaskSheet";
+import MonthSideSection from "../taskSheet/MonthSideSection";
+import MonthProgressSideSection from "../taskSheet/MonthProgressSideSection";
+import { useSelector } from "react-redux";
+import type { RootState } from "../../../redux/store/store";
 
 const TrackMainComponent = () => {
 
@@ -8,6 +12,11 @@ const TrackMainComponent = () => {
   const subsMon = ["April", "May", "June"];
   const [rows, setRows] = useState(1);
   const rowLimit = 10;
+  const monthlyData = useSelector(
+    (state: RootState) => state.monthlyData
+  );
+  const year = "2026";
+  const month = "Apr";
 
   return (
     <>
@@ -22,7 +31,7 @@ const TrackMainComponent = () => {
           </div>
         </div>
         <div className="bg-darkCard light:bg-lightCard rounded-2xl w-[20%] p-6">
-          <ProgressPie value={40} type="track" />
+          <ProgressPie value={year && month ? monthlyData[year][month].progress.progressPercent : 0} type="track" />
         </div>
       </div>
 
@@ -30,15 +39,19 @@ const TrackMainComponent = () => {
       <>
         <div className="flex gap-4 mt-4">
           <div className="w-[20%]"></div>
-          <div className="bg-darkCard light:bg-lightCard w-[65%] rounded-2xl h-35"></div>
+          <div className="bg-darkCard light:bg-lightCard w-[65%] rounded-2xl h-25"></div>
           <div className="w-[15%]"></div>
         </div>
         <div className="flex gap-4 mt-4">
-          <div className="bg-darkCard light:bg-lightCard w-[20%] rounded-2xl"></div>
-          <div className="bg-darkCard light:bg-lightCard w-[65%] rounded-2xl">
+          <div className="bg-darkCard light:bg-lightCard w-[20%] rounded-2xl">
+            <MonthSideSection />
+          </div>
+          <div className="bg-darkCard light:bg-lightCard w-[65%] rounded-2xl border border-gray-500">
             <DailyCalanderTaskSheet rows={rows} setRows={setRows} rowLimit={rowLimit} />
           </div>
-          <div className="bg-darkCard light:bg-lightCard w-[15%] rounded-2xl"></div>
+          <div className="bg-darkCard light:bg-lightCard w-[15%] rounded-2xl">
+            <MonthProgressSideSection rows={rows} />
+          </div>
         </div>
       </>
     </>
