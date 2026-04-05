@@ -34,6 +34,24 @@ tspan{
   color: white !important;
 }
 
+/* Smooth thin scrollbar */
+::-webkit-scrollbar {
+  width: 6px;
+}
+
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+::-webkit-scrollbar-thumb {
+  background: #6366f1; /* green (matches your button) */
+  border-radius: 10px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: #6366f1;
+}
+
 @theme {
   --color-darkBg: #0f172a;
   --color-darkText: #ffffff;

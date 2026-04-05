@@ -2,7 +2,7 @@ import { useDispatch, useSelector } from "react-redux"
 import type { RootState } from "../../../redux/store/store";
 import { updateTaskName } from "../../../redux/slices/monthlySlice";
 
-const MonthSideSection = () => {
+const HabitSection = () => {
 
   const dispatch = useDispatch();
   const monthlyData = useSelector(
@@ -34,4 +34,4 @@ const MonthSideSection = () => {
   )
 }
 
-export default MonthSideSection
+export default HabitSection

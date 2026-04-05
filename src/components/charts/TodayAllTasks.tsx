@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import { useState } from "react";
 
 interface Task {
   id: number;
@@ -6,7 +6,7 @@ interface Task {
   completed: boolean;
 }
 
-const TodayAllTasks: React.FC = () => {
+const TodayAllTasks = () => {
   const [tasks, setTasks] = useState<Task[]>([
     { id: 1, text: "Drink 2L water", completed: false },
     { id: 2, text: "Workout for 30 mins", completed: true },
@@ -28,7 +28,6 @@ const TodayAllTasks: React.FC = () => {
 
   return (
     <>
-
       {/* Task List */}
       <div className="space-y-1 w-full px-4 max-h-70 overflow-y-auto hide-scrollbar">
         {tasks.map((task, index) => (

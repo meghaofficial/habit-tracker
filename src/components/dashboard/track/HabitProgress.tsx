@@ -1,8 +1,7 @@
 import { useSelector } from "react-redux";
 import type { RootState } from "../../../redux/store/store";
-import { useParams } from "react-router-dom";
 
-const MonthProgressSideSection = ({ rows }: { rows: number }) => {
+const HabitProgress = ({ rows }: { rows: number }) => {
 
   // const { year, month } = useParams<{ year: string, month: string }>();
   const year = "2026";
@@ -24,7 +23,7 @@ const MonthProgressSideSection = ({ rows }: { rows: number }) => {
       {/* task input */}
       {Array.from({ length: rows }).map((_, index) => (
         <div className="text-[12px] flex items-center border-b border-gray-700 py-1.5" key={index}>
-          <div className="w-[70%] flex items-center gap-4 px-1">
+          <div className="w-[70%] flex items-center gap-4 px-1 ps-3">
             <span className="w-[10%] text-[8px]">{year && month && monthlyData[year][month]?.taskwise[index]?.progress}%</span>
             <div className="w-[90%]">
               <div className="h-5 bg-darkSuccess light:bg-lightSuccess rounded-sm" style={{ width: `${year && month && monthlyData[year][month]?.taskwise[index]?.progress}%` }}></div>
@@ -37,4 +36,4 @@ const MonthProgressSideSection = ({ rows }: { rows: number }) => {
   )
 }
 
-export default MonthProgressSideSection
+export default HabitProgress

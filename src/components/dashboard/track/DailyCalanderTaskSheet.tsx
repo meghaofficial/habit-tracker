@@ -88,7 +88,7 @@ const DailyCalanderTaskSheet = ({ rows, setRows, rowLimit }: CompType) => {
         </div>
 
         {/* Week Letters */}
-        <div className="p-2 text-[10px] flex items-center w-full border-b border-gray-500">
+        <div className="p-2 text-[10px] flex items-center w-full border-b border-gray-700">
           {Array.from({ length: 4 }).map((_, weekIndex) => (
             <div
               key={weekIndex}
@@ -109,7 +109,7 @@ const DailyCalanderTaskSheet = ({ rows, setRows, rowLimit }: CompType) => {
         </div>
 
         {/* Date Numbers */}
-        <div className="p-2 text-[10px] tracking-wider flex items-center w-full border-b border-headerBg">
+        <div className="p-2 text-[10px] tracking-wider flex items-center w-full border-b border-gray-700">
           <div className={`flex items-center justify-evenly ${totalD > 28 ? 'w-[22%]' : 'w-[25%]'} text-center`}>
             {daysNums.slice(0, 7).map((d, index) => (
               <p key={index}>{d}</p>
@@ -147,7 +147,7 @@ const DailyCalanderTaskSheet = ({ rows, setRows, rowLimit }: CompType) => {
         {year && month && monthlyData[year][month]?.taskwise.map((task, rowIndex) => (
           <div
             key={task.taskID}
-            className="p-2 flex items-center w-full border-b border-gray-300 relative"
+            className="p-2 flex items-center w-full border-b border-gray-700 relative"
           >
             {rowIndex > 0 && (
               <div className="absolute -right-2 cursor-pointer border rounded border-gray-400 text-gray-400 bg-white" onClick={() => month && year && dispatch(deleteRow({ year, month, rowID: task?.taskID }))}>

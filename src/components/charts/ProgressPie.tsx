@@ -7,14 +7,6 @@ type Props = {
 
 export const ProgressPie = ({ value, type }: Props) => {
 
-  const data = type === "analysis" ? [
-              { id: 0, value: value, color: "#6366f1", label: "Completed" },
-              { id: 1, value: 100 - value, color: "#cbd5f5", label: "Incompleted" },
-            ] : [
-              { id: 0, value: value, color: "#6366f1" },
-              { id: 1, value: 100 - value, color: "#cbd5f5" },
-            ]
-
   return (
     <div className={`${type === "analysis" ? 'w-64 h-64' : 'h-20 top-1.5'} flex items-center justify-center relative`}>
       <PieChart
