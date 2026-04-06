@@ -1,10 +1,10 @@
 import { motion, AnimatePresence } from "framer-motion";
-import { months } from "../../staticData";
-import { statusColors } from "../../types";
+import { months } from "../../../../staticData";
+import { statusColors } from "../../../../types";
 import { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import type { RootState } from "../../redux/store/store";
-import { setNote, setStatus } from "../../redux/slices/dateDataSlice";
+import type { RootState } from "../../../../redux/store/store";
+import { setNote, setStatus } from "../../../../redux/slices/dateDataSlice";
 
 export default function RightDrawer({ open, setOpen, activeDate, year, month }: { open: boolean, setOpen: React.Dispatch<React.SetStateAction<boolean>>, activeDate: number, year: number, month: number }) {
 

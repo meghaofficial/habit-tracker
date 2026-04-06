@@ -8,6 +8,7 @@ import type { RootState } from "../../../redux/store/store";
 import TargetsList from "./TargetsList";
 import { WeeklyTargetsAccordion } from "./WeeklyTargetsAccordion";
 import { motion } from "framer-motion";
+import Calendar from "./calander/Calendar";
 
 const TrackMainComponent = () => {
 
@@ -118,7 +119,9 @@ const TrackMainComponent = () => {
         {/* weekly targets */}
         <WeeklyTargetsAccordion />
       </>
-      ) : (<></>)}
+      ) : (
+        <Calendar />
+      )}
     </div>
   )
 }
