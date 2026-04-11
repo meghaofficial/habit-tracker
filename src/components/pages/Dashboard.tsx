@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { removeCreds } from "../../redux/slices/authSlice";
 import { useDispatch, useSelector } from "react-redux";
 import { IoMoon } from "react-icons/io5";
@@ -32,6 +32,11 @@ const Dashboard = () => {
       localStorage.setItem("theme", "light");
     }
   };
+
+  useEffect(() => {
+    localStorage.setItem("theme", isDark ? "dark" : "light");
+    // Update your DOM class here if needed (e.g., document.body.classList.toggle('dark', isDark))
+  }, [isDark]);
 
   // TRY UNCOMMENT THIS
   // useEffect(() => {
