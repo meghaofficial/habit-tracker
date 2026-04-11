@@ -1,13 +1,13 @@
 import { motion, AnimatePresence } from "framer-motion";
-import { useEffect, useState } from "react";
-import { FaRegEye, FaRegEyeSlash } from "react-icons/fa6";
+import { useState } from "react";
+// import { FaRegEye, FaRegEyeSlash } from "react-icons/fa6";
 import { RxCross2 } from "react-icons/rx";
 import { useDispatch } from "react-redux";
 import { setCreds } from "../../redux/slices/authSlice";
 
 const AuthForm = ({ open, setOpen }: { open: boolean, setOpen: React.Dispatch<React.SetStateAction<boolean>> }) => {
 
-  const [showPassword, setShowPassword] = useState(false);
+  // const [showPassword, setShowPassword] = useState(false);
   const [formData, setFormData] = useState({
     username: "",
     email: "",

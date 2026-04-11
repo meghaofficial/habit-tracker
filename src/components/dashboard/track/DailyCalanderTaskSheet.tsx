@@ -9,12 +9,12 @@ type CompType = {
   rows: number;
   setRows: React.Dispatch<React.SetStateAction<number>>;
   rowLimit: number;
+  month: string;
 };
 
-const DailyCalanderTaskSheet = ({ rows, setRows, rowLimit }: CompType) => {
+const DailyCalanderTaskSheet = ({ rows, setRows, rowLimit, month }: CompType) => {
   const dispatch = useDispatch<AppDispatch>();
   const year = "2026";
-  const month = "Apr";
   const [totalD, setTotalD] = useState(0);
   const [firstDay, setFirstDay] = useState<number>(0);
 
@@ -63,6 +63,8 @@ const DailyCalanderTaskSheet = ({ rows, setRows, rowLimit }: CompType) => {
     setTotalD(monthlyData[year][month].totalDaysInMonth);
     setFirstDay(monthlyData[year][month].firstDay);
   }, [month, year]);
+
+  console.log("test", month)
 
   useEffect(() => {
     if (monthlyData) {
@@ -228,9 +230,9 @@ const DailyCalanderTaskSheet = ({ rows, setRows, rowLimit }: CompType) => {
                 return (
                   <div key={dayIndex}>
                     <div className={`h-14 w-2.5 flex items-end bg-darkBg rounded-t-[3px]`}>
-                      <div className={`w-2.5 bg-darkSuccess light:bg-lightSuccess rounded-t-[3px]`} style={{ height: `${year && month && monthlyData[year][month].daywise[idx].progress}%` }}></div>
+                      <div className={`w-2.5 bg-darkSuccess light:bg-lightSuccess rounded-t-[3px]`} style={{ height: `${year && month && monthlyData[year][month].daywise[idx]?.progress}%` }}></div>
                     </div>
-                    <span className="text-[6px]">{year && month && Math.floor(monthlyData[year][month].daywise[idx].progress)}%</span>
+                    <span className="text-[6px]">{year && month && Math.floor(monthlyData[year][month].daywise[idx]?.progress)}%</span>
                   </div>
                 );
               })}
@@ -246,9 +248,9 @@ const DailyCalanderTaskSheet = ({ rows, setRows, rowLimit }: CompType) => {
                 return (
                   <div key={dayIndex}>
                     <div className={`h-14 w-2.5 flex items-end bg-darkBg rounded-t-[3px]`}>
-                      <div className={`w-2.5 bg-darkSuccess light:bg-lightSuccess rounded-t-[3px]`} style={{ height: `${year && month && monthlyData[year][month].daywise[idx].progress}%` }}></div>
+                      <div className={`w-2.5 bg-darkSuccess light:bg-lightSuccess rounded-t-[3px]`} style={{ height: `${year && month && monthlyData[year][month]?.daywise[idx]?.progress}%` }}></div>
                     </div>
-                    <span className="text-[6px]">{year && month && Math.floor(monthlyData[year][month].daywise[idx].progress)}%</span>
+                    <span className="text-[6px]">{year && month && Math.floor(monthlyData[year][month]?.daywise[idx]?.progress)}%</span>
                   </div>
                 );
               })}

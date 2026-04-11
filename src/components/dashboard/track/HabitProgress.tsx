@@ -1,11 +1,9 @@
 import { useSelector } from "react-redux";
 import type { RootState } from "../../../redux/store/store";
 
-const HabitProgress = ({ rows }: { rows: number }) => {
-
-  // const { year, month } = useParams<{ year: string, month: string }>();
+const HabitProgress = ({ rows, month }: { rows: number, month: string }) => {
+  
   const year = "2026";
-  const month = "Apr";
   const monthlyData = useSelector(
     (state: RootState) => state.monthlyData
   );

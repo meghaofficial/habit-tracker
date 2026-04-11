@@ -32,11 +32,18 @@ export const week: Record<number, string> = {
 
 // bright bluebonnet - https://www.color-hex.com/color-palettes/
 export const weekColors: string[] = [
-  "#e9f0f3",
-  "#d3e1e7",
-  "#bcd1da",
-  "#a6c2ce",
-  "#90b3c2"
+  "#eef2ff", // very light indigo
+  "#e0e7ff",
+  "#c7d2fe",
+  "#a5b4fc",
+  "#818cf8"  // closer to primary
+];
+export const weekColorsDark: string[] = [
+  "#1a1c3a",
+  "#23265a",
+  "#2d317a",
+  "#373c9a",
+  "#4448b5"
 ];
 
 export const plans = [

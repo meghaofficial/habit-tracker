@@ -9,6 +9,7 @@ import TargetsList from "./TargetsList";
 import { WeeklyTargetsAccordion } from "./WeeklyTargetsAccordion";
 import { motion } from "framer-motion";
 import Calendar from "./calander/Calendar";
+import { months } from "../../../staticData";
 
 const TrackMainComponent = () => {
 
@@ -20,7 +21,7 @@ const TrackMainComponent = () => {
     (state: RootState) => state.monthlyData
   );
   const year = "2026";
-  const month = "Apr";
+  const month = Object.keys(months).find(key => months[key] === activeMon);
   const [monthlyNote, setMonthlyNote] = useState("");
   const [active, setActive] = useState<"dashboard" | "calendar">("dashboard");
 
@@ -88,10 +89,10 @@ const TrackMainComponent = () => {
             <HabitSection />
           </div>
           <div className="bg-darkCard light:bg-lightCard w-[65%] rounded-2xl">
-            <DailyCalanderTaskSheet rows={rows} setRows={setRows} rowLimit={rowLimit} />
+            <DailyCalanderTaskSheet rows={rows} setRows={setRows} rowLimit={rowLimit} month={month || ""} />
           </div>
           <div className="bg-darkCard light:bg-lightCard w-[15%] rounded-2xl">
-            <HabitProgress rows={rows} />
+            <HabitProgress rows={rows} month={month || ""} />
           </div>
         </div>
         {/* monthly targets */}
@@ -120,7 +121,7 @@ const TrackMainComponent = () => {
         <WeeklyTargetsAccordion />
       </>
       ) : (
-        <Calendar />
+        <Calendar activeMon={activeMon} currYear={year} />
       )}
     </div>
   )

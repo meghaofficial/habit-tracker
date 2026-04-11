@@ -15,6 +15,7 @@ export default function RightDrawer({ open, setOpen, activeDate, year, month }: 
   );
 
   const [localNote, setLocalNote] = useState("");
+  const theme = localStorage.getItem("theme");
 
   useEffect(() => {
     const timer = setTimeout(() => {
@@ -70,7 +71,7 @@ export default function RightDrawer({ open, setOpen, activeDate, year, month }: 
               animate={{ x: 0 }}
               exit={{ x: "100%" }}
               transition={{ type: "spring", stiffness: 300, damping: 30 }}
-              className="fixed top-0 right-0 h-full w-100 bg-white shadow-2xl p-4"
+              className="fixed top-0 right-0 h-full w-100 bg-darkCard light:bg-lightCard shadow-2xl p-4 z-999"
             >
               <div className="flex justify-between items-center mb-4">
                 <h2 className="text-lg font-semibold">{`${activeDate}-${Object.keys(months)[month]}-${year}`}</h2>
@@ -82,10 +83,10 @@ export default function RightDrawer({ open, setOpen, activeDate, year, month }: 
                   <div
                     key={index}
                     className='flex items-center gap-2 p-2 rounded cursor-pointer'
-                    style={{ backgroundColor: value.bg, border: activeStatus === key ? `1px solid ${value.dot}` : '' }}
+                    style={{ backgroundColor: theme === "dark" ? value.dbg : value.bg, border: activeStatus === key ? `1px solid ${theme === "dark" ? value.ddot : value.dot}` : '' }}
                     onClick={() => setActiveStatus(key)}
                   >
-                    <div className={`h-2 w-2 rounded-full`} style={{ backgroundColor: value.dot }}></div>
+                    <div className={`h-2 w-2 rounded-full`} style={{ backgroundColor: theme === "dark" ? value.ddot : value.dot }}></div>
                     <span>{key}</span>
                   </div>
                 ))}
@@ -93,7 +94,7 @@ export default function RightDrawer({ open, setOpen, activeDate, year, month }: 
 
               <p className="mt-5 text-[12px] text-gray-600">Write about something different happened today!</p>
               <textarea
-                className="resize-none outline-none border rounded border-gray-300 text-[12px] p-2 mt-1 w-full h-50"
+                className="resize-none outline-none border rounded-2xl border-gray-700 text-[12px] p-3 mt-1 w-full h-50"
                 placeholder="Note"
                 name="note"
                 onChange={(e) => setLocalNote(e.target.value)}
