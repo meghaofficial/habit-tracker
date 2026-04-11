@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { removeCreds } from "../../redux/slices/authSlice";
 import { useDispatch, useSelector } from "react-redux";
 import { IoMoon } from "react-icons/io5";
@@ -11,11 +11,16 @@ const Dashboard = () => {
 
   const [activeTab, setActiveTab] = useState("track");
   const dispatch = useDispatch();
-  const [dark, setDark] = useState(false);
+  // const [dark, setDark] = useState(false);
+  const [isDark, setDark] = useState(() => {
+    const savedTheme = localStorage.getItem("theme");
+    return savedTheme === "dark";
+  });
   const username = useSelector((state: RootState) => state.auth.username);
 
   const toggleTheme = () => {
-    const newTheme = !dark;
+    // const newTheme = !dark;
+    const newTheme = !isDark;
     setDark(newTheme);
     const root = window.document.documentElement;
 
@@ -28,15 +33,16 @@ const Dashboard = () => {
     }
   };
 
-  useEffect(() => {
-    const savedTheme = localStorage.getItem("theme");
-    if (savedTheme === "dark") {
-      setDark(true);
-    }
-    else {
-      setDark(false)
-    }
-  }, []);
+  // TRY UNCOMMENT THIS
+  // useEffect(() => {
+  //   const savedTheme = localStorage.getItem("theme");
+  //   if (savedTheme === "dark") {
+  //     setDark(true);
+  //   }
+  //   else {
+  //     setDark(false)
+  //   }
+  // }, []);
 
   // useEffect(() => {
   //   const x = location.pathname.slice(1,);
@@ -46,7 +52,7 @@ const Dashboard = () => {
 
   return (
     <>
-      <div className="px-6 pt-4">
+      <div className="px-6 pt-4 overflow-x-hidden">
         <div className="flex items-center justify-between mt-3">
           <div className="flex flex-col">
             <h1 className="text-[32px] font-bold google-sans">Hello, {username}</h1>
@@ -73,10 +79,10 @@ const Dashboard = () => {
               className="relative w-14 h-8 flex items-center bg-darkBox light:bg-lightBox rounded-full p-1 transition cursor-pointer"
             >
               <div
-                className={`w-6 h-6 bg-darkCard light:bg-lightBg flex items-center justify-center text-darkText light:text-lightText rounded-full shadow-md transform transition ${dark ? "translate-x-6" : "translate-x-0"
+                className={`w-6 h-6 bg-darkCard light:bg-lightBg flex items-center justify-center text-darkText light:text-lightText rounded-full shadow-md transform transition ${isDark ? "translate-x-6" : "translate-x-0"
                   }`}
               >
-                {dark ? <IoMoon /> : <MdWbSunny className="text-yellow-500" />}
+                {isDark ? <IoMoon /> : <MdWbSunny className="text-yellow-500" />}
               </div>
             </button>
             <button className="border-none py-1.5 cursor-pointer px-4 bg-darkPrimary light:bg-lightPrimary text-white rounded-md text-sm" onClick={() => dispatch(removeCreds())}>
