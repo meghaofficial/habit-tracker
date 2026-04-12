@@ -64,8 +64,6 @@ const DailyCalanderTaskSheet = ({ rows, setRows, rowLimit, month }: CompType) =>
     setFirstDay(monthlyData[year][month].firstDay);
   }, [month, year]);
 
-  console.log("test", month)
-
   useEffect(() => {
     if (monthlyData) {
       if (month && year) {
@@ -167,9 +165,7 @@ const DailyCalanderTaskSheet = ({ rows, setRows, rowLimit, month }: CompType) =>
                   const key = `${task?.taskID}-${weekIndex}-${dayIndex}`
 
                   return (
-                    <>
-                      <span key={key} className={`h-4 w-4 rounded cursor-pointer ${monthlyData[year][month].checkboxKeys.includes(key) ? 'bg-darkSuccess light:bg-lightSuccess' : 'bg-darkBox light:bg-lightBox'}`} onClick={() => toggleCheckbox(key)}></span>
-                    </>
+                    <span key={key} className={`h-4 w-4 rounded cursor-pointer ${monthlyData[year][month].checkboxKeys.includes(key) ? 'bg-darkSuccess light:bg-lightSuccess' : 'bg-darkBox light:bg-lightBox'}`} onClick={() => toggleCheckbox(key)}></span>
                   );
                 })}
               </div>
@@ -181,7 +177,7 @@ const DailyCalanderTaskSheet = ({ rows, setRows, rowLimit, month }: CompType) =>
                 {Array.from({ length: totalD - 28 }, (_, i) => 29 + i).map((num, dayIndex) => {
                   const key = `${task?.taskID}-4-${dayIndex}`
                   return (
-                    <span className={`h-4 w-4 rounded cursor-pointer ${monthlyData[year][month].checkboxKeys.includes(key) ? 'bg-darkSuccess light:bg-lightSuccess' : 'bg-darkBox light:bg-lightBox'}`} onClick={() => toggleCheckbox(key)}></span>
+                    <span key={key} className={`h-4 w-4 rounded cursor-pointer ${monthlyData[year][month].checkboxKeys.includes(key) ? 'bg-darkSuccess light:bg-lightSuccess' : 'bg-darkBox light:bg-lightBox'}`} onClick={() => toggleCheckbox(key)}></span>
                   )
                 })}
               </div>

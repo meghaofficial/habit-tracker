@@ -1,30 +1,90 @@
 import { motion, AnimatePresence } from "framer-motion";
-import { useState } from "react";
-// import { FaRegEye, FaRegEyeSlash } from "react-icons/fa6";
+import { useEffect, useState } from "react";
+import { FaRegEye, FaRegEyeSlash } from "react-icons/fa6";
 import { RxCross2 } from "react-icons/rx";
 import { useDispatch } from "react-redux";
 import { setCreds } from "../../redux/slices/authSlice";
+import { axiosPublic } from "../../api/axios";
+import CircleLoader from "../loaders/CircleLoader";
+import { notify } from "../../helper";
 
 const AuthForm = ({ open, setOpen }: { open: boolean, setOpen: React.Dispatch<React.SetStateAction<boolean>> }) => {
 
-  // const [showPassword, setShowPassword] = useState(false);
+  const [showPassword, setShowPassword] = useState(false);
   const [formData, setFormData] = useState({
     username: "",
     email: "",
+    password: ""
   });
   const dispatch = useDispatch();
+  const [loginActive, setLoginActive] = useState(true);
+  const [signupLoading, setSignupLoading] = useState(false);
+  const [loginLoading, setLoginLoading] = useState(false);
 
-  const handleSubmit = (e: React.SubmitEvent<HTMLFormElement>) => {
+
+  const handleSignup = async () => {
+    setSignupLoading(true);
+    try {
+
+      const { username, email, password } = formData;
+      if (!username || !email || !password) return;
+
+      const res = await axiosPublic.post("/signup", { username, email, password });
+
+      if (res?.data?.success) {
+        notify.success(res?.data?.message || "Account created successfully");
+        setLoginActive(true);
+      }
+
+    } catch (error) {
+      console.error(error);
+      notify.error("Registration failed. Please try again.");
+    } finally {
+      setSignupLoading(false);
+    }
+  }
+  const handleLogin = async () => {
+    setLoginLoading(true);
+    try {
+
+      const { email, password } = formData;
+      if (!email || !password) return;
+
+      const res = await axiosPublic.post("/login", { email, password });
+
+      if (res?.data?.success) {
+        const { username, email, id } = res?.data?.user;
+        dispatch(setCreds({ username, email, id }));
+        setFormData({
+          username: "",
+          email: "",
+          password: ""
+        });
+        setOpen(false);
+      }
+
+    } catch (error) {
+      console.error(error);
+      notify.error("Login failed. Please try again.");
+    } finally {
+      setLoginLoading(false);
+    }
+  }
+
+  const handleSubmit = async (e: React.SubmitEvent<HTMLFormElement>) => {
     e.preventDefault();
-    const { username, email } = formData;
-    if (!username || !email) return;
-    dispatch(setCreds({ username, email }));
+    if (signupLoading || loginLoading) return;
+    if (loginActive) await handleLogin();
+    else await handleSignup();
+  }
+
+  useEffect(() => {
     setFormData({
       username: "",
       email: "",
+      password: ""
     });
-    setOpen(false);
-  }
+  }, [loginActive]);
 
   return (
     <>
@@ -55,11 +115,11 @@ const AuthForm = ({ open, setOpen }: { open: boolean, setOpen: React.Dispatch<Re
                 >
                   <RxCross2 className="cursor-pointer absolute right-7 top-7.5" onClick={() => setOpen(false)} />
                   {/* Header */}
-                  <h2 className="text-2xl font-semibold mb-4">Log in</h2>
-                  <p className="text-sm text-gray-500 mb-4">
+                  <h2 className="text-2xl font-semibold mb-4">{loginActive ? 'Log in' : 'Sign up'}</h2>
+                  <p className="text-sm text-gray-500 mb-4 select-none">
                     New user?{" "}
-                    <span className="text-blue-600 focus:underline cursor-pointer">
-                      Register Now
+                    <span className="text-blue-600 focus:underline cursor-pointer" onClick={() => setLoginActive(prev => !prev)}>
+                      {loginActive ? 'Register Now' : 'Login Now'}
                     </span>
                   </p>
 
@@ -81,19 +141,21 @@ const AuthForm = ({ open, setOpen }: { open: boolean, setOpen: React.Dispatch<Re
 
                   {/* Form */}
                   <form className="space-y-4" onSubmit={handleSubmit}>
-                    <div>
-                      <label className="text-sm font-medium">
-                        Username
-                      </label>
-                      <input
-                        type="text"
-                        placeholder="Username"
-                        className="w-full mt-1 px-3 py-2 border border-gray-500 rounded-lg focus:outline-none focus:ring-2 focus:ring-darkPrimary light:focus:ring-lightPrimary text-sm"
-                        required
-                        value={formData.username}
-                        onChange={(e) => setFormData(prev => ({ ...prev, username: e.target.value }))}
-                      />
-                    </div>
+                    {!loginActive && (
+                      <div>
+                        <label className="text-sm font-medium">
+                          Username
+                        </label>
+                        <input
+                          type="text"
+                          placeholder="Username"
+                          className="w-full mt-1 px-3 py-2 border border-gray-500 rounded-lg focus:outline-none focus:ring-2 focus:ring-darkPrimary light:focus:ring-lightPrimary text-sm"
+                          required
+                          value={formData.username}
+                          onChange={(e) => setFormData(prev => ({ ...prev, username: e.target.value }))}
+                        />
+                      </div>
+                    )}
 
                     <div>
                       <label className="text-sm font-medium">
@@ -109,10 +171,12 @@ const AuthForm = ({ open, setOpen }: { open: boolean, setOpen: React.Dispatch<Re
                       />
                     </div>
 
-                    {/* <div>
+                    <div>
                       <label className="text-sm font-medium">Password</label>
                       <div className="relative mt-1">
                         <input
+                          value={formData.password}
+                          onChange={(e) => setFormData(prev => ({ ...prev, password: e.target.value }))}
                           type={showPassword ? "text" : "password"}
                           placeholder="Enter password"
                           className="w-full px-3 py-2 border border-gray-500 rounded-lg pr-10 focus:outline-none focus:ring-2 focus:ring-darkPrimary light:focus:ring-lightPrimary text-sm"
@@ -121,10 +185,10 @@ const AuthForm = ({ open, setOpen }: { open: boolean, setOpen: React.Dispatch<Re
                           onClick={() => setShowPassword(!showPassword)}
                           className="absolute right-3 top-2.5 cursor-pointer text-gray-500"
                         >
-                          {showPassword ? <FaRegEyeSlash size={18} /> : <FaRegEye size={18} />}
+                          {showPassword ? <FaRegEye size={18} /> : <FaRegEyeSlash size={18} />}
                         </span>
                       </div>
-                    </div> */}
+                    </div>
 
                     {/* Remember + Forgot */}
                     <div className="flex justify-between items-center text-sm mt-10">
@@ -139,7 +203,7 @@ const AuthForm = ({ open, setOpen }: { open: boolean, setOpen: React.Dispatch<Re
 
                     {/* Submit */}
                     <button type="submit" className="w-full bg-darkSuccess light:bg-lightSuccess cursor-pointer text-white py-2 rounded-lg mt-2 transition">
-                      Sign In
+                      {(!signupLoading && !loginLoading) ? loginActive ? 'Log In' : 'Sign Up' : <CircleLoader />}
                     </button>
                   </form>
                 </div>

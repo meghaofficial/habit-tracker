@@ -11,3 +11,8 @@
   scrollbar-width: none;
   -ms-overflow-style: none;
 }
+
+canvas {
+  height: "50%" !important;
+  width: "50%" !important;
+}

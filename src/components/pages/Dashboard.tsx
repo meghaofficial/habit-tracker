@@ -6,6 +6,9 @@ import { MdWbSunny } from "react-icons/md";
 import type { RootState } from "../../redux/store/store";
 import AnalysisMainComponent from "../dashboard/analysis/AnalysisMainComponent";
 import TrackMainComponent from "../dashboard/track/TrackMainComponent";
+import { notify } from "../../helper";
+import { axiosPrivate, axiosPublic } from "../../api/axios";
+import CircleLoader from "../loaders/CircleLoader";
 
 const Dashboard = () => {
 
@@ -17,6 +20,7 @@ const Dashboard = () => {
     return savedTheme === "dark";
   });
   const username = useSelector((state: RootState) => state.auth.username);
+  const [logoutLoading, setLogoutLoading] = useState(false);
 
   const toggleTheme = () => {
     // const newTheme = !dark;
@@ -37,6 +41,25 @@ const Dashboard = () => {
     localStorage.setItem("theme", isDark ? "dark" : "light");
     // Update your DOM class here if needed (e.g., document.body.classList.toggle('dark', isDark))
   }, [isDark]);
+
+  const handleLogout = async () => {
+    setLogoutLoading(true);
+    try {
+
+      const res = await axiosPrivate.post("/logout");
+
+      if (res?.data?.success) {
+        localStorage.removeItem("accessToken");
+        dispatch(removeCreds());
+      }
+
+    } catch (error) {
+      console.error(error);
+      notify.error("Logout failed. Please try again.");
+    } finally {
+      setLogoutLoading(false);
+    }
+  }
 
   // TRY UNCOMMENT THIS
   // useEffect(() => {
@@ -90,8 +113,8 @@ const Dashboard = () => {
                 {isDark ? <IoMoon /> : <MdWbSunny className="text-yellow-500" />}
               </div>
             </button>
-            <button className="border-none py-1.5 cursor-pointer px-4 bg-darkPrimary light:bg-lightPrimary text-white rounded-md text-sm" onClick={() => dispatch(removeCreds())}>
-              Logout
+            <button className={`border-none py-1.5 min-w-24 min-h-8 flex items-center justify-center px-4 bg-darkPrimary light:bg-lightPrimary text-white rounded-md text-sm ${!logoutLoading && 'cursor-pointer'}`} onClick={handleLogout}>
+              {logoutLoading ? <CircleLoader /> : 'Logout'}
             </button>
           </div>
         </div>

@@ -24,7 +24,7 @@ const authSlice = createSlice({
     },
     removeCreds: (state) => {
       state.username = "";
-      state.username = "";
+      state.email = "";
       localStorage.removeItem("localUsername");
       localStorage.removeItem("localEmail");
     }

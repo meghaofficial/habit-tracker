@@ -9,6 +9,9 @@ import { removeCreds } from "../../redux/slices/authSlice";
 import type { RootState } from "../../redux/store/store";
 import { FaCalendarAlt, FaBell } from "react-icons/fa";
 import { GoGoal } from "react-icons/go";
+import { notify } from "../../helper";
+import { axiosPublic } from "../../api/axios";
+import CircleLoader from "../loaders/CircleLoader";
 
 const features = [
   { title: "Daily Tracking", desc: "Mark habits daily with a clean interface.", icon: <FaCalendarAlt className="text-yellow-500" /> },
@@ -23,7 +26,7 @@ const HomePage = () => {
   const [open, setOpen] = useState(false);
   const isLogin = useSelector((state: RootState) => state.auth.username !== "");
 
-  
+
   const dispatch = useDispatch();
 
   const toggleTheme = () => {
@@ -52,7 +55,7 @@ const HomePage = () => {
     };
   }, [open]);
 
-    useEffect(() => {
+  useEffect(() => {
     const savedTheme = localStorage.getItem("theme");
     if (savedTheme === "dark") {
       setDark(true);
@@ -87,10 +90,8 @@ const HomePage = () => {
               <button className="border-none py-1.5 cursor-pointer px-4 bg-darkPrimary light:bg-lightPrimary text-white rounded-md text-sm" onClick={() => {
                 if (!isLogin)
                   setOpen(true);
-                else 
-                  dispatch(removeCreds());
               }}>
-                {isLogin ? 'Logout' : 'Login'}
+                Login
               </button>
             </div>
           </nav>
@@ -133,12 +134,12 @@ const HomePage = () => {
               const Icon = f.icon;
               return (
                 <div key={i} className="bg-darkCard light:bg-lightCard p-5 rounded-lg">
-                <div className="flex items-center gap-2 mb-2">
-                  {Icon}
-                  <h3>{f.title}</h3>
+                  <div className="flex items-center gap-2 mb-2">
+                    {Icon}
+                    <h3>{f.title}</h3>
+                  </div>
+                  <p className="text-darkSubText light:text-lightSubText">{f.desc}</p>
                 </div>
-                <p className="text-darkSubText light:text-lightSubText">{f.desc}</p>
-              </div>
               )
             })}
           </section>
