@@ -7,6 +7,7 @@ import { setCreds } from "../../redux/slices/authSlice";
 import { axiosPublic } from "../../api/axios";
 import CircleLoader from "../loaders/CircleLoader";
 import { notify } from "../../helper";
+import axios from "axios";
 
 const AuthForm = ({ open, setOpen }: { open: boolean, setOpen: React.Dispatch<React.SetStateAction<boolean>> }) => {
 
@@ -53,8 +54,9 @@ const AuthForm = ({ open, setOpen }: { open: boolean, setOpen: React.Dispatch<Re
       const res = await axiosPublic.post("/login", { email, password });
 
       if (res?.data?.success) {
+        const accessToken = res?.data?.accessToken;
         const { username, email, id } = res?.data?.user;
-        dispatch(setCreds({ username, email, id }));
+        dispatch(setCreds({ username, email, id, accessToken }));
         setFormData({
           username: "",
           email: "",
@@ -62,10 +64,18 @@ const AuthForm = ({ open, setOpen }: { open: boolean, setOpen: React.Dispatch<Re
         });
         setOpen(false);
       }
+      else {
+        notify.error(res.data.message);
+      }
 
     } catch (error) {
-      console.error(error);
-      notify.error("Login failed. Please try again.");
+      if (axios.isAxiosError(error)) {
+        notify.error(error.response?.data.message);
+        // console.error("Error Data:", error.response?.data);
+      } else {
+        // console.error("Unexpected Error:", error);
+        notify.error("Login failed. Please try again.");
+      }
     } finally {
       setLoginLoading(false);
     }

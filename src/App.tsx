@@ -9,15 +9,16 @@ import Demo from './components/pages/Demo'
 import Dashboard from './components/pages/Dashboard'
 import HomePage from './components/pages/HomePage'
 import { refreshAccessToken } from './api/axios'
-import { setCreds } from './redux/slices/authSlice'
+import { removeCreds, setCreds } from './redux/slices/authSlice'
 import PageLoader from './components/loaders/PageLoader'
 import { ToastContainer } from 'react-toastify'
 
 function App() {
 
   const dispatch = useDispatch();
-  const isLogin = useSelector((state: RootState) => state.auth.username !== "");
-  const [isAuthLoading, setIsAuthLoading] = useState(true);
+  const isLogin = useSelector((state: RootState) => state.auth.accessToken !== "");
+  const user = useSelector((state: RootState) => state.auth);
+  const [isAuthLoading, setIsAuthLoading] = useState(false);
 
   useEffect(() => {
     const savedTheme = localStorage.getItem("theme");
@@ -34,17 +35,24 @@ function App() {
   dispatch(setYear({ year: date.getFullYear().toString() }));
 
   useEffect(() => {
+    setIsAuthLoading(true);
     const initAuth = async () => {
       try {
         const data = await refreshAccessToken();
 
         if (data?.success) {
+          // console.log("Data", data?.accessToken)
+          const accessToken = data?.accessToken;
           const { username, email, id } = data?.user;
-          dispatch(setCreds({ username, email, id }));
+          dispatch(setCreds({ username, email, id, accessToken }));
+        }
+        else {
+          dispatch(removeCreds());
         }
 
       } catch (err) {
-        console.log("User not logged in");
+        console.log("User not logged in", err);
+        dispatch(removeCreds());
       } finally {
         setIsAuthLoading(false);
       }
@@ -54,22 +62,22 @@ function App() {
   }, []);
 
   return (
-    isAuthLoading ? 
-    <div className='flex items-center justify-center h-screen'>
-      <PageLoader />
-    </div> :
-    <div className='bg-darkBg light:bg-lightBg text-darkText light:text-lightText'>
-      <ToastContainer position="top-right" autoClose={3000} />
-      <Routes>
-        <Route path='/' element={isLogin ? <Dashboard /> : <HomePage />} />
-        <Route path='/demo' element={<Demo />} />
-        {/* <Route path='/dashboard' element={<Dashboard />} />
+    isAuthLoading ?
+      <div className='flex items-center justify-center h-screen'>
+        <PageLoader />
+      </div> :
+      <div className='bg-darkBg light:bg-lightBg text-darkText light:text-lightText'>
+        <ToastContainer position="top-right" autoClose={3000} />
+        <Routes>
+          <Route path='/' element={isLogin ? <Dashboard /> : <HomePage />} />
+          <Route path='/demo' element={<Demo />} />
+          {/* <Route path='/dashboard' element={<Dashboard />} />
         <Route path='/plan' element={<Dashboard />} /> */}
-        {/* <Route path='/' element={<YearCalander />} />
+          {/* <Route path='/' element={<YearCalander />} />
         <Route path='/:week' element={<WeeklyLayout />} /> */}
-        <Route path='/*' element={<PageNotFound />} />
-      </Routes>
-    </div>
+          <Route path='/*' element={<PageNotFound />} />
+        </Routes>
+      </div>
   )
 }
 

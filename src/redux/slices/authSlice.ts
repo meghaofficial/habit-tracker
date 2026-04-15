@@ -1,13 +1,17 @@
 import { createSlice } from "@reduxjs/toolkit";
 
 interface FormDataState {
+  id: string;
   username: string;
   email: string;
+  accessToken: string;
 }
 
 const initialState: FormDataState = {
-  username: localStorage.getItem("localUsername") || "",
-  email: localStorage.getItem("localEmail") || "",
+  id: "",
+  username: "",
+  email: "",
+  accessToken: ""
 };
 
 const authSlice = createSlice({
@@ -15,18 +19,18 @@ const authSlice = createSlice({
   initialState,
   reducers: {
     setCreds: (state, action) => {
-      const { username, email } = action.payload;
-      if (!username || !email) return;
+      const { id, username, email, accessToken } = action.payload;
+      if (!id || !username || !email || !accessToken) return;
+      state.id = id;
       state.username = username;
       state.email = email;
-      localStorage.setItem("localUsername", username);
-      localStorage.setItem("localEmail", email);
+      state.accessToken = accessToken;
     },
     removeCreds: (state) => {
+      state.id = "";
       state.username = "";
       state.email = "";
-      localStorage.removeItem("localUsername");
-      localStorage.removeItem("localEmail");
+      state.accessToken = "";
     }
   }
 });

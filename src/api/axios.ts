@@ -1,4 +1,6 @@
 import axios from "axios";
+import { useSelector } from "react-redux";
+import type { RootState } from "../redux/store/store";
 
 const BASE_URL = import.meta.env.VITE_API_BASE_URL;
 
@@ -13,12 +15,6 @@ export const axiosPrivate = axios.create({
   headers: { "Content-Type": "application/json" },
   withCredentials: true,
 });
-
-// 🔐 Token helpers
-const getAccessToken = () => localStorage.getItem("accessToken");
-const setAccessToken = (token: string) =>
-  localStorage.setItem("accessToken", token);
-const removeAccessToken = () => localStorage.removeItem("accessToken");
 
 type FailedQueueItem = {
   resolve: (token: string) => void;
@@ -50,7 +46,7 @@ export const refreshAccessToken = async () => {
     });
 
     const data = response.data;
-    setAccessToken(data?.accessToken);
+    // setAccessToken(data?.accessToken);
 
     return data;
   } catch (error) {
@@ -62,7 +58,7 @@ export const refreshAccessToken = async () => {
 // 🔹 REQUEST INTERCEPTOR
 axiosPrivate.interceptors.request.use(
   (config) => {
-    const token = getAccessToken();
+    const token = useSelector((state: RootState) => state.auth.accessToken);
     if (token && config.headers) {
       config.headers.Authorization = `Bearer ${token}`;
     }
@@ -105,7 +101,7 @@ axiosPrivate.interceptors.response.use(
       } catch (err) {
         processQueue(err, null);
 
-        removeAccessToken();
+        // removeAccessToken();
         // 👉 dispatch logout() if using Redux
         // 👉 redirect to login
 
