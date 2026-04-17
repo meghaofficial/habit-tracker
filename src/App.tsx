@@ -12,12 +12,13 @@ import { refreshAccessToken } from './api/axios'
 import { removeCreds, setCreds } from './redux/slices/authSlice'
 import PageLoader from './components/loaders/PageLoader'
 import { ToastContainer } from 'react-toastify'
+import Settings from './components/pages/Settings'
 
 function App() {
 
   const dispatch = useDispatch();
   const isLogin = useSelector((state: RootState) => state.auth.accessToken !== "");
-  const user = useSelector((state: RootState) => state.auth);
+  // const user = useSelector((state: RootState) => state.auth);
   const [isAuthLoading, setIsAuthLoading] = useState(false);
 
   useEffect(() => {
@@ -43,7 +44,7 @@ function App() {
         if (data?.success) {
           // console.log("Data", data?.accessToken)
           const accessToken = data?.accessToken;
-          const { username, email, id } = data?.user;
+          const { username, email, id } = data?.user || {};
           dispatch(setCreds({ username, email, id, accessToken }));
         }
         else {
@@ -71,6 +72,7 @@ function App() {
         <Routes>
           <Route path='/' element={isLogin ? <Dashboard /> : <HomePage />} />
           <Route path='/demo' element={<Demo />} />
+          <Route path='/settings' element={<Settings />} />
           {/* <Route path='/dashboard' element={<Dashboard />} />
         <Route path='/plan' element={<Dashboard />} /> */}
           {/* <Route path='/' element={<YearCalander />} />

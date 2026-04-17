@@ -4,14 +4,10 @@ import { plans } from "../../staticData";
 import { MdWbSunny } from "react-icons/md";
 import { IoMoon, IoStatsChart } from "react-icons/io5";
 import AuthForm from "../auth/AuthForm";
-import { useDispatch, useSelector } from "react-redux";
-import { removeCreds } from "../../redux/slices/authSlice";
+import { useSelector } from "react-redux";
 import type { RootState } from "../../redux/store/store";
 import { FaCalendarAlt, FaBell } from "react-icons/fa";
 import { GoGoal } from "react-icons/go";
-import { notify } from "../../helper";
-import { axiosPublic } from "../../api/axios";
-import CircleLoader from "../loaders/CircleLoader";
 
 const features = [
   { title: "Daily Tracking", desc: "Mark habits daily with a clean interface.", icon: <FaCalendarAlt className="text-yellow-500" /> },
@@ -25,9 +21,6 @@ const HomePage = () => {
   const [dark, setDark] = useState(false);
   const [open, setOpen] = useState(false);
   const isLogin = useSelector((state: RootState) => state.auth.username !== "");
-
-
-  const dispatch = useDispatch();
 
   const toggleTheme = () => {
     const newTheme = !dark;
@@ -104,9 +97,9 @@ const HomePage = () => {
                 Track your daily habits, visualize progress, and stay consistent effortlessly.
               </p>
               <div>
-                <Link to="/dashboard" className="mr-2.5 py-3 px-5 rounded-lg border-none cursor-pointer text-white bg-darkPrimary light:bg-lightPrimary">
+                <span className="mr-2.5 py-3 px-5 rounded-lg border-none cursor-pointer text-white bg-darkPrimary light:bg-lightPrimary" onClick={() => setOpen(true)}>
                   Get Started
-                </Link>
+                </span>
                 <Link to="/demo"
                   className="border border-darkPrimary light:border-lightPrimary text-darkPrimary light:text-lightPrimary cursor-pointer bg-transparent py-3 px-5 rounded-lg"
                 >

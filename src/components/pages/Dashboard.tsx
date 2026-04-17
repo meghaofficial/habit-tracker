@@ -7,20 +7,22 @@ import type { RootState } from "../../redux/store/store";
 import AnalysisMainComponent from "../dashboard/analysis/AnalysisMainComponent";
 import TrackMainComponent from "../dashboard/track/TrackMainComponent";
 import { notify } from "../../helper";
-import { axiosPrivate, axiosPublic } from "../../api/axios";
+import { axiosPrivate } from "../../api/axios";
 import CircleLoader from "../loaders/CircleLoader";
+import { IoSettingsSharp } from "react-icons/io5";
+import { useNavigate } from "react-router-dom";
 
 const Dashboard = () => {
 
   const [activeTab, setActiveTab] = useState("track");
   const dispatch = useDispatch();
-  // const [dark, setDark] = useState(false);
   const [isDark, setDark] = useState(() => {
     const savedTheme = localStorage.getItem("theme");
     return savedTheme === "dark";
   });
   const username = useSelector((state: RootState) => state.auth.username);
   const [logoutLoading, setLogoutLoading] = useState(false);
+  const navigate = useNavigate();
 
   const toggleTheme = () => {
     // const newTheme = !dark;
@@ -49,7 +51,6 @@ const Dashboard = () => {
       const res = await axiosPrivate.post("/logout");
 
       if (res?.data?.success) {
-        localStorage.removeItem("accessToken");
         dispatch(removeCreds());
       }
 
@@ -116,6 +117,7 @@ const Dashboard = () => {
             <button className={`border-none py-1.5 min-w-24 min-h-8 flex items-center justify-center px-4 bg-darkPrimary light:bg-lightPrimary text-white rounded-md text-sm ${!logoutLoading && 'cursor-pointer'}`} onClick={handleLogout}>
               {logoutLoading ? <CircleLoader /> : 'Logout'}
             </button>
+            <IoSettingsSharp className="cursor-pointer text-xl" onClick={() => navigate("/settings")} />
           </div>
         </div>
 

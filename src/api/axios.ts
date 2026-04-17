@@ -1,6 +1,6 @@
 import axios from "axios";
-import { useSelector } from "react-redux";
-import type { RootState } from "../redux/store/store";
+import { store } from "../redux/store/store";
+import { setCreds } from "../redux/slices/authSlice";
 
 const BASE_URL = import.meta.env.VITE_API_BASE_URL;
 
@@ -58,7 +58,7 @@ export const refreshAccessToken = async () => {
 // 🔹 REQUEST INTERCEPTOR
 axiosPrivate.interceptors.request.use(
   (config) => {
-    const token = useSelector((state: RootState) => state.auth.accessToken);
+    const token = store.getState().auth.accessToken;
     if (token && config.headers) {
       config.headers.Authorization = `Bearer ${token}`;
     }
@@ -93,6 +93,8 @@ axiosPrivate.interceptors.response.use(
       try {
         const data = await refreshAccessToken();
         const newAccessToken = data?.accessToken;
+
+        store.dispatch(setCreds({ accessToken: newAccessToken }));
 
         processQueue(null, newAccessToken);
 
