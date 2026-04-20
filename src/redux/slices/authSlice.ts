@@ -5,13 +5,15 @@ interface FormDataState {
   username: string;
   email: string;
   accessToken: string;
+  isActiveSubs: boolean;
 }
 
 const initialState: FormDataState = {
   id: "",
   username: "",
   email: "",
-  accessToken: ""
+  accessToken: "",
+  isActiveSubs: false
 };
 
 const authSlice = createSlice({
@@ -25,6 +27,7 @@ const authSlice = createSlice({
       if (action.payload.username) state.username = action.payload.username;
       if (action.payload.email) state.email = action.payload.email;
       if (action.payload.accessToken) state.accessToken = action.payload.accessToken;
+      if (action.payload.isActiveSubs) state.isActiveSubs = action.payload.isActiveSubs;
     },
     removeCreds: (state) => {
       state.id = "";

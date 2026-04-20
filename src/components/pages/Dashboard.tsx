@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { removeCreds } from "../../redux/slices/authSlice";
+import { removeCreds, setCreds } from "../../redux/slices/authSlice";
 import { useDispatch, useSelector } from "react-redux";
 import { IoMoon } from "react-icons/io5";
 import { MdWbSunny } from "react-icons/md";
@@ -11,6 +11,8 @@ import { axiosPrivate } from "../../api/axios";
 import CircleLoader from "../loaders/CircleLoader";
 import { IoSettingsSharp } from "react-icons/io5";
 import { useNavigate } from "react-router-dom";
+import { plans } from "../../staticData";
+import Popup from "../shared/Popup";
 
 const Dashboard = () => {
 
@@ -23,6 +25,9 @@ const Dashboard = () => {
   const username = useSelector((state: RootState) => state.auth.username);
   const [logoutLoading, setLogoutLoading] = useState(false);
   const navigate = useNavigate();
+  const user = useSelector((state: RootState) => state.auth);
+  const [openPopup, setOpenPopup] = useState(false);
+  const [freeTrialLoading, setFreeTrialLoading] = useState(false);
 
   const toggleTheme = () => {
     // const newTheme = !dark;
@@ -62,6 +67,26 @@ const Dashboard = () => {
     }
   }
 
+  const handleActivateFree = async () => {
+    setFreeTrialLoading(true);
+    try {
+
+      const res = await axiosPrivate.patch("/free-trial");
+
+      if (res?.data?.success) {
+        notify.success(res?.data?.message);
+        dispatch(setCreds({ isActiveSubs: true }));
+        setOpenPopup(false);
+      }
+
+    } catch (error) {
+      console.error(error);
+      notify.error("Please try again.");
+    } finally {
+      setFreeTrialLoading(false);
+    }
+  }
+
   // TRY UNCOMMENT THIS
   // useEffect(() => {
   //   const savedTheme = localStorage.getItem("theme");
@@ -81,7 +106,63 @@ const Dashboard = () => {
 
   return (
     <>
+
       <div className="px-6 pt-4 overflow-x-hidden">
+
+        {!user?.isActiveSubs && (
+          <>
+            {/* overlay for not subscribed */}
+            <div className="z-9999 backdrop-blur fixed -top-5 left-0 w-full h-full mt-5 rounded-2xl overflow-x-hidden flex items-center justify-center flex-col">
+              <div className="absolute top-3 right-3 flex items-center gap-3">
+                <button className={`border-none py-1.5 min-w-24 min-h-8 flex items-center justify-center px-4 bg-darkPrimary light:bg-lightPrimary text-white rounded-md text-sm ${!logoutLoading && 'cursor-pointer'}`} onClick={handleLogout}>
+                  {logoutLoading ? <CircleLoader /> : 'Logout'}
+                </button>
+                <IoSettingsSharp className="cursor-pointer text-xl" onClick={() => navigate("/settings")} />
+              </div>
+              <p className="text-3xl mb-3 font-semibold">Oops! you don't have any active subscription.</p>
+              <p className="mb-5">To activate, please choose any active plan from the following.</p>
+              <div className="grid gap-3 grid-cols-5">
+                {plans.map((plan, i) => (
+                  <div key={i} className="bg-darkCard light:bg-lightCard p-5 rounded-lg text-center">
+                    <h3>{plan.title}</h3>
+                    <p style={{ fontSize: "22px", margin: "10px 0" }}>{plan.price}</p>
+                    <p className="text-gray-400 text-[14px] mb-3.75 w-55">
+                      {plan.desc}
+                    </p>
+                    <button onClick={() => {
+                      if (i == 0) setOpenPopup(true);
+                    }} className={`mr-2.5 py-2 px-5 text-sm rounded-md border-none cursor-pointer ${i === 0 ? 'bg-darkSuccess light:bg-lightSuccess text-black' : 'bg-darkPrimary light:bg-lightPrimary text-white'}`}>
+                      {i === 0 ? 'Activate' : 'Choose Plan'}
+                    </button>
+                  </div>
+                ))}
+              </div>
+            </div>
+          </>
+        )}
+
+        <Popup open={openPopup} setOpen={setOpenPopup}>
+          <div className="flex items-center justify-center h-95 flex-col google-sans">
+            <p>Are you sure you want to activate your free trial ? This action can be undone!</p>
+            <p className="text-gray-500 text-sm mt-3 w-[80%] tracking-wider text-justify">Tip: Use your free trial wisely. It is suggested to activate you free trial in the beginning of the month, otherwise you will get advantage of using it for minimum days. For example - If you activate your free trial on 25th of April then your activation will only be valid till April 31st. And if you activate your free trial on 4th of April then also your activation will be valid till April 31st. Your free trial activation will be valid till end of the current month no matter at which date you are activating your free trial.</p>
+            <div className="mt-3 flex items-center justify-center gap-3">
+              {freeTrialLoading ? (
+                <button className={`mr-2.5 py-2.5 px-5 min-w-20 rounded-md border-none bg-darkSuccess light:bg-lightSuccess text-black`}>
+                  <CircleLoader />
+                </button>
+              ) : (
+                <button onClick={handleActivateFree} className={`mr-2.5 py-2 px-5 rounded-md border-none cursor-pointer bg-darkSuccess light:bg-lightSuccess text-black`}>
+                  Confirm
+                </button>
+              )}
+              <button onClick={() => setOpenPopup(false)} className={`mr-2.5 py-2 px-5 rounded-md border-none cursor-pointer bg-red-500 text-black`}>
+                Cancel
+              </button>
+            </div>
+          </div>
+        </Popup>
+
+
         <div className="flex items-center justify-between mt-3">
           <div className="flex flex-col">
             <h1 className="text-[32px] font-bold google-sans">Hello, {username}</h1>
@@ -124,7 +205,7 @@ const Dashboard = () => {
         {activeTab === "track" && <TrackMainComponent />}
         {activeTab === "analysis" && <AnalysisMainComponent />}
 
-      </div>
+      </div >
     </>
   )
 }

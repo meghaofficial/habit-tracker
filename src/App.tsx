@@ -42,10 +42,10 @@ function App() {
         const data = await refreshAccessToken();
 
         if (data?.success) {
-          // console.log("Data", data?.accessToken)
           const accessToken = data?.accessToken;
           const { username, email, id } = data?.user || {};
-          dispatch(setCreds({ username, email, id, accessToken }));
+          console.log(data?.user);
+          dispatch(setCreds({ username, email, id, accessToken, isActiveSubs: data?.user?.hasUsedTrial || false }));
         }
         else {
           dispatch(removeCreds());

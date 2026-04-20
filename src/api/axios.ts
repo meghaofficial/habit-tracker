@@ -46,7 +46,6 @@ export const refreshAccessToken = async () => {
     });
 
     const data = response.data;
-    // setAccessToken(data?.accessToken);
 
     return data;
   } catch (error) {
