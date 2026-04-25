@@ -21,8 +21,6 @@ const authSlice = createSlice({
   initialState,
   reducers: {
     setCreds: (state, action) => {
-      // const { id, username, email, accessToken } = action.payload;
-      // if (!id || !username || !email || !accessToken) return;
       if (action.payload.id) state.id = action.payload.id;
       if (action.payload.username) state.username = action.payload.username;
       if (action.payload.email) state.email = action.payload.email;

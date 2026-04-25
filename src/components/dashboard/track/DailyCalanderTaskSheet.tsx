@@ -72,6 +72,8 @@ const DailyCalanderTaskSheet = ({ rows, setRows, rowLimit, month }: CompType) =>
     }
   }, [monthlyData]);
 
+  console.log("monthlyData[year][month]", monthlyData[year][month])
+
   return (
     <div className="flex flex-col w-full relative">
       <div className="w-full">

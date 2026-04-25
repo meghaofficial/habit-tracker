@@ -60,7 +60,7 @@ function App() {
     };
 
     initAuth();
-  }, []);
+  }, [dispatch]);
 
   return (
     isAuthLoading ?
