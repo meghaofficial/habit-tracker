@@ -1,21 +1,28 @@
-import { useDispatch, useSelector } from "react-redux"
-import type { RootState } from "../../../redux/store/store";
-import { updateTaskName } from "../../../redux/slices/monthlySlice";
+import type { ITask } from "../../../types";
+import { axiosPrivate } from "../../../api/axios";
+import { debounce, notify } from "../../../helper";
+import { useMemo } from "react";
 
-const HabitSection = () => {
+const HabitSection = ({ data }: { data: ITask[] }) => {
 
-  const dispatch = useDispatch();
-  const monthlyData = useSelector(
-    (state: RootState) => state.monthlyData
-  );
-  // const { year, month } = useParams();
-    const year = "2026";
-  const month = "Apr";
+  const handleChange = async (id: string, value: string) => {
+    // setFreeTrialLoading(true);
+    try {
 
-  const handleChange = (id: string, value: string) => {
-    if (!month || !year) return;
-    dispatch(updateTaskName({ year, month, taskID: id, taskName: value }));
+      await axiosPrivate.put(`/api/update-task-name?taskId=${id}`, { taskName: value });
+
+    } catch (error) {
+      console.error(error);
+      notify.error("Please try again.");
+    } finally {
+      // setFreeTrialLoading(false);
+    }
   }
+
+  const debouncedHandleChange = useMemo(
+    () => debounce(handleChange, 1000),
+    []
+  );
 
   return (
     <>
@@ -23,10 +30,10 @@ const HabitSection = () => {
         <p className="smText p-5.5 text-center border-b border-black" style={{ fontWeight: "bolder" }}>DAILY HABITS</p>
         <p className="smText p-2.5 text-center border-b border-darkBg bg-darkPrimary light:bg-lightPrimary" style={{ fontWeight: "bold" }}>HABITS</p>
         {/* task input */}
-        {month && year && monthlyData[year][month]?.taskwise?.map((task, index) => (
+        {data?.map((task, index) => (
           <div className="text-[12px] px-2 p-1 flex items-center gap-2 border-b border-gray-700" key={index}>
             <span>{index + 1}</span>
-            <input type="text" className="outline-none w-full py-1" title="value" value={year && month ? task?.task : ""} onChange={(e) => handleChange(task?.taskID, e.target.value)} />
+            <input type="text" className="outline-none w-full py-1" title="value" value={task?.name} onChange={(e) => debouncedHandleChange(task?._id, e.target.value)} />
           </div>
         ))}
       </div>

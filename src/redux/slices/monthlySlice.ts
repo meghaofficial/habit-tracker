@@ -72,7 +72,7 @@ const monthlySlice = createSlice({
 
       curr.progress.progressPercent = Math.floor(
         (curr.progress.totalDaysWorked / (totalRows * curr.totalDaysInMonth)) *
-          100,
+        100,
       );
       curr.taskwise.push({
         taskID: uuidv4(),
@@ -134,7 +134,7 @@ const monthlySlice = createSlice({
       const { year, month, day, isMarked } = action.payload;
       const curr = state[year][month];
 
-      if (isMarked){
+      if (isMarked) {
         curr.daywise[day].count += 1;
         curr.progress.totalDaysWorked += 1;
       }
@@ -167,6 +167,19 @@ const monthlySlice = createSlice({
         task.task = taskName;
       }
     },
+    // updateTaskName: (
+    //   state,
+    //   action: PayloadAction<{
+    //     taskID: string;
+    //     taskName: string;
+    //   }>,
+    // ) => {
+    //   const { taskID, taskName } = action.payload;
+    //   const task = curr.taskwise.find((t) => t.taskID === taskID);
+    //   if (task) {
+    //     task.task = taskName;
+    //   }
+    // },
     addCheckboxKey: (state, action) => {
       const { year, month, cbk } = action.payload;
       if (!year || !month) return;

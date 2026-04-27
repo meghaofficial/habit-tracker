@@ -1,78 +1,93 @@
-import { useEffect, useState } from "react";
-import { useDispatch, useSelector } from "react-redux";
-import type { AppDispatch, RootState } from "../../../redux/store/store";
+import { useEffect } from "react";
+import { useSelector } from "react-redux";
+import type { RootState } from "../../../redux/store/store";
 import { daysNums, weekLetters } from "../../../staticData";
-import { addCheckboxKey, deleteRow, removeCheckboxKey, updateDaywiseCount, updateTaskwiseCount, updateTotalTasks } from "../../../redux/slices/monthlySlice";
 import { LuMinus } from "react-icons/lu";
+import type { ITask } from "../../../types";
+import { axiosPrivate } from "../../../api/axios";
+import { notify } from "../../../helper";
 
-type CompType = {
-  rows: number;
-  setRows: React.Dispatch<React.SetStateAction<number>>;
-  rowLimit: number;
-  month: string;
-};
-
-const DailyCalanderTaskSheet = ({ rows, setRows, rowLimit, month }: CompType) => {
-  const dispatch = useDispatch<AppDispatch>();
+const DailyCalanderTaskSheet = (
+  { taskList, setTaskList, metaData, daywiseData,
+    // setDaywiseData 
+  }:
+    {
+      taskList: ITask[],
+      setTaskList: React.Dispatch<React.SetStateAction<ITask[]>>,
+      metaData: { firstDay: number, totalDays: number, overallDays: number },
+      daywiseData: { fullDate: string, count: number, total: number, progress: string }[],
+      setDaywiseData: React.Dispatch<React.SetStateAction<{ fullDate: string, count: number, total: number, progress: string }[]>>
+    }
+) => {
   const year = "2026";
-  const [totalD, setTotalD] = useState(0);
-  const [firstDay, setFirstDay] = useState<number>(0);
+  const totalD = metaData?.totalDays || 0;
+  const firstDay = metaData?.firstDay || 0;
 
-  const monthlyData = useSelector(
-    (state: RootState) => state.monthlyData
-  );
+  const month = 4;
+  const rowLimit = 10;
 
-  const toggleCheckbox = (key: string) => {
-    if (!year || !month) return;
+  const toggleCheckbox = async (taskId: string, cbKey: string, isChecked: boolean, fullDate: string) => {
+    // setFreeTrialLoading(true);
+    try {
 
-    const isChecked = monthlyData[year][month].checkboxKeys.includes(key);
-    const newValue = !isChecked;
+      const res = await axiosPrivate.put(`/api/update-task-check?taskId=${taskId}&checkboxKey=${cbKey}`, { isChecked, fullDate });
 
-    const parts = key.split("-");
-    const weekIndex = Number(parts[parts.length - 2]);
-    const dayIndex = Number(parts[parts.length - 1]);
-    const day = weekIndex * 7 + dayIndex + 1;
+      if (res?.data?.success) {
+        const { data } = res.data;
+        setTaskList(data.taskList);
 
-    if (newValue) {
-      dispatch(addCheckboxKey({ year, month, cbk: key }));
-    } else {
-      dispatch(removeCheckboxKey({ year, month, cbk: key }));
-    }
-
-    dispatch(updateTaskwiseCount({
-      year,
-      month,
-      checkboxData: {
-        ...Object.fromEntries(
-          monthlyData[year][month].checkboxKeys.map(k => [k, true])
-        ),
-        [key]: newValue
+        console.log("data", data);
       }
-    }));
 
-    dispatch(updateDaywiseCount({
-      year,
-      month,
-      day,
-      isMarked: newValue
-    }));
-  };
+    } catch (error) {
+      console.error(error);
+      notify.error("Please try again.");
+    } finally {
+      // setFreeTrialLoading(false);
+    }
+  }
+
+  const handleDeleteRow = async (taskId: string, fullDate: string) => {
+    // setFreeTrialLoading(true);
+    try {
+
+      const res = await axiosPrivate.delete(`/api/remove-task?taskId=${taskId}&fullDate=${fullDate}`);
+
+      if (res?.data?.success) {
+        const { data } = res.data;
+        setTaskList(data.taskList);
+      }
+
+    } catch (error) {
+      console.error(error);
+      notify.error("Please try again.");
+    } finally {
+      // setFreeTrialLoading(false);
+    }
+  }
+
+  const handleAddRow = async () => {
+    // setFreeTrialLoading(true);
+    try {
+
+      const res = await axiosPrivate.post(`/api/add-task`, { year, month });
+
+      if (res?.data?.success) {
+        const { data } = res.data;
+        setTaskList(data.taskList);
+      }
+
+    } catch (error) {
+      console.error(error);
+      notify.error("Please try again.");
+    } finally {
+      // setFreeTrialLoading(false);
+    }
+  }
 
   useEffect(() => {
-    if (!month || !year) return;
-    setTotalD(monthlyData[year][month].totalDaysInMonth);
-    setFirstDay(monthlyData[year][month].firstDay);
-  }, [month, year]);
-
-  useEffect(() => {
-    if (monthlyData) {
-      if (month && year) {
-        setRows(monthlyData[year][month].totalTasks);
-      }
-    }
-  }, [monthlyData]);
-
-  console.log("monthlyData[year][month]", monthlyData[year][month])
+    if (!taskList || !metaData) return;
+  }, [taskList, metaData]);
 
   return (
     <div className="flex flex-col w-full relative">
@@ -146,13 +161,15 @@ const DailyCalanderTaskSheet = ({ rows, setRows, rowLimit, month }: CompType) =>
         </div>
 
         {/* Checkbox Rows */}
-        {year && month && monthlyData[year][month]?.taskwise.map((task, rowIndex) => (
+        {taskList && taskList?.map((task, taskIndex) => (
           <div
-            key={task.taskID}
+            key={task?._id}
             className="p-2 flex items-center w-full border-b border-gray-700 relative"
           >
-            {rowIndex > 0 && (
-              <div className="absolute -right-2 cursor-pointer border rounded border-gray-400 text-gray-400 bg-white" onClick={() => month && year && dispatch(deleteRow({ year, month, rowID: task?.taskID }))}>
+            {taskIndex > 0 && (
+              <div className="absolute -right-2 cursor-pointer border rounded border-gray-400 text-gray-400 bg-white"
+                onClick={() => handleDeleteRow(task?._id, task?.taskData?.[0]?.fullDate || "")}
+              >
                 <LuMinus size={15} />
               </div>
             )}
@@ -163,11 +180,11 @@ const DailyCalanderTaskSheet = ({ rows, setRows, rowLimit, month }: CompType) =>
                 key={weekIndex}
                 className={`flex items-center justify-evenly ${totalD > 28 ? 'w-[22%]' : 'w-[25%]'} text-center`}
               >
-                {Array.from({ length: 7 }).map((_, dayIndex) => {
-                  const key = `${task?.taskID}-${weekIndex}-${dayIndex}`
-
+                {taskList?.[taskIndex]?.taskData?.slice(weekIndex * 7, (weekIndex + 1) * 7).map((t, dayIndex) => {
                   return (
-                    <span key={key} className={`h-4 w-4 rounded cursor-pointer ${monthlyData[year][month].checkboxKeys.includes(key) ? 'bg-darkSuccess light:bg-lightSuccess' : 'bg-darkBox light:bg-lightBox'}`} onClick={() => toggleCheckbox(key)}></span>
+                    <span key={dayIndex} className={`h-4 w-4 rounded cursor-pointer ${t?.isChecked ? 'bg-darkSuccess light:bg-lightSuccess' : 'bg-darkBox light:bg-lightBox'}`}
+                      onClick={() => toggleCheckbox(task._id, t?.checkboxKey, !t.isChecked, t.fullDate)}
+                    ></span>
                   );
                 })}
               </div>
@@ -177,9 +194,11 @@ const DailyCalanderTaskSheet = ({ rows, setRows, rowLimit, month }: CompType) =>
             {totalD > 28 && (
               <div className="flex items-center justify-evenly w-[12%] text-center">
                 {Array.from({ length: totalD - 28 }, (_, i) => 29 + i).map((num, dayIndex) => {
-                  const key = `${task?.taskID}-4-${dayIndex}`
+                  const t = taskList?.[taskIndex]?.taskData?.[28 + dayIndex];
                   return (
-                    <span key={key} className={`h-4 w-4 rounded cursor-pointer ${monthlyData[year][month].checkboxKeys.includes(key) ? 'bg-darkSuccess light:bg-lightSuccess' : 'bg-darkBox light:bg-lightBox'}`} onClick={() => toggleCheckbox(key)}></span>
+                    <span key={dayIndex} className={`h-4 w-4 rounded cursor-pointer ${t?.isChecked ? 'bg-darkSuccess light:bg-lightSuccess' : 'bg-darkBox light:bg-lightBox'}`}
+                      onClick={() => toggleCheckbox(task._id, t?.checkboxKey, !t.isChecked, t.fullDate)}
+                    ></span>
                   )
                 })}
               </div>
@@ -191,20 +210,10 @@ const DailyCalanderTaskSheet = ({ rows, setRows, rowLimit, month }: CompType) =>
 
 
       {/* Add Row Button */}
-      {rows < rowLimit && (
+      {taskList?.length < rowLimit && (
         <button
           className="cursor-pointer smText p-1.5"
-          onClick={() => {
-            setRows((prev) => prev + 1)
-            if (!year || !month) return;
-            dispatch(
-              updateTotalTasks({
-                year,
-                month,
-                totalRows: rows + 1
-              })
-            );
-          }}
+          onClick={handleAddRow}
         >
           ADD ROW +
         </button>
@@ -222,15 +231,13 @@ const DailyCalanderTaskSheet = ({ rows, setRows, rowLimit, month }: CompType) =>
               key={weekIndex}
               className={`flex items-center justify-evenly ${totalD > 28 ? 'w-[22%]' : 'w-[25%]'} text-center`}
             >
-              {Array.from({ length: 7 }).map((_, dayIndex) => {
-                const i1 = weekIndex * 7;
-                const idx = dayIndex + i1 + 1;
+              {daywiseData?.slice(weekIndex * 7, (weekIndex + 1) * 7)?.map((d, dayIndex) => {
                 return (
-                  <div key={dayIndex}>
+                  <div key={dayIndex} title={d?.progress}>
                     <div className={`h-14 w-2.5 flex items-end bg-darkBg rounded-t-[3px]`}>
-                      <div className={`w-2.5 bg-darkSuccess light:bg-lightSuccess rounded-t-[3px]`} style={{ height: `${year && month && monthlyData[year][month].daywise[idx]?.progress}%` }}></div>
+                      <div className={`w-2.5 bg-darkSuccess light:bg-lightSuccess rounded-t-[3px]`} style={{ height: `${d?.progress}%` }}></div>
                     </div>
-                    <span className="text-[6px]">{year && month && Math.floor(monthlyData[year][month].daywise[idx]?.progress)}%</span>
+                    <span className="text-[6px]">{d?.progress}%</span>
                   </div>
                 );
               })}
@@ -241,14 +248,13 @@ const DailyCalanderTaskSheet = ({ rows, setRows, rowLimit, month }: CompType) =>
           {totalD > 28 && (
             <div className="flex items-center justify-evenly w-[12%] text-center">
               {Array.from({ length: totalD - 28 }, (_, i) => 29 + i).map((_, dayIndex) => {
-                const i1 = 4 * 7;
-                const idx = dayIndex + i1 + 1;
+                const d = daywiseData?.[28 + dayIndex];
                 return (
-                  <div key={dayIndex}>
+                  <div key={dayIndex} title={d?.progress}>
                     <div className={`h-14 w-2.5 flex items-end bg-darkBg rounded-t-[3px]`}>
-                      <div className={`w-2.5 bg-darkSuccess light:bg-lightSuccess rounded-t-[3px]`} style={{ height: `${year && month && monthlyData[year][month]?.daywise[idx]?.progress}%` }}></div>
+                      <div className={`w-2.5 bg-darkSuccess light:bg-lightSuccess rounded-t-[3px]`} style={{ height: `${d?.progress}%` }}></div>
                     </div>
-                    <span className="text-[6px]">{year && month && Math.floor(monthlyData[year][month]?.daywise[idx]?.progress)}%</span>
+                    <span className="text-[6px]">{d?.progress}%</span>
                   </div>
                 );
               })}

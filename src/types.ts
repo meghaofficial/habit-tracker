@@ -41,7 +41,7 @@ export const statusColors: Record<string, { dot: string; bg: string; ddot: strin
     dot: "#EF4444",
     bg: "#FEE2E2",
     ddot: "#F87171",
-    dbg: "#3F1D1D", 
+    dbg: "#3F1D1D",
   },
   event: {
     dot: "#3B82F6",
@@ -52,14 +52,14 @@ export const statusColors: Record<string, { dot: string; bg: string; ddot: strin
   achievement: {
     dot: "#22C55E",
     bg: "#DCFCE7",
-    ddot: "#4ADE80", 
-    dbg: "#1C3D2B", 
+    ddot: "#4ADE80",
+    dbg: "#1C3D2B",
   },
   sick: {
     dot: "#A855F7",
     bg: "#F3E8FF",
-    ddot: "#C084FC", 
-    dbg: "#3B1E54", 
+    ddot: "#C084FC",
+    dbg: "#3B1E54",
   },
 };
 
@@ -85,3 +85,19 @@ export const statusColorsDark: Record<string, { dot: string; bg: string }> = {
     bg: "#3B1E54", // deep purple tint
   },
 };
+
+
+// NEWNEW
+
+export interface ITaskData {
+  checkboxKey: string;
+  fullDate: string;
+  isChecked: boolean;
+  _id: string;
+}
+
+export interface ITask {
+  _id: string;
+  name: string;
+  taskData: ITaskData[];
+}
