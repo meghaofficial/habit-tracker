@@ -100,4 +100,6 @@ export interface ITask {
   _id: string;
   name: string;
   taskData: ITaskData[];
+  count: number;
+  progress: string;
 }

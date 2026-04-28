@@ -1,6 +1,4 @@
-import { useEffect } from "react";
-import { useSelector } from "react-redux";
-import type { RootState } from "../../../redux/store/store";
+import { useEffect, useState } from "react";
 import { daysNums, weekLetters } from "../../../staticData";
 import { LuMinus } from "react-icons/lu";
 import type { ITask } from "../../../types";
@@ -9,25 +7,28 @@ import { notify } from "../../../helper";
 
 const DailyCalanderTaskSheet = (
   { taskList, setTaskList, metaData, daywiseData,
-    // setDaywiseData 
+    setDaywiseData
   }:
     {
       taskList: ITask[],
       setTaskList: React.Dispatch<React.SetStateAction<ITask[]>>,
       metaData: { firstDay: number, totalDays: number, overallDays: number },
-      daywiseData: { fullDate: string, count: number, total: number, progress: string }[],
-      setDaywiseData: React.Dispatch<React.SetStateAction<{ fullDate: string, count: number, total: number, progress: string }[]>>
+      daywiseData: { fullDate: string, count: number, progress: string, _id: string }[],
+      setDaywiseData: React.Dispatch<React.SetStateAction<{ fullDate: string, count: number, progress: string, _id: string }[]>>
     }
 ) => {
   const year = "2026";
   const totalD = metaData?.totalDays || 0;
   const firstDay = metaData?.firstDay || 0;
+  const [activeCheckbox, setActiveCheckbox] = useState<string>("");
+  const [addRowLoading, setAddRowLoading] = useState<boolean>(false);
+  const [removeRowID, setRemoveRowID] = useState<string | null>(null);
 
   const month = 4;
   const rowLimit = 10;
 
   const toggleCheckbox = async (taskId: string, cbKey: string, isChecked: boolean, fullDate: string) => {
-    // setFreeTrialLoading(true);
+    setActiveCheckbox(cbKey);
     try {
 
       const res = await axiosPrivate.put(`/api/update-task-check?taskId=${taskId}&checkboxKey=${cbKey}`, { isChecked, fullDate });
@@ -35,20 +36,19 @@ const DailyCalanderTaskSheet = (
       if (res?.data?.success) {
         const { data } = res.data;
         setTaskList(data.taskList);
-
-        console.log("data", data);
+        setDaywiseData(data.daywiseData);
       }
 
     } catch (error) {
       console.error(error);
       notify.error("Please try again.");
     } finally {
-      // setFreeTrialLoading(false);
+      setActiveCheckbox("");
     }
   }
 
   const handleDeleteRow = async (taskId: string, fullDate: string) => {
-    // setFreeTrialLoading(true);
+    setRemoveRowID(taskId);
     try {
 
       const res = await axiosPrivate.delete(`/api/remove-task?taskId=${taskId}&fullDate=${fullDate}`);
@@ -56,18 +56,19 @@ const DailyCalanderTaskSheet = (
       if (res?.data?.success) {
         const { data } = res.data;
         setTaskList(data.taskList);
+        setDaywiseData(data.daywiseData);
       }
 
     } catch (error) {
       console.error(error);
       notify.error("Please try again.");
     } finally {
-      // setFreeTrialLoading(false);
+      setRemoveRowID(null);
     }
   }
 
   const handleAddRow = async () => {
-    // setFreeTrialLoading(true);
+    setAddRowLoading(true);
     try {
 
       const res = await axiosPrivate.post(`/api/add-task`, { year, month });
@@ -75,13 +76,14 @@ const DailyCalanderTaskSheet = (
       if (res?.data?.success) {
         const { data } = res.data;
         setTaskList(data.taskList);
+        setDaywiseData(data.daywiseData);
       }
 
     } catch (error) {
       console.error(error);
       notify.error("Please try again.");
     } finally {
-      // setFreeTrialLoading(false);
+      setAddRowLoading(false);
     }
   }
 
@@ -167,12 +169,15 @@ const DailyCalanderTaskSheet = (
             className="p-2 flex items-center w-full border-b border-gray-700 relative"
           >
             {taskIndex > 0 && (
-              <div className="absolute -right-2 cursor-pointer border rounded border-gray-400 text-gray-400 bg-white"
-                onClick={() => handleDeleteRow(task?._id, task?.taskData?.[0]?.fullDate || "")}
-              >
-                <LuMinus size={15} />
-              </div>
-            )}
+              removeRowID === task?._id ? (
+                <button className="absolute -right-2 cursor-not-allowed smText p-2 animate-pulse bg-gray-400 rounded"></button>
+              ) : (
+                <div className="absolute -right-2 cursor-pointer border rounded border-gray-400 text-gray-400 bg-white"
+                  onClick={() => handleDeleteRow(task?._id, task?.taskData?.[0]?.fullDate || "")}
+                >
+                  <LuMinus size={15} />
+                </div>
+              ))}
 
             {/* Weeks 1–4 */}
             {Array.from({ length: 4 }).map((_, weekIndex) => (
@@ -182,9 +187,14 @@ const DailyCalanderTaskSheet = (
               >
                 {taskList?.[taskIndex]?.taskData?.slice(weekIndex * 7, (weekIndex + 1) * 7).map((t, dayIndex) => {
                   return (
-                    <span key={dayIndex} className={`h-4 w-4 rounded cursor-pointer ${t?.isChecked ? 'bg-darkSuccess light:bg-lightSuccess' : 'bg-darkBox light:bg-lightBox'}`}
-                      onClick={() => toggleCheckbox(task._id, t?.checkboxKey, !t.isChecked, t.fullDate)}
-                    ></span>
+                    activeCheckbox == t?.checkboxKey ? (
+                      <span key={dayIndex} className={`h-4 w-4 rounded border-2 border-darkSuccess light:border-lightSuccess animate-pulse`}
+                      ></span>
+                    ) : (
+                      <span key={dayIndex} className={`h-4 w-4 rounded cursor-pointer ${t?.isChecked ? 'bg-darkSuccess light:bg-lightSuccess' : 'bg-darkBox light:bg-lightBox'}`}
+                        onClick={() => !activeCheckbox && toggleCheckbox(task._id, t?.checkboxKey, !t.isChecked, t.fullDate)}
+                      ></span>
+                    )
                   );
                 })}
               </div>
@@ -196,9 +206,14 @@ const DailyCalanderTaskSheet = (
                 {Array.from({ length: totalD - 28 }, (_, i) => 29 + i).map((num, dayIndex) => {
                   const t = taskList?.[taskIndex]?.taskData?.[28 + dayIndex];
                   return (
-                    <span key={dayIndex} className={`h-4 w-4 rounded cursor-pointer ${t?.isChecked ? 'bg-darkSuccess light:bg-lightSuccess' : 'bg-darkBox light:bg-lightBox'}`}
-                      onClick={() => toggleCheckbox(task._id, t?.checkboxKey, !t.isChecked, t.fullDate)}
-                    ></span>
+                    activeCheckbox == t?.checkboxKey ? (
+                      <span key={dayIndex} className={`h-4 w-4 rounded border-2 border-darkSuccess light:border-lightSuccess animate-pulse`}
+                      ></span>
+                    ) : (
+                      <span key={dayIndex} className={`h-4 w-4 rounded cursor-pointer ${t?.isChecked ? 'bg-darkSuccess light:bg-lightSuccess' : 'bg-darkBox light:bg-lightBox'}`}
+                        onClick={() => !activeCheckbox && toggleCheckbox(task._id, t?.checkboxKey, !t.isChecked, t.fullDate)}
+                      ></span>
+                    )
                   )
                 })}
               </div>
@@ -211,12 +226,18 @@ const DailyCalanderTaskSheet = (
 
       {/* Add Row Button */}
       {taskList?.length < rowLimit && (
-        <button
-          className="cursor-pointer smText p-1.5"
-          onClick={handleAddRow}
-        >
-          ADD ROW +
-        </button>
+        addRowLoading ? (
+          <button className="cursor-not-allowed smText p-1.5 animate-pulse">
+            Adding...
+          </button>
+        ) : (
+          <button
+            className="cursor-pointer smText p-1.5"
+            onClick={handleAddRow}
+          >
+            ADD ROW +
+          </button>
+        )
       )}
 
       {/* Day wise (column wise progress) */}
