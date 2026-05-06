@@ -1,10 +1,8 @@
-import type { ITask } from "../../../types";
 import { axiosPrivate } from "../../../api/axios";
-// import { debounce, notify } from "../../../helper";
 import { useEffect, useRef, useState } from "react";
 import { notify } from "../../../helper";
 
-const HabitSection = ({ data }: { data: ITask[] }) => {
+const HabitSection = ({ taskList }: { taskList: string[] }) => {
 
   return (
     <>
@@ -12,9 +10,9 @@ const HabitSection = ({ data }: { data: ITask[] }) => {
         <p className="smText p-5.5 text-center border-b border-black" style={{ fontWeight: "bolder" }}>DAILY HABITS</p>
         <p className="smText p-2.5 text-center border-b border-darkBg bg-darkPrimary light:bg-lightPrimary" style={{ fontWeight: "bold" }}>HABITS</p>
         {/* task input */}
-        {data?.map((task, index) => (
-          <div key={task?._id}>
-            <InputData index={index} taskId={task._id} name={task.name} />
+        {taskList?.map((task, index) => (
+          <div key={index}>
+            <InputData index={index} taskId={task} name={task} />
           </div>
         ))}
       </div>

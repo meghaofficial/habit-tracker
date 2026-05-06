@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react"
+import { useState } from "react"
 import { ProgressPie } from "../../charts/ProgressPie";
 import DailyCalanderTaskSheet from "./DailyCalanderTaskSheet";
 import HabitSection from "./HabitSection";
@@ -7,26 +7,34 @@ import TargetsList from "./TargetsList";
 import { WeeklyTargetsAccordion } from "./WeeklyTargetsAccordion";
 import { motion } from "framer-motion";
 import Calendar from "./calander/Calendar";
-import { axiosPrivate } from "../../../api/axios";
-import { notify } from "../../../helper";
 import type { ITask } from "../../../types";
-import MonthlyNote from "./MonthlyNote";
 
-const TrackMainComponent = () => {
+const TrackMainComponent = ({ dashboardData, totalMonths }: {
+  dashboardData: {
+    _id: string;
+    userID: string;
+    month: number;
+    year: number;
+    totalDays: number;
+    firstDay: number;
+  },
+  totalMonths: number[]
+}) => {
 
-  const [months, setMonths] = useState<string[]>([]);
-  const [activeMon, setActiveMon] = useState<string | undefined>();
+  const [activeMon, setActiveMon] = useState<number | null>(null);
+  const selectedMonth =
+    activeMon && totalMonths.includes(activeMon)
+      ? activeMon
+      : totalMonths[0];
   const year = "2026";
   const [active, setActive] = useState<"dashboard" | "calendar">("dashboard");
 
 
-
-  const [taskList, setTaskList] = useState<ITask[]>([{ _id: "", name: "", taskData: [], count: 0, progress: "" }]);
-  const [chartData, setChartData] = useState<{ firstDay: number, totalDays: number, overallDays: number }>({ firstDay: 0, totalDays: 0, overallDays: 0 });
+  const [taskList, setTaskList] = useState<string[]>([]);
   const [daywiseData, setDaywiseData] = useState<{ fullDate: string, count: number, progress: string, _id: string }[]>([{ fullDate: "", count: 0, progress: "0", _id: "" }]);
-  const [monthlyNote, setMonthlyNote] = useState("");
-  const [currMon, setCurrMon] = useState<number>(-1);
-  const [currYear, setCurrYear] = useState<number>(-1);
+  // const [monthlyNote, setMonthlyNote] = useState("");
+  // const [currMon, setCurrMon] = useState<number>(-1);
+  // const [currYear, setCurrYear] = useState<number>(-1);
 
 
   const monMap: { [key: number]: string } = {
@@ -44,49 +52,21 @@ const TrackMainComponent = () => {
     12: "December"
   }
 
-  const getData = async () => {
-    // setFreeTrialLoading(true);
-    try {
-
-      const res = await axiosPrivate.get(`/api/dashboard`);
-
-      if (res?.data?.success) {
-        const { data } = res.data;
-        setTaskList(data.taskList);
-        setDaywiseData(data?.daywiseData || []);
-        setChartData({ firstDay: data.firstDay, totalDays: data.totalDays, overallDays: data.overallDays });
-        setMonthlyNote(data?.note);
-        setCurrMon(data?.month);
-        setCurrYear(data?.year);
-        // setMonths(data.month_year);
-        // setActiveMon(monMap[Number(data.month_year[0].split("-")[0])]);
-        // setActiveYear(data.month_year[0].split("-")[1]);
-        // setOverallProgress(data.overallProgress);
-      }
-
-    } catch (error) {
-      console.error(error);
-      notify.error("Please try again.");
-    } finally {
-      // setFreeTrialLoading(false);
-    }
-  }
-
-  useEffect(() => {
-    getData();
-  }, []);
-
   return (
     <div className="pb-5">
       {/* details */}
       <div className="flex gap-4 mt-6">
         <div className="bg-darkCard light:bg-lightCard rounded-2xl w-[80%] p-6 flex flex-col gap-3">
-          <span className="text-3xl tracking-wider font-bold playfair-display">{monMap?.[currMon]}, {currYear}</span>
+          <span className="text-3xl tracking-wider font-bold playfair-display">{monMap?.[dashboardData?.month]}, {dashboardData?.year}</span>
           <div className="flex items-center justify-between">
             {/* months */}
             <div className="text-sm google-sans flex items-center gap-3 mt-3">
-              {months?.map((mon, index) => (
-                <button key={index} className={`px-4 py-2 rounded-full cursor-pointer hover:bg-darkPrimary light:hover:bg-lightPrimary ${activeMon === monMap[Number(mon.split("-")[index])] ? 'bg-darkPrimary light:bg-lightPrimary text-white' : 'bg-darkBox light:bg-lightBg'}`} onClick={() => setActiveMon(monMap[Number(mon.split("-")[index])])}>{monMap[Number(mon.split("-")[index])]}</button>
+              {totalMonths?.map((mon, index) => (
+                <button key={index} className={`px-4 py-2 rounded-full cursor-pointer hover:bg-darkPrimary light:hover:bg-lightPrimary ${selectedMonth === mon ? 'bg-darkPrimary light:bg-lightPrimary text-white' : 'bg-darkBox light:bg-lightBg'}`}
+                  onClick={() => setActiveMon(mon)}
+                >
+                  {monMap[mon]}
+                </button>
               ))}
             </div>
             {/* switch to calander */}
@@ -137,19 +117,19 @@ const TrackMainComponent = () => {
           </div>
           <div className="flex gap-4 mt-4">
             <div className="bg-darkCard light:bg-lightCard w-[20%] rounded-2xl">
-              <HabitSection data={taskList} />
+              <HabitSection taskList={taskList} />
             </div>
             <div className="bg-darkCard light:bg-lightCard w-[65%] rounded-2xl">
-              <DailyCalanderTaskSheet taskList={taskList} setTaskList={setTaskList} metaData={chartData} daywiseData={daywiseData} setDaywiseData={setDaywiseData} />
+              <DailyCalanderTaskSheet taskList={taskList} setTaskList={setTaskList} daywiseData={daywiseData} setDaywiseData={setDaywiseData} dashboardData={dashboardData} />
             </div>
             <div className="bg-darkCard light:bg-lightCard w-[15%] rounded-2xl">
-              <HabitProgress taskList={taskList} total={Number(chartData?.totalDays)} />
+              {/* <HabitProgress taskList={taskList} total={dashboardData?.totalDays} /> */}
             </div>
           </div>
           {/* monthly targets */}
           <div className="flex gap-4 mt-4">
             {/* note */}
-            <MonthlyNote note={monthlyNote} currMon={currMon} currYear={currYear} />
+            {/* <MonthlyNote note={monthlyNote} currMon={currMon} currYear={currYear} /> */}
             {/* monthly targets */}
             <div className="bg-darkCard light:bg-lightCard w-1/3 rounded-2xl p-2">
               <p className="font-semibold text-lg px-5 py-3">Monthly Targets</p>

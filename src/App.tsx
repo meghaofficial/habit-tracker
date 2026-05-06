@@ -44,7 +44,7 @@ function App() {
         if (data?.success) {
           const accessToken = data?.accessToken;
           const { username, email, id } = data?.user || {};
-          dispatch(setCreds({ username, email, id, accessToken, isActiveSubs: data?.user?.hasUsedTrial || false }));
+          dispatch(setCreds({ username, email, id, accessToken }));
         }
         else {
           dispatch(removeCreds());

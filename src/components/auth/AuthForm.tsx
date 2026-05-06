@@ -56,7 +56,7 @@ const AuthForm = ({ open, setOpen }: { open: boolean, setOpen: React.Dispatch<Re
       if (res?.data?.success) {
         const accessToken = res?.data?.accessToken;
         const { username, email, id } = res?.data?.user;
-        dispatch(setCreds({ username, email, id, accessToken, isActiveSubs: res?.data?.user?.hasUsedTrial || false }));
+        dispatch(setCreds({ username, email, id, accessToken }));
         setFormData({
           username: "",
           email: "",

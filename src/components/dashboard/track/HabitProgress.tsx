@@ -1,6 +1,4 @@
-import type { ITask } from "../../../types";
-
-const HabitProgress = ({ taskList, total }: { taskList: ITask[], total: number }) => {
+const HabitProgress = ({ taskList, total }: { taskList: string[], total: number }) => {
 
   return (
     <div className="">

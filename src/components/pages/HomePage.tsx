@@ -8,6 +8,7 @@ import { useSelector } from "react-redux";
 import type { RootState } from "../../redux/store/store";
 import { FaCalendarAlt, FaBell } from "react-icons/fa";
 import { GoGoal } from "react-icons/go";
+import { axiosPrivate } from "../../api/axios";
 
 const features = [
   { title: "Daily Tracking", desc: "Mark habits daily with a clean interface.", icon: <FaCalendarAlt className="text-yellow-500" /> },
