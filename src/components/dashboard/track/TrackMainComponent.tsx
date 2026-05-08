@@ -31,7 +31,6 @@ const TrackMainComponent = ({ dashboardData, totalMonths }: {
 
 
   const [taskList, setTaskList] = useState<{ _id: string, name: string }[]>([]);
-  const [daywiseData, setDaywiseData] = useState<{ fullDate: string, count: number, progress: string, _id: string }[]>([{ fullDate: "", count: 0, progress: "0", _id: "" }]);
   // const [monthlyNote, setMonthlyNote] = useState("");
   // const [currMon, setCurrMon] = useState<number>(-1);
   // const [currYear, setCurrYear] = useState<number>(-1);
@@ -120,7 +119,7 @@ const TrackMainComponent = ({ dashboardData, totalMonths }: {
               <HabitSection taskList={taskList} />
             </div>
             <div className="bg-darkCard light:bg-lightCard w-[65%] rounded-2xl">
-              <DailyCalanderTaskSheet taskList={taskList} setTaskList={setTaskList} daywiseData={daywiseData} setDaywiseData={setDaywiseData} dashboardData={dashboardData} />
+              <DailyCalanderTaskSheet taskList={taskList} setTaskList={setTaskList} dashboardData={dashboardData} />
             </div>
             <div className="bg-darkCard light:bg-lightCard w-[15%] rounded-2xl">
               {/* <HabitProgress taskList={taskList} total={dashboardData?.totalDays} /> */}
@@ -147,7 +146,8 @@ const TrackMainComponent = ({ dashboardData, totalMonths }: {
           <WeeklyTargetsAccordion />
         </>
       ) : (
-        <Calendar activeMon={activeMon} currYear={year} />
+        // <Calendar activeMon={activeMon} currYear={year} />
+        <></>
       )}
     </div>
   )

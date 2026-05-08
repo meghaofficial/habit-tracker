@@ -8,16 +8,12 @@ const DailyCalanderTaskSheet = (
   {
     taskList,
     setTaskList,
-    daywiseData,
-    setDaywiseData,
 
     dashboardData
   }:
     {
       taskList: { _id: string, name: string }[],
-      setTaskList: React.Dispatch<React.SetStateAction<string[]>>,
-      daywiseData: { fullDate: string, count: number, progress: string, _id: string }[],
-      setDaywiseData: React.Dispatch<React.SetStateAction<{ fullDate: string, count: number, progress: string, _id: string }[]>>,
+      setTaskList: React.Dispatch<React.SetStateAction<{ _id: string, name: string }[]>>,
 
       dashboardData: {
         _id: string;
@@ -296,12 +292,12 @@ const DailyCalanderTaskSheet = (
         >
 
           {/* Weeks 1–4 */}
-          {Array.from({ length: 4 }).map((_, weekIndex) => (
+          {/* {Array.from({ length: 4 }).map((_, weekIndex) => (
             <div
               key={weekIndex}
               className={`flex items-center justify-evenly ${totalD > 28 ? 'w-[22%]' : 'w-[25%]'} text-center`}
             >
-              {daywiseData?.slice(weekIndex * 7, (weekIndex + 1) * 7)?.map((d, dayIndex) => {
+              {dateLogs?.slice(weekIndex * 7, (weekIndex + 1) * 7)?.map((d, dayIndex) => {
                 return (
                   <div key={dayIndex} title={d?.progress}>
                     <div className={`h-14 w-2.5 flex items-end bg-darkBg rounded-t-[3px]`}>
@@ -312,13 +308,13 @@ const DailyCalanderTaskSheet = (
                 );
               })}
             </div>
-          ))}
+          ))} */}
 
           {/* Week 5 (3 days) */}
-          {totalD > 28 && (
+          {/* {totalD > 28 && (
             <div className="flex items-center justify-evenly w-[12%] text-center">
               {Array.from({ length: totalD - 28 }, (_, i) => 29 + i).map((_, dayIndex) => {
-                const d = daywiseData?.[28 + dayIndex];
+                const d = dateLogs?.[28 + dayIndex];
                 return (
                   <div key={dayIndex} title={d?.progress}>
                     <div className={`h-14 w-2.5 flex items-end bg-darkBg rounded-t-[3px]`}>
@@ -329,7 +325,7 @@ const DailyCalanderTaskSheet = (
                 );
               })}
             </div>
-          )}
+          )} */}
 
         </div>
       </div>
