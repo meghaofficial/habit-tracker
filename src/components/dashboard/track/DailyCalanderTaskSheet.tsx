@@ -14,7 +14,7 @@ const DailyCalanderTaskSheet = (
     dashboardData
   }:
     {
-      taskList: string[],
+      taskList: { _id: string, name: string }[],
       setTaskList: React.Dispatch<React.SetStateAction<string[]>>,
       daywiseData: { fullDate: string, count: number, progress: string, _id: string }[],
       setDaywiseData: React.Dispatch<React.SetStateAction<{ fullDate: string, count: number, progress: string, _id: string }[]>>,
@@ -29,7 +29,6 @@ const DailyCalanderTaskSheet = (
       },
     }
 ) => {
-  const year = "2026";
   const totalD = dashboardData?.totalDays || 0;
   const firstDay = dashboardData?.firstDay || 0;
   const [activeCheckbox, setActiveCheckbox] = useState<string>("");
@@ -41,34 +40,9 @@ const DailyCalanderTaskSheet = (
     userID: string;
     monthDashID: string;
     fullDate: Date;
-    tasks: {
-      [taskID: string]: boolean
-    }
+    tasks: [string]
   }[]>([]);
-  // const [taskList, setTaskList] = useState<string[]>([]);
-
-  const month = 4;
   const rowLimit = 10;
-
-  // const toggleCheckbox = async (taskId: string, cbKey: string, isChecked: boolean, fullDate: string) => {
-  //   setActiveCheckbox(cbKey);
-  //   try {
-
-  //     const res = await axiosPrivate.put(`/api/update-task-check?taskId=${taskId}&checkboxKey=${cbKey}`, { isChecked, fullDate });
-
-  //     if (res?.data?.success) {
-  //       const { data } = res.data;
-  //       setTaskList(data.taskList);
-  //       setDaywiseData(data.daywiseData);
-  //     }
-
-  //   } catch (error) {
-  //     console.error(error);
-  //     notify.error("Please try again.");
-  //   } finally {
-  //     setActiveCheckbox("");
-  //   }
-  // }
 
   const handleDeleteRow = async (taskId: string, fullDate: string) => {
     setRemoveRowID(taskId);
@@ -94,12 +68,11 @@ const DailyCalanderTaskSheet = (
     setAddRowLoading(true);
     try {
 
-      const res = await axiosPrivate.post(`/api/add-task`, { year, month });
+      const res = await axiosPrivate.post(`/api/add-task?monthDashID=${dashboardData?._id}`, { taskName: "" });
 
       if (res?.data?.success) {
-        const { data } = res.data;
-        setTaskList(data.taskList);
-        setDaywiseData(data.daywiseData);
+        setTaskList(res?.data?.tasks);
+        // setDaywiseData(data.daywiseData);
       }
 
     } catch (error) {
@@ -116,7 +89,19 @@ const DailyCalanderTaskSheet = (
       const res = await axiosPrivate.get(`/api/date-logs?monthDashID=${dashboardData?._id}`);
       if (res?.data?.success) {
         setDateLogs(res?.data?.dateLogs);
-        setTaskList(Object.keys(res?.data?.dateLogs[0].tasks));
+      }
+    } catch (error) {
+      console.error(error);
+    } finally {
+      // setDashLoading(false);
+    }
+  }
+  const getTasks = async () => {
+    // setDashLoading(true);
+    try {
+      const res = await axiosPrivate.get(`/api/get-task?monthDashID=${dashboardData?._id}`);
+      if (res?.data?.success) {
+        setTaskList(res?.data?.tasks);
       }
     } catch (error) {
       console.error(error);
@@ -125,26 +110,41 @@ const DailyCalanderTaskSheet = (
     }
   }
 
-  const toggleCheckbox = async (date: Date, taskID: string, marked: boolean) => {
-    // setDashLoading(false);
+  const toggleCheckbox = async (date: Date, taskID: string, marked: boolean, id: string) => {
+    setActiveCheckbox(`${taskID}-${id}`);
     try {
-      const res = await axiosPrivate.patch(`/api/date-logs?monthDashID=${dashboardData?._id}&date=${date}taskID=${taskID}`, { marked });
+      const res = await axiosPrivate.patch(`/api/date-logs?monthDashID=${dashboardData?._id}&fullDate=${date}&taskID=${taskID}`, { marked });
       if (res?.data?.success) {
-        // setDateLogs(res?.data?.dateLogs);
+        const updated = dateLogs.map(d =>
+          d?._id === id
+            ? {
+                ...d,
+                tasks: res?.data?.dateLog?.tasks
+              }
+            : d
+        );
+        setDateLogs(updated);
       }
     } catch (error) {
       console.error(error);
     } finally {
-      // setDashLoading(false);
+      setActiveCheckbox("");
     }
   }
 
   const dateLogRef = useRef(false);
+  const taskLogRef = useRef(false);
 
   useEffect(() => {
     if (dateLogRef.current || !dashboardData?._id) return;
     getDateLogs();
     dateLogRef.current = true;
+  }, [dashboardData?._id]);
+
+  useEffect(() => {
+    if (taskLogRef.current || !dashboardData?._id) return;
+    getTasks();
+    taskLogRef.current = true;
   }, [dashboardData?._id]);
 
   return (
@@ -219,9 +219,9 @@ const DailyCalanderTaskSheet = (
         </div>
 
         {/* Checkbox Rows */}
-        {taskList.length > 0 && taskList?.map((taskID, taskIndex) => (
+        {taskList.length > 0 && taskList?.map((task, taskIndex) => (
           <div
-            key={taskID}
+            key={task?._id}
             className="p-2 flex items-center w-full border-b border-gray-700 relative"
           >
             {taskIndex > 0 && (
@@ -229,7 +229,7 @@ const DailyCalanderTaskSheet = (
                 <button className="absolute -right-2 cursor-not-allowed smText p-2 animate-pulse bg-gray-400 rounded"></button>
               ) : (
                 <div className="absolute -right-2 cursor-pointer border rounded border-gray-400 text-gray-400 bg-white"
-                  onClick={() => handleDeleteRow(task?._id, task?.taskData?.[0]?.fullDate || "")}
+                // onClick={() => handleDeleteRow(task?._id, task?.taskData?.[0]?.fullDate || "")}
                 >
                   <LuMinus size={15} />
                 </div>
@@ -241,28 +241,15 @@ const DailyCalanderTaskSheet = (
                 key={weekIndex}
                 className={`flex items-center justify-evenly ${totalD > 28 ? 'w-[22%]' : 'w-[25%]'} text-center`}
               >
-                {/* {taskList?.[taskIndex]?.taskData?.slice(weekIndex * 7, (weekIndex + 1) * 7).map((t, dayIndex) => {
-                  return (
-                    activeCheckbox == t?.checkboxKey ? (
-                      <span key={dayIndex} className={`h-4 w-4 rounded border-2 border-darkSuccess light:border-lightSuccess animate-pulse`}
-                      ></span>
-                    ) : (
-                      <span key={dayIndex} className={`h-4 w-4 rounded cursor-pointer ${t?.isChecked ? 'bg-darkSuccess light:bg-lightSuccess' : 'bg-darkBox light:bg-lightBox'}`}
-                        onClick={() => !activeCheckbox && toggleCheckbox(task._id, t?.checkboxKey, !t.isChecked, t.fullDate)}
-                      ></span>
-                    )
-                  );
-                })} */}
                 {dateLogs?.slice(weekIndex * 7, (weekIndex + 1) * 7).map((log, dayIndex) => {
-                  const isChecked = log._id in log.tasks
+                  const isChecked = log?.tasks?.includes(task?._id);
                   return (
-                    activeCheckbox == log?._id ? (
+                    activeCheckbox == `${task?._id}-${log._id}` ? (
                       <span key={dayIndex} className={`h-4 w-4 rounded border-2 border-darkSuccess light:border-lightSuccess animate-pulse`}
                       ></span>
                     ) : (
                       <span key={dayIndex} className={`h-4 w-4 rounded cursor-pointer ${isChecked ? 'bg-darkSuccess light:bg-lightSuccess' : 'bg-darkBox light:bg-lightBox'}`}
-                      // onClick={() => !activeCheckbox && toggleCheckbox(task._id, log?._id, !isChecked, log.fullDate)}
-                      // onClick={() => toggleCheckbox(log.fullDate, log.)}
+                      onClick={() => toggleCheckbox(log.fullDate, task?._id, !isChecked, log?._id)}
                       ></span>
                     )
                   );
@@ -273,16 +260,16 @@ const DailyCalanderTaskSheet = (
             {/* Week 5 */}
             {totalD > 28 && (
               <div className="flex items-center justify-evenly w-[12%] text-center">
-                {Array.from({ length: totalD - 28 }, (_, i) => 29 + i).map((num, dayIndex) => {
+                {Array.from({ length: totalD - 28 }, (_, i) => 29 + i).map((_, dayIndex) => {
                   const log = dateLogs?.[28 + dayIndex];
-                  const isChecked = log._id in log.tasks;
+                  const isChecked = log?.tasks?.includes(task?._id);
                   return (
-                    activeCheckbox == log?._id ? (
+                    activeCheckbox == `${task?._id}-${log._id}` ? (
                       <span key={dayIndex} className={`h-4 w-4 rounded border-2 border-darkSuccess light:border-lightSuccess animate-pulse`}
                       ></span>
                     ) : (
                       <span key={dayIndex} className={`h-4 w-4 rounded cursor-pointer ${isChecked ? 'bg-darkSuccess light:bg-lightSuccess' : 'bg-darkBox light:bg-lightBox'}`}
-                      // onClick={() => !activeCheckbox && toggleCheckbox(task._id, log?._id, !isChecked, log.fullDate)}
+                      onClick={() => toggleCheckbox(log.fullDate, task?._id, !isChecked, log?._id)}
                       ></span>
                     )
                   )

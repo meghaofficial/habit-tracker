@@ -30,7 +30,7 @@ const TrackMainComponent = ({ dashboardData, totalMonths }: {
   const [active, setActive] = useState<"dashboard" | "calendar">("dashboard");
 
 
-  const [taskList, setTaskList] = useState<string[]>([]);
+  const [taskList, setTaskList] = useState<{ _id: string, name: string }[]>([]);
   const [daywiseData, setDaywiseData] = useState<{ fullDate: string, count: number, progress: string, _id: string }[]>([{ fullDate: "", count: 0, progress: "0", _id: "" }]);
   // const [monthlyNote, setMonthlyNote] = useState("");
   // const [currMon, setCurrMon] = useState<number>(-1);
