@@ -44,18 +44,13 @@ const DailyCalanderTaskSheet = (
   }[]>([]);
   const rowLimit = 10;
 
-  const handleDeleteRow = async (taskId: string, fullDate: string) => {
+  const handleDeleteRow = async (taskId: string) => {
     setRemoveRowID(taskId);
     try {
-
-      const res = await axiosPrivate.delete(`/api/remove-task?taskId=${taskId}&fullDate=${fullDate}`);
-
+      const res = await axiosPrivate.delete(`/api/task?taskID=${taskId}&monthDashID=${dashboardData._id}`);
       if (res?.data?.success) {
-        const { data } = res.data;
-        setTaskList(data.taskList);
-        setDaywiseData(data.daywiseData);
+        setTaskList(res?.data?.tasks);
       }
-
     } catch (error) {
       console.error(error);
       notify.error("Please try again.");
@@ -67,14 +62,10 @@ const DailyCalanderTaskSheet = (
   const handleAddRow = async () => {
     setAddRowLoading(true);
     try {
-
-      const res = await axiosPrivate.post(`/api/add-task?monthDashID=${dashboardData?._id}`, { taskName: "" });
-
+      const res = await axiosPrivate.post(`/api/task?monthDashID=${dashboardData?._id}`, { taskName: "" });
       if (res?.data?.success) {
         setTaskList(res?.data?.tasks);
-        // setDaywiseData(data.daywiseData);
       }
-
     } catch (error) {
       console.error(error);
       notify.error("Please try again.");
@@ -99,7 +90,7 @@ const DailyCalanderTaskSheet = (
   const getTasks = async () => {
     // setDashLoading(true);
     try {
-      const res = await axiosPrivate.get(`/api/get-task?monthDashID=${dashboardData?._id}`);
+      const res = await axiosPrivate.get(`/api/task?monthDashID=${dashboardData?._id}`);
       if (res?.data?.success) {
         setTaskList(res?.data?.tasks);
       }
@@ -219,21 +210,21 @@ const DailyCalanderTaskSheet = (
         </div>
 
         {/* Checkbox Rows */}
-        {taskList.length > 0 && taskList?.map((task, taskIndex) => (
+        {taskList.length > 0 && taskList?.map((task) => (
           <div
             key={task?._id}
             className="p-2 flex items-center w-full border-b border-gray-700 relative"
           >
-            {taskIndex > 0 && (
+            {
               removeRowID === task?._id ? (
                 <button className="absolute -right-2 cursor-not-allowed smText p-2 animate-pulse bg-gray-400 rounded"></button>
               ) : (
                 <div className="absolute -right-2 cursor-pointer border rounded border-gray-400 text-gray-400 bg-white"
-                // onClick={() => handleDeleteRow(task?._id, task?.taskData?.[0]?.fullDate || "")}
+                onClick={() => handleDeleteRow(task?._id)}
                 >
                   <LuMinus size={15} />
                 </div>
-              ))}
+              )}
 
             {/* Weeks 1–4 */}
             {Array.from({ length: 4 }).map((_, weekIndex) => (
@@ -244,7 +235,7 @@ const DailyCalanderTaskSheet = (
                 {dateLogs?.slice(weekIndex * 7, (weekIndex + 1) * 7).map((log, dayIndex) => {
                   const isChecked = log?.tasks?.includes(task?._id);
                   return (
-                    activeCheckbox == `${task?._id}-${log._id}` ? (
+                    activeCheckbox == `${task?._id}-${log?._id}` ? (
                       <span key={dayIndex} className={`h-4 w-4 rounded border-2 border-darkSuccess light:border-lightSuccess animate-pulse`}
                       ></span>
                     ) : (
@@ -264,7 +255,7 @@ const DailyCalanderTaskSheet = (
                   const log = dateLogs?.[28 + dayIndex];
                   const isChecked = log?.tasks?.includes(task?._id);
                   return (
-                    activeCheckbox == `${task?._id}-${log._id}` ? (
+                    activeCheckbox == `${task?._id}-${log?._id}` ? (
                       <span key={dayIndex} className={`h-4 w-4 rounded border-2 border-darkSuccess light:border-lightSuccess animate-pulse`}
                       ></span>
                     ) : (

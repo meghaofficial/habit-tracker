@@ -29,19 +29,19 @@ const InputData = ({ index, taskId, name }: { index: number; taskId: string; nam
     prevValueRef.current = name; // keep in sync
   }, [name]);
 
-  useEffect(() => {
-    if (value === prevValueRef.current) return;
+  // useEffect(() => {
+  //   if (value === prevValueRef.current) return;
 
-    const timeout = setTimeout(() => {
-      axiosPrivate.put(`/api/update-task-name?taskId=${taskId}`, {
-        taskName: value
-      }).catch(() => notify.error("Please try again."));
-    }, 500);
+  //   const timeout = setTimeout(() => {
+  //     axiosPrivate.put(`/api/update-task-name?taskId=${taskId}`, {
+  //       taskName: value
+  //     }).catch(() => notify.error("Please try again."));
+  //   }, 500);
 
-    prevValueRef.current = value;
+  //   prevValueRef.current = value;
 
-    return () => clearTimeout(timeout);
-  }, [value, taskId]);
+  //   return () => clearTimeout(timeout);
+  // }, [value, taskId]);
 
   return (
     <div className="text-[12px] px-2 p-1 flex items-center gap-2 border-b border-gray-700">
