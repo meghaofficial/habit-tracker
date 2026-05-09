@@ -3,7 +3,9 @@ import { ProgressPie } from "../../charts/ProgressPie"
 import TodayAllTasks from "../../charts/TodayAllTasks"
 import { WeeklyBarChart } from "../../charts/WeeklyBarChart"
 
-const AnalysisMainComponent = () => {
+const AnalysisMainComponent = ({ taskList }: {
+  taskList: { _id: string, taskName: string }[]
+}) => {
 
   const lineValues = Array.from({ length: 31 }, () =>
     Math.floor(Math.random() * 100)
@@ -37,7 +39,7 @@ const AnalysisMainComponent = () => {
             <p className="text-gray-500 text-[10px] px-5 py-3 cursor-default" title="Today's Date">3 April 2026</p>
           </div>
           <div className="flex items-center justify-center mt-5">
-            <TodayAllTasks />
+            <TodayAllTasks taskList={taskList} />
           </div>
         </div>
       </div>

@@ -69,6 +69,18 @@ const Dashboard = () => {
   }>({ _id: "", userID: "", month: 0, year: 0, totalDays: 0, firstDay: 0 });
   const [subscriptionData, setSubscriptionData] = useState<{ planType: string; startDate: Date | string; endDate: Date | string; status: string; }>({ planType: "", startDate: "", endDate: "", status: "" });
   const [totalMonths, setTotalMonths] = useState<number[]>([]);
+  const [taskList, setTaskList] = useState<{ _id: string, taskName: string }[]>([]);
+
+
+
+
+
+
+
+
+
+
+
 
   const toggleTheme = () => {
     // const newTheme = !dark;
@@ -328,8 +340,8 @@ const Dashboard = () => {
               </div>
             </div>
 
-            {activeTab === "track" && <TrackMainComponent dashboardData={dashboardData} totalMonths={totalMonths} />}
-            {activeTab === "analysis" && <AnalysisMainComponent />}
+            {activeTab === "track" && <TrackMainComponent dashboardData={dashboardData} totalMonths={totalMonths} taskList={taskList} setTaskList={setTaskList} />}
+            {activeTab === "analysis" && <AnalysisMainComponent taskList={taskList}/>}
 
           </>
         )}

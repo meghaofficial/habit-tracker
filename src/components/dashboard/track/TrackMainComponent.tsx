@@ -6,8 +6,9 @@ import HabitProgress from "./HabitProgress";
 import TargetsList from "./TargetsList";
 import { WeeklyTargetsAccordion } from "./WeeklyTargetsAccordion";
 import { motion } from "framer-motion";
+import MonthlyNote from "./MonthlyNote";
 
-const TrackMainComponent = ({ dashboardData, totalMonths }: {
+const TrackMainComponent = ({ dashboardData, totalMonths, taskList, setTaskList }: {
   dashboardData: {
     _id: string;
     userID: string;
@@ -16,7 +17,10 @@ const TrackMainComponent = ({ dashboardData, totalMonths }: {
     totalDays: number;
     firstDay: number;
   },
-  totalMonths: number[]
+  totalMonths: number[],
+
+  taskList: { _id: string, taskName: string }[],
+  setTaskList: React.Dispatch<React.SetStateAction<{ _id: string, taskName: string }[]>>
 }) => {
 
   const [activeMon, setActiveMon] = useState<number | null>(null);
@@ -24,23 +28,18 @@ const TrackMainComponent = ({ dashboardData, totalMonths }: {
     activeMon && totalMonths.includes(activeMon)
       ? activeMon
       : totalMonths[0];
-  const year = "2026";
   const [active, setActive] = useState<"dashboard" | "calendar">("dashboard");
 
 
-  const [taskList, setTaskList] = useState<{ _id: string, name: string }[]>([]);
-  // const [monthlyNote, setMonthlyNote] = useState("");
-  // const [currMon, setCurrMon] = useState<number>(-1);
-  // const [currYear, setCurrYear] = useState<number>(-1);
-    const [progress, setProgress] = useState<{
-      overallProgress: { total: number, count: number, progress: string | number },
-      dateLogProgress: { fullDate: Date | string, count: number, progress: string | number }[],
-      taskProgress: { id: string, count: number, progress: string | number }[]
-    }>({
-      overallProgress: { total: 0, count: 0, progress: 0 },
-      dateLogProgress: [],
-      taskProgress: []
-    });
+  const [progress, setProgress] = useState<{
+    overallProgress: { total: number, count: number, progress: string | number },
+    dateLogProgress: { fullDate: Date | string, count: number, progress: string | number }[],
+    taskProgress: { id: string, count: number, progress: string | number }[]
+  }>({
+    overallProgress: { total: 0, count: 0, progress: 0 },
+    dateLogProgress: [],
+    taskProgress: []
+  });
 
 
   const monMap: { [key: number]: string } = {
@@ -135,7 +134,7 @@ const TrackMainComponent = ({ dashboardData, totalMonths }: {
           {/* monthly targets */}
           <div className="flex gap-4 mt-4">
             {/* note */}
-            {/* <MonthlyNote note={monthlyNote} currMon={currMon} currYear={currYear} /> */}
+            <MonthlyNote monthID={dashboardData._id} />
             {/* monthly targets */}
             <div className="bg-darkCard light:bg-lightCard w-1/3 rounded-2xl p-2">
               <p className="font-semibold text-lg px-5 py-3">Monthly Targets</p>

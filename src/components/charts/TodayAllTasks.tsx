@@ -6,7 +6,9 @@ interface Task {
   completed: boolean;
 }
 
-const TodayAllTasks = () => {
+const TodayAllTasks = ({ taskList }: {
+  taskList: { _id: string, taskName: string }[]
+}) => {
   const [tasks, setTasks] = useState<Task[]>([
     { id: 1, text: "Drink 2L water", completed: false },
     { id: 2, text: "Workout for 30 mins", completed: true },
@@ -30,28 +32,35 @@ const TodayAllTasks = () => {
     <>
       {/* Task List */}
       <div className="space-y-1 w-full px-4 max-h-70 overflow-y-auto hide-scrollbar">
-        {tasks.map((task, index) => (
+        {taskList.map((task, index) => (
           <div
-            key={task.id}
+            key={task?._id}
             className="bg-slate-800 px-4 py-3 rounded-lg transition flex items-center w-full gap-2"
           >
             <span>{index + 1}.</span>
             <div className="flex items-center justify-between w-full">
               {/* Task Text */}
-              <span
-                className={`text-sm transition ${task.completed
+              {/* <span
+                className={`text-sm transition 
+                  ${task.completed
                     ? "line-through text-slate-400"
                     : "text-white"
                   }`}
               >
                 {task.text}
+              </span> */}
+              <span
+                className={`text-sm transition 
+                  `}
+              >
+                {task.taskName}
               </span>
 
               {/* Checkbox */}
               <input
                 type="checkbox"
-                checked={task.completed}
-                onChange={() => toggleTask(task.id)}
+                // checked={task.completed}
+                // onChange={() => toggleTask(task._id)}
                 className="w-4 h-4 accent-darkPrimary cursor-pointer"
               />
             </div>

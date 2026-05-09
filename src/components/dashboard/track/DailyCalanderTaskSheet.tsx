@@ -14,8 +14,8 @@ const DailyCalanderTaskSheet = (
     setProgress
   }:
     {
-      taskList: { _id: string, name: string }[],
-      setTaskList: React.Dispatch<React.SetStateAction<{ _id: string, name: string }[]>>,
+      taskList: { _id: string, taskName: string }[],
+      setTaskList: React.Dispatch<React.SetStateAction<{ _id: string, taskName: string }[]>>,
 
       dashboardData: {
         _id: string;
@@ -42,15 +42,6 @@ const DailyCalanderTaskSheet = (
   const [activeCheckbox, setActiveCheckbox] = useState<string>("");
   const [addRowLoading, setAddRowLoading] = useState<boolean>(false);
   const [removeRowID, setRemoveRowID] = useState<string | null>(null);
-  // const [progress, setProgress] = useState<{
-  //   overallProgress: { total: number, count: number, progress: string | number },
-  //   dateLogProgress: { fullDate: Date | string, count: number, progress: string | number }[],
-  //   taskProgress: { id: string, count: number, progress: string | number }[]
-  // }>({
-  //   overallProgress: { total: 0, count: 0, progress: 0 },
-  //   dateLogProgress: [],
-  //   taskProgress: []
-  // });
 
   const [dateLogs, setDateLogs] = useState<{
     _id: string;

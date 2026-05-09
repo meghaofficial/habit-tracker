@@ -2,8 +2,9 @@ import { useEffect, useRef, useState } from 'react';
 import { axiosPrivate } from '../../../api/axios';
 import { notify } from '../../../helper';
 
-const MonthlyNote = ({ note, currMon, currYear }: { note: string, currMon: number, currYear: string }) => {
+const MonthlyNote = ({ monthID }: { monthID: string }) => {
 
+  const [note, setNote] = useState("");
   const [monthlyNote, setMonthlyNote] = useState(note);
   const prevMonNoteRef = useRef(note);
 
@@ -17,10 +18,8 @@ const MonthlyNote = ({ note, currMon, currYear }: { note: string, currMon: numbe
     if (monthlyNote === prevMonNoteRef.current) return;
 
     const timeout = setTimeout(() => {
-      axiosPrivate.put(`/api/update-month-note`, {
-        monthlyNote,
-        month: currMon,
-        year: currYear
+      axiosPrivate.put(`/api/monthly-note?monthDashID=${monthID}`, {
+        note: monthlyNote,
       }).catch(() => notify.error("Please try again."));
 
       prevMonNoteRef.current = monthlyNote;
@@ -28,7 +27,26 @@ const MonthlyNote = ({ note, currMon, currYear }: { note: string, currMon: numbe
     }, 500);
 
     return () => clearTimeout(timeout);
-  }, [monthlyNote, currMon, currYear]);
+  }, [monthlyNote]);
+
+  const getNote = async () => {
+    try {
+      const res = await axiosPrivate.get(`/api/monthly-note?monthDashID=${monthID}`);
+      if (res?.data?.success) {
+        setNote(res?.data?.note?.note);
+      }
+    } catch (error) {
+      console.error(error);
+    }
+  }
+
+  const noteRef = useRef(false);
+
+  useEffect(() => {
+    if (noteRef.current || !monthID) return;
+    getNote();
+    noteRef.current = true;
+  }, [monthID]);
 
   return (
     <div className="bg-darkCard light:bg-lightCard w-1/3 rounded-2xl p-2 h-100 overflow-y-auto">
