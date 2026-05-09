@@ -6,8 +6,6 @@ import HabitProgress from "./HabitProgress";
 import TargetsList from "./TargetsList";
 import { WeeklyTargetsAccordion } from "./WeeklyTargetsAccordion";
 import { motion } from "framer-motion";
-import Calendar from "./calander/Calendar";
-import type { ITask } from "../../../types";
 
 const TrackMainComponent = ({ dashboardData, totalMonths }: {
   dashboardData: {
@@ -34,6 +32,15 @@ const TrackMainComponent = ({ dashboardData, totalMonths }: {
   // const [monthlyNote, setMonthlyNote] = useState("");
   // const [currMon, setCurrMon] = useState<number>(-1);
   // const [currYear, setCurrYear] = useState<number>(-1);
+    const [progress, setProgress] = useState<{
+      overallProgress: { total: number, count: number, progress: string | number },
+      dateLogProgress: { fullDate: Date | string, count: number, progress: string | number }[],
+      taskProgress: { id: string, count: number, progress: string | number }[]
+    }>({
+      overallProgress: { total: 0, count: 0, progress: 0 },
+      dateLogProgress: [],
+      taskProgress: []
+    });
 
 
   const monMap: { [key: number]: string } = {
@@ -102,7 +109,7 @@ const TrackMainComponent = ({ dashboardData, totalMonths }: {
         </div>
         {/* monthly progress */}
         <div className="bg-darkCard light:bg-lightCard rounded-2xl w-[20%] p-6">
-          {/* <ProgressPie value={Number(overallProgress?.progress)} type="track" /> */}
+          <ProgressPie value={Number(progress?.overallProgress?.progress)} type="track" />
         </div>
       </div>
 
@@ -119,10 +126,10 @@ const TrackMainComponent = ({ dashboardData, totalMonths }: {
               <HabitSection taskList={taskList} />
             </div>
             <div className="bg-darkCard light:bg-lightCard w-[65%] rounded-2xl">
-              <DailyCalanderTaskSheet taskList={taskList} setTaskList={setTaskList} dashboardData={dashboardData} />
+              <DailyCalanderTaskSheet taskList={taskList} setTaskList={setTaskList} dashboardData={dashboardData} progress={progress} setProgress={setProgress} />
             </div>
             <div className="bg-darkCard light:bg-lightCard w-[15%] rounded-2xl">
-              {/* <HabitProgress taskList={taskList} total={dashboardData?.totalDays} /> */}
+              <HabitProgress progress={progress?.taskProgress} total={dashboardData?.totalDays} count={progress?.overallProgress.count} />
             </div>
           </div>
           {/* monthly targets */}

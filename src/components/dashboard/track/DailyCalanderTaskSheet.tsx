@@ -9,7 +9,9 @@ const DailyCalanderTaskSheet = (
     taskList,
     setTaskList,
 
-    dashboardData
+    dashboardData,
+    progress,
+    setProgress
   }:
     {
       taskList: { _id: string, name: string }[],
@@ -23,6 +25,16 @@ const DailyCalanderTaskSheet = (
         totalDays: number;
         firstDay: number;
       },
+      progress: {
+        overallProgress: { total: number, count: number, progress: string | number },
+        dateLogProgress: { fullDate: Date | string, count: number, progress: string | number }[],
+        taskProgress: { id: string, count: number, progress: string | number }[]
+      },
+      setProgress: React.Dispatch<React.SetStateAction<{
+        overallProgress: { total: number, count: number, progress: string | number },
+        dateLogProgress: { fullDate: Date | string, count: number, progress: string | number }[],
+        taskProgress: { id: string, count: number, progress: string | number }[]
+      }>>,
     }
 ) => {
   const totalD = dashboardData?.totalDays || 0;
@@ -30,6 +42,15 @@ const DailyCalanderTaskSheet = (
   const [activeCheckbox, setActiveCheckbox] = useState<string>("");
   const [addRowLoading, setAddRowLoading] = useState<boolean>(false);
   const [removeRowID, setRemoveRowID] = useState<string | null>(null);
+  // const [progress, setProgress] = useState<{
+  //   overallProgress: { total: number, count: number, progress: string | number },
+  //   dateLogProgress: { fullDate: Date | string, count: number, progress: string | number }[],
+  //   taskProgress: { id: string, count: number, progress: string | number }[]
+  // }>({
+  //   overallProgress: { total: 0, count: 0, progress: 0 },
+  //   dateLogProgress: [],
+  //   taskProgress: []
+  // });
 
   const [dateLogs, setDateLogs] = useState<{
     _id: string;
@@ -76,6 +97,7 @@ const DailyCalanderTaskSheet = (
       const res = await axiosPrivate.get(`/api/date-logs?monthDashID=${dashboardData?._id}`);
       if (res?.data?.success) {
         setDateLogs(res?.data?.dateLogs);
+        setProgress(res?.data?.progress);
       }
     } catch (error) {
       console.error(error);
@@ -105,12 +127,13 @@ const DailyCalanderTaskSheet = (
         const updated = dateLogs.map(d =>
           d?._id === id
             ? {
-                ...d,
-                tasks: res?.data?.dateLog?.tasks
-              }
+              ...d,
+              tasks: res?.data?.dateLog?.tasks
+            }
             : d
         );
         setDateLogs(updated);
+        setProgress(res?.data?.progress);
       }
     } catch (error) {
       console.error(error);
@@ -216,7 +239,7 @@ const DailyCalanderTaskSheet = (
                 <button className="absolute -right-2 cursor-not-allowed smText p-2 animate-pulse bg-gray-400 rounded"></button>
               ) : (
                 <div className="absolute -right-2 cursor-pointer border rounded border-gray-400 text-gray-400 bg-white"
-                onClick={() => handleDeleteRow(task?._id)}
+                  onClick={() => handleDeleteRow(task?._id)}
                 >
                   <LuMinus size={15} />
                 </div>
@@ -236,7 +259,7 @@ const DailyCalanderTaskSheet = (
                       ></span>
                     ) : (
                       <span key={dayIndex} className={`h-4 w-4 rounded cursor-pointer ${isChecked ? 'bg-darkSuccess light:bg-lightSuccess' : 'bg-darkBox light:bg-lightBox'}`}
-                      onClick={() => toggleCheckbox(log.fullDate, task?._id, !isChecked, log?._id)}
+                        onClick={() => toggleCheckbox(log.fullDate, task?._id, !isChecked, log?._id)}
                       ></span>
                     )
                   );
@@ -256,7 +279,7 @@ const DailyCalanderTaskSheet = (
                       ></span>
                     ) : (
                       <span key={dayIndex} className={`h-4 w-4 rounded cursor-pointer ${isChecked ? 'bg-darkSuccess light:bg-lightSuccess' : 'bg-darkBox light:bg-lightBox'}`}
-                      onClick={() => toggleCheckbox(log.fullDate, task?._id, !isChecked, log?._id)}
+                        onClick={() => toggleCheckbox(log.fullDate, task?._id, !isChecked, log?._id)}
                       ></span>
                     )
                   )
@@ -292,14 +315,14 @@ const DailyCalanderTaskSheet = (
         >
 
           {/* Weeks 1–4 */}
-          {/* {Array.from({ length: 4 }).map((_, weekIndex) => (
+          {Array.from({ length: 4 }).map((_, weekIndex) => (
             <div
               key={weekIndex}
               className={`flex items-center justify-evenly ${totalD > 28 ? 'w-[22%]' : 'w-[25%]'} text-center`}
             >
-              {dateLogs?.slice(weekIndex * 7, (weekIndex + 1) * 7)?.map((d, dayIndex) => {
+              {progress?.dateLogProgress?.slice(weekIndex * 7, (weekIndex + 1) * 7)?.map((d, dayIndex) => {
                 return (
-                  <div key={dayIndex} title={d?.progress}>
+                  <div key={dayIndex} title={d?.progress?.toString()}>
                     <div className={`h-14 w-2.5 flex items-end bg-darkBg rounded-t-[3px]`}>
                       <div className={`w-2.5 bg-darkSuccess light:bg-lightSuccess rounded-t-[3px]`} style={{ height: `${d?.progress}%` }}></div>
                     </div>
@@ -308,15 +331,15 @@ const DailyCalanderTaskSheet = (
                 );
               })}
             </div>
-          ))} */}
+          ))}
 
           {/* Week 5 (3 days) */}
-          {/* {totalD > 28 && (
+          {totalD > 28 && (
             <div className="flex items-center justify-evenly w-[12%] text-center">
               {Array.from({ length: totalD - 28 }, (_, i) => 29 + i).map((_, dayIndex) => {
-                const d = dateLogs?.[28 + dayIndex];
+                const d = progress?.dateLogProgress?.[28 + dayIndex];
                 return (
-                  <div key={dayIndex} title={d?.progress}>
+                  <div key={dayIndex} title={d?.progress?.toString()}>
                     <div className={`h-14 w-2.5 flex items-end bg-darkBg rounded-t-[3px]`}>
                       <div className={`w-2.5 bg-darkSuccess light:bg-lightSuccess rounded-t-[3px]`} style={{ height: `${d?.progress}%` }}></div>
                     </div>
@@ -325,7 +348,7 @@ const DailyCalanderTaskSheet = (
                 );
               })}
             </div>
-          )} */}
+          )}
 
         </div>
       </div>

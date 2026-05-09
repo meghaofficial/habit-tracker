@@ -7,7 +7,7 @@ const HabitSection = ({
 }: {
   taskList: {
     _id: string,
-    taskName: string
+    name: string
   }[]
 }) => {
 
@@ -32,7 +32,7 @@ const HabitSection = ({
           <InputData
             index={index}
             taskId={task._id}
-            taskName={task.taskName}
+            taskName={task.name}
           />
         </div>
       ))}
