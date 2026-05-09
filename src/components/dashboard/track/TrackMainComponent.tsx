@@ -1,4 +1,4 @@
-import { useState } from "react"
+import { useEffect, useRef, useState } from "react"
 import { ProgressPie } from "../../charts/ProgressPie";
 import DailyCalanderTaskSheet from "./DailyCalanderTaskSheet";
 import HabitSection from "./HabitSection";
@@ -7,6 +7,7 @@ import TargetsList from "./TargetsList";
 import { WeeklyTargetsAccordion } from "./WeeklyTargetsAccordion";
 import { motion } from "framer-motion";
 import MonthlyNote from "./MonthlyNote";
+import { axiosPrivate } from "../../../api/axios";
 
 const TrackMainComponent = ({ dashboardData, totalMonths, taskList, setTaskList }: {
   dashboardData: {
@@ -138,7 +139,7 @@ const TrackMainComponent = ({ dashboardData, totalMonths, taskList, setTaskList 
             {/* monthly targets */}
             <div className="bg-darkCard light:bg-lightCard w-1/3 rounded-2xl p-2">
               <p className="font-semibold text-lg px-5 py-3">Monthly Targets</p>
-              <TargetsList />
+              <TargetsList type="monthly" monthID={dashboardData?._id} />
             </div>
             {/* gauge progress */}
             <div className="bg-darkCard light:bg-lightCard w-1/3 rounded-2xl">
