@@ -96,7 +96,7 @@ const TargetsList = ({ type, monthID }: { type: string, monthID: string }) => {
       const baseUrl = type === "monthly" ? `/api/monthly-targets` : ``
       const res = await axiosPrivate.get(`${baseUrl}?monthDashID=${monthID}`);
       if (res?.data?.success) {
-        setTargets(res?.data?.monthlyTargets?.targets);
+        setTargets(res?.data?.target?.targets);
       }
     } catch (error) {
       console.error(error);
