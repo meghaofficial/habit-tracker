@@ -149,7 +149,7 @@ const TrackMainComponent = ({ dashboardData, totalMonths, taskList, setTaskList 
             </div>
           </div>
           {/* weekly targets */}
-          <WeeklyTargetsAccordion />
+          <WeeklyTargetsAccordion monthID={dashboardData?._id} />
         </>
       ) : (
         // <Calendar activeMon={activeMon} currYear={year} />

@@ -2,7 +2,7 @@ import { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import TargetsList from "./TargetsList";
 
-export const WeeklyTargetsAccordion = () => {
+export const WeeklyTargetsAccordion = ({ monthID}: {monthID: string}) => {
 
   const [open, setOpen] = useState(false);
 
@@ -35,7 +35,7 @@ export const WeeklyTargetsAccordion = () => {
               {Array.from({ length: 5 }).map((_, index) => (
                 <div className="bg-darkCard light:bg-lightCard border border-gray-700 w-1/3 rounded-2xl p-2 min-w-80 min-h-80" key={index}>
                   <p className="font-semibold text-md px-5 py-3">Week {index+1} Targets</p>
-                  <TargetsList />
+                  <TargetsList type="weekly" monthID={monthID} week={index+1} />
                 </div>
               ))}
               </div>

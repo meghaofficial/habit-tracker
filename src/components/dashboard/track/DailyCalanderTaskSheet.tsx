@@ -317,7 +317,7 @@ const DailyCalanderTaskSheet = (
                     <div className={`h-14 w-2.5 flex items-end bg-darkBg rounded-t-[3px]`}>
                       <div className={`w-2.5 bg-darkSuccess light:bg-lightSuccess rounded-t-[3px]`} style={{ height: `${d?.progress}%` }}></div>
                     </div>
-                    <span className="text-[6px]">{d?.progress}%</span>
+                    <span className="text-[6px]">{Number.isNaN(d?.progress) ? '0' : d?.progress}%</span>
                   </div>
                 );
               })}
@@ -334,7 +334,7 @@ const DailyCalanderTaskSheet = (
                     <div className={`h-14 w-2.5 flex items-end bg-darkBg rounded-t-[3px]`}>
                       <div className={`w-2.5 bg-darkSuccess light:bg-lightSuccess rounded-t-[3px]`} style={{ height: `${d?.progress}%` }}></div>
                     </div>
-                    <span className="text-[6px]">{d?.progress}%</span>
+                    <span className="text-[6px]">{Number.isNaN(d?.progress) ? 0 : d?.progress}%</span>
                   </div>
                 );
               })}

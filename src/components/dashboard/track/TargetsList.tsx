@@ -10,21 +10,21 @@ interface Target {
   completed: boolean;
 }
 
-const TargetsList = ({ type, monthID }: { type: string, monthID: string }) => {
+const TargetsList = ({ type, monthID, week = 0 }: { type: string, monthID: string, week?: number }) => {
 
   const [targets, setTargets] = useState<Target[]>([]);
   const [singleTarget, setSingleTarget] = useState("");
   const [loading, setLoading] = useState(false);
 
-  const toggleTarget = (id: string) => {
-    setTargets((prev) =>
-      prev.map((target) =>
-        target._id === id
-          ? { ...target, completed: !target.completed }
-          : target
-      )
-    );
-  };
+  // const toggleTarget = (id: string) => {
+  //   setTargets((prev) =>
+  //     prev.map((target) =>
+  //       target._id === id
+  //         ? { ...target, completed: !target.completed }
+  //         : target
+  //     )
+  //   );
+  // };
 
   // const handleAddSingleTarget = () => {
   //   if (!singleTarget.trim()) return;
@@ -46,8 +46,8 @@ const TargetsList = ({ type, monthID }: { type: string, monthID: string }) => {
     if (!singleTarget.trim()) return;
     setLoading(true);
     try {
-      const baseUrl = type === "monthly" ? `/api/add-monthly-target` : ``
-      const res = await axiosPrivate.patch(`${baseUrl}?monthDashID=${monthID}`, { target: singleTarget });
+      const url = type === "monthly" ? `/api/add-monthly-target?monthDashID=${monthID}` : `/api/add-weekly-target?monthDashID=${monthID}&week=${week}`
+      const res = await axiosPrivate.patch(url, { target: singleTarget });
       if (res?.data?.success) {
         setTargets(res?.data?.target?.targets);
         setSingleTarget("");
@@ -62,11 +62,10 @@ const TargetsList = ({ type, monthID }: { type: string, monthID: string }) => {
   const removeTarget = async (id: string) => {
     // setLoading(true);
     try {
-      const url = type === "monthly" ? `/api/remove-monthly-target?monthDashID=${monthID}&targetID=${id}` : ``
+      const url = type === "monthly" ? `/api/remove-monthly-target?monthDashID=${monthID}&targetID=${id}` : `/api/remove-weekly-target?monthDashID=${monthID}&week=${week}&targetID=${id}`
       const res = await axiosPrivate.patch(url);
       if (res?.data?.success) {
-        setTargets(prev => prev.filter(p => p?._id !== id))
-        // setTargets(res?.data?.target?.targets);
+        setTargets(prev => prev.filter(p => p?._id !== id));
       }
     } catch (error) {
       console.error(error);
@@ -75,10 +74,10 @@ const TargetsList = ({ type, monthID }: { type: string, monthID: string }) => {
     }
   }
 
-    const markTarget = async (id: string, mark: boolean) => {
+  const markTarget = async (id: string, mark: boolean) => {
     // setLoading(true);
     try {
-      const url = type === "monthly" ? `/api/mark-monthly-target?monthDashID=${monthID}&targetID=${id}` : ``;
+      const url = type === "monthly" ? `/api/mark-monthly-target?monthDashID=${monthID}&targetID=${id}` : `/api/mark-weekly-target?monthDashID=${monthID}&week=${week}&targetID=${id}`;
       const res = await axiosPrivate.patch(url, { mark });
       if (res?.data?.success) {
         setTargets(res?.data?.target?.targets);
@@ -93,8 +92,8 @@ const TargetsList = ({ type, monthID }: { type: string, monthID: string }) => {
   const getTargets = async () => {
     // setDashLoading(true);
     try {
-      const baseUrl = type === "monthly" ? `/api/monthly-targets` : ``
-      const res = await axiosPrivate.get(`${baseUrl}?monthDashID=${monthID}`);
+      const url = type === "monthly" ? `/api/monthly-targets?monthDashID=${monthID}` : `/api/weekly-targets?monthDashID=${monthID}&week=${week}`
+      const res = await axiosPrivate.get(url);
       if (res?.data?.success) {
         setTargets(res?.data?.target?.targets);
       }
@@ -118,13 +117,13 @@ const TargetsList = ({ type, monthID }: { type: string, monthID: string }) => {
       {/* input */}
       <div className="flex gap-4 px-4 mt-2">
         <input disabled={targets?.length >= 10} type="text" className="focus:outline-none focus:ring-2 focus:ring-darkPrimary light:focus:ring-lightPrimary resize-none rounded-lg px-3 py-2 text-[14px] w-[80%] border border-gray-500" onChange={(e) => setSingleTarget(e.target.value)} value={singleTarget} />
-        <button className={`text-[14px] border-none rounded-md ${targets?.length < 10 ? 'bg-darkPrimary light:bg-lightPrimary cursor-pointer text-white' : 'text-white/50 bg-darkPrimary/50 light:bg-lightPrimary/50'} w-[20%]`} onClick={addTarget} title={targets.length >= 10 ? 'Can not add more than 10 targets' : ""}>
+        <button className={`text-[14px] border-none rounded-md ${targets?.length < 10 ? 'bg-darkPrimary light:bg-lightPrimary cursor-pointer text-white' : 'text-white/50 bg-darkPrimary/50 light:bg-lightPrimary/50'} w-[20%]`} onClick={addTarget} title={targets?.length >= 10 ? 'Can not add more than 10 targets' : ""}>
           Add
         </button>
       </div>
       {/* Targets List */}
       <div className="w-full px-2 max-h-70 overflow-y-auto mt-3">
-        {targets.length > 0 ? targets.reverse().map((target, index) => (
+        {targets?.length > 0 ? targets?.reverse()?.map((target, index) => (
           <div
             key={target?._id}
             className="bg-darkCard light:bg-lightCard px-4 py-3 rounded-lg transition flex items-center w-full gap-2"
