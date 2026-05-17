@@ -11,7 +11,8 @@ const DailyCalanderTaskSheet = (
 
     dashboardData,
     progress,
-    setProgress
+    setProgress,
+    monthStatus,
   }:
     {
       taskList: { _id: string, taskName: string }[],
@@ -35,6 +36,7 @@ const DailyCalanderTaskSheet = (
         dateLogProgress: { fullDate: Date | string, count: number, progress: string | number }[],
         taskProgress: { id: string, count: number, progress: string | number }[]
       }>>,
+      monthStatus: string,
     }
 ) => {
   const totalD = dashboardData?.totalDays || 0;
@@ -68,6 +70,10 @@ const DailyCalanderTaskSheet = (
   }
 
   const handleAddRow = async () => {
+    if (monthStatus === "scheduled"){
+      alert('Can not add task as the subscription for this month is not active');
+      return;
+    }
     setAddRowLoading(true);
     try {
       const res = await axiosPrivate.post(`/api/task?monthDashID=${dashboardData?._id}`, { taskName: "" });
@@ -152,19 +158,14 @@ const DailyCalanderTaskSheet = (
     });
   };
 
-  const dateLogRef = useRef(false);
-  const taskLogRef = useRef(false);
-
   useEffect(() => {
-    if (dateLogRef.current || !dashboardData?._id) return;
+    if (!dashboardData?._id) return;
     getDateLogs();
-    dateLogRef.current = true;
   }, [dashboardData?._id]);
 
   useEffect(() => {
-    if (taskLogRef.current || !dashboardData?._id) return;
+    if (!dashboardData?._id) return;
     getTasks();
-    taskLogRef.current = true;
   }, [dashboardData?._id]);
 
   return (

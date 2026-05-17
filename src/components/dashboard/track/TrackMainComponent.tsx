@@ -156,7 +156,6 @@ const TrackMainComponent = ({ dashboardData, taskList, activeMonth, setTaskList,
   const getDashboard = async (month: Date) => {
     // setDashLoading(true);
     try {
-      console.log("mon", month)
       const y = month.getFullYear();
       const m = month.getMonth();
       const res = await axiosPrivate.get(`/api/dashboard?year=${y}&month=${m}`);
@@ -251,16 +250,25 @@ const TrackMainComponent = ({ dashboardData, taskList, activeMonth, setTaskList,
           <div className="flex gap-4 mt-4 relative">
             {/* left detail */}
             <div className="bg-darkCard light:bg-lightCard w-[19.5%] rounded-2xl overflow-x-hidden h-25 absolute -top-29 p-3 flex flex-col justify-between">
-              <p className="text-3xl tracking-wider font-bold playfair-display text-center">{monMap?.[(new Date(activeMonth?.startDate)).getMonth()]}, {(new Date(activeMonth?.startDate)).getFullYear()}</p>
+              <p className="text-3xl tracking-wider font-bold playfair-display text-center line-clamp-1" title={
+                `${monMap?.[(new Date(activeMonth?.startDate)).getMonth() + 1]}, ${(new Date(activeMonth?.startDate)).getFullYear()}`
+              }>
+                {monMap?.[(new Date(activeMonth?.startDate)).getMonth() + 1]}, {(new Date(activeMonth?.startDate)).getFullYear()}
+              </p>
               <div className="text-sm google-sans flex items-center gap-3 overflow-x-auto overflow-y-hidden hide-scrollbar">
                 {subsMonths?.map((s, index) => (
-                  <button key={index} className={`px-4 py-1 rounded-full cursor-pointer ${activeMonth?.startDate?.toString() === s?.startDate?.toString() && activeMonth?.endDate?.toString() === s?.endDate?.toString() ? 'bg-darkPrimary light:bg-lightPrimary text-white' : 'bg-darkBox light:bg-lightBg hover:bg-darkBox/50 light:hover:bg-lightBox/50'}`}
+                  <button key={index} className={`px-4 py-1 text-nowrap rounded-full cursor-pointer ${activeMonth?.startDate?.toString() === s?.startDate?.toString() && activeMonth?.endDate?.toString() === s?.endDate?.toString() ? 'bg-darkPrimary light:bg-lightPrimary text-white' : 'bg-darkBox light:bg-lightBg hover:bg-darkBox/50 light:hover:bg-lightBox/50'}`}
                     onClick={() => {
                       getDashboard(new Date(s?.startDate));
                       setActiveMonth(s);
                     }}
                   >
                     {monMap[Number(getInclusiveMonthCount(s?.startDate, s?.endDate))]}
+                    {(new Date(subsMonths?.[subsMonths?.length - 1]?.endDate)).getFullYear() !== (new Date(subsMonths?.[0]?.endDate)).getFullYear() ? (
+                      <span>
+                        {" "}{(new Date(s?.startDate)).getFullYear()}
+                      </span>
+                    ) : ""}
                   </button>
                 ))}
               </div>
@@ -278,7 +286,7 @@ const TrackMainComponent = ({ dashboardData, taskList, activeMonth, setTaskList,
               {/* {activeMonth?.status === "scheduled" && (
                 <div className="z-9999 backdrop-blur absolute -top-35 h-70 left-0 w-full mt-5 rounded-2xl overflow-x-hidden flex items-center justify-center flex-col"></div>
               )} */}
-              <DailyCalanderTaskSheet taskList={taskList} setTaskList={setTaskList} dashboardData={dashboardData} progress={progress} setProgress={setProgress} />
+              <DailyCalanderTaskSheet taskList={taskList} setTaskList={setTaskList} dashboardData={dashboardData} progress={progress} setProgress={setProgress} monthStatus={activeMonth?.status} />
             </div>
             <div className="bg-darkCard light:bg-lightCard w-[15%] rounded-2xl overflow-x-hidden">
               <HabitProgress progress={progress?.taskProgress} total={dashboardData?.totalDays} count={progress?.overallProgress.count} />
@@ -287,7 +295,7 @@ const TrackMainComponent = ({ dashboardData, taskList, activeMonth, setTaskList,
           {/* monthly targets */}
           <div className="flex gap-4 mt-4">
             {/* note */}
-            <MonthlyNote monthID={dashboardData._id} />
+            <MonthlyNote monthID={dashboardData?._id} />
             {/* monthly targets */}
             <div className="bg-darkCard light:bg-lightCard w-1/3 rounded-2xl p-2">
               <p className="font-semibold text-lg px-5 py-3">Monthly Targets</p>

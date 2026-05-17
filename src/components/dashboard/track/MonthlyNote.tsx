@@ -3,50 +3,48 @@ import { axiosPrivate } from '../../../api/axios';
 import { notify } from '../../../helper';
 
 const MonthlyNote = ({ monthID }: { monthID: string }) => {
+  const [monthlyNote, setMonthlyNote] = useState("");
+  
+  // Keeps track of what is currently saved on the server
+  const serverNoteRef = useRef(""); 
 
-  const [note, setNote] = useState("");
-  const [monthlyNote, setMonthlyNote] = useState(note);
-  const prevMonNoteRef = useRef(note);
-
-  // sync when prop changes
-  useEffect(() => {
-    setMonthlyNote(note);
-    prevMonNoteRef.current = note;
-  }, [note]);
-
-  useEffect(() => {
-    if (monthlyNote === prevMonNoteRef.current) return;
-
-    const timeout = setTimeout(() => {
-      axiosPrivate.put(`/api/monthly-note?monthDashID=${monthID}`, {
-        note: monthlyNote,
-      }).catch(() => notify.error("Please try again."));
-
-      prevMonNoteRef.current = monthlyNote;
-
-    }, 500);
-
-    return () => clearTimeout(timeout);
-  }, [monthlyNote]);
-
+  // 1. Fetch note when monthID changes
   const getNote = async () => {
     try {
       const res = await axiosPrivate.get(`/api/monthly-note?monthDashID=${monthID}`);
       if (res?.data?.success) {
-        setNote(res?.data?.note?.note);
+        const fetchedNote = res?.data?.note?.note || "";
+        serverNoteRef.current = fetchedNote; // Update server reference first
+        setMonthlyNote(fetchedNote);         // Then update UI state
       }
     } catch (error) {
       console.error(error);
     }
-  }
-
-  const noteRef = useRef(false);
+  };
 
   useEffect(() => {
-    if (noteRef.current || !monthID) return;
+    if (!monthID) return;
     getNote();
-    noteRef.current = true;
   }, [monthID]);
+
+  // 2. Auto-save only when user input differs from server state
+  useEffect(() => {
+    // If the state matches what's on the server, skip the API call
+    if (monthlyNote === serverNoteRef.current) return;
+
+    const timeout = setTimeout(() => {
+      axiosPrivate.put(`/api/monthly-note?monthDashID=${monthID}`, {
+        note: monthlyNote,
+      })
+      .then(() => {
+        // Update the server reference after a successful save
+        serverNoteRef.current = monthlyNote; 
+      })
+      .catch(() => notify.error("Please try again."));
+    }, 500);
+
+    return () => clearTimeout(timeout);
+  }, [monthlyNote, monthID]);
 
   return (
     <div className="bg-darkCard light:bg-lightCard w-1/3 rounded-2xl p-2 h-100 overflow-y-auto">

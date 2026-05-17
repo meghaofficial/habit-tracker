@@ -1,5 +1,4 @@
-import { useEffect, useRef, useState } from "react";
-import { v4 as uuidv4 } from "uuid";
+import { useEffect, useState } from "react";
 import { RxCross2 } from "react-icons/rx";
 import { PiNotepad } from "react-icons/pi";
 import { axiosPrivate } from "../../../api/axios";
@@ -51,7 +50,6 @@ const TargetsList = ({ type, monthID, week = 0 }: { type: string, monthID: strin
   }
 
   const markTarget = async (id: string, mark: boolean) => {
-    // setLoading(true);
     try {
       const url = type === "monthly" ? `/api/mark-monthly-target?monthDashID=${monthID}&targetID=${id}` : `/api/mark-weekly-target?monthDashID=${monthID}&week=${week}&targetID=${id}`;
       const res = await axiosPrivate.patch(url, { mark });
@@ -60,8 +58,6 @@ const TargetsList = ({ type, monthID, week = 0 }: { type: string, monthID: strin
       }
     } catch (error) {
       console.error(error);
-    } finally {
-      // setLoading(false);
     }
   }
 
@@ -81,19 +77,24 @@ const TargetsList = ({ type, monthID, week = 0 }: { type: string, monthID: strin
     }
   }
 
-  const monthlyTargetRef = useRef(false);
-
+  // FIXED: Removed the buggy monthlyTargetRef condition entirely
+  // Also added 'type' and 'week' dependencies so switching tabs updates the data
   useEffect(() => {
-    if (monthlyTargetRef.current || !monthID) return;
+    if (!monthID) return;
     getTargets();
-    monthlyTargetRef.current = true;
-  }, [monthID]);
+  }, [monthID, type, week]);
 
   return (
     <>
       {/* input */}
       <div className="flex gap-4 px-4 mt-2">
-        <input disabled={targets?.length >= 10} type="text" className="focus:outline-none focus:ring-2 focus:ring-darkPrimary light:focus:ring-lightPrimary resize-none rounded-lg px-3 py-2 text-[14px] w-[80%] border border-gray-500" onChange={(e) => setSingleTarget(e.target.value)} value={singleTarget} />
+        <input 
+          disabled={targets?.length >= 10} 
+          type="text" 
+          className="focus:outline-none focus:ring-2 focus:ring-darkPrimary light:focus:ring-lightPrimary resize-none rounded-lg px-3 py-2 text-[14px] w-[80%] border border-gray-500" 
+          onChange={(e) => setSingleTarget(e.target.value)} 
+          value={singleTarget} 
+        />
         <button className={`text-[14px] border-none rounded-md 
           ${targets?.length < 10 ?
             'bg-darkPrimary light:bg-lightPrimary cursor-pointer text-white' :
@@ -117,40 +118,43 @@ const TargetsList = ({ type, monthID, week = 0 }: { type: string, monthID: strin
           </div>
         ) : (
           <>
-            {targets?.length > 0 ? targets?.reverse()?.map((target, index) => (
-              <div
-                key={target?._id}
-                className="bg-darkCard light:bg-lightCard px-4 py-3 rounded-lg transition flex items-center w-full gap-2"
-              >
-                <span>{index + 1}.</span>
-                <div className="flex items-center justify-between w-full">
-                  {/* Target Text */}
-                  <span
-                    className={`text-sm transition ${target?.completed
-                      ? "line-through text-slate-400"
-                      : ""
-                      }`}
-                  >
-                    {target?.value}
-                  </span>
-                  {!removeLoading && (
-                    <div className="flex items-center gap-2">
-                      {/* Checkbox */}
-                      <input
-                        type="checkbox"
-                        checked={target?.completed}
-                        onChange={() => markTarget(target?._id, !target?.completed)}
-                        className="w-4 h-4 accent-darkPrimary cursor-pointer"
-                      />
-                      <RxCross2 className="text-gray-500 cursor-pointer hover:text-red-500" onClick={() => removeTarget(target?._id)} />
-                    </div>
-                  )}
+            {targets?.length > 0 ? (
+              // FIXED: Creating a shallow copy before reversing to protect state mutations
+              [...targets].reverse().map((target, index) => (
+                <div
+                  key={target?._id}
+                  className="bg-darkCard light:bg-lightCard px-4 py-3 rounded-lg transition flex items-center w-full gap-2 mb-2"
+                >
+                  <span>{index + 1}.</span>
+                  <div className="flex items-center justify-between w-full">
+                    <span
+                      className={`text-sm transition ${target?.completed
+                        ? "line-through text-slate-400"
+                        : ""
+                        }`}
+                    >
+                      {target?.value}
+                    </span>
+                    {!removeLoading && (
+                      <div className="flex items-center gap-2">
+                        <input
+                          type="checkbox"
+                          checked={target?.completed}
+                          onChange={() => markTarget(target?._id, !target?.completed)}
+                          className="w-4 h-4 accent-darkPrimary cursor-pointer"
+                        />
+                        <RxCross2 className="text-gray-500 cursor-pointer hover:text-red-500" onClick={() => removeTarget(target?._id)} />
+                      </div>
+                    )}
+                  </div>
                 </div>
-              </div>
-            )) : (
+              ))
+            ) : (
               <div className="flex items-center justify-center flex-col text-gray-700 google-sans h-60 gap-3">
                 <PiNotepad className="text-[80px]" />
-                <span className="text-[14px]">Add Monthly Targets</span>
+                <span className="text-[14px]">
+                  {type === "monthly" ? "Add Monthly Targets" : "Add Weekly Targets"}
+                </span>
               </div>
             )}
           </>
