@@ -39,7 +39,6 @@ const DailyCalanderTaskSheet = (
 ) => {
   const totalD = dashboardData?.totalDays || 0;
   const firstDay = dashboardData?.firstDay || 0;
-  const [activeCheckbox, setActiveCheckbox] = useState<string>("");
   const [addRowLoading, setAddRowLoading] = useState<boolean>(false);
   const [removeRowID, setRemoveRowID] = useState<string | null>(null);
 
@@ -48,7 +47,7 @@ const DailyCalanderTaskSheet = (
     userID: string;
     monthDashID: string;
     fullDate: Date;
-    tasks: [string]
+    tasks: string[]
   }[]>([]);
   const rowLimit = 10;
 
@@ -58,6 +57,7 @@ const DailyCalanderTaskSheet = (
       const res = await axiosPrivate.delete(`/api/task?taskID=${taskId}&monthDashID=${dashboardData._id}`);
       if (res?.data?.success) {
         setTaskList(res?.data?.tasks);
+        setProgress(res?.data?.progress);
       }
     } catch (error) {
       console.error(error);
@@ -73,6 +73,7 @@ const DailyCalanderTaskSheet = (
       const res = await axiosPrivate.post(`/api/task?monthDashID=${dashboardData?._id}`, { taskName: "" });
       if (res?.data?.success) {
         setTaskList(res?.data?.tasks);
+        setProgress(res?.data?.progress);
       }
     } catch (error) {
       console.error(error);
@@ -82,8 +83,9 @@ const DailyCalanderTaskSheet = (
     }
   }
 
+  const [getLogLoading, setGetLogLoading] = useState(false);
   const getDateLogs = async () => {
-    // setDashLoading(true);
+    setGetLogLoading(true);
     try {
       const res = await axiosPrivate.get(`/api/date-logs?monthDashID=${dashboardData?._id}`);
       if (res?.data?.success) {
@@ -93,7 +95,7 @@ const DailyCalanderTaskSheet = (
     } catch (error) {
       console.error(error);
     } finally {
-      // setDashLoading(false);
+      setGetLogLoading(false);
     }
   }
   const getTasks = async () => {
@@ -110,28 +112,45 @@ const DailyCalanderTaskSheet = (
     }
   }
 
-  const toggleCheckbox = async (date: Date, taskID: string, marked: boolean, id: string) => {
-    setActiveCheckbox(`${taskID}-${id}`);
-    try {
-      const res = await axiosPrivate.patch(`/api/date-logs?monthDashID=${dashboardData?._id}&fullDate=${date}&taskID=${taskID}`, { marked });
-      if (res?.data?.success) {
-        const updated = dateLogs.map(d =>
-          d?._id === id
+  const requestQueue = useRef(Promise.resolve());
+  const toggleCheckbox = (
+    date: Date,
+    taskID: string,
+    marked: boolean,
+    id: string
+  ) => {
+    requestQueue.current = requestQueue.current.then(async () => {
+      const previousLogs = JSON.parse(JSON.stringify(dateLogs));
+
+      // optimistic update
+      setDateLogs(prev =>
+        prev.map(d =>
+          d._id === id
             ? {
               ...d,
-              tasks: res?.data?.dateLog?.tasks
+              tasks: marked
+                ? [...d.tasks, taskID]
+                : d.tasks.filter(t => t !== taskID)
             }
             : d
+        )
+      );
+
+      try {
+        const res = await axiosPrivate.patch(
+          `/api/date-logs?monthDashID=${dashboardData?._id}&fullDate=${date}&taskID=${taskID}`,
+          { marked }
         );
-        setDateLogs(updated);
-        setProgress(res?.data?.progress);
+
+        if (res?.data?.success) {
+          setProgress(res?.data?.progress);
+        }
+      } catch (error) {
+        setDateLogs(previousLogs);
+        console.error(error);
       }
-    } catch (error) {
-      console.error(error);
-    } finally {
-      setActiveCheckbox("");
-    }
-  }
+    });
+  };
 
   const dateLogRef = useRef(false);
   const taskLogRef = useRef(false);
@@ -240,19 +259,14 @@ const DailyCalanderTaskSheet = (
             {Array.from({ length: 4 }).map((_, weekIndex) => (
               <div
                 key={weekIndex}
-                className={`flex items-center justify-evenly ${totalD > 28 ? 'w-[22%]' : 'w-[25%]'} text-center`}
+                className={`flex items-center justify-evenly py-px ${totalD > 28 ? 'w-[22%]' : 'w-[25%]'} text-center`}
               >
                 {dateLogs?.slice(weekIndex * 7, (weekIndex + 1) * 7).map((log, dayIndex) => {
                   const isChecked = log?.tasks?.includes(task?._id);
                   return (
-                    activeCheckbox == `${task?._id}-${log?._id}` ? (
-                      <span key={dayIndex} className={`h-4 w-4 rounded border-2 border-darkSuccess light:border-lightSuccess animate-pulse`}
-                      ></span>
-                    ) : (
-                      <span key={dayIndex} className={`h-4 w-4 rounded cursor-pointer ${isChecked ? 'bg-darkSuccess light:bg-lightSuccess' : 'bg-darkBox light:bg-lightBox'}`}
-                        onClick={() => toggleCheckbox(log.fullDate, task?._id, !isChecked, log?._id)}
-                      ></span>
-                    )
+                    <span key={dayIndex} className={`h-4 w-4 rounded cursor-pointer ${isChecked ? 'bg-darkSuccess light:bg-lightSuccess' : 'bg-darkBox light:bg-lightBox'}`}
+                      onClick={() => toggleCheckbox(log.fullDate, task?._id, !isChecked, log?._id)}
+                    ></span>
                   );
                 })}
               </div>
@@ -265,14 +279,9 @@ const DailyCalanderTaskSheet = (
                   const log = dateLogs?.[28 + dayIndex];
                   const isChecked = log?.tasks?.includes(task?._id);
                   return (
-                    activeCheckbox == `${task?._id}-${log?._id}` ? (
-                      <span key={dayIndex} className={`h-4 w-4 rounded border-2 border-darkSuccess light:border-lightSuccess animate-pulse`}
-                      ></span>
-                    ) : (
-                      <span key={dayIndex} className={`h-4 w-4 rounded cursor-pointer ${isChecked ? 'bg-darkSuccess light:bg-lightSuccess' : 'bg-darkBox light:bg-lightBox'}`}
-                        onClick={() => toggleCheckbox(log.fullDate, task?._id, !isChecked, log?._id)}
-                      ></span>
-                    )
+                    <span key={dayIndex} className={`h-4 w-4 rounded cursor-pointer ${isChecked ? 'bg-darkSuccess light:bg-lightSuccess' : 'bg-darkBox light:bg-lightBox'}`}
+                      onClick={() => toggleCheckbox(log.fullDate, task?._id, !isChecked, log?._id)}
+                    ></span>
                   )
                 })}
               </div>
@@ -281,7 +290,6 @@ const DailyCalanderTaskSheet = (
           </div>
         ))}
       </div>
-
 
       {/* Add Row Button */}
       {taskList?.length < rowLimit && (
@@ -304,41 +312,45 @@ const DailyCalanderTaskSheet = (
         <div
           className="p-2 flex items-center w-full"
         >
-
-          {/* Weeks 1–4 */}
-          {Array.from({ length: 4 }).map((_, weekIndex) => (
-            <div
-              key={weekIndex}
-              className={`flex items-center justify-evenly ${totalD > 28 ? 'w-[22%]' : 'w-[25%]'} text-center`}
-            >
-              {progress?.dateLogProgress?.slice(weekIndex * 7, (weekIndex + 1) * 7)?.map((d, dayIndex) => {
-                return (
-                  <div key={dayIndex} title={d?.progress?.toString()}>
-                    <div className={`h-14 w-2.5 flex items-end bg-darkBg rounded-t-[3px]`}>
-                      <div className={`w-2.5 bg-darkSuccess light:bg-lightSuccess rounded-t-[3px]`} style={{ height: `${d?.progress}%` }}></div>
-                    </div>
-                    <span className="text-[6px]">{Number.isNaN(d?.progress) ? '0' : d?.progress}%</span>
-                  </div>
-                );
-              })}
-            </div>
-          ))}
-
-          {/* Week 5 (3 days) */}
-          {totalD > 28 && (
-            <div className="flex items-center justify-evenly w-[12%] text-center">
-              {Array.from({ length: totalD - 28 }, (_, i) => 29 + i).map((_, dayIndex) => {
-                const d = progress?.dateLogProgress?.[28 + dayIndex];
-                return (
-                  <div key={dayIndex} title={d?.progress?.toString()}>
-                    <div className={`h-14 w-2.5 flex items-end bg-darkBg rounded-t-[3px]`}>
-                      <div className={`w-2.5 bg-darkSuccess light:bg-lightSuccess rounded-t-[3px]`} style={{ height: `${d?.progress}%` }}></div>
-                    </div>
-                    <span className="text-[6px]">{Number.isNaN(d?.progress) ? 0 : d?.progress}%</span>
-                  </div>
-                );
-              })}
-            </div>
+          {getLogLoading ? (
+            <div className="w-full bg-gray-500/50 h-21 -mt-1 rounded-lg animate-pulse"></div>
+          ) : (
+            <>
+              {/* Weeks 1–4 */}
+              {Array.from({ length: 4 }).map((_, weekIndex) => (
+                <div
+                  key={weekIndex}
+                  className={`flex items-center justify-evenly ${totalD > 28 ? 'w-[22%]' : 'w-[25%]'} text-center`}
+                >
+                  {progress?.dateLogProgress?.slice(weekIndex * 7, (weekIndex + 1) * 7)?.map((d, dayIndex) => {
+                    return (
+                      <div key={dayIndex} title={d?.progress?.toString()}>
+                        <div className={`h-14 w-2.5 flex items-end bg-darkBg rounded-t-[3px]`}>
+                          <div className={`w-2.5 bg-darkSuccess light:bg-lightSuccess rounded-t-[3px]`} style={{ height: `${d?.progress}%` }}></div>
+                        </div>
+                        <span className="text-[6px]">{Number.isNaN(Number(d?.progress)) ? '0' : d?.progress}%</span>
+                      </div>
+                    );
+                  })}
+                </div>
+              ))}
+              {/* Week 5 (3 days) */}
+              {totalD > 28 && (
+                <div className="flex items-center justify-evenly w-[12%] text-center">
+                  {Array.from({ length: totalD - 28 }, (_, i) => 29 + i).map((_, dayIndex) => {
+                    const d = progress?.dateLogProgress?.[28 + dayIndex];
+                    return (
+                      <div key={dayIndex} title={d?.progress?.toString()}>
+                        <div className={`h-14 w-2.5 flex items-end bg-darkBg rounded-t-[3px]`}>
+                          <div className={`w-2.5 bg-darkSuccess light:bg-lightSuccess rounded-t-[3px]`} style={{ height: `${d?.progress}%` }}></div>
+                        </div>
+                        <span className="text-[6px]">{Number.isNaN(Number(d?.progress)) ? 0 : d?.progress}%</span>
+                      </div>
+                    );
+                  })}
+                </div>
+              )}
+            </>
           )}
 
         </div>
