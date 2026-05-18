@@ -278,7 +278,7 @@ const Dashboard = () => {
                   <p className="mb-5">To activate, please choose any active plan from the following.</p>
                   <div className={`grid gap-3 ${showFree ? 'grid-cols-1 sm:grid-cols-2 md:grid-cols-3' : 'grid-cols-1'}`}>
                     {plans.slice(0, showFree ? plans.length : 1).map((plan, i) => (
-                      <div key={i} className="bg-darkCard light:bg-lightCard p-5 rounded-lg text-center">
+                      <div key={i} className="glass-card p-5 rounded-lg text-center">
                         <h3>{plan.title}</h3>
                         <p style={{ fontSize: "22px", margin: "10px 0" }}>{plan.price}</p>
                         <p className="text-gray-400 text-[14px] mb-3.75 w-55">
@@ -323,7 +323,7 @@ const Dashboard = () => {
               <p className="mb-8 text-center">To activate, please choose any active plan from the following.</p>
               <div className={`flex overflow-x-auto hide-scrollbar gap-3 ${showFree ? 'grid-cols-1 sm:grid-cols-2 md:grid-cols-3' : 'grid-cols-1'}`}>
                 {plansList.slice(1).map((plan, i) => (
-                  <div key={i} className="bg-darkCard light:bg-lightCard p-2 rounded-lg text-center">
+                  <div key={i} className="glass-card p-2 rounded-lg text-center">
                     <h3>{formattedText(plan?.planName)}</h3>
                     <p style={{ fontSize: "22px", margin: "10px 0" }}>₹{plan?.amount}</p>
                     <p className="text-gray-400 text-[14px] mb-3.75 w-55">
@@ -352,7 +352,7 @@ const Dashboard = () => {
                 </div>
               </div>
               <div className="flex items-center gap-4">
-                <div className="bg-darkCard light:bg-lightCard rounded-lg flex gap-4 p-2 ps-4 items-end">
+                <div className="glass-card rounded-lg flex gap-4 p-2 ps-4 items-end">
                   <div className="flex flex-col items-start">
                     <span className="text-[10px] text-gray-500">
                       {activeMonth?.status === "active" && 'Current Plan'}

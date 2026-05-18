@@ -8,6 +8,8 @@ import { WeeklyTargetsAccordion } from "./WeeklyTargetsAccordion";
 import { motion } from "framer-motion";
 import MonthlyNote from "./MonthlyNote";
 import { axiosPrivate } from "../../../api/axios";
+import Calendar from "./calander/Calendar";
+import { monMap } from "../../../staticData";
 
 interface MonthsI { _id: string, planID: string, startDate: Date | string, endDate: Date | string, status: string }
 
@@ -169,21 +171,6 @@ const TrackMainComponent = ({ dashboardData, taskList, activeMonth, setTaskList,
     }
   }
 
-  const monMap: { [key: number]: string } = {
-    1: "January",
-    2: "February",
-    3: "March",
-    4: "April",
-    5: "May",
-    6: "June",
-    7: "July",
-    8: "August",
-    9: "September",
-    10: "October",
-    11: "November",
-    12: "December"
-  }
-
   const getAllSubscription = async () => {
     try {
       const res = await axiosPrivate.get("/api/all-subscriptions");
@@ -207,7 +194,6 @@ const TrackMainComponent = ({ dashboardData, taskList, activeMonth, setTaskList,
 
   return (
     <div className="py-5">
-
       {/* slider between dashboard & calander */}
       <div className="flex justify-end google-sans">
         <div className="relative flex bg-darkBox light:bg-lightBg rounded-full p-1 w-65">
@@ -244,12 +230,12 @@ const TrackMainComponent = ({ dashboardData, taskList, activeMonth, setTaskList,
         <>
           <div className="flex gap-4 mt-4">
             <div className="w-[20%]"></div>
-            <div className="bg-darkCard light:bg-lightCard w-[65%] rounded-2xl h-25"></div>
+            <div className="glass-card w-[65%] rounded-2xl h-25"></div>
             <div className="w-[15%]"></div>
           </div>
           <div className="flex gap-4 mt-4 relative">
             {/* left detail */}
-            <div className="bg-darkCard light:bg-lightCard w-[19.5%] rounded-2xl overflow-x-hidden h-25 absolute -top-29 p-3 flex flex-col justify-between">
+            <div className="glass-card w-[19.5%] rounded-2xl overflow-x-hidden h-25 absolute -top-29 p-3 flex flex-col justify-between">
               <p className="text-3xl tracking-wider font-bold playfair-display text-center line-clamp-1" title={
                 `${monMap?.[(new Date(activeMonth?.startDate)).getMonth() + 1]}, ${(new Date(activeMonth?.startDate)).getFullYear()}`
               }>
@@ -257,7 +243,7 @@ const TrackMainComponent = ({ dashboardData, taskList, activeMonth, setTaskList,
               </p>
               <div className="text-sm google-sans flex items-center gap-3 overflow-x-auto overflow-y-hidden hide-scrollbar">
                 {subsMonths?.map((s, index) => (
-                  <button key={index} className={`px-4 py-1 text-nowrap rounded-full cursor-pointer ${activeMonth?.startDate?.toString() === s?.startDate?.toString() && activeMonth?.endDate?.toString() === s?.endDate?.toString() ? 'bg-darkPrimary light:bg-lightPrimary text-white' : 'bg-darkBox light:bg-lightBg hover:bg-darkBox/50 light:hover:bg-lightBox/50'}`}
+                  <button key={index} className={`px-4 py-1 text-nowrap rounded-full cursor-pointer ${activeMonth?.startDate?.toString() === s?.startDate?.toString() && activeMonth?.endDate?.toString() === s?.endDate?.toString() ? 'bg-darkPrimary light:bg-lightPrimary text-white' : `border ${s?.status === "active" ? 'border-darkSuccess' : 'border-white/50'} hover:bg-darkBox/50 light:hover:bg-lightBox/50`}`}
                     onClick={() => {
                       getDashboard(new Date(s?.startDate));
                       setActiveMonth(s);
@@ -274,21 +260,18 @@ const TrackMainComponent = ({ dashboardData, taskList, activeMonth, setTaskList,
               </div>
             </div>
             {/* right detail */}
-            <div className="bg-darkCard light:bg-lightCard w-[14.5%] rounded-2xl overflow-x-hidden h-25 absolute -top-29 right-0 overflow-y-hidden">
+            <div className="glass-card w-[14.5%] rounded-2xl overflow-x-hidden h-25 absolute -top-29 right-0 overflow-y-hidden">
               <ProgressPie value={Number.isNaN(Number(progress?.overallProgress?.progress)) ? 0 : Number(progress?.overallProgress?.progress)} type="" />
             </div>
 
             {/* below sections */}
-            <div className="bg-darkCard light:bg-lightCard w-[20%] rounded-2xl overflow-x-hidden">
+            <div className="glass-card w-[20%] rounded-2xl overflow-x-hidden">
               <HabitSection taskList={taskList} />
             </div>
-            <div className="bg-darkCard light:bg-lightCard w-[65%] rounded-2xl relative">
-              {/* {activeMonth?.status === "scheduled" && (
-                <div className="z-9999 backdrop-blur absolute -top-35 h-70 left-0 w-full mt-5 rounded-2xl overflow-x-hidden flex items-center justify-center flex-col"></div>
-              )} */}
+            <div className=" w-[65%] rounded-2xl relative">
               <DailyCalanderTaskSheet taskList={taskList} setTaskList={setTaskList} dashboardData={dashboardData} progress={progress} setProgress={setProgress} monthStatus={activeMonth?.status} />
             </div>
-            <div className="bg-darkCard light:bg-lightCard w-[15%] rounded-2xl overflow-x-hidden">
+            <div className="glass-card w-[15%] rounded-2xl overflow-x-hidden">
               <HabitProgress progress={progress?.taskProgress} total={dashboardData?.totalDays} count={progress?.overallProgress.count} />
             </div>
           </div>
@@ -297,12 +280,12 @@ const TrackMainComponent = ({ dashboardData, taskList, activeMonth, setTaskList,
             {/* note */}
             <MonthlyNote monthID={dashboardData?._id} />
             {/* monthly targets */}
-            <div className="bg-darkCard light:bg-lightCard w-1/3 rounded-2xl p-2">
+            <div className="glass-card w-1/3 rounded-2xl p-2">
               <p className="font-semibold text-lg px-5 py-3">Monthly Targets</p>
               <TargetsList type="monthly" monthID={dashboardData?._id} />
             </div>
             {/* gauge progress */}
-            <div className="bg-darkCard light:bg-lightCard w-1/3 rounded-2xl">
+            <div className="glass-card w-1/3 rounded-2xl">
               <p className="font-semibold text-lg px-5 pt-3">Your Monthly Targets Progress</p>
               <div className="relative left-10 top-10">
                 <ProgressPie value={Number.isNaN(Number(progress?.overallProgress?.progress)) ? 0 : Number(progress?.overallProgress?.progress)} type="analysis" />
@@ -310,11 +293,10 @@ const TrackMainComponent = ({ dashboardData, taskList, activeMonth, setTaskList,
             </div>
           </div>
           {/* weekly targets */}
-          <WeeklyTargetsAccordion monthID={dashboardData?._id} />
+          {/* <WeeklyTargetsAccordion monthID={dashboardData?._id} /> */}
         </>
       ) : (
-        // <Calendar activeMon={activeMon} currYear={year} />
-        <></>
+        <Calendar month={(new Date(activeMonth?.startDate)).getMonth()} year={(new Date(activeMonth?.startDate)).getFullYear()} setActiveMonth={setActiveMonth} subsMonths={subsMonths} activeStartDate={activeMonth?.startDate?.toString()} />
       )}
     </div>
   )

@@ -62,23 +62,35 @@ function App() {
   }, [dispatch]);
 
   return (
-    isAuthLoading ?
-      <div className='flex items-center justify-center h-screen'>
-        <PageLoader />
-      </div> :
-      <div className='bg-darkBg light:bg-lightBg text-darkText light:text-lightText'>
-        <ToastContainer position="top-right" autoClose={3000} />
-        <Routes>
-          <Route path='/' element={isLogin ? <Dashboard /> : <HomePage />} />
-          <Route path='/demo' element={<Demo />} />
-          <Route path='/settings' element={<Settings />} />
-          {/* <Route path='/dashboard' element={<Dashboard />} />
-        <Route path='/plan' element={<Dashboard />} /> */}
-          {/* <Route path='/' element={<YearCalander />} />
-        <Route path='/:week' element={<WeeklyLayout />} /> */}
-          <Route path='/*' element={<PageNotFound />} />
-        </Routes>
+    <>
+      <div class="blob-bg-container">
+        <div class="blob blob-purple"></div>
+        <div class="blob blob-cyan"></div>
+        <div class="blob blob-blue"></div>
+        <div class="blob blob-pink"></div>
+  <div class="blob blob-violet"></div>
+  <div class="blob blob-emerald"></div>
       </div>
+      <div class="main-content">
+        {isAuthLoading ?
+          <div className='flex items-center justify-center h-screen'>
+            <PageLoader />
+          </div> :
+          <div className='text-darkText light:text-lightText'>
+            <ToastContainer position="top-right" autoClose={3000} />
+            <Routes>
+              <Route path='/' element={isLogin ? <Dashboard /> : <HomePage />} />
+              <Route path='/demo' element={<Demo />} />
+              <Route path='/settings' element={<Settings />} />
+              {/* <Route path='/dashboard' element={<Dashboard />} />
+        <Route path='/plan' element={<Dashboard />} /> */}
+              {/* <Route path='/' element={<YearCalander />} />
+        <Route path='/:week' element={<WeeklyLayout />} /> */}
+              <Route path='/*' element={<PageNotFound />} />
+            </Routes>
+          </div>}
+      </div>
+    </>
   )
 }
 

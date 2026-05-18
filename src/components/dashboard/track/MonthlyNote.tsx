@@ -19,9 +19,9 @@ function formatTimestamp(isoString: string) {
 const MonthlyNote = ({ monthID }: { monthID: string }) => {
   const [monthlyNote, setMonthlyNote] = useState("");
   const [lastUpdated, setLastUpdates] = useState("");
-  
+
   // Keeps track of what is currently saved on the server
-  const serverNoteRef = useRef(""); 
+  const serverNoteRef = useRef("");
 
   // 1. Fetch note when monthID changes
   const getNote = async () => {
@@ -52,28 +52,30 @@ const MonthlyNote = ({ monthID }: { monthID: string }) => {
       axiosPrivate.put(`/api/monthly-note?monthDashID=${monthID}`, {
         note: monthlyNote,
       })
-      .then(() => {
-        // Update the server reference after a successful save
-        serverNoteRef.current = monthlyNote; 
-      })
-      .catch(() => notify.error("Please try again."));
+        .then(() => {
+          // Update the server reference after a successful save
+          serverNoteRef.current = monthlyNote;
+        })
+        .catch(() => notify.error("Please try again."));
     }, 500);
 
     return () => clearTimeout(timeout);
   }, [monthlyNote, monthID]);
 
   return (
-    <div className="bg-darkCard light:bg-lightCard w-1/3 rounded-2xl p-2 h-100 overflow-y-auto">
+    <div className="glass-card w-1/3 rounded-2xl p-2 h-100 overflow-y-auto">
       <div className='px-5 py-3 flex flex-col '>
         <p className="font-semibold text-lg">Note for this Month</p>
-        <p className='text-gray-500 text-[10px] text-nowrap'>Last Updated At - {formatTimestamp(lastUpdated)}</p>
+        {lastUpdated && (
+          <p className='text-gray-500 text-[10px] text-nowrap'>Last Updated At - {formatTimestamp(lastUpdated)}</p>
+        )}
       </div>
 
       <div className="px-4">
         <textarea
           value={monthlyNote}
           onChange={(e) => setMonthlyNote(e.target.value)}
-          className="outline-none bg-darkBox light:bg-lightBg resize-none rounded-xl px-3 py-2 text-[14px] w-full h-77"
+          className="outline-none bg-darkBox/50 light:bg-lightBg resize-none rounded-xl px-3 py-2 text-[14px] w-full h-77"
           placeholder="Write something for this month for your motivation."
         />
       </div>

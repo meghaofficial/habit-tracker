@@ -169,11 +169,12 @@ const DailyCalanderTaskSheet = (
   }, [dashboardData?._id]);
 
   return (
-    <div className="flex flex-col w-full relative">
+    <div className="relative">
+    <div className="flex flex-col w-full relative glass-card rounded-2xl">
       <div className="w-full">
 
         {/* Week Header */}
-        <div className="font-semibold p-2 text-[10px] tracking-wider flex items-center w-full border-b border-gray-500">
+        <div className="font-semibold p-2 text-[10px] text-white/90 tracking-wide flex items-center w-full border-b border-gray-500">
           <p className={`${totalD > 28 ? 'w-[22%]' : 'w-[25%]'} text-center`}>WEEK 1</p>
           <p className={`${totalD > 28 ? 'w-[22%]' : 'w-[25%]'} text-center`}>WEEK 2</p>
           <p className={`${totalD > 28 ? 'w-[22%]' : 'w-[25%]'} text-center`}>WEEK 3</p>
@@ -205,7 +206,7 @@ const DailyCalanderTaskSheet = (
         </div>
 
         {/* Date Numbers */}
-        <div className="p-2 text-[10px] tracking-wider flex items-center w-full border-b border-gray-700">
+        <div className="p-2 text-[10px] tracking-wider text-white/55 flex items-center w-full border-b border-gray-700">
           <div className={`flex items-center justify-evenly ${totalD > 28 ? 'w-[22%]' : 'w-[25%]'} text-center`}>
             {daysNums.slice(0, 7).map((d, index) => (
               <p key={index}>{d}</p>
@@ -265,7 +266,7 @@ const DailyCalanderTaskSheet = (
                 {dateLogs?.slice(weekIndex * 7, (weekIndex + 1) * 7).map((log, dayIndex) => {
                   const isChecked = log?.tasks?.includes(task?._id);
                   return (
-                    <span key={dayIndex} className={`h-4 w-4 rounded cursor-pointer ${isChecked ? 'bg-darkSuccess light:bg-lightSuccess' : 'bg-darkBox light:bg-lightBox'}`}
+                    <span key={dayIndex} className={`h-4 w-4 rounded cursor-pointer ${isChecked ? 'bg-darkSuccess shadow-[0_0_5px_rgba(74,222,128,0.5)] light:bg-lightSuccess' : 'glass-card'}`}
                       onClick={() => toggleCheckbox(log.fullDate, task?._id, !isChecked, log?._id)}
                     ></span>
                   );
@@ -280,7 +281,7 @@ const DailyCalanderTaskSheet = (
                   const log = dateLogs?.[28 + dayIndex];
                   const isChecked = log?.tasks?.includes(task?._id);
                   return (
-                    <span key={dayIndex} className={`h-4 w-4 rounded cursor-pointer ${isChecked ? 'bg-darkSuccess light:bg-lightSuccess' : 'bg-darkBox light:bg-lightBox'}`}
+                    <span key={dayIndex} className={`h-4 w-4 rounded cursor-pointer ${isChecked ? 'bg-darkSuccess shadow-[0_0_5px_rgba(74,222,128,0.5)] light:bg-lightSuccess' : 'glass-card'}`}
                       onClick={() => toggleCheckbox(log.fullDate, task?._id, !isChecked, log?._id)}
                     ></span>
                   )
@@ -308,7 +309,8 @@ const DailyCalanderTaskSheet = (
         )
       )}
 
-      {/* Day wise (column wise progress) */}
+    </div>
+    {/* Day wise (column wise progress) */}
       <div className="absolute flex gap-2 w-full justify-center -top-28">
         <div
           className="p-2 flex items-center w-full"
@@ -326,8 +328,8 @@ const DailyCalanderTaskSheet = (
                   {progress?.dateLogProgress?.slice(weekIndex * 7, (weekIndex + 1) * 7)?.map((d, dayIndex) => {
                     return (
                       <div key={dayIndex} title={d?.progress?.toString()}>
-                        <div className={`h-14 w-2.5 flex items-end bg-darkBg rounded-t-[3px]`}>
-                          <div className={`w-2.5 bg-darkSuccess light:bg-lightSuccess rounded-t-[3px]`} style={{ height: `${d?.progress}%` }}></div>
+                        <div className={`h-14 w-2.5 flex items-end glass-card rounded-t-[3px]`}>
+                          <div className={`w-2.5 bg-darkSuccess shadow-[0_0_5px_rgba(74,222,128,0.5)] light:bg-lightSuccess rounded-t-[3px]`} style={{ height: `${d?.progress}%` }}></div>
                         </div>
                         <span className="text-[6px]">{Number.isNaN(Number(d?.progress)) ? '0' : d?.progress}%</span>
                       </div>
@@ -342,7 +344,7 @@ const DailyCalanderTaskSheet = (
                     const d = progress?.dateLogProgress?.[28 + dayIndex];
                     return (
                       <div key={dayIndex} title={d?.progress?.toString()}>
-                        <div className={`h-14 w-2.5 flex items-end bg-darkBg rounded-t-[3px]`}>
+                        <div className={`h-14 w-2.5 flex items-end glass-card rounded-t-[3px]`}>
                           <div className={`w-2.5 bg-darkSuccess light:bg-lightSuccess rounded-t-[3px]`} style={{ height: `${d?.progress}%` }}></div>
                         </div>
                         <span className="text-[6px]">{Number.isNaN(Number(d?.progress)) ? 0 : d?.progress}%</span>

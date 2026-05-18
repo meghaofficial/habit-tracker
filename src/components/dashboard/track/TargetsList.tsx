@@ -123,7 +123,7 @@ const TargetsList = ({ type, monthID, week = 0 }: { type: string, monthID: strin
               [...targets].reverse().map((target, index) => (
                 <div
                   key={target?._id}
-                  className="bg-darkCard light:bg-lightCard px-4 py-3 rounded-lg transition flex items-center w-full gap-2 mb-2"
+                  className="px-4 py-3 rounded-lg transition flex items-center w-full gap-2 mb-2"
                 >
                   <span>{index + 1}.</span>
                   <div className="flex items-center justify-between w-full">
