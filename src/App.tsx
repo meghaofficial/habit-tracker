@@ -13,6 +13,7 @@ import { removeCreds, setCreds } from './redux/slices/authSlice'
 import PageLoader from './components/loaders/PageLoader'
 import { ToastContainer } from 'react-toastify'
 import Settings from './components/pages/Settings'
+import FloatingActionButtonComp from './components/shared/FloatingActionButtonComp'
 
 function App() {
 
@@ -68,8 +69,8 @@ function App() {
         <div class="blob blob-cyan"></div>
         <div class="blob blob-blue"></div>
         <div class="blob blob-pink"></div>
-  <div class="blob blob-violet"></div>
-  <div class="blob blob-emerald"></div>
+        <div class="blob blob-violet"></div>
+        <div class="blob blob-emerald"></div>
       </div>
       <div class="main-content">
         {isAuthLoading ?
@@ -89,6 +90,8 @@ function App() {
               <Route path='/*' element={<PageNotFound />} />
             </Routes>
           </div>}
+
+          <FloatingActionButtonComp />
       </div>
     </>
   )
