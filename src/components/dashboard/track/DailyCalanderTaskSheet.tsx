@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from "react";
+import React, { useCallback, useEffect, useRef, useState } from "react";
 import { daysNums, weekLetters } from "../../../staticData";
 import { LuMinus } from "react-icons/lu";
 import { axiosPrivate } from "../../../api/axios";
@@ -271,29 +271,18 @@ const DailyCalanderTaskSheet = (
                       key={weekIndex}
                       className={`flex items-center justify-evenly py-px ${totalD > 28 ? 'w-[22%]' : 'w-[25%]'} text-center`}
                     >
-                      {dateLogs?.slice(weekIndex * 7, (weekIndex + 1) * 7).map((log, dayIndex) => {
-                        const isChecked = log?.tasks?.includes(task?._id);
-                        return (
-                          <span key={dayIndex} className={`h-4 w-4 rounded cursor-pointer ${isChecked ? 'bg-darkSuccess shadow-[0_0_5px_rgba(74,222,128,0.5)] light:bg-lightSuccess' : 'glass-card'}`}
-                            onClick={() => toggleCheckbox(log.fullDate, task?._id, !isChecked, log?._id)}
-                          ></span>
-                        );
-                      })}
+                      <TaskRow taskID={task?._id} logs={dateLogs?.slice(weekIndex * 7, (weekIndex + 1) * 7)} onToggle={toggleCheckbox} />
                     </div>
                   ))}
 
                   {/* Week 5 */}
                   {totalD > 28 && (
                     <div className="flex items-center justify-evenly w-[12%] text-center">
-                      {Array.from({ length: totalD - 28 }, (_, i) => 29 + i).map((_, dayIndex) => {
-                        const log = dateLogs?.[28 + dayIndex];
-                        const isChecked = log?.tasks?.includes(task?._id);
-                        return (
-                          <span key={dayIndex} className={`h-4 w-4 rounded cursor-pointer ${isChecked ? 'bg-darkSuccess shadow-[0_0_5px_rgba(74,222,128,0.5)] light:bg-lightSuccess' : 'glass-card'}`}
-                            onClick={() => toggleCheckbox(log.fullDate, task?._id, !isChecked, log?._id)}
-                          ></span>
-                        )
-                      })}
+                      <TaskRow
+                        taskID={task?._id}
+                        logs={dateLogs?.slice(28)}
+                        onToggle={toggleCheckbox}
+                      />
                     </div>
                   )}
 
@@ -302,12 +291,12 @@ const DailyCalanderTaskSheet = (
               {/* Add Row Button */}
               {taskList?.length < rowLimit && (
                 addRowLoading ? (
-                  <button className="cursor-not-allowed smText p-1.5 animate-pulse">
+                  <button className="cursor-not-allowed smText p-1.5 animate-pulse w-full text-center">
                     Adding...
                   </button>
                 ) : (
                   <button
-                    className="cursor-pointer smText p-1.5"
+                    className="cursor-pointer smText p-1.5 text-center w-full"
                     onClick={handleAddRow}
                   >
                     ADD ROW +
@@ -374,5 +363,91 @@ const DailyCalanderTaskSheet = (
     </div>
   );
 };
+
+const CheckboxCell = React.memo(({
+  checked,
+  onToggle,
+  fullDate,
+  taskID,
+  logID
+}: {
+  checked: boolean,
+  onToggle: (
+    fullDate: Date,
+    taskID: string,
+    checked: boolean,
+    logID: string
+  ) => void,
+  fullDate: Date,
+  taskID: string,
+  logID: string
+}) => {
+
+  const handleClick = useCallback(() => {
+    onToggle(fullDate, taskID, !checked, logID)
+  }, [onToggle, fullDate, taskID, checked, logID])
+
+  return (
+    <span
+      className={`h-4 w-4 rounded cursor-pointer ${checked
+        ? "bg-darkSuccess"
+        : "bg-white/5 border border-white/10"
+        }`}
+      onClick={handleClick}
+    />
+  );
+});
+
+const TaskRow = React.memo(({ taskID, logs, onToggle }: {
+  taskID: string,
+  logs: {
+    _id: string;
+    userID: string;
+    monthDashID: string;
+    fullDate: Date;
+    tasks: string[]
+  }[],
+  onToggle: (
+    fullDate: Date,
+    taskID: string,
+    checked: boolean,
+    logID: string
+  ) => void
+}) => {
+  return (
+    logs.map(log => (
+      <CheckboxCell
+        key={log._id}
+        checked={log.tasks.includes(taskID)}
+        onToggle={onToggle}
+        fullDate={log.fullDate}
+        taskID={taskID}
+        logID={log._id}
+      />
+    ))
+  )
+});
+
+const ProgressColumn = React.memo(({
+  progress
+}: {
+  progress: number
+}) => {
+
+  return (
+    <div title={progress.toString()}>
+      <div className="h-14 w-2.5 flex items-end bg-white/5 rounded-t-[3px]">
+        <div
+          className="w-2.5 bg-darkSuccess rounded-t-[3px]"
+          style={{ height: `${progress}%` }}
+        />
+      </div>
+
+      <span className="text-[6px]">
+        {Number.isNaN(Number(progress)) ? 0 : progress}%
+      </span>
+    </div>
+  );
+});
 
 export default DailyCalanderTaskSheet;
