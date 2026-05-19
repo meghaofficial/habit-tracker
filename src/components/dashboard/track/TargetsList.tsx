@@ -3,6 +3,7 @@ import { RxCross2 } from "react-icons/rx";
 import { PiNotepad } from "react-icons/pi";
 import { axiosPrivate } from "../../../api/axios";
 import CircleLoader from "../../loaders/CircleLoader";
+import { motion, AnimatePresence } from 'framer-motion';
 
 interface Target {
   _id: string;
@@ -15,6 +16,7 @@ const TargetsList = ({ type, monthID, week = 0 }: { type: string, monthID: strin
   const [targets, setTargets] = useState<Target[]>([]);
   const [singleTarget, setSingleTarget] = useState("");
   const [loading, setLoading] = useState(false);
+  const [progress, setProgress] = useState("0");
 
   const addTarget = async () => {
     if (!singleTarget.trim()) return;
@@ -84,16 +86,26 @@ const TargetsList = ({ type, monthID, week = 0 }: { type: string, monthID: strin
     getTargets();
   }, [monthID, type, week]);
 
+  useEffect(() => {
+    if (targets?.length <= 0) return;
+    const donePr = targets?.filter(t => t?.completed === true).length ?? 0;
+    const pr = ((donePr/targets?.length)*100).toFixed(2);
+    setProgress(pr)
+  }, [targets]);
+
   return (
-    <>
+    <div className="relative">
+      <div className="absolute -top-9.5 w-[45%] right-4">
+        <DarkProgressBar progress={Number(progress)} />
+      </div>
       {/* input */}
       <div className="flex gap-4 px-4 mt-2">
-        <input 
-          disabled={targets?.length >= 10} 
-          type="text" 
-          className="focus:outline-none focus:ring-2 focus:ring-darkPrimary light:focus:ring-lightPrimary resize-none rounded-lg px-3 py-2 text-[14px] w-[80%] border border-gray-500" 
-          onChange={(e) => setSingleTarget(e.target.value)} 
-          value={singleTarget} 
+        <input
+          disabled={targets?.length >= 10}
+          type="text"
+          className="focus:outline-none focus:ring-2 focus:ring-darkPrimary light:focus:ring-lightPrimary resize-none rounded-lg px-3 py-2 text-[14px] w-[80%] border border-gray-500"
+          onChange={(e) => setSingleTarget(e.target.value)}
+          value={singleTarget}
         />
         <button className={`text-[14px] border-none rounded-md 
           ${targets?.length < 10 ?
@@ -160,8 +172,61 @@ const TargetsList = ({ type, monthID, week = 0 }: { type: string, monthID: strin
           </>
         )}
       </div>
-    </>
+    </div>
   )
+}
+
+
+interface ProgressBarProps {
+  progress: number; // Value between 0 and 100
+}
+
+function DarkProgressBar({ progress }: ProgressBarProps) {
+  const [isHovered, setIsHovered] = useState(false);
+
+  // Ensure progress stays within 0-100 bounds
+  const clampedProgress = Math.max(0, Math.min(100, progress));
+
+  return (
+    <div
+      className="relative w-full h-3 bg-darkBox/50 rounded-full cursor-pointer"
+      onMouseEnter={() => setIsHovered(true)}
+      onMouseLeave={() => setIsHovered(false)}
+    >
+      {/* Animated Progress Fill */}
+      <motion.div
+        className="absolute top-0 left-0 h-full bg-linear-to-r from-violet-500 to-fuchsia-500 rounded-full"
+        initial={{ width: 0 }}
+        animate={{ width: `${clampedProgress}%` }}
+        transition={{ duration: 0.8, ease: "easeOut" }}
+      />
+
+      {/* Invisible Anchor Point at the Tip for Tooltip Alignment */}
+      <motion.div
+        className="absolute top-0 h-full"
+        initial={{ left: 0 }}
+        animate={{ left: `${clampedProgress}%` }}
+        transition={{ duration: 0.8, ease: "easeOut" }}
+      >
+        {/* Smooth Tooltip */}
+        <AnimatePresence>
+          {isHovered && (
+            <motion.div
+              initial={{ opacity: 0, y: 10, scale: 0.95, x: "-50%" }}
+              animate={{ opacity: 1, y: 0, scale: 1, x: "-50%" }}
+              exit={{ opacity: 0, y: 6, scale: 0.95, x: "-50%" }}
+              transition={{ duration: 0.2, ease: "easeInOut" }}
+              className="absolute bottom-6 left-0 px-2.5 py-1 text-xs font-semibold text-white bg-zinc-900 border border-zinc-700 rounded-md shadow-xl whitespace-nowrap pointer-events-none"
+            >
+              {clampedProgress}%
+              {/* Tooltip Arrow */}
+              <div className="absolute top-full left-1/2 -translate-x-1/2 w-2 h-2 bg-zinc-900 border-r border-b border-zinc-700 rotate-45" />
+            </motion.div>
+          )}
+        </AnimatePresence>
+      </motion.div>
+    </div>
+  );
 }
 
 export default TargetsList

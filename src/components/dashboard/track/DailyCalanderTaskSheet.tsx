@@ -70,7 +70,7 @@ const DailyCalanderTaskSheet = (
   }
 
   const handleAddRow = async () => {
-    if (monthStatus === "scheduled"){
+    if (monthStatus === "scheduled") {
       alert('Can not add task as the subscription for this month is not active');
       return;
     }
@@ -170,153 +170,166 @@ const DailyCalanderTaskSheet = (
 
   return (
     <div className="relative">
-    <div className="flex flex-col w-full relative glass-card rounded-2xl">
-      <div className="w-full">
+      <div className="flex flex-col w-full relative glass-card rounded-2xl">
+        <div className="w-full">
 
-        {/* Week Header */}
-        <div className="font-semibold p-2 text-[10px] text-white/90 tracking-wide flex items-center w-full border-b border-gray-500">
-          <p className={`${totalD > 28 ? 'w-[22%]' : 'w-[25%]'} text-center`}>WEEK 1</p>
-          <p className={`${totalD > 28 ? 'w-[22%]' : 'w-[25%]'} text-center`}>WEEK 2</p>
-          <p className={`${totalD > 28 ? 'w-[22%]' : 'w-[25%]'} text-center`}>WEEK 3</p>
-          <p className={`${totalD > 28 ? 'w-[22%]' : 'w-[25%]'} text-center`}>WEEK 4</p>
-          {totalD > 28 && (
-            <p className={`w-[12%] text-center`}>WEEK 5</p>
-          )}
-        </div>
-
-        {/* Week Letters */}
-        <div className="p-2 text-[10px] flex items-center w-full border-b border-gray-700">
-          {Array.from({ length: 4 }).map((_, weekIndex) => (
-            <div
-              key={weekIndex}
-              className={`flex items-center justify-evenly ${totalD > 28 ? 'w-[22%]' : 'w-[25%]'} text-center`}
-            >
-              {Array.from({ length: 7 + firstDay }).slice(firstDay, 7 + firstDay).map((_, index) => (
-                <p key={index}>{weekLetters[(index + firstDay) % 7]}</p>
-              ))}
-            </div>
-          ))}
-          {totalD > 28 && (
-            <div className="flex items-center justify-evenly w-[12%] text-center">
-              {Array.from({ length: totalD - 28 }, (_, i) => 29 + i).map((_, index) => (
-                <p key={index}>{weekLetters[(index + firstDay) % 7]}</p>
-              ))}
-            </div>
-          )}
-        </div>
-
-        {/* Date Numbers */}
-        <div className="p-2 text-[10px] tracking-wider text-white/55 flex items-center w-full border-b border-gray-700">
-          <div className={`flex items-center justify-evenly ${totalD > 28 ? 'w-[22%]' : 'w-[25%]'} text-center`}>
-            {daysNums.slice(0, 7).map((d, index) => (
-              <p key={index}>{d}</p>
-            ))}
+          {/* Week Header */}
+          <div className="font-semibold p-2 text-[10px] text-white/90 tracking-wide flex items-center w-full border-b border-gray-500">
+            <p className={`${totalD > 28 ? 'w-[22%]' : 'w-[25%]'} text-center`}>WEEK 1</p>
+            <p className={`${totalD > 28 ? 'w-[22%]' : 'w-[25%]'} text-center`}>WEEK 2</p>
+            <p className={`${totalD > 28 ? 'w-[22%]' : 'w-[25%]'} text-center`}>WEEK 3</p>
+            <p className={`${totalD > 28 ? 'w-[22%]' : 'w-[25%]'} text-center`}>WEEK 4</p>
+            {totalD > 28 && (
+              <p className={`w-[12%] text-center`}>WEEK 5</p>
+            )}
           </div>
 
-          <div className={`flex items-center justify-evenly ${totalD > 28 ? 'w-[22%]' : 'w-[25%]'} text-center`}>
-            {daysNums.slice(7, 14).map((d, index) => (
-              <p key={index}>{d}</p>
-            ))}
-          </div>
-
-          <div className={`flex items-center justify-evenly ${totalD > 28 ? 'w-[22%]' : 'w-[25%]'} text-center`}>
-            {daysNums.slice(14, 21).map((d, index) => (
-              <p key={index}>{d}</p>
-            ))}
-          </div>
-
-          <div className={`flex items-center justify-evenly ${totalD > 28 ? 'w-[22%]' : 'w-[25%]'} text-center`}>
-            {daysNums.slice(21, 28).map((d, index) => (
-              <p key={index}>{d}</p>
-            ))}
-          </div>
-
-          {totalD > 28 && (
-            <div className="flex items-center justify-evenly w-[12%] text-center">
-              {Array.from({ length: totalD - 28 }, (_, i) => 29 + i).map((num) => (
-                <p key={num}>{num} </p>
-              ))}
-            </div>
-          )}
-        </div>
-
-        {/* Checkbox Rows */}
-        {taskList.length > 0 && taskList?.map((task) => (
-          <div
-            key={task?._id}
-            className="p-2 flex items-center w-full border-b border-gray-700 relative"
-          >
-            {
-              removeRowID === task?._id ? (
-                <button className="absolute -right-2 cursor-not-allowed smText p-2 animate-pulse bg-gray-400 rounded"></button>
-              ) : (
-                <div className="absolute -right-2 cursor-pointer border rounded border-gray-400 text-gray-400 bg-white"
-                  onClick={() => handleDeleteRow(task?._id)}
-                >
-                  <LuMinus size={15} />
-                </div>
-              )}
-
-            {/* Weeks 1–4 */}
+          {/* Week Letters */}
+          <div className="p-2 text-[10px] flex items-center w-full border-b border-gray-700">
             {Array.from({ length: 4 }).map((_, weekIndex) => (
               <div
                 key={weekIndex}
-                className={`flex items-center justify-evenly py-px ${totalD > 28 ? 'w-[22%]' : 'w-[25%]'} text-center`}
+                className={`flex items-center justify-evenly ${totalD > 28 ? 'w-[22%]' : 'w-[25%]'} text-center`}
               >
-                {dateLogs?.slice(weekIndex * 7, (weekIndex + 1) * 7).map((log, dayIndex) => {
-                  const isChecked = log?.tasks?.includes(task?._id);
-                  return (
-                    <span key={dayIndex} className={`h-4 w-4 rounded cursor-pointer ${isChecked ? 'bg-darkSuccess shadow-[0_0_5px_rgba(74,222,128,0.5)] light:bg-lightSuccess' : 'glass-card'}`}
-                      onClick={() => toggleCheckbox(log.fullDate, task?._id, !isChecked, log?._id)}
-                    ></span>
-                  );
-                })}
+                {Array.from({ length: 7 + firstDay }).slice(firstDay, 7 + firstDay).map((_, index) => (
+                  <p key={index}>{weekLetters[(index + firstDay) % 7]}</p>
+                ))}
               </div>
             ))}
-
-            {/* Week 5 */}
             {totalD > 28 && (
               <div className="flex items-center justify-evenly w-[12%] text-center">
-                {Array.from({ length: totalD - 28 }, (_, i) => 29 + i).map((_, dayIndex) => {
-                  const log = dateLogs?.[28 + dayIndex];
-                  const isChecked = log?.tasks?.includes(task?._id);
-                  return (
-                    <span key={dayIndex} className={`h-4 w-4 rounded cursor-pointer ${isChecked ? 'bg-darkSuccess shadow-[0_0_5px_rgba(74,222,128,0.5)] light:bg-lightSuccess' : 'glass-card'}`}
-                      onClick={() => toggleCheckbox(log.fullDate, task?._id, !isChecked, log?._id)}
-                    ></span>
-                  )
-                })}
+                {Array.from({ length: totalD - 28 }, (_, i) => 29 + i).map((_, index) => (
+                  <p key={index}>{weekLetters[(index + firstDay) % 7]}</p>
+                ))}
               </div>
             )}
-
           </div>
-        ))}
+
+          {/* Date Numbers */}
+          <div className="p-2 text-[10px] tracking-wider text-white/55 flex items-center w-full border-b border-gray-700">
+            <div className={`flex items-center justify-evenly ${totalD > 28 ? 'w-[22%]' : 'w-[25%]'} text-center`}>
+              {daysNums.slice(0, 7).map((d, index) => (
+                <p key={index}>{d}</p>
+              ))}
+            </div>
+
+            <div className={`flex items-center justify-evenly ${totalD > 28 ? 'w-[22%]' : 'w-[25%]'} text-center`}>
+              {daysNums.slice(7, 14).map((d, index) => (
+                <p key={index}>{d}</p>
+              ))}
+            </div>
+
+            <div className={`flex items-center justify-evenly ${totalD > 28 ? 'w-[22%]' : 'w-[25%]'} text-center`}>
+              {daysNums.slice(14, 21).map((d, index) => (
+                <p key={index}>{d}</p>
+              ))}
+            </div>
+
+            <div className={`flex items-center justify-evenly ${totalD > 28 ? 'w-[22%]' : 'w-[25%]'} text-center`}>
+              {daysNums.slice(21, 28).map((d, index) => (
+                <p key={index}>{d}</p>
+              ))}
+            </div>
+
+            {totalD > 28 && (
+              <div className="flex items-center justify-evenly w-[12%] text-center">
+                {Array.from({ length: totalD - 28 }, (_, i) => 29 + i).map((num) => (
+                  <p key={num}>{num} </p>
+                ))}
+              </div>
+            )}
+          </div>
+
+          {/* Checkbox Rows */}
+          {getLogLoading ? (
+            <div className="p-2 flex flex-col gap-3">
+              {Array.from({ length: 5 }).map((_, index) => (
+                <div key={index} className="w-full bg-gray-500/50 h-7 rounded-lg animate-pulse"></div>
+              ))}
+            </div>
+          ) : (
+            <>
+              {taskList.length > 0 && taskList?.map((task) => (
+                <div
+                  key={task?._id}
+                  className="p-2 flex items-center w-full border-b border-gray-700 relative"
+                >
+                  {
+                    removeRowID === task?._id ? (
+                      <button className="absolute -right-2 cursor-not-allowed smText p-2 animate-pulse bg-gray-400 rounded"></button>
+                    ) : (
+                      <div className="absolute -right-2 cursor-pointer border rounded border-gray-400 text-gray-400 bg-white"
+                        onClick={() => handleDeleteRow(task?._id)}
+                      >
+                        <LuMinus size={15} />
+                      </div>
+                    )}
+
+                  {/* Weeks 1–4 */}
+                  {Array.from({ length: 4 }).map((_, weekIndex) => (
+                    <div
+                      key={weekIndex}
+                      className={`flex items-center justify-evenly py-px ${totalD > 28 ? 'w-[22%]' : 'w-[25%]'} text-center`}
+                    >
+                      {dateLogs?.slice(weekIndex * 7, (weekIndex + 1) * 7).map((log, dayIndex) => {
+                        const isChecked = log?.tasks?.includes(task?._id);
+                        return (
+                          <span key={dayIndex} className={`h-4 w-4 rounded cursor-pointer ${isChecked ? 'bg-darkSuccess shadow-[0_0_5px_rgba(74,222,128,0.5)] light:bg-lightSuccess' : 'glass-card'}`}
+                            onClick={() => toggleCheckbox(log.fullDate, task?._id, !isChecked, log?._id)}
+                          ></span>
+                        );
+                      })}
+                    </div>
+                  ))}
+
+                  {/* Week 5 */}
+                  {totalD > 28 && (
+                    <div className="flex items-center justify-evenly w-[12%] text-center">
+                      {Array.from({ length: totalD - 28 }, (_, i) => 29 + i).map((_, dayIndex) => {
+                        const log = dateLogs?.[28 + dayIndex];
+                        const isChecked = log?.tasks?.includes(task?._id);
+                        return (
+                          <span key={dayIndex} className={`h-4 w-4 rounded cursor-pointer ${isChecked ? 'bg-darkSuccess shadow-[0_0_5px_rgba(74,222,128,0.5)] light:bg-lightSuccess' : 'glass-card'}`}
+                            onClick={() => toggleCheckbox(log.fullDate, task?._id, !isChecked, log?._id)}
+                          ></span>
+                        )
+                      })}
+                    </div>
+                  )}
+
+                </div>
+              ))}
+              {/* Add Row Button */}
+              {taskList?.length < rowLimit && (
+                addRowLoading ? (
+                  <button className="cursor-not-allowed smText p-1.5 animate-pulse">
+                    Adding...
+                  </button>
+                ) : (
+                  <button
+                    className="cursor-pointer smText p-1.5"
+                    onClick={handleAddRow}
+                  >
+                    ADD ROW +
+                  </button>
+                )
+              )}
+            </>
+          )}
+        </div>
+
       </div>
-
-      {/* Add Row Button */}
-      {taskList?.length < rowLimit && (
-        addRowLoading ? (
-          <button className="cursor-not-allowed smText p-1.5 animate-pulse">
-            Adding...
-          </button>
-        ) : (
-          <button
-            className="cursor-pointer smText p-1.5"
-            onClick={handleAddRow}
-          >
-            ADD ROW +
-          </button>
-        )
-      )}
-
-    </div>
-    {/* Day wise (column wise progress) */}
+      {/* Day wise (column wise progress) */}
       <div className="absolute flex gap-2 w-full justify-center -top-28">
         <div
           className="p-2 flex items-center w-full"
         >
           {getLogLoading ? (
-            <div className="w-full bg-gray-500/50 h-21 -mt-1 rounded-lg animate-pulse"></div>
+            <div className="px-1 flex gap-3 justify-center w-full items-center">
+              {Array.from({ length: 30 }).map((_, index) => (
+                <div key={index} className="w-3 bg-gray-500/50 h-18 rounded-lg animate-pulse"></div>
+              ))}
+            </div>
           ) : (
             <>
               {/* Weeks 1–4 */}
