@@ -4,7 +4,7 @@ import DailyCalanderTaskSheet from "./DailyCalanderTaskSheet";
 import HabitSection from "./HabitSection";
 import HabitProgress from "./HabitProgress";
 import TargetsList from "./TargetsList";
-import { WeeklyTargetsAccordion } from "./WeeklyTargetsAccordion";
+// import { WeeklyTargetsAccordion } from "./WeeklyTargetsAccordion";
 import { motion } from "framer-motion";
 import MonthlyNote from "./MonthlyNote";
 import { axiosPrivate } from "../../../api/axios";
@@ -195,7 +195,7 @@ const TrackMainComponent = ({ dashboardData, taskList, activeMonth, setTaskList,
   return (
     <div className="py-5">
       {/* slider between dashboard & calander */}
-      <div className="flex justify-end google-sans">
+      <div className="flex justify-end google-sans pr-15">
         <div className="relative flex bg-darkBox light:bg-lightBg rounded-full p-1 w-65">
 
           {/* Sliding Background */}

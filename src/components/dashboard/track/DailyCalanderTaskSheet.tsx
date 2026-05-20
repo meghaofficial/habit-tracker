@@ -158,6 +158,19 @@ const DailyCalanderTaskSheet = (
     });
   };
 
+  const handleReset = async () => {
+    const con = confirm("Are you sure you want to reset the dashboard?");
+    if (!con) return;
+    try {
+      const res = await axiosPrivate.patch(`/api/reset-date-log?monthDashID=${dashboardData._id}`);
+      if (res?.data?.success) {
+        await getDateLogs();
+      }
+    } catch (error) {
+      console.error(error);
+    }
+  }
+
   useEffect(() => {
     if (!dashboardData?._id) return;
     getDateLogs();
@@ -170,6 +183,7 @@ const DailyCalanderTaskSheet = (
 
   return (
     <div className="relative">
+      <span className="absolute -top-40 -right-45 text-[12px] cursor-pointer tracking-wider text-red-500 hover:underline" onClick={handleReset}>Reset</span>
       <div className="flex flex-col w-full relative glass-card rounded-2xl">
         <div className="w-full">
 

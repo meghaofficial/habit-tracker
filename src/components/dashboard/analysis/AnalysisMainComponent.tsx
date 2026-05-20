@@ -1,3 +1,5 @@
+import { useEffect } from "react"
+import { axiosPrivate } from "../../../api/axios"
 import { MonthlyLineChart } from "../../charts/MonthlyLineChart"
 import { ProgressPie } from "../../charts/ProgressPie"
 import TodayAllTasks from "../../charts/TodayAllTasks"
@@ -10,6 +12,24 @@ const AnalysisMainComponent = ({ taskList }: {
   const lineValues = Array.from({ length: 31 }, () =>
     Math.floor(Math.random() * 100)
   );
+
+  const getTodaysActivity = async () => {
+    // setDashLoading(true);
+    try {
+      const res = await axiosPrivate.get(`/api/get-today-activity`);
+      if (res?.data?.success) {
+        // setDashboardData(res?.data?.monthData);
+      }
+    } catch (error) {
+      console.error(error);
+    } finally {
+      // setDashLoading(false);
+    }
+  }
+
+  useEffect(() => {
+    getTodaysActivity();
+  }, []);
 
   return (
     <>
