@@ -16,7 +16,7 @@ const DailyCalanderTaskSheet = (
   }:
     {
       taskList: { _id: string, taskName: string }[],
-      setTaskList: React.Dispatch<React.SetStateAction<{ _id: string, taskName: string }[]>>,
+      setTaskList: React.Dispatch<React.SetStateAction<{ _id: string, taskName: string, monthDashID: string }[]>>,
 
       dashboardData: {
         _id: string;

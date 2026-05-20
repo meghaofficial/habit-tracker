@@ -1,13 +1,6 @@
 import { BarChart } from "@mui/x-charts/BarChart";
 
-type Props = {
-  maxValue: number;
-};
-
-export const WeeklyBarChart = ({ maxValue }: Props) => {
-  const data = Array.from({ length: 7 }, (_, i) =>
-    Math.floor(Math.random() * maxValue)
-  );
+export const WeeklyBarChart = ({ data, maxValue }: { data: {date: string, week: string, range: string, weekDays: string[], taskDone: number[] }, maxValue: number }) => {
 
   return (
     <div className="w-full h-70">
@@ -15,7 +8,7 @@ export const WeeklyBarChart = ({ maxValue }: Props) => {
         xAxis={[
           {
             scaleType: "band",
-            data: [1, 2, 3, 4, 5, 6, 7],
+            data: data?.weekDays,
             label: "Days",
           },
         ]}
@@ -28,7 +21,7 @@ export const WeeklyBarChart = ({ maxValue }: Props) => {
         ]}
         series={[
           {
-            data,
+            data: data?.taskDone,
             color: "#6366f1",
           },
         ]}

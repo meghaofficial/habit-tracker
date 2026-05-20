@@ -82,7 +82,7 @@ const Dashboard = () => {
     totalDays: number;
     firstDay: number;
   }>({ _id: "", userID: "", month: 0, year: 0, totalDays: 0, firstDay: 0 });
-  const [taskList, setTaskList] = useState<{ _id: string, taskName: string }[]>([]);
+  const [taskList, setTaskList] = useState<{ _id: string, taskName: string, monthDashID: string }[]>([]);
   const [hasUsedFreeloading, setHasUsedFreeLoading] = useState(false);
   const [openPlan, setOpenPlan] = useState(false);
   const [activeMonth, setActiveMonth] = useState<Subscription | any>({});
@@ -389,7 +389,7 @@ const Dashboard = () => {
             </div>
 
             {activeTab === "track" && <TrackMainComponent dashboardData={dashboardData} taskList={taskList} setTaskList={setTaskList} activeMonth={activeMonth} setActiveMonth={setActiveMonth} setDashboardData={setDashboardData} />}
-            {activeTab === "analysis" && <AnalysisMainComponent taskList={taskList} />}
+            {activeTab === "analysis" && <AnalysisMainComponent taskList={taskList} monthDashID={dashboardData?._id} />}
 
           </>
         )}

@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { axiosPrivate } from "../../api/axios";
 
 interface Task {
   id: number;
@@ -6,8 +7,9 @@ interface Task {
   completed: boolean;
 }
 
-const TodayAllTasks = ({ taskList }: {
-  taskList: { _id: string, taskName: string }[]
+const TodayAllTasks = ({ taskList, fullDate }: {
+  taskList: { _id: string, taskName: string, monthDashID: string }[],
+  fullDate: string
 }) => {
   const [tasks, setTasks] = useState<Task[]>([
     { id: 1, text: "Drink 2L water", completed: false },
@@ -28,14 +30,30 @@ const TodayAllTasks = ({ taskList }: {
     );
   };
 
+  const markTask = async (taskID: string, marked: boolean) => {
+    try {
+      const res = await axiosPrivate.patch(
+        `/api/date-logs?monthDashID=${taskList?.[0]?.monthDashID}&fullDate=${fullDate}&taskID=${taskID}`,
+        { marked }
+      );
+
+      if (res?.data?.success) {
+        // setProgress(res?.data?.progress);
+      }
+    } catch (error) {
+      // setDateLogs(previousLogs);
+      console.error(error);
+    }
+  }
+
   return (
     <>
       {/* Task List */}
-      <div className="space-y-1 w-full px-4 max-h-70 overflow-y-auto hide-scrollbar">
+      <div className="space-y-1 w-full px-4 pb-4 max-h-70 overflow-y-auto hide-scrollbar">
         {taskList.map((task, index) => (
           <div
             key={task?._id}
-            className="bg-slate-800 px-4 py-3 rounded-lg transition flex items-center w-full gap-2"
+            className="bg-darkBox/50 px-4 py-3 rounded-lg transition flex items-center w-full gap-2"
           >
             <span>{index + 1}.</span>
             <div className="flex items-center justify-between w-full">

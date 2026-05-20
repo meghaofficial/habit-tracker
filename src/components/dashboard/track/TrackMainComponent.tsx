@@ -131,7 +131,7 @@ const TrackMainComponent = ({ dashboardData, taskList, activeMonth, setTaskList,
   },
 
   taskList: { _id: string, taskName: string }[],
-  setTaskList: React.Dispatch<React.SetStateAction<{ _id: string, taskName: string }[]>>,
+  setTaskList: React.Dispatch<React.SetStateAction<{ _id: string, taskName: string, monthDashID: string }[]>>,
   setActiveMonth: React.Dispatch<React.SetStateAction<MonthsI>>,
   activeMonth: MonthsI,
   setDashboardData: React.Dispatch<React.SetStateAction<{
