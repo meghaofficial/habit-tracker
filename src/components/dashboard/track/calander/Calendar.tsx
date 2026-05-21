@@ -12,9 +12,9 @@ interface MonthsI { _id: string, planID: string, startDate: Date | string, endDa
 const Calendar = ({ month, year, setActiveMonth, subsMonths, activeStartDate }: { 
   month: number, 
   year: number,
-  setActiveMonth: React.Dispatch<React.SetStateAction<MonthsI>>,
-  subsMonths: MonthsI[],
-  activeStartDate: string
+  setActiveMonth?: React.Dispatch<React.SetStateAction<MonthsI>>,
+  subsMonths?: MonthsI[],
+  activeStartDate?: string
 }) => {
 
   const [todayDate, setTodayDate] = useState(1);
@@ -54,36 +54,36 @@ const Calendar = ({ month, year, setActiveMonth, subsMonths, activeStartDate }: 
     setTodayDate(d);
   }, []);
 
-const handleNext = () => {
-  const currentIndex = subsMonths?.findIndex(m => m?.startDate === activeStartDate);
-  if (currentIndex !== -1 && currentIndex < subsMonths.length - 1) {
-    const nextMonth = subsMonths[currentIndex + 1];
-    setActiveMonth(nextMonth);
-  }
-};
+// const handleNext = () => {
+//   const currentIndex = subsMonths?.findIndex(m => m?.startDate === activeStartDate);
+//   if (currentIndex !== -1 && currentIndex < subsMonths.length - 1) {
+//     const nextMonth = subsMonths[currentIndex + 1];
+//     setActiveMonth(nextMonth);
+//   }
+// };
 
-const handlePrev = () => {
-  const currentIndex = subsMonths?.findIndex(m => m?.startDate === activeStartDate);
-  if (currentIndex > 0) {
-    const prevMonth = subsMonths[currentIndex - 1];
-    setActiveMonth(prevMonth);
-  }
-};
+// const handlePrev = () => {
+//   const currentIndex = subsMonths?.findIndex(m => m?.startDate === activeStartDate);
+//   if (currentIndex > 0) {
+//     const prevMonth = subsMonths[currentIndex - 1];
+//     setActiveMonth(prevMonth);
+//   }
+// };
 
 
   return (
     <>
-      <div className="relative">
-        <p className="p-3 text-[40px] font-extrabold playfair-display text-center">{monMap[month+1]} {year}</p>
+      <div className="relative w-full">
+        <p className="mt-2 text-[40px] font-extrabold playfair-display text-center">{monMap[month+1]} {year}</p>
 
-<div className="absolute right-5 top-10 flex items-center justify-center gap-2">
+{/* <div className="absolute right-5 top-10 flex items-center justify-center gap-2">
   <div className={`bg-darkCard p-2 rounded-full cursor-pointer hover:bg-darkBox`} onClick={handlePrev}>
     <MdKeyboardArrowLeft size={20} />
   </div>
   <div className={`bg-darkCard p-2 rounded-full cursor-pointer hover:bg-darkBox`} onClick={handleNext}>
     <MdKeyboardArrowRight size={20} />
   </div>
-</div>
+</div> */}
 
         {/* Month */}
         <div className="px-1.5">
@@ -96,7 +96,7 @@ const handlePrev = () => {
             {Array.from({ length: totalD + firstDay }).map((_, index) => (
               <div
                 key={index}
-                className={`text-center py-5 relative rounded-md ${todayDate === index + 1 - firstDay && 'bg-darkPrimary light:bg-lightPrimary text-white'}`}
+                className={`text-center py-1 relative rounded-md ${todayDate === index + 1 - firstDay && 'bg-darkPrimary light:bg-lightPrimary text-white'}`}
                 style={{
                   backgroundColor:
                     todayDate === index + 1 - firstDay ? //todays date
@@ -116,8 +116,8 @@ const handlePrev = () => {
                 <div className='h-2 w-2 rounded-full absolute top-2 left-2'
                   style={{ backgroundColor: getStatusColor(index + 1 > firstDay ? index + 1 - firstDay : null)?.color }}
                   title={getStatusColor(index + 1 > firstDay ? index + 1 - firstDay : null)?.status} />
-                <div className="flex items-center justify-evenly">
-                  <span className={``} style={{
+                <div className="flex items-center justify-center">
+                  <span style={{
                     fontSize: todayDate === index + 1 - firstDay ? '20px' : '',
                     fontWeight: todayDate === index + 1 - firstDay ? 'bold' : ''
                   }}>

@@ -70,7 +70,7 @@ const TodayAllTasks = ({ taskList, log, setLog }: {
         {taskList.map((task, index) => (
           <div
             key={task?._id}
-            className="bg-darkBox/50 px-4 py-3 rounded-lg transition flex items-center w-full gap-2"
+            className="bg-darkBox/20 px-4 py-3 rounded-lg transition flex items-center w-full gap-2"
           >
             <span>{index + 1}.</span>
             <div className="flex items-center justify-between w-full">

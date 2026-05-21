@@ -344,8 +344,9 @@ const DailyCalanderTaskSheet = (
                   {progress?.dateLogProgress?.slice(weekIndex * 7, (weekIndex + 1) * 7)?.map((d, dayIndex) => {
                     return (
                       <div key={dayIndex} title={d?.progress?.toString()}>
-                        <div className={`h-14 w-2.5 flex items-end glass-card rounded-t-[3px]`}>
-                          <div className={`w-2.5 bg-darkSuccess shadow-[0_0_5px_rgba(74,222,128,0.5)] light:bg-lightSuccess rounded-t-[3px]`} style={{ height: `${d?.progress}%` }}></div>
+                        <div className={`h-14 w-2.5 flex items-end bg-white/5 border border-white/10 rounded-t-[3px]`}>
+                          <div className={`w-2.5 bg-darkSuccess shadow-[0_0_5px_rgba(74,222,128,0.5)] light:bg-lightSuccess rounded-t-[3px]`} style={{ height: `${d?.progress}%` }}
+                          ></div>
                         </div>
                         <span className="text-[6px]">{Number.isNaN(Number(d?.progress)) ? '0' : d?.progress}%</span>
                       </div>
@@ -360,7 +361,7 @@ const DailyCalanderTaskSheet = (
                     const d = progress?.dateLogProgress?.[28 + dayIndex];
                     return (
                       <div key={dayIndex} title={d?.progress?.toString()}>
-                        <div className={`h-14 w-2.5 flex items-end glass-card rounded-t-[3px]`}>
+                        <div className={`h-14 w-2.5 flex items-end bg-white/5 border border-white/10 rounded-t-[3px]`}>
                           <div className={`w-2.5 bg-darkSuccess light:bg-lightSuccess rounded-t-[3px]`} style={{ height: `${d?.progress}%` }}></div>
                         </div>
                         <span className="text-[6px]">{Number.isNaN(Number(d?.progress)) ? 0 : d?.progress}%</span>
@@ -440,28 +441,6 @@ const TaskRow = React.memo(({ taskID, logs, onToggle }: {
       />
     ))
   )
-});
-
-const ProgressColumn = React.memo(({
-  progress
-}: {
-  progress: number
-}) => {
-
-  return (
-    <div title={progress.toString()}>
-      <div className="h-14 w-2.5 flex items-end bg-white/5 rounded-t-[3px]">
-        <div
-          className="w-2.5 bg-darkSuccess rounded-t-[3px]"
-          style={{ height: `${progress}%` }}
-        />
-      </div>
-
-      <span className="text-[6px]">
-        {Number.isNaN(Number(progress)) ? 0 : progress}%
-      </span>
-    </div>
-  );
 });
 
 export default DailyCalanderTaskSheet;

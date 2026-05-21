@@ -4,6 +4,7 @@ import { MonthlyLineChart } from "../../charts/MonthlyLineChart"
 import { ProgressPie } from "../../charts/ProgressPie"
 import TodayAllTasks from "../../charts/TodayAllTasks"
 import { WeeklyBarChart } from "../../charts/WeeklyBarChart"
+import Calendar from "../track/calander/Calendar"
 
 interface Log {
   _id: string;
@@ -38,9 +39,9 @@ const AnalysisMainComponent = ({ taskList, monthDashID }: {
   const [monthlyAna, setMonthlyAna] = useState<{ dates: number[], tasks: number[] }>({
     dates: [], tasks: []
   });
-    const [log, setLog] = useState<Log>({
-      _id: "", monthDashID: "", fullDate: "", tasks: []
-    });
+  const [log, setLog] = useState<Log>({
+    _id: "", monthDashID: "", fullDate: "", tasks: []
+  });
 
   const getTodaysActivity = async () => {
     // setDashLoading(true);
@@ -95,7 +96,17 @@ const AnalysisMainComponent = ({ taskList, monthDashID }: {
     <>
       {/* upper daywise, weekly, todays task */}
       <div className="grid grid-cols-3 gap-4 mt-10">
-        <div className="bg-darkCard light:bg-lightCard rounded-2xl">
+        <div className="bg-black/20 rounded-2xl px-2">
+          {/* <div className="flex items-center justify-between">
+            <p className="font-semibold text-lg px-5 py-3">Calendar</p>
+            <p className="text-gray-500 text-[10px] px-5 py-3 cursor-default" title="Today's Date">{formatDateString(weeklyAna?.date)}</p>
+          </div> */}
+          <div className="flex items-center justify-center">
+            {/* <WeeklyBarChart data={weeklyAna} /> */}
+            <Calendar year={(new Date).getFullYear()} month={(new Date).getMonth()} />
+          </div>
+        </div>
+        <div className="bg-black/20 rounded-2xl">
           <div className="flex items-center justify-between">
             <p className="font-semibold text-lg px-5 py-3">Todays Activity</p>
             {/* 3 April 2026 */}
@@ -105,16 +116,7 @@ const AnalysisMainComponent = ({ taskList, monthDashID }: {
             <ProgressPie value={Number(todayProgress)} type="analysis" />
           </div>
         </div>
-        <div className="bg-darkCard light:bg-lightCard rounded-2xl">
-          {/* <div className="flex items-center justify-between">
-            <p className="font-semibold text-lg px-5 py-3">Weekly Activity</p>
-            <p className="text-gray-500 text-[10px] px-5 py-3 cursor-default" title="Today's Date">{weeklyAna?.date}</p>
-          </div>
-          <div className="flex items-center justify-center mt-5 pe-7">
-            <WeeklyBarChart data={weeklyAna} />
-          </div> */}
-        </div>
-        <div className="bg-darkCard light:bg-lightCard rounded-2xl">
+        <div className="bg-black/20 rounded-2xl">
           <div className="flex items-center justify-between">
             <p className="font-semibold text-lg px-5 py-3">Todays Tasks</p>
             <p className="text-gray-500 text-[10px] px-5 py-3 cursor-default" title="Today's Date">{formatDateString(todayDate)}</p>
@@ -126,7 +128,7 @@ const AnalysisMainComponent = ({ taskList, monthDashID }: {
       </div>
 
       <div className="my-4 grid grid-cols-2 gap-4">
-        <div className="bg-darkCard light:bg-lightCard rounded-2xl">
+        <div className="bg-black/20 rounded-2xl">
           <div className="flex items-center justify-between">
             <p className="font-semibold text-lg px-5 py-3">Weekly Activity</p>
             {/* April 2026 */}
@@ -136,15 +138,60 @@ const AnalysisMainComponent = ({ taskList, monthDashID }: {
             <WeeklyBarChart data={weeklyAna} maxValue={taskList?.length} />
           </div>
         </div>
-        {/* curr month progress */}
-        <div className="bg-darkCard light:bg-lightCard rounded-2xl">
-          <div className="flex items-center justify-between">
+        <div className="bg-black/20 rounded-2xl p-4 grid grid-cols-2 gap-4">
+          <div className="rounded-2xl bg-black/20 px-4 pt-4">
+            <span className="text-[14px] text-gray-500">Streak</span>
+            <div className="flex items-center w-full justify-between">
+              <span className="text-[60px] font-bold google-sans">40</span>
+              <span className="text-[50px]">
+                🔥
+              </span>
+            </div>
+          </div>
+          <div className="rounded-2xl bg-black/20 px-4 pt-4 flex justify-end flex-col">
+            <span className="text-[14px] text-gray-500">Longest Streak</span>
+            <div className="flex items-center mt-2 w-full">
+              <span className="text-[40px] font-bold google-sans">40</span>
+              <span className="text-[40px]">
+                🫡
+              </span>
+            </div>
+          </div>
+          <div className="rounded-2xl bg-black/20 p-4">
+          <span className="text-[14px] text-gray-500">Most Consistent Habit</span>
+            <div className="flex items-center mt-2 w-full justify-between">
+              <span className="text-[40px] font-bold google-sans line-clamp-1">DSA</span>
+              <span className="text-[40px]">
+                🤗
+              </span>
+            </div>
+          </div>
+          <div className="rounded-2xl bg-black/20 p-4">
+          <span className="text-[14px] text-gray-500">Weakest Habit</span>
+            <div className="flex items-center mt-2 w-full justify-between">
+              <span className="text-[40px] font-bold google-sans line-clamp-1" title="Exercise">Exercise</span>
+              <span className="text-[40px]">
+                😒
+              </span>
+            </div>
+          </div>
+          {/* <div className="flex items-center justify-between">
             <p className="font-semibold text-lg px-5 py-3">Monthly Activity</p>
             <p className="text-gray-500 text-[10px] px-5 py-3 cursor-default" title="Today's Date">{formatDateString(weeklyAna?.date)}</p>
           </div>
           <div className="flex items-center justify-center mt-5 pe-5">
             <MonthlyLineChart data={monthlyAna} />
-          </div>
+          </div> */}
+        </div>
+      </div>
+      {/* curr month progress */}
+      <div className="bg-black/20 rounded-2xl">
+        <div className="flex items-center justify-between">
+          <p className="font-semibold text-lg px-5 py-3">Monthly Activity</p>
+          <p className="text-gray-500 text-[10px] px-5 py-3 cursor-default" title="Today's Date">{formatDateString(weeklyAna?.date)}</p>
+        </div>
+        <div className="flex items-center justify-center mt-5 pe-5">
+          <MonthlyLineChart data={monthlyAna} />
         </div>
       </div>
     </>
