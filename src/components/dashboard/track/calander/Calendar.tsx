@@ -54,9 +54,6 @@ const Calendar = ({ month, year, setActiveMonth, subsMonths, activeStartDate }: 
     setTodayDate(d);
   }, []);
 
-  console.log("subsmonths", subsMonths);
-  console.log("activemon", activeStartDate)
-
 const handleNext = () => {
   const currentIndex = subsMonths?.findIndex(m => m?.startDate === activeStartDate);
   if (currentIndex !== -1 && currentIndex < subsMonths.length - 1) {
