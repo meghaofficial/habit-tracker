@@ -64,15 +64,15 @@ function App() {
 
   return (
     <>
-      <div class="blob-bg-container">
-        <div class="blob blob-purple"></div>
-        <div class="blob blob-cyan"></div>
-        <div class="blob blob-blue"></div>
-        <div class="blob blob-pink"></div>
-        <div class="blob blob-violet"></div>
-        <div class="blob blob-emerald"></div>
+      <div className="blob-bg-container">
+        <div className="blob blob-purple"></div>
+        <div className="blob blob-cyan"></div>
+        <div className="blob blob-blue"></div>
+        <div className="blob blob-pink"></div>
+        <div className="blob blob-violet"></div>
+        <div className="blob blob-emerald"></div>
       </div>
-      <div class="main-content">
+      <div className="main-content">
         {isAuthLoading ?
           <div className='flex items-center justify-center h-screen'>
             <PageLoader />

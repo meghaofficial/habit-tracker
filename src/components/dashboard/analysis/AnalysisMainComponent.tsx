@@ -5,6 +5,7 @@ import { ProgressPie } from "../../charts/ProgressPie"
 import TodayAllTasks from "../../charts/TodayAllTasks"
 import { WeeklyBarChart } from "../../charts/WeeklyBarChart"
 import Calendar from "../track/calander/Calendar"
+import { motion, AnimatePresence } from "framer-motion";
 
 interface Log {
   _id: string;
@@ -42,6 +43,9 @@ const AnalysisMainComponent = ({ taskList, monthDashID }: {
   const [log, setLog] = useState<Log>({
     _id: "", monthDashID: "", fullDate: "", tasks: []
   });
+  const [streakData, setStreakData] = useState<{ streak: number, longestStreak: number, mostConsistentHabits: string[], leastConsistentHabits: string[] }>({
+    streak: 0, longestStreak: 0, mostConsistentHabits: [], leastConsistentHabits: []
+  })
 
   const getTodaysActivity = async () => {
     // setDashLoading(true);
@@ -86,10 +90,25 @@ const AnalysisMainComponent = ({ taskList, monthDashID }: {
     }
   }
 
+  const getStreak = async () => {
+    // setDashLoading(true);
+    try {
+      const res = await axiosPrivate.get(`/api/get-streak?monthDashID=${monthDashID}`);
+      if (res?.data?.success) {
+        setStreakData(res?.data?.data);
+      }
+    } catch (error) {
+      console.error(error);
+    } finally {
+      // setDashLoading(false);
+    }
+  }
+
   useEffect(() => {
     getTodaysActivity();
     getWeeklyActivity();
     getMonthlyActivity();
+    getStreak();
   }, [log?.tasks]);
 
   return (
@@ -139,49 +158,78 @@ const AnalysisMainComponent = ({ taskList, monthDashID }: {
           </div>
         </div>
         <div className="bg-black/20 rounded-2xl p-4 grid grid-cols-2 gap-4">
-          <div className="rounded-2xl bg-black/20 px-4 pt-4">
-            <span className="text-[14px] text-gray-500">Streak</span>
-            <div className="flex items-center w-full justify-between">
-              <span className="text-[60px] font-bold google-sans">40</span>
-              <span className="text-[50px]">
+
+          <div className="rounded-2xl bg-black/20 p-4 flex flex-col justify-between min-h-37.5">
+            <div>
+              <span className="text-[13px] tracking-wide text-gray-500">
+                Streak
+              </span>
+            </div>
+
+            <div className="flex items-end justify-between mt-4">
+              <span className="text-[64px] leading-none font-bold google-sans">
+                {streakData?.streak}
+              </span>
+
+              <span className="text-[44px] leading-none">
                 🔥
               </span>
             </div>
           </div>
-          <div className="rounded-2xl bg-black/20 px-4 pt-4 flex justify-end flex-col">
-            <span className="text-[14px] text-gray-500">Longest Streak</span>
-            <div className="flex items-center mt-2 w-full">
-              <span className="text-[40px] font-bold google-sans">40</span>
-              <span className="text-[40px]">
+
+          <div className="rounded-2xl bg-black/20 p-4 flex flex-col justify-between min-h-37.5">
+            <div>
+              <span className="text-[13px] tracking-wide text-gray-500">
+                Longest Streak
+              </span>
+            </div>
+
+            <div className="flex items-end justify-between mt-4">
+              <span className="text-[52px] leading-none font-bold google-sans">
+                {streakData?.longestStreak}
+              </span>
+
+              <span className="text-[40px] leading-none">
                 🫡
               </span>
             </div>
           </div>
-          <div className="rounded-2xl bg-black/20 p-4">
-          <span className="text-[14px] text-gray-500">Most Consistent Habit</span>
-            <div className="flex items-center mt-2 w-full justify-between">
-              <span className="text-[40px] font-bold google-sans line-clamp-1">DSA</span>
-              <span className="text-[40px]">
-                🤗
+
+          <div className="rounded-2xl bg-black/20 p-4 flex flex-col justify-between min-h-35">
+            <div>
+              <span className="text-[13px] tracking-wide text-gray-500">
+                Most Consistent Habit
+              </span>
+            </div>
+
+            <div className="flex items-end justify-between gap-3 mt-4">
+              {/* <span className="text-[36px] leading-none font-bold google-sans line-clamp-1">
+                DSA
+              </span> */}
+              <RotatingText words={streakData?.mostConsistentHabits?.length > 0 ? streakData?.mostConsistentHabits : ['None']} />
+
+              <span className="text-[38px] leading-none shrink-0">
+                {streakData?.mostConsistentHabits?.length > 0 ? '🤗' : '😥'}
               </span>
             </div>
           </div>
-          <div className="rounded-2xl bg-black/20 p-4">
-          <span className="text-[14px] text-gray-500">Weakest Habit</span>
-            <div className="flex items-center mt-2 w-full justify-between">
-              <span className="text-[40px] font-bold google-sans line-clamp-1" title="Exercise">Exercise</span>
-              <span className="text-[40px]">
-                😒
+
+          <div className="rounded-2xl bg-black/20 p-4 flex flex-col justify-between min-h-35">
+            <div>
+              <span className="text-[13px] tracking-wide text-gray-500">
+                Weakest Habit
+              </span>
+            </div>
+
+            <div className="flex items-end justify-between gap-3 mt-4">
+              <RotatingText words={streakData?.leastConsistentHabits?.length > 0 ? streakData?.leastConsistentHabits : ['None']} />
+
+              <span className="text-[38px] leading-none shrink-0">
+                {streakData?.leastConsistentHabits?.length > 0 ? '😒' : '😓'}
               </span>
             </div>
           </div>
-          {/* <div className="flex items-center justify-between">
-            <p className="font-semibold text-lg px-5 py-3">Monthly Activity</p>
-            <p className="text-gray-500 text-[10px] px-5 py-3 cursor-default" title="Today's Date">{formatDateString(weeklyAna?.date)}</p>
-          </div>
-          <div className="flex items-center justify-center mt-5 pe-5">
-            <MonthlyLineChart data={monthlyAna} />
-          </div> */}
+
         </div>
       </div>
       {/* curr month progress */}
@@ -196,6 +244,52 @@ const AnalysisMainComponent = ({ taskList, monthDashID }: {
       </div>
     </>
   )
+}
+
+function RotatingText({ words }: { words: string[] }) {
+  const [index, setIndex] = useState(0);
+
+  const shouldAnimate = words.length > 1;
+
+  useEffect(() => {
+    if (!shouldAnimate) return;
+
+    const interval = setInterval(() => {
+      setIndex((prev) => (prev + 1) % words.length);
+    }, 3000);
+
+    return () => clearInterval(interval);
+  }, [words.length]);
+
+  return (
+    <div className="relative h-10 overflow-hidden w-62.5">
+      <AnimatePresence mode="wait">
+        {shouldAnimate ? (
+          <motion.div
+            key={words[index]}
+            initial={{ y: 40, opacity: 0 }}
+            animate={{ y: 0, opacity: 1 }}
+            exit={{ y: -40, opacity: 0 }}
+            transition={{
+              duration: 0.45,
+              ease: [0.22, 1, 0.36, 1],
+            }}
+            className="absolute left-0 w-full text-[36px] leading-none font-bold google-sans line-clamp-1"
+            title={words[index]}
+          >
+            {words[index]}
+          </motion.div>
+        ) : (
+          <div
+            className="absolute left-0 w-full text-[36px] leading-none font-bold google-sans line-clamp-1"
+            title={words[0]}
+          >
+            {words[0]}
+          </div>
+        )}
+      </AnimatePresence>
+    </div>
+  );
 }
 
 export default AnalysisMainComponent
