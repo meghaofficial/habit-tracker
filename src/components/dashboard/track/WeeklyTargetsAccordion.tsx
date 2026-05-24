@@ -2,13 +2,13 @@ import { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import TargetsList from "./TargetsList";
 
-export const WeeklyTargetsAccordion = () => {
+export const WeeklyTargetsAccordion = ({ monthID}: {monthID: string}) => {
 
   const [open, setOpen] = useState(false);
 
   return (
     <div className="flex gap-4 mt-4 w-full">
-      <div className="rounded-xl overflow-hidden bg-darkCard light:bg-lightCard shadow-sm w-full">
+      <div className="rounded-xl overflow-hidden glass-card shadow-sm w-full">
         {/* Header */}
         <button
           onClick={() => setOpen(prev => !prev)}
@@ -33,9 +33,9 @@ export const WeeklyTargetsAccordion = () => {
             >
               <div className="flex overflow-x-auto gap-4 px-4 pb-4 hide-scrollbar">
               {Array.from({ length: 5 }).map((_, index) => (
-                <div className="bg-darkCard light:bg-lightCard border border-gray-700 w-1/3 rounded-2xl p-2 min-w-80 min-h-80" key={index}>
+                <div className="glass-card border border-gray-700 w-1/3 rounded-2xl p-2 min-w-80 min-h-80" key={index}>
                   <p className="font-semibold text-md px-5 py-3">Week {index+1} Targets</p>
-                  <TargetsList />
+                  <TargetsList type="weekly" monthID={monthID} week={index+1} />
                 </div>
               ))}
               </div>

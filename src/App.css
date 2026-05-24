@@ -16,3 +16,163 @@ canvas {
   height: "50%" !important;
   width: "50%" !important;
 }
+
+
+/* BLURRED BLOB */
+/* Base styles for the dark theme */
+body {
+  margin: 0;
+  padding: 0;
+  background-color: #0B0F19; /* Deep dark blue/gray */
+  color: #F3F4F6;
+  font-family: sans-serif;
+  min-height: 100vh;
+}
+
+/* Container to isolate the background elements */
+.blob-bg-container {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  overflow: hidden;
+  z-index: -1; /* Keeps blobs behind text */
+  /* Heavy blur turns sharp circles into soft glowing clouds */
+  filter: blur(80px); 
+  opacity: 0.6; /* Prevents the colors from overpowering the text */
+}
+
+/* Shared properties for all blobs */
+.blob {
+  position: absolute;
+  border-radius: 50%;
+  mix-blend-mode: screen; /* Enhances color mixing on dark themes */
+}
+
+/* Custom styles for individual blob colors and animation delays */
+.blob-purple {
+  top: -10%;
+  left: -10%;
+  width: 50vw;
+  height: 50vw;
+  background: radial-gradient(circle, rgba(147,51,234,0.5) 0%, rgba(0,0,0,0) 70%);
+  animation: floatAround 25s infinite alternate ease-in-out;
+}
+
+.blob-cyan {
+  bottom: -10%;
+  right: -5%;
+  width: 45vw;
+  height: 45vw;
+  background: radial-gradient(circle, rgba(6,182,212,0.4) 0%, rgba(0,0,0,0) 70%);
+  animation: floatAround 30s infinite alternate-reverse ease-in-out;
+}
+
+.blob-blue {
+  top: 30%;
+  left: 40%;
+  width: 35vw;
+  height: 35vw;
+  background: radial-gradient(circle, rgba(59,130,246,0.45) 0%, rgba(0,0,0,0) 70%);
+  animation: floatAround 20s infinite alternate ease-in-out;
+  animation-delay: -5s;
+}
+
+.blob-pink {
+  top: 15%;
+  right: 15%;
+  width: 30vw;
+  height: 30vw;
+  background: radial-gradient(circle, rgba(236, 72, 153, 0.4) 0%, rgba(0,0,0,0) 70%);
+  /* Uses the alternative path with a negative delay to start mid-cycle */
+  animation: floatAlternative 22s infinite alternate ease-in-out;
+  animation-delay: -3s;
+}
+
+.blob-violet {
+  bottom: 10%;
+  left: 15%;
+  width: 40vw;
+  height: 40vw;
+  background: radial-gradient(circle, rgba(109, 40, 217, 0.45) 0%, rgba(0,0,0,0) 70%);
+  animation: floatAround 28s infinite alternate-reverse ease-in-out;
+  animation-delay: -7s;
+}
+
+.blob-emerald {
+  bottom: 40%;
+  right: 35%;
+  width: 25vw;
+  height: 25vw;
+  background: radial-gradient(circle, rgba(16, 185, 129, 0.3) 0%, rgba(0,0,0,0) 70%);
+  animation: floatAlternative 18s infinite alternate ease-in-out;
+  animation-delay: -11s;
+}
+@keyframes floatAlternative {
+  0% {
+    transform: translate(0px, 0px) scale(0.9);
+  }
+  50% {
+    transform: translate(-6vw, 8vh) scale(1.2);
+  }
+  100% {
+    transform: translate(7vw, -4vh) scale(1);
+  }
+}
+
+
+/* Optional: Content container formatting */
+.main-content {
+  position: relative;
+  z-index: 1;
+}
+
+
+/* GLASS MORPHISM */
+.glass-card {
+  /* width: 240px;
+  height: 360px; */
+  background: rgba(255, 255, 255, 0.05);
+  backdrop-filter: blur(5px);
+  -webkit-backdrop-filter: blur(5px);
+  /* border-radius: 20px; */
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  box-shadow: 
+    0 8px 32px rgba(0, 0, 0, 0.1),
+    inset 0 1px 0 #ffffff12,
+    inset 0 -1px 0 rgba(255, 255, 255, 0.1),
+    inset 0 0 0px 0px rgba(255, 255, 255, 0);
+  /* position: relative; */
+  overflow: hidden;
+}
+
+.glass-card::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 1px;
+  background: linear-gradient(
+    90deg,
+    transparent,
+    rgba(255, 255, 255, 0.8),
+    transparent
+  );
+}
+
+.glass-card::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 1px;
+  height: 100%;
+  background: linear-gradient(
+    180deg,
+    rgba(255, 255, 255, 0.8),
+    transparent,
+    rgba(255, 255, 255, 0.3)
+  );
+}

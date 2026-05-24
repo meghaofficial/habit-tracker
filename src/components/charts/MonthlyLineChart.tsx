@@ -1,22 +1,18 @@
 import { LineChart } from "@mui/x-charts/LineChart";
 
-type Props = {
-  values: number[];
-};
-
-export const MonthlyLineChart = ({ values }: Props) => {
+export const MonthlyLineChart = ({ data }: { data: { dates: number[], tasks: number[] } }) => {
   return (
     <div className="w-full overflow-x-auto hide-scrollbar">
       <div className="min-w-225">
         <LineChart
           xAxis={[
             {
-              data: Array.from({ length: 31 }, (_, i) => i + 1),
+              data: data?.dates,
             },
           ]}
           series={[
             {
-              data: values,
+              data: data?.tasks,
               color: "#6366f1",
               area: false, 
             },

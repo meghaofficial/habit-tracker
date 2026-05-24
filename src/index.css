@@ -82,3 +82,10 @@ tspan{
   --color-subHeaderText: #bf787b;
   --color-smHeaderBg: #f8e2dd;
 }
+
+.MuiChartsLegend-item:first-child{
+  margin-bottom: -10px;
+}
+.MuiChartsLegend-root{
+  margin-left: -10px !important;
+}

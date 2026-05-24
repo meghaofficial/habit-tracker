@@ -34,6 +34,20 @@ function getInclusiveMonthCount(startDateISO: Date | string, endDateISO: Date | 
   return result;
 }
 
+type Subscription = {
+  _id: string;
+  userID: string;
+  planID: string;
+  planType: string;
+  startDate: string;
+  endDate: string;
+  status: string;
+  paymentStatus: string;
+  createdAt: string;
+  updatedAt: string;
+  __v: number;
+};
+
 
 const Dashboard = () => {
 
@@ -55,6 +69,7 @@ const Dashboard = () => {
     planType: string;  // free, paid
     no_of_months: number;
     amount: number;
+    description: string;
   }[]>([]);
   const [showDashboard, setShowDashboard] = useState(false);
   const [dashLoading, setDashLoading] = useState(false);
@@ -67,20 +82,10 @@ const Dashboard = () => {
     totalDays: number;
     firstDay: number;
   }>({ _id: "", userID: "", month: 0, year: 0, totalDays: 0, firstDay: 0 });
-  const [subscriptionData, setSubscriptionData] = useState<{ planType: string; startDate: Date | string; endDate: Date | string; status: string; }>({ planType: "", startDate: "", endDate: "", status: "" });
-  const [totalMonths, setTotalMonths] = useState<number[]>([]);
-  const [taskList, setTaskList] = useState<{ _id: string, taskName: string }[]>([]);
-
-
-
-
-
-
-
-
-
-
-
+  const [taskList, setTaskList] = useState<{ _id: string, taskName: string, monthDashID: string }[]>([]);
+  const [hasUsedFreeloading, setHasUsedFreeLoading] = useState(false);
+  const [openPlan, setOpenPlan] = useState(false);
+  const [activeMonth, setActiveMonth] = useState<Subscription | any>({});
 
   const toggleTheme = () => {
     // const newTheme = !dark;
@@ -130,6 +135,26 @@ const Dashboard = () => {
         notify.success(res?.data?.message);
         setOpenPopup(false);
         setShowDashboard(true);
+        await getDashboard();
+        await getActiveSubscription();
+      }
+
+    } catch (error) {
+      console.error(error);
+      notify.error("Please try again.");
+    } finally {
+      setFreeTrialLoading(false);
+    }
+  }
+
+  const handleSubscribe = async (planID: string, amount: number) => {
+    setFreeTrialLoading(true);
+    try {
+      const res = await axiosPrivate.post("/api/subscribe", { planID, amount });
+
+      if (res?.data?.success) {
+        notify.success(res?.data?.message);
+        setOpenPlan(false);
       }
 
     } catch (error) {
@@ -164,17 +189,23 @@ const Dashboard = () => {
       setDashLoading(false);
     }
   }
+
+  const [activeSubsLoading, setActiveSubsLoading] = useState(false);
   const getActiveSubscription = async () => {
+    setActiveSubsLoading(true);
     try {
       const res = await axiosPrivate.get("/api/active-subscription");
       if (res?.data?.success) {
-        setSubscriptionData(res?.data?.subscription);
+        setActiveMonth(res?.data?.subscription);
       }
     } catch (error) {
       console.error(error);
+    } finally {
+      setActiveSubsLoading(false);
     }
   }
   const hasUsedFree = async () => {
+    setHasUsedFreeLoading(true);
     try {
       const res = await axiosPrivate.get("/api/has-used-free");
       if (res?.data?.success) {
@@ -182,6 +213,8 @@ const Dashboard = () => {
       }
     } catch (error) {
       console.error(error);
+    } finally {
+      setHasUsedFreeLoading(false);
     }
   }
 
@@ -214,34 +247,18 @@ const Dashboard = () => {
     subsRef.current = true;
   }, []);
 
-  useEffect(() => {
-    if (!subscriptionData) return;
-    setTotalMonths(getInclusiveMonthCount(subscriptionData.startDate, subscriptionData.endDate));
-  }, [subscriptionData]);
-
-  // TRY UNCOMMENT THIS
-  // useEffect(() => {
-  //   const savedTheme = localStorage.getItem("theme");
-  //   if (savedTheme === "dark") {
-  //     setDark(true);
-  //   }
-  //   else {
-  //     setDark(false)
-  //   }
-  // }, []);
-
-  // useEffect(() => {
-  //   const x = location.pathname.slice(1,);
-  //   setActiveTab(x[0].toUpperCase() + x.slice(1,));
-  // }, [location.pathname]);
-
+  const formattedText = (text: string) => {
+    const arr = text.split("_");
+    const temp = arr.map(d => d[0].toUpperCase() + d.slice(1));
+    return temp.join(" ");
+  }
 
   return (
     <>
 
       <div className="px-6 pt-4 overflow-x-hidden">
 
-        {dashLoading ? (
+        {dashLoading || hasUsedFreeloading ? (
           <div className='flex items-center justify-center h-screen'>
             <PageLoader />
           </div>
@@ -261,7 +278,7 @@ const Dashboard = () => {
                   <p className="mb-5">To activate, please choose any active plan from the following.</p>
                   <div className={`grid gap-3 ${showFree ? 'grid-cols-1 sm:grid-cols-2 md:grid-cols-3' : 'grid-cols-1'}`}>
                     {plans.slice(0, showFree ? plans.length : 1).map((plan, i) => (
-                      <div key={i} className="bg-darkCard light:bg-lightCard p-5 rounded-lg text-center">
+                      <div key={i} className="glass-card p-5 rounded-lg text-center">
                         <h3>{plan.title}</h3>
                         <p style={{ fontSize: "22px", margin: "10px 0" }}>{plan.price}</p>
                         <p className="text-gray-400 text-[14px] mb-3.75 w-55">
@@ -280,7 +297,7 @@ const Dashboard = () => {
             )}
 
             <Popup open={openPopup} setOpen={setOpenPopup}>
-              <div className="flex items-center justify-center h-95 flex-col google-sans">
+              <div className="flex items-center justify-evenly h-95 flex-col google-sans">
                 <p>Are you sure you want to activate your free trial ? This action can be undone!</p>
                 <p className="text-gray-500 text-sm mt-3 w-[80%] tracking-wider text-justify">Tip: Use your free trial wisely. It is suggested to activate you free trial in the beginning of the month, otherwise you will get advantage of using it for minimum days. For example - If you activate your free trial on 25th of April then your activation will only be valid till April 31st. And if you activate your free trial on 4th of April then also your activation will be valid till April 31st. Your free trial activation will be valid till end of the current month no matter at which date you are activating your free trial.</p>
                 <div className="mt-3 flex items-center justify-center gap-3">
@@ -300,6 +317,28 @@ const Dashboard = () => {
               </div>
             </Popup>
 
+            {/* extent plan popup */}
+            <Popup open={openPlan} setOpen={setOpenPlan}>
+              <p className="text-3xl my-3 font-semibold text-center">Select your Plan</p>
+              <p className="mb-8 text-center">To activate, please choose any active plan from the following.</p>
+              <div className={`flex overflow-x-auto hide-scrollbar gap-3 ${showFree ? 'grid-cols-1 sm:grid-cols-2 md:grid-cols-3' : 'grid-cols-1'}`}>
+                {plansList.slice(1).map((plan, i) => (
+                  <div key={i} className="glass-card p-2 rounded-lg text-center">
+                    <h3>{formattedText(plan?.planName)}</h3>
+                    <p style={{ fontSize: "22px", margin: "10px 0" }}>₹{plan?.amount}</p>
+                    <p className="text-gray-400 text-[14px] mb-3.75 w-55">
+                      {plan?.description}
+                    </p>
+                    <button onClick={() => {
+                      handleSubscribe(plan?._id, Number(plan?.amount))
+                    }} className={`mr-2.5 py-2 px-5 text-sm rounded-md border-none cursor-pointer bg-darkSuccess light:bg-lightSuccess text-black`}>
+                      Subscribe
+                    </button>
+                  </div>
+                ))}
+              </div>
+            </Popup>
+
 
             <div className="flex items-center justify-between mt-3">
               <div className="flex flex-col">
@@ -313,14 +352,23 @@ const Dashboard = () => {
                 </div>
               </div>
               <div className="flex items-center gap-4">
-                <div className="bg-darkCard light:bg-lightCard rounded-lg flex gap-4 p-2 ps-4 items-end">
+                <div className="glass-card rounded-lg flex gap-4 p-2 ps-4 items-end">
                   <div className="flex flex-col items-start">
-                    <span className="text-[10px] text-gray-500">Current Plan</span>
-                    <span className="text-[14px]">{formatMonthYearSimple(subscriptionData.startDate)} - {formatMonthYearSimple(subscriptionData.endDate)}</span>
+                    <span className="text-[10px] text-gray-500">
+                      {activeMonth?.status === "active" && 'Current Plan'}
+                      {activeMonth?.status === "scheduled" && 'Scheduled'}
+                    </span>
+                    {activeSubsLoading ? (
+                      <div className="w-45 h-5 mt-1 rounded bg-gray-500/50 animate-pulse"></div>
+                    ) : (
+                      <span className="text-[14px]">{formatMonthYearSimple(activeMonth?.startDate)} - {formatMonthYearSimple(activeMonth?.endDate)}</span>
+                    )}
                   </div>
-                  <button className="py-2 px-4 text-[14px] border-none rounded-md text-white cursor-pointer bg-darkSuccess light:bg-lightSuccess">
-                    Extend Plan
-                  </button>
+                  {!activeSubsLoading && (
+                    <button className="py-2 px-4 text-[14px] border-none rounded-md text-white cursor-pointer bg-darkSuccess light:bg-lightSuccess" onClick={() => setOpenPlan(true)}>
+                      Extend Plan
+                    </button>
+                  )}
                 </div>
                 <button
                   onClick={toggleTheme}
@@ -340,8 +388,8 @@ const Dashboard = () => {
               </div>
             </div>
 
-            {activeTab === "track" && <TrackMainComponent dashboardData={dashboardData} totalMonths={totalMonths} taskList={taskList} setTaskList={setTaskList} />}
-            {activeTab === "analysis" && <AnalysisMainComponent taskList={taskList}/>}
+            {activeTab === "track" && <TrackMainComponent dashboardData={dashboardData} taskList={taskList} setTaskList={setTaskList} activeMonth={activeMonth} setActiveMonth={setActiveMonth} setDashboardData={setDashboardData} />}
+            {activeTab === "analysis" && <AnalysisMainComponent taskList={taskList} monthDashID={dashboardData?._id} />}
 
           </>
         )}

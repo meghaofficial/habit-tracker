@@ -1,12 +1,21 @@
 import { useEffect, useState } from "react"
-import { months, week, weekColors, weekColorsDark } from "../../../../staticData"
+import { monMap, months, week, weekColors, weekColorsDark } from "../../../../staticData"
 import { statusColors } from "../../../../types";
 import { getDaysInMonth, getFirstDayOfMonth } from "../../../../helper";
 import type { RootState } from "../../../../redux/store/store";
 import { useSelector } from "react-redux";
 import RightDrawer from "./RightDrawer";
+import { MdKeyboardArrowLeft, MdKeyboardArrowRight } from "react-icons/md";
 
-const Calendar = ({ activeMon, currYear }: { activeMon: string, currYear: string }) => {
+interface MonthsI { _id: string, planID: string, startDate: Date | string, endDate: Date | string, status: string }
+
+const Calendar = ({ month, year, setActiveMonth, subsMonths, activeStartDate }: { 
+  month: number, 
+  year: number,
+  setActiveMonth?: React.Dispatch<React.SetStateAction<MonthsI>>,
+  subsMonths?: MonthsI[],
+  activeStartDate?: string
+}) => {
 
   const [todayDate, setTodayDate] = useState(1);
   const [totalD, setTotalD] = useState(0);
@@ -16,8 +25,6 @@ const Calendar = ({ activeMon, currYear }: { activeMon: string, currYear: string
   const dateData = useSelector(
     (state: RootState) => state.dateData
   );
-  const year = Number(currYear);
-  const month = Object.keys(months).indexOf(activeMon);
   const theme = localStorage.getItem("theme");
 
   const getStatusColor = (date: number | null): Record<string, string> => {
@@ -47,11 +54,36 @@ const Calendar = ({ activeMon, currYear }: { activeMon: string, currYear: string
     setTodayDate(d);
   }, []);
 
+// const handleNext = () => {
+//   const currentIndex = subsMonths?.findIndex(m => m?.startDate === activeStartDate);
+//   if (currentIndex !== -1 && currentIndex < subsMonths.length - 1) {
+//     const nextMonth = subsMonths[currentIndex + 1];
+//     setActiveMonth(nextMonth);
+//   }
+// };
+
+// const handlePrev = () => {
+//   const currentIndex = subsMonths?.findIndex(m => m?.startDate === activeStartDate);
+//   if (currentIndex > 0) {
+//     const prevMonth = subsMonths[currentIndex - 1];
+//     setActiveMonth(prevMonth);
+//   }
+// };
+
+
   return (
     <>
-      <div>
-        <p className="p-3 text-[40px] font-extrabold playfair-display text-center">{activeMon}</p>
+      <div className="relative w-full">
+        <p className="mt-2 text-[40px] font-extrabold playfair-display text-center">{monMap[month+1]} {year}</p>
 
+{/* <div className="absolute right-5 top-10 flex items-center justify-center gap-2">
+  <div className={`bg-darkCard p-2 rounded-full cursor-pointer hover:bg-darkBox`} onClick={handlePrev}>
+    <MdKeyboardArrowLeft size={20} />
+  </div>
+  <div className={`bg-darkCard p-2 rounded-full cursor-pointer hover:bg-darkBox`} onClick={handleNext}>
+    <MdKeyboardArrowRight size={20} />
+  </div>
+</div> */}
 
         {/* Month */}
         <div className="px-1.5">
@@ -64,7 +96,7 @@ const Calendar = ({ activeMon, currYear }: { activeMon: string, currYear: string
             {Array.from({ length: totalD + firstDay }).map((_, index) => (
               <div
                 key={index}
-                className={`text-center py-5 relative rounded-md ${todayDate === index + 1 - firstDay && 'bg-darkPrimary light:bg-lightPrimary text-white'}`}
+                className={`text-center py-1 relative rounded-md ${todayDate === index + 1 - firstDay && 'bg-darkPrimary light:bg-lightPrimary text-white'}`}
                 style={{
                   backgroundColor:
                     todayDate === index + 1 - firstDay ? //todays date
@@ -73,7 +105,7 @@ const Calendar = ({ activeMon, currYear }: { activeMon: string, currYear: string
                         theme === "dark" ?
                           weekColorsDark[Math.floor((index - firstDay) / 7)] :
                           weekColors[Math.floor((index - firstDay) / 7)] :
-                        theme === "dark" ? "#1e293b" : "#ffffff"
+                        "transparent"
                 }}
                 onClick={() => {
                   if (index + 1 <= firstDay) return;
@@ -84,21 +116,13 @@ const Calendar = ({ activeMon, currYear }: { activeMon: string, currYear: string
                 <div className='h-2 w-2 rounded-full absolute top-2 left-2'
                   style={{ backgroundColor: getStatusColor(index + 1 > firstDay ? index + 1 - firstDay : null)?.color }}
                   title={getStatusColor(index + 1 > firstDay ? index + 1 - firstDay : null)?.status} />
-                <div className="flex items-center justify-evenly">
-                  <span className={``} style={{
+                <div className="flex items-center justify-center">
+                  <span style={{
                     fontSize: todayDate === index + 1 - firstDay ? '20px' : '',
                     fontWeight: todayDate === index + 1 - firstDay ? 'bold' : ''
                   }}>
                     {index + 1 > firstDay ? index + 1 - firstDay : ""}
                   </span>
-                  {/* {index + 1 > firstDay && (
-                    <div className="flex flex-col gap-2">
-                      <div className="h-3 w-10 rounded-sm bg-green-500"></div>
-                      <div className="h-3 w-10 rounded-sm bg-yellow-500"></div>
-                      <div className="h-3 w-10 rounded-sm bg-red-500"></div>
-                    </div>
-                  )} */}
-                  {/* <span className="text-2xl">&#128512;</span> */}
                 </div>
               </div>
             ))}

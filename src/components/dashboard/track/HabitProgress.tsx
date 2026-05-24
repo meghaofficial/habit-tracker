@@ -12,11 +12,11 @@ const HabitProgress = ({ progress, total, count }: { progress: { id: string, cou
       </p>
       {/* task input */}
       {progress?.map((p, index) => (
-        <div className="text-[12px] flex items-center border-b border-gray-700 py-1.5" key={index}>
+        <div className="text-[12px] flex items-center border-b border-gray-700 py-[5.6px]" key={index}>
           <div className="w-[70%] flex items-center gap-3 px-1 ps-3" title={p?.progress?.toString()}>
             <span className="w-[25%] text-[8px]">{p?.progress === '100.00' ? '100.0' : p?.progress}%</span>
             <div className="w-full">
-              <div className="h-5 bg-darkSuccess light:bg-lightSuccess rounded-sm" style={{ width: `${p?.progress}%` }}></div>
+              <div className="h-5 bg-darkSuccess light:bg-lightSuccess shadow-[0_0_5px_rgba(74,222,128,0.5)] rounded-sm" style={{ width: `${p?.progress}%` }}></div>
             </div>
           </div>
           <p className="w-[30%] px-2 p-1 text-center text-[10px]">{p?.count} / {total}</p>
