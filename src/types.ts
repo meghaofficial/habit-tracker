@@ -103,3 +103,10 @@ export interface ITask {
   count: number;
   progress: string;
 }
+
+export interface Log {
+  _id: string;
+  monthDashID: string;
+  fullDate: Date | string;
+  tasks: string[];
+}

@@ -6,32 +6,18 @@ import TodayAllTasks from "../../charts/TodayAllTasks"
 import { WeeklyBarChart } from "../../charts/WeeklyBarChart"
 import Calendar from "../track/calander/Calendar"
 import { motion, AnimatePresence } from "framer-motion";
+import type { Log } from "../../../types"
+import { formatDateString } from "../../../helper"
 
-interface Log {
-  _id: string;
-  monthDashID: string;
-  fullDate: Date | string;
-  tasks: string[];
-}
-
-function formatDateString(dateStr: string) {
-  const parts = dateStr.split('-');
-  const year = parts[0];
-  const monthIndex = parseInt(parts[1], 10) - 1;
-  const months = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
-  if (parts.length === 2) {
-    return `${months[monthIndex]} ${year}`;
-  }
-  const day = parseInt(parts[2], 10);
-  return `${day} ${months[monthIndex]} ${year}`;
-}
-
-const AnalysisMainComponent = ({ taskList, monthDashID }: {
-  taskList: { _id: string, taskName: string, monthDashID: string }[], monthDashID: string
+const AnalysisMainComponent = ({ taskList, monthDashID, log, setLog, todayDate, setTodayDate }: {
+  taskList: { _id: string, taskName: string, monthDashID: string }[], monthDashID: string,
+  log: Log,
+  setLog: React.Dispatch<React.SetStateAction<Log>>,
+  todayDate: string,
+  setTodayDate: React.Dispatch<React.SetStateAction<string>>
 }) => {
 
   const [todayProgress, setTodayProgress] = useState("0");
-  const [todayDate, setTodayDate] = useState("");
   const [weeklyAna, setWeeklyAna] = useState<{
     date: string, week: string, range: string, weekDays: string[], taskDone: number[]
   }>({
@@ -39,9 +25,6 @@ const AnalysisMainComponent = ({ taskList, monthDashID }: {
   });
   const [monthlyAna, setMonthlyAna] = useState<{ dates: number[], tasks: number[] }>({
     dates: [], tasks: []
-  });
-  const [log, setLog] = useState<Log>({
-    _id: "", monthDashID: "", fullDate: "", tasks: []
   });
   const [streakData, setStreakData] = useState<{ streak: number, longestStreak: number, mostConsistentHabits: string[], leastConsistentHabits: string[] }>({
     streak: 0, longestStreak: 0, mostConsistentHabits: [], leastConsistentHabits: []

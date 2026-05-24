@@ -14,14 +14,9 @@ import { useNavigate } from "react-router-dom";
 import { plans } from "../../staticData";
 import Popup from "../shared/Popup";
 import PageLoader from "../loaders/PageLoader";
+import type { Log } from "../../types";
+import { IoMdLogOut } from "react-icons/io";
 
-function formatMonthYearSimple(isoString: Date | string) {
-  const date = new Date(isoString);
-  const day = date.getDate();
-  const month = date.toLocaleString('en-US', { month: 'long' });
-  const year = date.getFullYear();
-  return `${day}/${month}/${year}`;
-}
 function getInclusiveMonthCount(startDateISO: Date | string, endDateISO: Date | string) {
   const start = new Date(startDateISO);
   const end = new Date(endDateISO);
@@ -34,7 +29,7 @@ function getInclusiveMonthCount(startDateISO: Date | string, endDateISO: Date | 
   return result;
 }
 
-type Subscription = {
+interface Subscription {
   _id: string;
   userID: string;
   planID: string;
@@ -86,6 +81,10 @@ const Dashboard = () => {
   const [hasUsedFreeloading, setHasUsedFreeLoading] = useState(false);
   const [openPlan, setOpenPlan] = useState(false);
   const [activeMonth, setActiveMonth] = useState<Subscription | any>({});
+    const [log, setLog] = useState<Log>({
+    _id: "", monthDashID: "", fullDate: "", tasks: []
+  });
+    const [todayDate, setTodayDate] = useState("");
 
   const toggleTheme = () => {
     // const newTheme = !dark;
@@ -256,7 +255,7 @@ const Dashboard = () => {
   return (
     <>
 
-      <div className="px-6 pt-4 overflow-x-hidden">
+      <div className="sm:px-6 px-5 sm:pt-4 pt-3 overflow-x-hidden">
 
         {dashLoading || hasUsedFreeloading ? (
           <div className='flex items-center justify-center h-screen'>
@@ -340,7 +339,7 @@ const Dashboard = () => {
             </Popup>
 
 
-            <div className="flex items-center justify-between mt-3">
+            <div className="flex sm:flex-row flex-col sm:items-center justify-between mt-3">
               <div className="flex flex-col">
                 <h1 className="text-[32px] font-bold google-sans">Hello, {username}</h1>
                 <div className="mt-2 text-sm flex items-center gap-4">
@@ -351,8 +350,8 @@ const Dashboard = () => {
                   <span className={`cursor-pointer hover:text-darkText light:hover:text-lightText ${activeTab === 'history' ? 'text-darkText light:text-lightText' : 'text-gray-500'}`} onClick={() => setActiveTab("history")}>History</span>
                 </div>
               </div>
-              <div className="flex items-center gap-4">
-                <div className="glass-card rounded-lg flex gap-4 p-2 ps-4 items-end">
+              <div className="sm:flex hidden items-center gap-4">
+                {/* <div className="bg-darkBox/50 light:bg-lightBox/50 rounded-lg gap-4 p-2 ps-4 items-end">
                   <div className="flex flex-col items-start">
                     <span className="text-[10px] text-gray-500">
                       {activeMonth?.status === "active" && 'Current Plan'}
@@ -369,8 +368,8 @@ const Dashboard = () => {
                       Extend Plan
                     </button>
                   )}
-                </div>
-                <button
+                </div> */}
+                {/* <button
                   onClick={toggleTheme}
                   className="relative w-14 h-8 flex items-center bg-darkBox light:bg-lightBox rounded-full p-1 transition cursor-pointer"
                 >
@@ -380,16 +379,17 @@ const Dashboard = () => {
                   >
                     {isDark ? <IoMoon /> : <MdWbSunny className="text-yellow-500" />}
                   </div>
-                </button>
-                <button className={`border-none py-1.5 min-w-24 min-h-8 flex items-center justify-center px-4 bg-darkPrimary light:bg-lightPrimary text-white rounded-md text-sm ${!logoutLoading && 'cursor-pointer'}`} onClick={handleLogout}>
+                </button> */}
+                {/* <button className={`border-none py-1.5 min-w-24 min-h-8 flex items-center justify-center px-4 bg-darkPrimary light:bg-lightPrimary text-white rounded-md text-sm ${!logoutLoading && 'cursor-pointer'}`} onClick={handleLogout}>
                   {logoutLoading ? <CircleLoader /> : 'Logout'}
-                </button>
+                </button> */}
                 <IoSettingsSharp className="cursor-pointer text-xl" onClick={() => navigate("/settings")} />
+                <IoMdLogOut className="cursor-pointer text-xl" title="Logout" onClick={handleLogout} />
               </div>
             </div>
 
-            {activeTab === "track" && <TrackMainComponent dashboardData={dashboardData} taskList={taskList} setTaskList={setTaskList} activeMonth={activeMonth} setActiveMonth={setActiveMonth} setDashboardData={setDashboardData} />}
-            {activeTab === "analysis" && <AnalysisMainComponent taskList={taskList} monthDashID={dashboardData?._id} />}
+            {activeTab === "track" && <TrackMainComponent dashboardData={dashboardData} taskList={taskList} setTaskList={setTaskList} activeMonth={activeMonth} setActiveMonth={setActiveMonth} setDashboardData={setDashboardData} log={log} setLog={setLog} todayDate={todayDate} />}
+            {activeTab === "analysis" && <AnalysisMainComponent taskList={taskList} monthDashID={dashboardData?._id} log={log} setLog={setLog} todayDate={todayDate} setTodayDate={setTodayDate} />}
 
           </>
         )}

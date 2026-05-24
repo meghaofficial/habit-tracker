@@ -3,6 +3,7 @@ import { daysNums, weekLetters } from "../../../staticData";
 import { LuMinus } from "react-icons/lu";
 import { axiosPrivate } from "../../../api/axios";
 import { notify } from "../../../helper";
+import { RiResetLeftLine } from "react-icons/ri";
 
 const DailyCalanderTaskSheet = (
   {
@@ -183,12 +184,11 @@ const DailyCalanderTaskSheet = (
 
   return (
     <div className="relative">
-      <span className="absolute -top-40 -right-45 text-[12px] cursor-pointer tracking-wider text-red-500 hover:underline" onClick={handleReset}>Reset</span>
-      <div className="flex flex-col w-full relative glass-card rounded-2xl">
+      <div className="flex flex-col w-full relative bg-black/50 border border-darkBox/50 rounded-2xl">
         <div className="w-full">
 
           {/* Week Header */}
-          <div className="font-semibold p-2 text-[10px] text-white/90 tracking-wide flex items-center w-full border-b border-gray-500">
+          <div className="font-semibold p-2 text-[10px] text-white/90 tracking-wide flex items-center w-full border-b border-darkBox/50">
             <p className={`${totalD > 28 ? 'w-[22%]' : 'w-[25%]'} text-center`}>WEEK 1</p>
             <p className={`${totalD > 28 ? 'w-[22%]' : 'w-[25%]'} text-center`}>WEEK 2</p>
             <p className={`${totalD > 28 ? 'w-[22%]' : 'w-[25%]'} text-center`}>WEEK 3</p>
@@ -199,7 +199,7 @@ const DailyCalanderTaskSheet = (
           </div>
 
           {/* Week Letters */}
-          <div className="p-2 text-[10px] flex items-center w-full border-b border-gray-700">
+          <div className="p-2 text-[10px] flex items-center w-full border-b border-darkBox/50">
             {Array.from({ length: 4 }).map((_, weekIndex) => (
               <div
                 key={weekIndex}
@@ -220,7 +220,7 @@ const DailyCalanderTaskSheet = (
           </div>
 
           {/* Date Numbers */}
-          <div className="p-2 text-[10px] tracking-wider text-white/55 flex items-center w-full border-b border-gray-700">
+          <div className="p-2 text-[10px] tracking-wider text-white/55 flex items-center w-full border-b border-darkBox/50">
             <div className={`flex items-center justify-evenly ${totalD > 28 ? 'w-[22%]' : 'w-[25%]'} text-center`}>
               {daysNums.slice(0, 7).map((d, index) => (
                 <p key={index}>{d}</p>
@@ -266,7 +266,7 @@ const DailyCalanderTaskSheet = (
               {taskList.length > 0 && taskList?.map((task) => (
                 <div
                   key={task?._id}
-                  className="p-2 flex items-center w-full border-b border-gray-700 relative"
+                  className="p-2 flex items-center w-full border-b border-darkBox/50 relative"
                 >
                   {
                     removeRowID === task?._id ? (
@@ -319,6 +319,12 @@ const DailyCalanderTaskSheet = (
               )}
             </>
           )}
+
+          <div className="absolute h-4 w-4 flex items-center justify-center -right-2 bottom-2 cursor-pointer border rounded border-darkBox/50 text-white/70 bg-red-600"
+            onClick={handleReset}
+          >
+            <RiResetLeftLine size={12} />
+          </div>
         </div>
 
       </div>

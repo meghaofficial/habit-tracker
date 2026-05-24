@@ -10,6 +10,10 @@ import MonthlyNote from "./MonthlyNote";
 import { axiosPrivate } from "../../../api/axios";
 import Calendar from "./calander/Calendar";
 import { monMap } from "../../../staticData";
+import TodayAllTasks from "../../charts/TodayAllTasks";
+import type { Log } from "../../../types";
+import { formatDateString, formatDateString2, formatMonthYearSimple } from "../../../helper";
+import { IoIosArrowRoundBack, IoIosArrowRoundForward } from "react-icons/io";
 
 interface MonthsI { _id: string, planID: string, startDate: Date | string, endDate: Date | string, status: string }
 
@@ -120,7 +124,7 @@ const splitSubscriptionsByMonth = (
   return result;
 };
 
-const TrackMainComponent = ({ dashboardData, taskList, activeMonth, setTaskList, setActiveMonth, setDashboardData }: {
+const TrackMainComponent = ({ dashboardData, taskList, activeMonth, setTaskList, setActiveMonth, setDashboardData, log, setLog }: {
   dashboardData: {
     _id: string;
     userID: string;
@@ -130,7 +134,7 @@ const TrackMainComponent = ({ dashboardData, taskList, activeMonth, setTaskList,
     firstDay: number;
   },
 
-  taskList: { _id: string, taskName: string }[],
+  taskList: { _id: string, taskName: string, monthDashID: string }[],
   setTaskList: React.Dispatch<React.SetStateAction<{ _id: string, taskName: string, monthDashID: string }[]>>,
   setActiveMonth: React.Dispatch<React.SetStateAction<MonthsI>>,
   activeMonth: MonthsI,
@@ -142,6 +146,9 @@ const TrackMainComponent = ({ dashboardData, taskList, activeMonth, setTaskList,
     totalDays: number;
     firstDay: number;
   }>>,
+  log: Log,
+  setLog: React.Dispatch<React.SetStateAction<Log>>,
+  // todayDate: string
 }) => {
   const [active, setActive] = useState<"dashboard" | "calendar">("dashboard");
   const [subsMonths, setSubsMonths] = useState<MonthsI[]>([]);
@@ -192,13 +199,56 @@ const TrackMainComponent = ({ dashboardData, taskList, activeMonth, setTaskList,
     subsRef.current = true;
   }, []);
 
+  // For task list sm screen
+  const [selectedDate, setSelectedDate] = useState(new Date());
+  const [todayDate, setTodayDate] = useState(new Date());
+
+  const [logLoading, setLogLoading] = useState(false);
+  const getLog = async (date: Date) => {
+    setLogLoading(true);
+    try {
+      const res = await axiosPrivate.get(
+        `/api/get-log-date?monthDashID=${taskList?.[0]?.monthDashID}&fullDate=${getMidnightISO(date)}`
+      );
+
+      if (res?.data?.success) {
+        setLog(res?.data?.dateLog);
+      }
+    } catch (error) {
+      console.error(error);
+    } finally {
+      setLogLoading(false);
+    }
+  };
+
+  function getMidnightISO(date: Date) {
+    const newDate = new Date(date);
+    newDate.setUTCHours(0, 0, 0, 0);
+    return newDate.toISOString();
+  }
+  const handlePrevDate = () => {
+    const prev = new Date(selectedDate);
+    prev.setDate(prev.getDate() - 1);
+
+    setSelectedDate(prev);
+    getLog(prev);
+  };
+  const handleNextDate = () => {
+    const next = new Date(selectedDate);
+    next.setDate(next.getDate() + 1);
+
+    setSelectedDate(next);
+    getLog(next);
+  };
+  useEffect(() => {
+    getLog(selectedDate);
+  }, []);
+
   return (
     <div className="py-5">
       {/* slider between dashboard & calander */}
-      <div className="flex justify-end google-sans pr-15">
+      {/* <div className="flex justify-end google-sans pr-15">
         <div className="relative flex bg-darkBox light:bg-lightBg rounded-full p-1 w-65">
-
-          {/* Sliding Background */}
           <motion.div
             className="absolute top-1 bottom-1 w-1/2 bg-darkSuccess light:bg-lightSuccess rounded-full"
             animate={{
@@ -206,16 +256,12 @@ const TrackMainComponent = ({ dashboardData, taskList, activeMonth, setTaskList,
             }}
             transition={{ type: "spring", stiffness: 300, damping: 25 }}
           />
-
-          {/* Dashboard */}
           <button
             onClick={() => setActive("dashboard")}
             className={`relative z-10 flex-1 py-2 text-sm font-medium rounded-full transition cursor-pointer`}
           >
             Dashboard
           </button>
-
-          {/* Calendar */}
           <button
             onClick={() => setActive("calendar")}
             className={`relative z-10 flex-1 py-2 text-sm font-medium rounded-full transition cursor-pointer`}
@@ -223,25 +269,37 @@ const TrackMainComponent = ({ dashboardData, taskList, activeMonth, setTaskList,
             Calendar
           </button>
         </div>
-      </div>
+      </div> */}
 
       {/* MAIN CHART */}
       {active === "dashboard" ? (
         <>
-          <div className="flex gap-4 mt-4">
+          <div className="sm:flex hidden gap-4 mt-4">
             <div className="w-[20%]"></div>
-            <div className="glass-card w-[65%] rounded-2xl h-25"></div>
+            <div className="bg-black/50 border border-darkBox/50 w-[65%] rounded-2xl h-25"></div>
             <div className="w-[15%]"></div>
           </div>
-          <div className="flex gap-4 mt-4 relative">
+          <div className="sm:flex hidden gap-4 mt-4 relative">
             {/* left detail */}
-            <div className="glass-card w-[19.5%] rounded-2xl overflow-x-hidden h-25 absolute -top-29 p-3 flex flex-col justify-between">
-              <p className="text-3xl tracking-wider font-bold playfair-display text-center line-clamp-1" title={
+            <div className="bg-black/50 border border-darkBox/50 w-[19.5%] rounded-2xl overflow-x-hidden h-25 absolute -top-29 p-3 flex flex-col justify-between">
+              <p className="text-3xl tracking-wider font-bold playfair-display px-3 line-clamp-1" title={
                 `${monMap?.[(new Date(activeMonth?.startDate)).getMonth() + 1]}, ${(new Date(activeMonth?.startDate)).getFullYear()}`
               }>
                 {monMap?.[(new Date(activeMonth?.startDate)).getMonth() + 1]}, {(new Date(activeMonth?.startDate)).getFullYear()}
               </p>
-              <div className="text-sm google-sans flex items-center gap-3 overflow-x-auto overflow-y-hidden hide-scrollbar">
+              <div className="flex flex-col items-start px-3">
+                    <span className="text-[10px] text-gray-500">
+                      {activeMonth?.status === "active" && 'Current Plan'}
+                      {activeMonth?.status === "scheduled" && 'Scheduled'}
+                    </span>
+                    <span className="text-[10px] tracking-wider">{formatMonthYearSimple(activeMonth?.startDate)} - {formatMonthYearSimple(activeMonth?.endDate)}</span>
+                    {/* {activeSubsLoading ? (
+                      <div className="w-45 h-5 mt-1 rounded bg-gray-500/50 animate-pulse"></div>
+                    ) : (
+                      <span className="text-[14px]">{formatMonthYearSimple(activeMonth?.startDate)} - {formatMonthYearSimple(activeMonth?.endDate)}</span>
+                    )} */}
+                  </div>
+              {/* <div className="text-sm google-sans flex items-center gap-3 overflow-x-auto overflow-y-hidden hide-scrollbar">
                 {subsMonths?.map((s, index) => (
                   <button key={index} className={`px-4 py-1 text-nowrap rounded-full cursor-pointer ${activeMonth?.startDate?.toString() === s?.startDate?.toString() && activeMonth?.endDate?.toString() === s?.endDate?.toString() ? 'bg-darkPrimary light:bg-lightPrimary text-white' : `border ${s?.status === "active" ? 'border-darkSuccess' : 'border-white/50'} hover:bg-darkBox/50 light:hover:bg-lightBox/50`}`}
                     onClick={() => {
@@ -257,35 +315,73 @@ const TrackMainComponent = ({ dashboardData, taskList, activeMonth, setTaskList,
                     ) : ""}
                   </button>
                 ))}
-              </div>
+              </div> */}
             </div>
             {/* right detail */}
-            <div className="glass-card w-[14.5%] rounded-2xl overflow-x-hidden h-25 absolute -top-29 right-0 overflow-y-hidden">
+            <div className="bg-black/50 border border-darkBox/50 w-[14.5%] rounded-2xl overflow-x-hidden h-25 absolute -top-29 right-0 overflow-y-hidden">
               <ProgressPie value={Number.isNaN(Number(progress?.overallProgress?.progress)) ? 0 : Number(progress?.overallProgress?.progress)} type="" />
             </div>
 
             {/* below sections */}
-            <div className="glass-card w-[20%] rounded-2xl overflow-x-hidden">
+            <div className="bg-black/50 border border-darkBox/50 w-[20%] rounded-2xl overflow-x-hidden">
               <HabitSection taskList={taskList} />
             </div>
             <div className=" w-[65%] rounded-2xl relative">
               <DailyCalanderTaskSheet taskList={taskList} setTaskList={setTaskList} dashboardData={dashboardData} progress={progress} setProgress={setProgress} monthStatus={activeMonth?.status} />
             </div>
-            <div className="glass-card w-[15%] rounded-2xl overflow-x-hidden">
+            <div className="bg-black/50 border border-darkBox/50 w-[15%] rounded-2xl overflow-x-hidden">
               <HabitProgress progress={progress?.taskProgress} total={dashboardData?.totalDays} count={progress?.overallProgress.count} />
             </div>
           </div>
+          {/* sm screen */}
+          <div className="sm:hidden flex items-center justify-between">
+            <p className="google-sans text-[25px] bg-darkPrimary/50 font-bold p-2 w-full rounded-lg">{formatDateString2(todayDate)}</p>
+          </div>
           {/* monthly targets */}
-          <div className="flex gap-4 mt-4">
+          <div className="flex sm:flex-row flex-col gap-4 mt-4">
+            {/* for sm screen */}
+            <div className="bg-black/20 rounded-2xl sm:hidden">
+              <div className="flex items-center justify-between py-3">
+                <div className="px-5">
+                  <p className="font-semibold text-lg">Todays Tasks</p>
+                  {logLoading ? (
+                    <div className="w-20 h-4 mt-1 rounded bg-gray-500/50 animate-pulse"></div>
+                  ) : (
+                    <p className="text-gray-500 mt-1 text-[10px] cursor-default">{formatDateString2(selectedDate.toString())}</p>
+                  )}
+                </div>
+                {!logLoading && (
+                  <div className="px-5 flex items-center gap-2">
+                    <button onClick={handlePrevDate}>
+                      <IoIosArrowRoundBack size={20} />
+                    </button>
+                    <button onClick={handleNextDate}>
+                      <IoIosArrowRoundForward size={20} />
+                    </button>
+                  </div>
+                )}
+              </div>
+              <div className="flex items-center justify-center">
+                {logLoading ? (
+                  <div className="flex flex-col gap-2 w-full px-5 pb-5">
+                    {Array.from({ length: 6 }).map((_, index) => (
+                      <div className="w-full h-8 mt-1 rounded bg-gray-500/50 animate-pulse"></div>
+                    ))}
+                  </div>
+                ) : (
+                  <TodayAllTasks taskList={taskList} log={log} setLog={setLog} />
+                )}
+              </div>
+            </div>
             {/* note */}
             <MonthlyNote monthID={dashboardData?._id} />
             {/* monthly targets */}
-            <div className="glass-card w-1/3 rounded-2xl p-2">
+            <div className="bg-black/50 border border-darkBox/50 sm:w-1/3 rounded-2xl p-2">
               <p className="font-semibold text-lg px-5 py-3">Monthly Targets</p>
               <TargetsList type="monthly" monthID={dashboardData?._id} />
             </div>
             {/* gauge progress */}
-            <div className="glass-card w-1/3 rounded-2xl">
+            <div className="bg-black/50 w-1/3 rounded-2xl sm:block hidden border border-darkBox/50">
               <p className="font-semibold text-lg px-5 pt-3">Your Monthly Targets Progress</p>
               <div className="relative left-10 top-10">
                 <ProgressPie value={Number.isNaN(Number(progress?.overallProgress?.progress)) ? 0 : Number(progress?.overallProgress?.progress)} type="analysis" />

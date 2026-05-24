@@ -91,7 +91,7 @@ function App() {
             </Routes>
           </div>}
 
-          <FloatingActionButtonComp />
+          {/* <FloatingActionButtonComp /> */}
       </div>
     </>
   )

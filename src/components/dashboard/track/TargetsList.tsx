@@ -95,7 +95,7 @@ const TargetsList = ({ type, monthID, week = 0 }: { type: string, monthID: strin
 
   return (
     <div className="relative">
-      <div className="absolute -top-9.5 w-[45%] right-4">
+      <div className="sm:absolute -top-9.5 sm:w-[45%] w-[80%] right-4 sm:ms-0 ms-4 sm:my-0 -mt-0.5 mb-4">
         <DarkProgressBar progress={Number(progress)} />
       </div>
       {/* input */}
@@ -103,11 +103,11 @@ const TargetsList = ({ type, monthID, week = 0 }: { type: string, monthID: strin
         <input
           disabled={targets?.length >= 10}
           type="text"
-          className="focus:outline-none focus:ring-2 focus:ring-darkPrimary light:focus:ring-lightPrimary resize-none rounded-lg px-3 py-2 text-[14px] w-[80%] border border-gray-500"
+          className="focus:outline-none focus:ring-2 focus:ring-darkPrimary light:focus:ring-lightPrimary resize-none rounded-lg px-3 py-2 text-[14px] w-[80%] border bg-black/20 border-darkBox/50"
           onChange={(e) => setSingleTarget(e.target.value)}
           value={singleTarget}
         />
-        <button className={`text-[14px] border-none rounded-md 
+        <button className={`text-[14px] border-none rounded-md h-9 
           ${targets?.length < 10 ?
             'bg-darkPrimary light:bg-lightPrimary cursor-pointer text-white' :
             'text-white/50 bg-darkPrimary/50 light:bg-lightPrimary/50'} 
@@ -140,7 +140,7 @@ const TargetsList = ({ type, monthID, week = 0 }: { type: string, monthID: strin
                   <span>{index + 1}.</span>
                   <div className="flex items-center justify-between w-full">
                     <span
-                      className={`text-sm transition ${target?.completed
+                      className={`text-sm transition line-clamp-1 ${target?.completed
                         ? "line-through text-slate-400"
                         : ""
                         }`}

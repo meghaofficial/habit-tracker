@@ -66,7 +66,7 @@ const TodayAllTasks = ({ taskList, log, setLog }: {
   return (
     <>
       {/* Task List */}
-      <div className="space-y-1 w-full px-4 pb-4 max-h-70 overflow-y-auto hide-scrollbar">
+      <div className="space-y-1 w-full px-4 pb-4 sm:max-h-70 sm:overflow-y-auto hide-scrollbar">
         {taskList.map((task, index) => (
           <div
             key={task?._id}

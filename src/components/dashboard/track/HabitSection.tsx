@@ -84,13 +84,13 @@ const InputData = ({
   }, [value, taskId]);
 
   return (
-    <div className="text-[12px] px-2 p-1 flex items-center gap-2 border-b border-gray-700">
+    <div className="text-[12px] px-2 p-1 flex items-center gap-2 border-b border-darkBox/50">
       <span>{index + 1}</span>
 
       <input
         type="text"
         className="outline-none w-full py-1"
-        title="value"
+        title={value}
         value={value}
         onChange={(e) =>
           setValue(e.target.value)

@@ -63,7 +63,7 @@ const MonthlyNote = ({ monthID }: { monthID: string }) => {
   }, [monthlyNote, monthID]);
 
   return (
-    <div className="glass-card w-1/3 rounded-2xl p-2 h-100 overflow-y-auto">
+    <div className="sm:bg-black/50 border border-darkBox/50 bg-black/20 sm:w-1/3 rounded-2xl sm:p-2 h-100 overflow-y-auto">
       <div className='px-5 py-3 flex flex-col '>
         <p className="font-semibold text-lg">Note for this Month</p>
         {lastUpdated && (
@@ -75,7 +75,7 @@ const MonthlyNote = ({ monthID }: { monthID: string }) => {
         <textarea
           value={monthlyNote}
           onChange={(e) => setMonthlyNote(e.target.value)}
-          className="outline-none bg-darkBox/50 light:bg-lightBg resize-none rounded-xl px-3 py-2 text-[14px] w-full h-77"
+          className="outline-none bg-gray-500/10 resize-none rounded-xl px-3 py-2 text-[14px] w-full h-77"
           placeholder="Write something for this month for your motivation."
         />
       </div>
