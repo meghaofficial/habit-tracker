@@ -23,7 +23,7 @@ canvas {
 body {
   margin: 0;
   padding: 0;
-  background-color: #0B0F19; /* Deep dark blue/gray */
+  /* background-color: #0B0F19;  */
   color: #F3F4F6;
   font-family: sans-serif;
   min-height: 100vh;
@@ -37,77 +37,9 @@ body {
   width: 100vw;
   height: 100vh;
   overflow: hidden;
-  z-index: -1; /* Keeps blobs behind text */
-  /* Heavy blur turns sharp circles into soft glowing clouds */
+  z-index: -1;
   filter: blur(80px); 
-  opacity: 0.6; /* Prevents the colors from overpowering the text */
-}
-
-/* Shared properties for all blobs */
-.blob {
-  position: absolute;
-  border-radius: 50%;
-  mix-blend-mode: screen; /* Enhances color mixing on dark themes */
-}
-
-/* Custom styles for individual blob colors and animation delays */
-.blob-purple {
-  top: -10%;
-  left: -10%;
-  width: 50vw;
-  height: 50vw;
-  background: radial-gradient(circle, rgba(147,51,234,0.5) 0%, rgba(0,0,0,0) 70%);
-  animation: floatAround 25s infinite alternate ease-in-out;
-}
-
-.blob-cyan {
-  bottom: -10%;
-  right: -5%;
-  width: 45vw;
-  height: 45vw;
-  background: radial-gradient(circle, rgba(6,182,212,0.4) 0%, rgba(0,0,0,0) 70%);
-  animation: floatAround 30s infinite alternate-reverse ease-in-out;
-}
-
-.blob-blue {
-  top: 30%;
-  left: 40%;
-  width: 35vw;
-  height: 35vw;
-  background: radial-gradient(circle, rgba(59,130,246,0.45) 0%, rgba(0,0,0,0) 70%);
-  animation: floatAround 20s infinite alternate ease-in-out;
-  animation-delay: -5s;
-}
-
-.blob-pink {
-  top: 15%;
-  right: 15%;
-  width: 30vw;
-  height: 30vw;
-  background: radial-gradient(circle, rgba(236, 72, 153, 0.4) 0%, rgba(0,0,0,0) 70%);
-  /* Uses the alternative path with a negative delay to start mid-cycle */
-  animation: floatAlternative 22s infinite alternate ease-in-out;
-  animation-delay: -3s;
-}
-
-.blob-violet {
-  bottom: 10%;
-  left: 15%;
-  width: 40vw;
-  height: 40vw;
-  background: radial-gradient(circle, rgba(109, 40, 217, 0.45) 0%, rgba(0,0,0,0) 70%);
-  animation: floatAround 28s infinite alternate-reverse ease-in-out;
-  animation-delay: -7s;
-}
-
-.blob-emerald {
-  bottom: 40%;
-  right: 35%;
-  width: 25vw;
-  height: 25vw;
-  background: radial-gradient(circle, rgba(16, 185, 129, 0.3) 0%, rgba(0,0,0,0) 70%);
-  animation: floatAlternative 18s infinite alternate ease-in-out;
-  animation-delay: -11s;
+  opacity: 0.6;
 }
 @keyframes floatAlternative {
   0% {

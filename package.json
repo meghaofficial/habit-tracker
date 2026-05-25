@@ -20,6 +20,7 @@
     "@mui/x-charts": "^8.28.2",
     "@reduxjs/toolkit": "^2.11.2",
     "@tailwindcss/vite": "^4.2.1",
+    "animate.css": "^4.1.1",
     "apexcharts": "^5.10.3",
     "axios": "^1.15.0",
     "framer-motion": "^12.38.0",

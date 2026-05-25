@@ -64,13 +64,21 @@ function App() {
 
   return (
     <>
-      <div className="blob-bg-container">
-        <div className="blob blob-purple"></div>
-        <div className="blob blob-cyan"></div>
-        <div className="blob blob-blue"></div>
-        <div className="blob blob-pink"></div>
-        <div className="blob blob-violet"></div>
-        <div className="blob blob-emerald"></div>
+      <div className="fixed top-0 left-0 w-screen h-screen overflow-hidden -z-10 opacity-[0.6] blur-[80px]">
+        <div className="absolute rounded-1/2 -top-[25%] -left-[15%] w-[50vw] h-[50vh]"
+          style={{
+            background: `radial-gradient(circle, #6365f1d4 0%, rgba(0,0,0,0) 70%)`,
+            animation: `floatAround 25s infinite alternate ease-in-out`,
+            mixBlendMode: 'screen'
+          }}
+        ></div>
+        <div className="absolute rounded-1/2 -top-[15%] -right-[15%] w-[45vw] h-[45vh]"
+          style={{
+            background: `radial-gradient(circle, #a955f77f 0%, rgba(0,0,0,0) 70%)`,
+            animation: `floatAround 30s infinite alternate-reverse ease-in-out`,
+            mixBlendMode: 'screen'
+          }}
+        ></div>
       </div>
       <div className="main-content">
         {isAuthLoading ?
@@ -83,15 +91,11 @@ function App() {
               <Route path='/' element={isLogin ? <Dashboard /> : <HomePage />} />
               <Route path='/demo' element={<Demo />} />
               <Route path='/settings' element={<Settings />} />
-              {/* <Route path='/dashboard' element={<Dashboard />} />
-        <Route path='/plan' element={<Dashboard />} /> */}
-              {/* <Route path='/' element={<YearCalander />} />
-        <Route path='/:week' element={<WeeklyLayout />} /> */}
               <Route path='/*' element={<PageNotFound />} />
             </Routes>
           </div>}
 
-          {/* <FloatingActionButtonComp /> */}
+        {/* <FloatingActionButtonComp /> */}
       </div>
     </>
   )

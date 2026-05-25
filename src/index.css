@@ -1,12 +1,13 @@
 @import "tailwindcss";
+@import 'animate.css';
 @custom-variant light (&:is(.light, .light *)); 
 
 @layer base {
   :root {
-    color-scheme: dark; /* Tells browser the default is dark */
+    color-scheme: dark;
   }
   :root.light {
-    color-scheme: light; /* Updates browser UI when light is active */
+    color-scheme: light;
   }
 }
 
@@ -88,4 +89,19 @@ tspan{
 }
 .MuiChartsLegend-root{
   margin-left: -10px !important;
+}
+.animate__fadeInDown {
+  animation-name: smallFadeDown !important;
+}
+
+@keyframes smallFadeDown {
+  from {
+    opacity: 0;
+    transform: translate3d(0, -20px, 0);
+  }
+
+  to {
+    opacity: 1;
+    transform: translate3d(0, 0, 0);
+  }
 }
