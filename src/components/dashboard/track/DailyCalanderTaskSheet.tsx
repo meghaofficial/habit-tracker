@@ -184,7 +184,7 @@ const DailyCalanderTaskSheet = (
 
   return (
     <div className="relative">
-      <div className="flex flex-col w-full relative bg-black/50 border border-darkBox/50 rounded-2xl">
+      <div className="flex flex-col w-full relative border border-white/10 bg-black/20 backdrop-blur-2xl rounded-2xl light:bg-lightCard">
         <div className="w-full">
 
           {/* Week Header */}

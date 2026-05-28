@@ -3,7 +3,7 @@ import { RxCross2 } from "react-icons/rx";
 import { PiNotepad } from "react-icons/pi";
 import { axiosPrivate } from "../../../api/axios";
 import CircleLoader from "../../loaders/CircleLoader";
-import { motion, AnimatePresence } from 'framer-motion';
+import { motion, AnimatePresence } from "framer-motion";
 
 interface Target {
   _id: string;
@@ -11,8 +11,15 @@ interface Target {
   completed: boolean;
 }
 
-const TargetsList = ({ type, monthID, week = 0 }: { type: string, monthID: string, week?: number }) => {
-
+const TargetsList = ({
+  type,
+  monthID,
+  week = 0,
+}: {
+  type: string;
+  monthID: string;
+  week?: number;
+}) => {
   const [targets, setTargets] = useState<Target[]>([]);
   const [singleTarget, setSingleTarget] = useState("");
   const [loading, setLoading] = useState(false);
@@ -22,7 +29,10 @@ const TargetsList = ({ type, monthID, week = 0 }: { type: string, monthID: strin
     if (!singleTarget.trim()) return;
     setLoading(true);
     try {
-      const url = type === "monthly" ? `/api/add-monthly-target?monthDashID=${monthID}` : `/api/add-weekly-target?monthDashID=${monthID}&week=${week}`
+      const url =
+        type === "monthly"
+          ? `/api/add-monthly-target?monthDashID=${monthID}`
+          : `/api/add-weekly-target?monthDashID=${monthID}&week=${week}`;
       const res = await axiosPrivate.patch(url, { target: singleTarget });
       if (res?.data?.success) {
         setTargets(res?.data?.target?.targets);
@@ -33,27 +43,33 @@ const TargetsList = ({ type, monthID, week = 0 }: { type: string, monthID: strin
     } finally {
       setLoading(false);
     }
-  }
+  };
 
   const [removeLoading, setRemoveLoading] = useState(false);
   const removeTarget = async (id: string) => {
     setRemoveLoading(true);
     try {
-      const url = type === "monthly" ? `/api/remove-monthly-target?monthDashID=${monthID}&targetID=${id}` : `/api/remove-weekly-target?monthDashID=${monthID}&week=${week}&targetID=${id}`
+      const url =
+        type === "monthly"
+          ? `/api/remove-monthly-target?monthDashID=${monthID}&targetID=${id}`
+          : `/api/remove-weekly-target?monthDashID=${monthID}&week=${week}&targetID=${id}`;
       const res = await axiosPrivate.patch(url);
       if (res?.data?.success) {
-        setTargets(prev => prev.filter(p => p?._id !== id));
+        setTargets((prev) => prev.filter((p) => p?._id !== id));
       }
     } catch (error) {
       console.error(error);
     } finally {
       setRemoveLoading(false);
     }
-  }
+  };
 
   const markTarget = async (id: string, mark: boolean) => {
     try {
-      const url = type === "monthly" ? `/api/mark-monthly-target?monthDashID=${monthID}&targetID=${id}` : `/api/mark-weekly-target?monthDashID=${monthID}&week=${week}&targetID=${id}`;
+      const url =
+        type === "monthly"
+          ? `/api/mark-monthly-target?monthDashID=${monthID}&targetID=${id}`
+          : `/api/mark-weekly-target?monthDashID=${monthID}&week=${week}&targetID=${id}`;
       const res = await axiosPrivate.patch(url, { mark });
       if (res?.data?.success) {
         setTargets(res?.data?.target?.targets || []);
@@ -61,13 +77,16 @@ const TargetsList = ({ type, monthID, week = 0 }: { type: string, monthID: strin
     } catch (error) {
       console.error(error);
     }
-  }
+  };
 
   const [getTargetsLoading, setGetTargetsLoading] = useState(false);
   const getTargets = async () => {
     setGetTargetsLoading(true);
     try {
-      const url = type === "monthly" ? `/api/monthly-targets?monthDashID=${monthID}` : `/api/weekly-targets?monthDashID=${monthID}&week=${week}`
+      const url =
+        type === "monthly"
+          ? `/api/monthly-targets?monthDashID=${monthID}`
+          : `/api/weekly-targets?monthDashID=${monthID}&week=${week}`;
       const res = await axiosPrivate.get(url);
       if (res?.data?.success) {
         setTargets(res?.data?.target?.targets || []);
@@ -77,7 +96,7 @@ const TargetsList = ({ type, monthID, week = 0 }: { type: string, monthID: strin
     } finally {
       setGetTargetsLoading(false);
     }
-  }
+  };
 
   // FIXED: Removed the buggy monthlyTargetRef condition entirely
   // Also added 'type' and 'week' dependencies so switching tabs updates the data
@@ -88,94 +107,144 @@ const TargetsList = ({ type, monthID, week = 0 }: { type: string, monthID: strin
 
   useEffect(() => {
     if (targets?.length <= 0) return;
-    const donePr = targets?.filter(t => t?.completed === true).length ?? 0;
-    const pr = ((donePr/targets?.length)*100).toFixed(2);
-    setProgress(pr)
+    const donePr = targets?.filter((t) => t?.completed === true).length ?? 0;
+    const pr = ((donePr / targets?.length) * 100).toFixed(2);
+    setProgress(pr);
   }, [targets]);
 
   return (
-    <div className="relative">
-      <div className="sm:absolute -top-9.5 sm:w-[45%] w-[80%] right-4 sm:ms-0 ms-4 sm:my-0 -mt-0.5 mb-4">
-        <DarkProgressBar progress={Number(progress)} />
+    <div className="relative overflow-hidden rounded-[30px] shadow-[0_20px_60px_rgba(0,0,0,0.18)] backdrop-blur-2xl light:bg-lightCard ">
+      {/* Glow */}
+      <div className="absolute -right-10 -top-10 h-40 w-40 rounded-full bg-[#8B5CF6]/10 blur-3xl" />
+
+      {/* Progress */}
+      <div className="relative z-10 mb-6">
+        <div className=" rounded-[22px] border border-white/10 bg-white/4 p-3 shadow-[inset_0_1px_2px_rgba(255,255,255,0.06)] backdrop-blur-xl ">
+          <DarkProgressBar progress={Number(progress)} />
+        </div>
       </div>
-      {/* input */}
-      <div className="flex gap-4 px-4 mt-2">
+
+      {/* Input Section */}
+      <div className="relative z-10 flex gap-3">
         <input
           disabled={targets?.length >= 10}
           type="text"
-          className="focus:outline-none focus:ring-2 focus:ring-darkPrimary light:focus:ring-lightPrimary resize-none rounded-lg px-3 py-2 text-[14px] w-[80%] border bg-black/20 border-darkBox/50"
-          onChange={(e) => setSingleTarget(e.target.value)}
           value={singleTarget}
+          onChange={(e) => setSingleTarget(e.target.value)}
+          placeholder={
+            type === "monthly"
+              ? "Add monthly target..."
+              : "Add weekly target..."
+          }
+          className=" h-13 flex-1 rounded-2xl border border-white/10 bg-white/4 px-4 text-[15px] text-white outline-none placeholder:text-white/25 shadow-[inset_0_1px_2px_rgba(255,255,255,0.06)] backdrop-blur-xl transition-all duration-300 focus:border-[#8B5CF6]/40 focus:bg-white/6 focus:shadow-[0_0_25px_rgba(139,92,246,0.15)] light:text-lightText"
         />
-        <button className={`text-[14px] border-none rounded-md h-9 
-          ${targets?.length < 10 ?
-            'bg-darkPrimary light:bg-lightPrimary cursor-pointer text-white' :
-            'text-white/50 bg-darkPrimary/50 light:bg-lightPrimary/50'} 
-            w-[20%]`} onClick={() => {
+
+        <button
+          disabled={targets?.length >= 10}
+          onClick={() => {
             if (loading) return;
             addTarget();
-          }} title={targets?.length >= 10 ? 'Can not add more than 10 targets' : ""}>
-          {loading ? <CircleLoader /> : "Add"}
+          }}
+          title={
+            targets?.length >= 10 ? "Can not add more than 10 targets" : ""
+          }
+          className={`relative overflow-hidden rounded-2xl px-6 text-[15px] font-semibold transition-all duration-300 ${targets?.length < 10 ? ` bg-linear-to-r from-[#6366F1] via-[#3B82F6] to-[#A855F7] text-white shadow-[0_15px_40px_rgba(99,102,241,0.35)] hover:scale-[1.03] ` : ` bg-white/5 text-white/30 `} `}
+        >
+          {/* Shine */}
+          {targets?.length < 10 && (
+            <div className="absolute inset-0 bg-linear-to-t from-transparent via-white/10 to-white/20 opacity-70" />
+          )}
+
+          <span className="relative z-10">
+            {loading ? <CircleLoader /> : "Add"}
+          </span>
         </button>
       </div>
-      {/* Targets List */}
-      <div className="w-full px-2 max-h-70 overflow-y-auto mt-3">
+
+      {/* Targets */}
+      <div className="relative z-10 mt-6 max-h-90 overflow-y-auto pr-1">
         {getTargetsLoading ? (
-          <div className="px-2 mt-1 flex items-center flex-col gap-2">
-            <div className="bg-gray-500/50 rounded-lg h-10 w-full animate-pulse"></div>
-            <div className="bg-gray-500/50 rounded-lg h-10 w-full animate-pulse"></div>
-            <div className="bg-gray-500/50 rounded-lg h-10 w-full animate-pulse"></div>
-            <div className="bg-gray-500/50 rounded-lg h-10 w-full animate-pulse"></div>
-            <div className="bg-gray-500/50 rounded-lg h-10 w-full animate-pulse"></div>
+          <div className="space-y-3">
+            {Array.from({ length: 5 }).map((_, i) => (
+              <div
+                key={i}
+                className=" h-16 animate-pulse rounded-2xl border border-white/10 bg-white/4"
+              />
+            ))}
           </div>
         ) : (
           <>
             {targets?.length > 0 ? (
-              // FIXED: Creating a shallow copy before reversing to protect state mutations
               [...targets].reverse().map((target, index) => (
                 <div
                   key={target?._id}
-                  className="px-4 py-3 rounded-lg transition flex items-center w-full gap-2 mb-2"
+                  className=" group relative mb-3 overflow-hidden rounded-[22px] border border-white/10 bg-white/4 p-4 shadow-[inset_0_1px_2px_rgba(255,255,255,0.04)] backdrop-blur-xl transition-all duration-300 hover:border-white/20 hover:bg-white/6"
                 >
-                  <span>{index + 1}.</span>
-                  <div className="flex items-center justify-between w-full">
-                    <span
-                      className={`text-sm transition line-clamp-1 ${target?.completed
-                        ? "line-through text-slate-400"
-                        : ""
-                        }`}
-                    >
-                      {target?.value}
-                    </span>
+                  {/* Hover Glow */}
+                  <div className="absolute inset-0 opacity-0 transition-opacity duration-300 group-hover:opacity-100">
+                    <div className="absolute inset-0 bg-linear-to-r from-[#6366F1]/5 via-transparent to-[#A855F7]/5" />
+                  </div>
+
+                  <div className="relative z-10 flex items-center justify-between gap-4">
+                    {/* Left */}
+                    <div className="flex items-center gap-4">
+                      <div className=" flex h-9 w-9 items-center justify-center rounded-xl bg-linear-to-br from-[#6366F1] to-[#A855F7] text-[13px] font-bold text-white shadow-lg ">
+                        {index + 1}
+                      </div>
+
+                      <span
+                        className={`max-w-55 text-[15px] font-medium transition-all duration-300 line-clamp-1 ${target?.completed ? "text-white/35 line-through" : "text-white light:text-lightText"} `}
+                      >
+                        {target?.value}
+                      </span>
+                    </div>
+
+                    {/* Actions */}
                     {!removeLoading && (
-                      <div className="flex items-center gap-2">
+                      <div className="flex items-center gap-3">
                         <input
                           type="checkbox"
                           checked={target?.completed}
-                          onChange={() => markTarget(target?._id, !target?.completed)}
-                          className="w-4 h-4 accent-darkPrimary cursor-pointer"
+                          onChange={() =>
+                            markTarget(target?._id, !target?.completed)
+                          }
+                          className=" h-5 w-5 cursor-pointer accent-[#8B5CF6] "
                         />
-                        <RxCross2 className="text-gray-500 cursor-pointer hover:text-red-500" onClick={() => removeTarget(target?._id)} />
+
+                        <button
+                          onClick={() => removeTarget(target?._id)}
+                          className=" flex h-9 w-9 items-center justify-center rounded-xl bg-white/4 text-white/40 transition-all duration-300 hover:bg-red-500/15 hover:text-red-400 "
+                        >
+                          <RxCross2 className="text-[16px]" />
+                        </button>
                       </div>
                     )}
                   </div>
                 </div>
               ))
             ) : (
-              <div className="flex items-center justify-center flex-col text-gray-700 google-sans h-60 gap-3">
-                <PiNotepad className="text-[80px]" />
-                <span className="text-[14px]">
-                  {type === "monthly" ? "Add Monthly Targets" : "Add Weekly Targets"}
-                </span>
+              <div className=" flex h-75 flex-col items-center justify-center rounded-[28px] border border-dashed border-white/10 bg-white/3 text-center ">
+                <div className=" flex h-24 w-24 items-center justify-center rounded-full bg-linear-to-br from-[#6366F1]/20 to-[#A855F7]/20 text-[#8B5CF6] shadow-[0_20px_50px_rgba(99,102,241,0.15)] ">
+                  <PiNotepad className="text-[54px]" />
+                </div>
+
+                <p className="mt-6 text-[20px] font-bold text-white light:text-lightText">
+                  No Targets Yet
+                </p>
+
+                <p className="mt-2 max-w-70 text-[14px] leading-7 text-darkSubText light:text-lightSubText">
+                  {type === "monthly"
+                    ? "Add monthly goals to stay focused and productive."
+                    : "Create weekly targets and build consistency."}
+                </p>
               </div>
             )}
           </>
         )}
       </div>
     </div>
-  )
-}
-
+  );
+};
 
 interface ProgressBarProps {
   progress: number; // Value between 0 and 100
@@ -219,7 +288,6 @@ function DarkProgressBar({ progress }: ProgressBarProps) {
               className="absolute bottom-6 left-0 px-2.5 py-1 text-xs font-semibold text-white bg-zinc-900 border border-zinc-700 rounded-md shadow-xl whitespace-nowrap pointer-events-none"
             >
               {clampedProgress}%
-              {/* Tooltip Arrow */}
               <div className="absolute top-full left-1/2 -translate-x-1/2 w-2 h-2 bg-zinc-900 border-r border-b border-zinc-700 rotate-45" />
             </motion.div>
           )}
@@ -229,4 +297,4 @@ function DarkProgressBar({ progress }: ProgressBarProps) {
   );
 }
 
-export default TargetsList
+export default TargetsList;

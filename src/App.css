@@ -108,3 +108,19 @@ body {
     rgba(255, 255, 255, 0.3)
   );
 }
+
+
+@keyframes gradientFill {
+  0% {
+    color: transparent;
+    -webkit-text-stroke: 2px rgba(99, 102, 241, 0.9);
+    filter: drop-shadow(0 0 12px rgba(99, 102, 241, 0.35));
+    background-size: 0% 100%;
+  }
+
+  100% {
+    color: transparent;
+    -webkit-text-stroke: 0px transparent;
+    background-size: 100% 100%;
+  }
+}

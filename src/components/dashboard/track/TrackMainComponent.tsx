@@ -276,12 +276,12 @@ const TrackMainComponent = ({ dashboardData, taskList, activeMonth, setTaskList,
         <>
           <div className="sm:flex hidden gap-4 mt-4">
             <div className="w-[20%]"></div>
-            <div className="bg-black/50 border border-darkBox/50 w-[65%] rounded-2xl h-25"></div>
+            <div className="bg-black/20 border border-white/10 w-[65%] rounded-2xl h-25"></div>
             <div className="w-[15%]"></div>
           </div>
           <div className="sm:flex hidden gap-4 mt-4 relative">
             {/* left detail */}
-            <div className="bg-black/50 border border-darkBox/50 w-[19.5%] rounded-2xl overflow-x-hidden h-25 absolute -top-29 p-3 flex flex-col justify-between">
+            <div className="bg-black/20 border border-white/10 w-[19.5%] backdrop-blur-2xl light:bg-lightCard rounded-2xl overflow-x-hidden h-25 absolute -top-29 p-3 flex flex-col justify-between">
               <p className="text-3xl tracking-wider font-bold playfair-display px-3 line-clamp-1" title={
                 `${monMap?.[(new Date(activeMonth?.startDate)).getMonth() + 1]}, ${(new Date(activeMonth?.startDate)).getFullYear()}`
               }>
@@ -318,18 +318,18 @@ const TrackMainComponent = ({ dashboardData, taskList, activeMonth, setTaskList,
               </div> */}
             </div>
             {/* right detail */}
-            <div className="bg-black/50 border border-darkBox/50 w-[14.5%] rounded-2xl overflow-x-hidden h-25 absolute -top-29 right-0 overflow-y-hidden">
+            <div className="bg-black/20 border border-white/10 w-[14.5%] backdrop-blur-2xl light:bg-lightCard rounded-2xl overflow-x-hidden h-25 absolute -top-29 right-0 overflow-y-hidden">
               <ProgressPie value={Number.isNaN(Number(progress?.overallProgress?.progress)) ? 0 : Number(progress?.overallProgress?.progress)} type="" />
             </div>
 
             {/* below sections */}
-            <div className="bg-black/50 border border-darkBox/50 w-[20%] rounded-2xl overflow-x-hidden">
+            <div className="bg-black/20 border border-white/10 w-[20%] backdrop-blur-2xl light:bg-lightCard rounded-2xl overflow-x-hidden">
               <HabitSection taskList={taskList} />
             </div>
             <div className=" w-[65%] rounded-2xl relative">
               <DailyCalanderTaskSheet taskList={taskList} setTaskList={setTaskList} dashboardData={dashboardData} progress={progress} setProgress={setProgress} monthStatus={activeMonth?.status} />
             </div>
-            <div className="bg-black/50 border border-darkBox/50 w-[15%] rounded-2xl overflow-x-hidden">
+            <div className="bg-black/20 border border-white/10 backdrop-blur-2xl light:bg-lightCard w-[15%] rounded-2xl overflow-x-hidden">
               <HabitProgress progress={progress?.taskProgress} total={dashboardData?.totalDays} count={progress?.overallProgress.count} />
             </div>
           </div>
@@ -365,7 +365,7 @@ const TrackMainComponent = ({ dashboardData, taskList, activeMonth, setTaskList,
                 {logLoading ? (
                   <div className="flex flex-col gap-2 w-full px-5 pb-5">
                     {Array.from({ length: 6 }).map((_, index) => (
-                      <div className="w-full h-8 mt-1 rounded bg-gray-500/50 animate-pulse"></div>
+                      <div key={index} className="w-full h-8 mt-1 rounded bg-gray-500/50 animate-pulse"></div>
                     ))}
                   </div>
                 ) : (
@@ -376,12 +376,12 @@ const TrackMainComponent = ({ dashboardData, taskList, activeMonth, setTaskList,
             {/* note */}
             <MonthlyNote monthID={dashboardData?._id} />
             {/* monthly targets */}
-            <div className="bg-black/50 border border-darkBox/50 sm:w-1/3 rounded-2xl p-2">
+            <div className="bg-black/20 border border-white/10 backdrop-blur-2xl light:bg-lightCard sm:w-1/3 rounded-2xl p-2">
               <p className="font-semibold text-lg px-5 py-3">Monthly Targets</p>
               <TargetsList type="monthly" monthID={dashboardData?._id} />
             </div>
             {/* gauge progress */}
-            <div className="bg-black/50 w-1/3 rounded-2xl sm:block hidden border border-darkBox/50">
+            <div className="bg-black/20 backdrop-blur-2xl light:bg-lightCard w-1/3 rounded-2xl sm:block hidden border border-white/10">
               <p className="font-semibold text-lg px-5 pt-3">Your Monthly Targets Progress</p>
               <div className="relative left-10 top-10">
                 <ProgressPie value={Number.isNaN(Number(progress?.overallProgress?.progress)) ? 0 : Number(progress?.overallProgress?.progress)} type="analysis" />
