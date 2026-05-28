@@ -69,8 +69,8 @@ export const plans = [
   },
   {
     title: "Current Year",
-    price: "₹20/month",
-    desc: "Pay ₹20 per month for the remaining months of the current year (including this month)."
+    price: "₹20",
+    desc: "Covers current month + next remaining months of current year (₹20/month)."
   }
 ];
 

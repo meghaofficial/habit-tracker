@@ -274,29 +274,10 @@ const HomePage = () => {
           </section>
 
           {/* Pricing Section */}
-          {/* <section className="my-20">
-            <h2 className="text-[32px] font-semibold mb-7.5 text-center">Choose Your Plan</h2>
-            <div className="grid gap-5 grid-cols-5" style={{ gridTemplateColumns: "repeat(auto-fit, minmax(220px, 1fr))" }}>
-              {plans.map((plan, i) => (
-                <div key={i} className="bg-darkCard light:bg-lightCard p-5 rounded-lg text-center">
-                  <h3>{plan.title}</h3>
-                  <p style={{ fontSize: "22px", margin: "10px 0" }}>{plan.price}</p>
-                  <p className="text-gray-400 text-[14px] mb-3.75">
-                    {plan.desc}
-                  </p>
-                  <button className={`mr-2.5 py-2 px-5 text-sm rounded-md border-none cursor-pointer ${i === 0 ? 'bg-darkSuccess light:bg-lightSuccess text-black hover:text-white' : 'bg-darkPrimary light:bg-lightPrimary text-white'}`}>
-                    {i === 0 ? 'Activate' : 'Choose Plan'}
-                  </button>
-                </div>
-              ))}
-            </div>
-          </section> */}
-
-          {/* Extend Plan Section */}
           <PlanSection />
 
           {/* Footer */}
-          <footer className="text-center p-5 border-t border-darkBorder light:border-lightBorder">
+          <footer className="text-center p-5 border-t mt-20 border-darkBorder light:border-lightBorder">
             <p>© 2026 Habitify. All rights reserved.</p>
           </footer>
         </div>
