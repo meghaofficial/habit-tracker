@@ -1,33 +1,44 @@
 import { useEffect, useState } from "react";
-import { Link } from "react-router-dom";
-import { plans } from "../../staticData";
-import { MdWbSunny } from "react-icons/md";
-import { IoMoon, IoStatsChart } from "react-icons/io5";
+import { IoStatsChart } from "react-icons/io5";
 import AuthForm from "../auth/AuthForm";
 import { useSelector } from "react-redux";
 import type { RootState } from "../../redux/store/store";
 import { FaCalendarAlt, FaBell } from "react-icons/fa";
 import { GoGoal } from "react-icons/go";
-import { axiosPrivate } from "../../api/axios";
 import Logo from "../shared/Logo";
 import { IoMdLogIn } from "react-icons/io";
 import CustomButton from "../shared/CutomButton";
 import { LuSunMedium, LuSunMoon } from "react-icons/lu";
-import HeroRightSection from "../shared/HeroRightSection";
 import PlanSection from "../home/PlanSection";
 
 const features = [
-  { title: "Daily Tracking", desc: "Mark habits daily with a clean interface.", icon: <FaCalendarAlt className="text-yellow-500" /> },
-  { title: "Progress", desc: "Track streaks and completion rates.", icon: <IoStatsChart className="text-blue-500" /> },
-  { title: "Goals", desc: "Set weekly and monthly targets.", icon: <GoGoal className="text-red-500" /> },
-  { title: "Reminders", desc: "Never miss a habit again.", icon: <FaBell className="text-green-500" /> },
+  {
+    title: "Daily Tracking",
+    desc: "Mark habits daily with a clean interface.",
+    icon: <FaCalendarAlt className="text-yellow-500" />,
+  },
+  {
+    title: "Progress",
+    desc: "Track streaks and completion rates.",
+    icon: <IoStatsChart className="text-blue-500" />,
+  },
+  {
+    title: "Goals",
+    desc: "Set weekly and monthly targets.",
+    icon: <GoGoal className="text-red-500" />,
+  },
+  {
+    title: "Reminders",
+    desc: "Never miss a habit again.",
+    icon: <FaBell className="text-green-500" />,
+  },
 ];
 
 const HomePage = () => {
-
   const [dark, setDark] = useState(false);
   const [open, setOpen] = useState(false);
   const isLogin = useSelector((state: RootState) => state.auth.username !== "");
+  const [showNavbar, setShowNavbar] = useState(false);
 
   const toggleTheme = () => {
     const newTheme = !dark;
@@ -59,35 +70,41 @@ const HomePage = () => {
     const savedTheme = localStorage.getItem("theme");
     if (savedTheme === "dark") {
       setDark(true);
+    } else {
+      setDark(false);
     }
-    else {
-      setDark(false)
-    }
+  }, []);
+
+  useEffect(() => {
+    const handleScroll = () => {
+      setShowNavbar(window.scrollY > 80);
+    };
+
+    window.addEventListener("scroll", handleScroll);
+
+    return () => window.removeEventListener("scroll", handleScroll);
   }, []);
 
   return (
     <>
       <div className="min-h-screen sm:px-0 px-4">
-        <div className="w-[90%] max-w-300 m-auto" style={{ fontFamily: "Poppins, sans-serif" }}>
+        <div
+          className="w-[90%] max-w-300 m-auto"
+          style={{ fontFamily: "Poppins, sans-serif" }}
+        >
           {/* Navbar */}
           <nav className="flex justify-between items-center py-5 sm:pt-10 pt-7">
             <Logo />
             <div className="flex items-center gap-4">
-              <CustomButton
-                onClick={toggleTheme}
-                type="transparent"
-              >
+              <CustomButton onClick={toggleTheme} type="transparent">
                 <div className="flex items-center gap-1">
                   {dark ? <LuSunMoon /> : <LuSunMedium />}
-                  <span>
-                    {dark ? "Dark Theme" : "Light Theme"}
-                  </span>
+                  <span>{dark ? "Dark Theme" : "Light Theme"}</span>
                 </div>
               </CustomButton>
               <CustomButton
                 onClick={() => {
-                  if (!isLogin)
-                    setOpen(true);
+                  if (!isLogin) setOpen(true);
                 }}
               >
                 <div className="flex items-center gap-1">
@@ -96,29 +113,52 @@ const HomePage = () => {
                 </div>
               </CustomButton>
             </div>
-            {/* <button
-              className="group relative flex items-center gap-2 overflow-hidden rounded-xl border border-white/10 bg-white/6 px-4 py-2.5 text-sm font-medium text-white backdrop-blur-md transition-all duration-300 hover:-translate-y-1 hover:border-white/20 hover:bg-white/10 active:scale-[0.98]"
-              onClick={() => {
-                if (!isLogin) setOpen(true);
-              }}
-            >
-              <div className="absolute inset-0 opacity-0 transition-opacity duration-300 group-hover:opacity-100 bg-linear-to-r from-transparent via-white/8 to-transparent" />
-              <span className="relative z-10">Login</span>
-              <IoMdLogIn className="relative z-10 text-[18px] transition-all duration-300 group-hover:translate-x-0.5" />
-            </button> */}
+          </nav>
+          <nav
+            className={`fixed left-1/2 top-4 z-50 flex w-[95%] max-w-300 -translate-x-1/2 items-center justify-between rounded-2xl border border-white/10 bg-black/30 px-5 py-4 shadow-[0_20px_60px_rgba(0,0,0,0.18)] backdrop-blur-2xl transition-all duration-500 ease-out ${showNavbar ? "translate-y-0 opacity-100" : "-translate-y-10 opacity-0 pointer-events-none"} light:bg-white/70 `}
+          >
+            <Logo />
 
+            <div className="flex items-center gap-4">
+              <CustomButton onClick={toggleTheme} type="transparent">
+                <div className="flex items-center gap-1">
+                  {dark ? <LuSunMoon /> : <LuSunMedium />}
+                  <span>{dark ? "Dark Theme" : "Light Theme"}</span>
+                </div>
+              </CustomButton>
+
+              <CustomButton
+                onClick={() => {
+                  if (!isLogin) setOpen(true);
+                }}
+              >
+                <div className="flex items-center gap-1">
+                  <span>Login</span>
+                  <IoMdLogIn />
+                </div>
+              </CustomButton>
+            </div>
           </nav>
 
           {/* Hero */}
-          <section className="flex items-center justify-between py-15">
-            <div className="max-w-125">
-              <p className="italic text-violet-500 font-semibold uppercase">Build habits that actually stick.</p>
-              <div className="flex items-center gap-3">
-                <p className="text-[100px] font-bold">Habit</p>
-                <p className="text-[100px] font-bold leading-none bg-linear-to-r from-[#5B5CF6] via-[#3B82F6] to-[#A855F7] bg-clip-text text-transparent drop-shadow-[0_2px_8px_rgba(59,130,246,0.15)]">Tracker</p>
+          <section className="flex sm:flex-row flex-col sm:items-center justify-between py-15">
+            <div className="sm:max-w-125">
+              <p className="italic text-violet-500 font-semibold uppercase">
+                Build habits that actually stick.
+              </p>
+              <div className="flex sm:flex-row flex-col sm:items-center gap-3">
+                <p className="sm:text-[7em] text-[22vw] font-bold">Habit</p>
+                <p className="sm:text-[7em] text-[22vw] sm:mt-0 -mt-5 font-bold leading-none bg-linear-to-r from-[#5B5CF6] via-[#3B82F6] to-[#A855F7] bg-clip-text text-transparent drop-shadow-[0_2px_8px_rgba(59,130,246,0.15)]">
+                  Tracker
+                </p>
               </div>
-              <p className="text-gray-500">Track your daily habits, build lasting routines, and visualize your progress with beautifully organized insights. Stay motivated, maintain consistency effortlessly, and transform small daily actions into meaningful long-term growth.</p>
-              <div className="mt-5 flex gap-10 google-sans">
+              <p className="text-gray-500 sm:mt-0 mt-5">
+                Track your daily habits, build lasting routines, and visualize
+                your progress with beautifully organized insights. Stay
+                motivated, maintain consistency effortlessly, and transform
+                small daily actions into meaningful long-term growth.
+              </p>
+              <div className="mt-5 flex sm:flex-nowrap flex-wrap gap-10 google-sans">
                 {[
                   ["STREAKS", "Daily Consistency"],
                   ["TRACKING", "Smart Insights"],
@@ -143,22 +183,11 @@ const HomePage = () => {
                   </div>
                 ))}
               </div>
-              {/* <div className="flex flex-row items-center gap-3">
-                <span className="sm:mr-2.5 py-3 px-5 rounded-lg border-none cursor-pointer text-white bg-darkPrimary light:bg-lightPrimary" onClick={() => setOpen(true)}>
-                  Get Started
-                </span>
-                <Link to="/demo"
-                  className="border hover:bg-darkPrimary hover:text-white border-darkPrimary light:border-lightPrimary text-darkPrimary light:text-lightPrimary cursor-pointer bg-transparent py-3 px-5 rounded-lg"
-                >
-                  View Demo
-                </Link>
-              </div> */}
             </div>
-            {/* <HeroRightSection /> */}
 
-            <div className="relative overflow-hidden rounded-[28px] border border-white/10 bg-black/20 p-5 shadow-[0_20px_60px_rgba(0,0,0,0.18)] backdrop-blur-2xl light:bg-lightCard">
+            <div className="relative overflow-hidden rounded-[28px] border border-white/10 bg-black/20 p-5 shadow-[0_20px_60px_rgba(0,0,0,0.18)] backdrop-blur-2xl light:bg-lightCard sm:mt-0 mt-10">
               {/* Glow */}
-              <div className="absolute -left-10 -top-10 h-40 w-40 rounded-full bg-[#22c55e]/10 blur-3xl" />
+              <div className="absolute -left-10 -top-10 h-40 w-40 rounded-full bg-darkSuccess/10 blur-3xl" />
 
               {/* Header */}
               <div className="relative mb-5 flex items-center justify-between">
@@ -225,6 +254,21 @@ const HomePage = () => {
           </section>
 
           {/* Features */}
+          <div className="text-center mt-30">
+            <p className="text-[14px] font-bold uppercase tracking-[0.2em] text-[#8B5CF6]">
+              Features
+            </p>
+
+            <h2 className="mt-3 text-[42px] font-black tracking-[-0.05em] text-white light:text-lightText">
+              Build Better Habits
+            </h2>
+
+            <p className="mx-auto mt-4 max-w-155 text-[16px] leading-7 text-darkSubText light:text-lightSubText">
+              Track habits, maintain streaks, set meaningful goals, and gain
+              actionable insights to stay consistent and achieve lasting
+              personal growth.
+            </p>
+          </div>
           <section
             className="my-15 grid gap-6"
             style={{
@@ -282,7 +326,6 @@ const HomePage = () => {
           </footer>
         </div>
       </div>
-
 
       {/* auth form */}
       <div>
