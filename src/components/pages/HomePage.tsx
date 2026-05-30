@@ -99,7 +99,7 @@ const HomePage = () => {
               <CustomButton onClick={toggleTheme} type="transparent">
                 <div className="flex items-center gap-1">
                   {dark ? <LuSunMoon /> : <LuSunMedium />}
-                  <span>{dark ? "Dark Theme" : "Light Theme"}</span>
+                  <span className="sm:block hidden">{dark ? "Dark Theme" : "Light Theme"}</span>
                 </div>
               </CustomButton>
               <CustomButton
@@ -108,14 +108,14 @@ const HomePage = () => {
                 }}
               >
                 <div className="flex items-center gap-1">
-                  <span>Login</span>
+                  <span className="sm:block hidden">Login</span>
                   <IoMdLogIn />
                 </div>
               </CustomButton>
             </div>
           </nav>
           <nav
-            className={`fixed left-1/2 top-4 z-50 flex w-[95%] max-w-300 -translate-x-1/2 items-center justify-between rounded-2xl border border-white/10 bg-black/30 px-5 py-4 shadow-[0_20px_60px_rgba(0,0,0,0.18)] backdrop-blur-2xl transition-all duration-500 ease-out ${showNavbar ? "translate-y-0 opacity-100" : "-translate-y-10 opacity-0 pointer-events-none"} light:bg-white/70 `}
+            className={`fixed left-1/2 top-2 z-50 flex w-[95%] max-w-300 -translate-x-1/2 items-center justify-between rounded-2xl border border-white/10 bg-black/30 px-5 py-4 shadow-[0_20px_60px_rgba(0,0,0,0.18)] backdrop-blur-2xl transition-all duration-500 ease-out ${showNavbar ? "translate-y-0 opacity-100" : "-translate-y-10 opacity-0 pointer-events-none"} light:bg-white/70 `}
           >
             <Logo />
 
@@ -123,7 +123,7 @@ const HomePage = () => {
               <CustomButton onClick={toggleTheme} type="transparent">
                 <div className="flex items-center gap-1">
                   {dark ? <LuSunMoon /> : <LuSunMedium />}
-                  <span>{dark ? "Dark Theme" : "Light Theme"}</span>
+                  <span className="sm:block hidden">{dark ? "Dark Theme" : "Light Theme"}</span>
                 </div>
               </CustomButton>
 
@@ -133,7 +133,7 @@ const HomePage = () => {
                 }}
               >
                 <div className="flex items-center gap-1">
-                  <span>Login</span>
+                  <span className="sm:block hidden">Login</span>
                   <IoMdLogIn />
                 </div>
               </CustomButton>
