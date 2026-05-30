@@ -23,26 +23,26 @@ const PlanSection = () => {
           {/* Glow */}
           <div className="absolute inset-0 bg-linear-to-br from-white/10 via-transparent to-transparent opacity-80" />
 
-          <div className="relative h-full rounded-[34px] bg-[#0B1020] p-8">
+          <div className="relative h-full rounded-[34px] bg-[#0B1020] light:bg-lightCard p-8">
             {/* Top */}
             <div className="flex items-center justify-between">
-              <span className="text-[13px] font-bold uppercase tracking-[0.18em] text-white/65">
+              <span className="text-[13px] font-bold uppercase tracking-[0.18em] text-white/65 light:text-black">
                 New User
               </span>
 
-              <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-white/10 backdrop-blur-xl">
+              <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-white/10 light:bg-lightBox backdrop-blur-xl">
                 ✦
               </div>
             </div>
 
             {/* Content */}
             <div>
-              <span className="text-[44px] font-black tracking-[-0.05em] text-white">
+              <span className="text-[44px] font-black tracking-[-0.05em] text-white light:text-black">
                 Free {"  "}
               </span>
               <span className="mb-4 text-[22px]">/ month</span>
 
-              <p className="mt-2 max-w-105 text-[16px]/6 text-white/45">
+              <p className="mt-2 max-w-105 text-[16px]/6 text-white/45 light:text-lightSubText">
                 Perfect to start building habits, tracking streaks, and
                 improving your consistency every day.
               </p>
@@ -61,11 +61,11 @@ const PlanSection = () => {
                 "Cross-device access",
               ].map((feature, idx) => (
                 <div key={idx} className="flex items-center gap-4">
-                  <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-[#172036]">
+                  <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-[#172036] light:bg-lightBox">
                     ✓
                   </div>
 
-                  <span className="text-[16px] font-medium text-white/75">
+                  <span className="text-[16px] font-medium text-white/75 light:text-black">
                     {feature}
                   </span>
                 </div>
@@ -120,7 +120,7 @@ const PlanSection = () => {
                   "AI productivity insights",
                 ].map((feature, idx) => (
                   <div key={idx} className="flex items-center gap-3">
-                    <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-white/10">
+                    <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-white/10 light:bg-lightBox">
                       ✓
                     </div>
 

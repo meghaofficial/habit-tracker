@@ -59,9 +59,9 @@ const TodayAllTasks = ({ taskList, log, setLog }: {
     }
   }
 
-  useEffect(() => {
-    getLog();
-  }, []);
+  // useEffect(() => {
+  //   getLog();
+  // }, []);
 
   return (
     <>

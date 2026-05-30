@@ -1,56 +1,65 @@
 import { motion, AnimatePresence } from "framer-motion";
-import { months } from "../../../../staticData";
 import { statusColors } from "../../../../types";
 import { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import type { RootState } from "../../../../redux/store/store";
-import { setNote, setStatus } from "../../../../redux/slices/dateDataSlice";
+
+const months: Record<string, string> = {
+  Jan: "January",
+  Feb: "February",
+  Mar: "March",
+  Apr: "April",
+  May: "May",
+  June: "June",
+  July: "July",
+  Aug: "August",
+  Sep: "September",
+  Oct: "October",
+  Nov: "November",
+  Dec: "December",
+};
 
 export default function RightDrawer({ open, setOpen, activeDate, year, month }: { open: boolean, setOpen: React.Dispatch<React.SetStateAction<boolean>>, activeDate: number, year: number, month: number }) {
 
   const [activeStatus, setActiveStatus] = useState("");
-  const dispatch = useDispatch();
-  const dateData = useSelector(
-    (state: RootState) => state.dateData
-  );
 
   const [localNote, setLocalNote] = useState("");
   const theme = localStorage.getItem("theme");
 
-  useEffect(() => {
-    const timer = setTimeout(() => {
-      dispatch(
-        setNote({
-          date: activeDate,
-          month: Object.keys(months)[month],
-          year,
-          note: localNote,
-        })
-      );
-    }, 500);
+  // useEffect(() => {
+  //   const timer = setTimeout(() => {
+  //     dispatch(
+  //       setNote({
+  //         date: activeDate,
+  //         month: Object.keys(months)[month],
+  //         year,
+  //         note: localNote,
+  //       })
+  //     );
+  //   }, 500);
 
-    return () => clearTimeout(timer);
-  }, [localNote]);
+  //   return () => clearTimeout(timer);
+  // }, [localNote]);
 
-  useEffect(() => {
-    dispatch(setStatus({
-      date: activeDate,
-      month: Object.keys(months)[month],
-      year,
-      status: activeStatus,
-    }));
-  }, [activeStatus]);
+  // useEffect(() => {
+  //   dispatch(setStatus({
+  //     date: activeDate,
+  //     month: Object.keys(months)[month],
+  //     year,
+  //     status: activeStatus,
+  //   }));
+  // }, [activeStatus]);
 
-  useEffect(() => {
-    const currDate = `${activeDate}-${Object.keys(months)[month]}-${year}`;
-    if (currDate in dateData){
-      setActiveStatus(dateData[currDate]?.status);
-      setLocalNote(dateData[currDate]?.note || "");
-    }
-    else {
-      setActiveStatus("default");
-    }
-  }, [open]);
+  // useEffect(() => {
+  //   const currDate = `${activeDate}-${Object.keys(months)[month]}-${year}`;
+  //   if (currDate in dateData){
+  //     setActiveStatus(dateData[currDate]?.status);
+  //     setLocalNote(dateData[currDate]?.note || "");
+  //   }
+  //   else {
+  //     setActiveStatus("default");
+  //   }
+  // }, [open]);
 
   return (
       <AnimatePresence>

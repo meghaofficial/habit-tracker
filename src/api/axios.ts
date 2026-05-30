@@ -21,11 +21,9 @@ type FailedQueueItem = {
   reject: (error: unknown) => void;
 };
 
-// 🔄 Refresh state
 let isRefreshing = false;
 let failedQueue: FailedQueueItem[] = [];
 
-// Process queued requests
 const processQueue = (error: unknown, token: string | null = null) => {
   failedQueue.forEach((prom) => {
     if (error) {
@@ -38,7 +36,6 @@ const processQueue = (error: unknown, token: string | null = null) => {
   failedQueue = [];
 };
 
-// 🔁 Refresh API
 export const refreshAccessToken = async () => {
   try {
     const response = await axiosPublic.get("/refresh", {
@@ -54,7 +51,6 @@ export const refreshAccessToken = async () => {
   }
 };
 
-// 🔹 REQUEST INTERCEPTOR
 axiosPrivate.interceptors.request.use(
   (config) => {
     const token = store.getState().auth.accessToken;
@@ -66,7 +62,6 @@ axiosPrivate.interceptors.request.use(
   (error) => Promise.reject(error),
 );
 
-// 🔹 RESPONSE INTERCEPTOR (🔥 MAIN LOGIC)
 axiosPrivate.interceptors.response.use(
   (response) => response,
   async (error) => {
@@ -74,7 +69,6 @@ axiosPrivate.interceptors.response.use(
 
     if (error.response?.status === 401 && !prevRequest._retry) {
       if (isRefreshing) {
-        // 🟡 Add request to queue
         return new Promise((resolve, reject) => {
           failedQueue.push({
             resolve: (token) => {

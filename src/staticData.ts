@@ -5,21 +5,6 @@ export const daysNums: number[] = [
   23, 24, 25, 26, 27, 28, 29, 30, 31,
 ];
 
-export const months: Record<string, string> = {
-  Jan: "January",
-  Feb: "February",
-  Mar: "March",
-  Apr: "April",
-  May: "May",
-  June: "June",
-  July: "July",
-  Aug: "August",
-  Sep: "September",
-  Oct: "October",
-  Nov: "November",
-  Dec: "December",
-};
-
 export const week: Record<number, string> = {
   0: "Sun",
   1: "Mon",
@@ -30,7 +15,6 @@ export const week: Record<number, string> = {
   6: "Sat",
 };
 
-// bright bluebonnet - https://www.color-hex.com/color-palettes/
 export const weekColors: string[] = [
   "#eef2ff", // very light indigo
   "#e0e7ff",

@@ -1,15 +1,9 @@
 import { useEffect, useState } from "react";
 import { IoStatsChart } from "react-icons/io5";
-import AuthForm from "../auth/AuthForm";
-import { useSelector } from "react-redux";
-import type { RootState } from "../../redux/store/store";
 import { FaCalendarAlt, FaBell } from "react-icons/fa";
 import { GoGoal } from "react-icons/go";
-import Logo from "../shared/Logo";
-import { IoMdLogIn } from "react-icons/io";
-import CustomButton from "../shared/CutomButton";
-import { LuSunMedium, LuSunMoon } from "react-icons/lu";
 import PlanSection from "../home/PlanSection";
+import NavigationBar from "../shared/NavigationBar";
 
 const features = [
   {
@@ -36,35 +30,7 @@ const features = [
 
 const HomePage = () => {
   const [dark, setDark] = useState(false);
-  const [open, setOpen] = useState(false);
-  const isLogin = useSelector((state: RootState) => state.auth.username !== "");
   const [showNavbar, setShowNavbar] = useState(false);
-
-  const toggleTheme = () => {
-    const newTheme = !dark;
-    setDark(newTheme);
-    const root = window.document.documentElement;
-
-    if (newTheme) {
-      root.classList.remove("light");
-      localStorage.setItem("theme", "dark");
-    } else {
-      root.classList.add("light");
-      localStorage.setItem("theme", "light");
-    }
-  };
-
-  useEffect(() => {
-    if (open) {
-      document.body.style.overflow = "hidden";
-    } else {
-      document.body.style.overflow = "auto";
-    }
-
-    return () => {
-      document.body.style.overflow = "auto";
-    };
-  }, [open]);
 
   useEffect(() => {
     const savedTheme = localStorage.getItem("theme");
@@ -94,50 +60,12 @@ const HomePage = () => {
         >
           {/* Navbar */}
           <nav className="flex justify-between items-center py-5 sm:pt-10 pt-7">
-            <Logo />
-            <div className="flex items-center gap-4">
-              <CustomButton onClick={toggleTheme} type="transparent">
-                <div className="flex items-center gap-1">
-                  {dark ? <LuSunMoon /> : <LuSunMedium />}
-                  <span className="sm:block hidden">{dark ? "Dark Theme" : "Light Theme"}</span>
-                </div>
-              </CustomButton>
-              <CustomButton
-                onClick={() => {
-                  if (!isLogin) setOpen(true);
-                }}
-              >
-                <div className="flex items-center gap-1">
-                  <span className="sm:block hidden">Login</span>
-                  <IoMdLogIn />
-                </div>
-              </CustomButton>
-            </div>
+            <NavigationBar />
           </nav>
           <nav
-            className={`fixed left-1/2 top-2 z-50 flex w-[95%] max-w-300 -translate-x-1/2 items-center justify-between rounded-2xl border border-white/10 bg-black/30 px-5 py-4 shadow-[0_20px_60px_rgba(0,0,0,0.18)] backdrop-blur-2xl transition-all duration-500 ease-out ${showNavbar ? "translate-y-0 opacity-100" : "-translate-y-10 opacity-0 pointer-events-none"} light:bg-white/70 `}
+            className={`fixed left-1/2 top-2 z-30 flex w-[95%] max-w-300 -translate-x-1/2 items-center justify-between rounded-2xl border border-white/10 bg-black/30 px-5 py-4 shadow-[0_20px_60px_rgba(0,0,0,0.18)] backdrop-blur-2xl transition-all duration-500 ease-out ${showNavbar ? "translate-y-0 opacity-100" : "-translate-y-10 opacity-0 pointer-events-none"} light:bg-white/70 `}
           >
-            <Logo />
-
-            <div className="flex items-center gap-4">
-              <CustomButton onClick={toggleTheme} type="transparent">
-                <div className="flex items-center gap-1">
-                  {dark ? <LuSunMoon /> : <LuSunMedium />}
-                  <span className="sm:block hidden">{dark ? "Dark Theme" : "Light Theme"}</span>
-                </div>
-              </CustomButton>
-
-              <CustomButton
-                onClick={() => {
-                  if (!isLogin) setOpen(true);
-                }}
-              >
-                <div className="flex items-center gap-1">
-                  <span className="sm:block hidden">Login</span>
-                  <IoMdLogIn />
-                </div>
-              </CustomButton>
-            </div>
+            <NavigationBar />
           </nav>
 
           {/* Hero */}
@@ -185,7 +113,7 @@ const HomePage = () => {
               </div>
             </div>
 
-            <div className="relative overflow-hidden rounded-[28px] border border-white/10 bg-black/20 p-5 shadow-[0_20px_60px_rgba(0,0,0,0.18)] backdrop-blur-2xl light:bg-lightCard sm:mt-0 mt-10">
+            <div className="relative overflow-hidden rounded-[28px] border border-white/10 bg-black/20 p-5 shadow-[0_20px_60px_rgba(0,0,0,0.18)] backdrop-blur-2xl light:bg-lightCard sm:mt-0 mt-10 sm:hidden lg:block">
               {/* Glow */}
               <div className="absolute -left-10 -top-10 h-40 w-40 rounded-full bg-darkSuccess/10 blur-3xl" />
 
@@ -328,9 +256,9 @@ const HomePage = () => {
       </div>
 
       {/* auth form */}
-      <div>
+      {/* <div>
         <AuthForm open={open} setOpen={setOpen} />
-      </div>
+      </div> */}
     </>
   );
 };

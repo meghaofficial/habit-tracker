@@ -3,7 +3,6 @@ import './App.css'
 import PageNotFound from './components/shared/PageNotFound'
 import { useDispatch, useSelector } from 'react-redux'
 import { useEffect, useState } from 'react'
-import { setYear } from './redux/slices/monthlySlice'
 import type { RootState } from './redux/store/store'
 import Demo from './components/pages/Demo'
 import Dashboard from './components/pages/Dashboard'
@@ -13,13 +12,11 @@ import { removeCreds, setCreds } from './redux/slices/authSlice'
 import PageLoader from './components/loaders/PageLoader'
 import { ToastContainer } from 'react-toastify'
 import Settings from './components/pages/Settings'
-import FloatingActionButtonComp from './components/shared/FloatingActionButtonComp'
 
 function App() {
 
   const dispatch = useDispatch();
   const isLogin = useSelector((state: RootState) => state.auth.accessToken !== "");
-  // const user = useSelector((state: RootState) => state.auth);
   const [isAuthLoading, setIsAuthLoading] = useState(false);
 
   useEffect(() => {
@@ -32,9 +29,6 @@ function App() {
       root.classList.add("light");
     }
   }, []);
-
-  const date = new Date();
-  dispatch(setYear({ year: date.getFullYear().toString() }));
 
   useEffect(() => {
     setIsAuthLoading(true);

@@ -1,4 +1,5 @@
-import { toast } from 'react-toastify';
+import { toast } from "react-toastify";
+import type { SubscriptionI } from "./types";
 // import debounce from 'lodash.debounce';
 
 export const getDaysInMonth = (year: number, month: number) =>
@@ -15,7 +16,7 @@ export const notify = {
 
 export const debounce = <T extends (...args: any[]) => any>(
   func: T,
-  delay: number
+  delay: number,
 ) => {
   let timer: ReturnType<typeof setTimeout>;
 
@@ -27,12 +28,24 @@ export const debounce = <T extends (...args: any[]) => any>(
   };
 };
 
-
 export function formatDateString(dateStr: string) {
-  const parts = dateStr.split('-');
+  const parts = dateStr.split("-");
   const year = parts[0];
   const monthIndex = parseInt(parts[1], 10) - 1;
-  const months = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
+  const months = [
+    "Jan",
+    "Feb",
+    "Mar",
+    "Apr",
+    "May",
+    "Jun",
+    "Jul",
+    "Aug",
+    "Sep",
+    "Oct",
+    "Nov",
+    "Dec",
+  ];
   if (parts.length === 2) {
     return `${months[monthIndex]} ${year}`;
   }
@@ -51,7 +64,79 @@ export function formatDateString2(date: string | Date) {
 export function formatMonthYearSimple(isoString: Date | string) {
   const date = new Date(isoString);
   const day = date.getDate();
-  const month = date.toLocaleString('en-US', { month: 'long' });
+  const month = date.toLocaleString("en-US", { month: "long" });
   const year = date.getFullYear();
   return `${day}/${month}/${year}`;
 }
+
+// NEw new
+export const formattedText = (text: string) => {
+  const arr = text.split("_");
+  const temp = arr.map((d) => d[0].toUpperCase() + d.slice(1));
+  return temp.join(" ");
+};
+export const splitSubscriptionsByMonth = (
+  subscriptions: SubscriptionI[],
+): SubscriptionI[] => {
+  const result: SubscriptionI[] = [];
+
+  for (const subscription of subscriptions) {
+    const originalStart = new Date(subscription.startDate);
+    const originalEnd = new Date(subscription.endDate);
+
+    let currentYear = originalStart.getFullYear();
+    let currentMonth = originalStart.getMonth();
+
+    while (
+      currentYear < originalEnd.getFullYear() ||
+      (currentYear === originalEnd.getFullYear() &&
+        currentMonth <= originalEnd.getMonth())
+    ) {
+      const isFirstMonth =
+        currentYear === originalStart.getFullYear() &&
+        currentMonth === originalStart.getMonth();
+
+      const isLastMonth =
+        currentYear === originalEnd.getFullYear() &&
+        currentMonth === originalEnd.getMonth();
+
+      let segmentStart: Date;
+      let segmentEnd: Date;
+
+      if (isFirstMonth) {
+        segmentStart = new Date(originalStart);
+      } else {
+        segmentStart = new Date(currentYear, currentMonth, 1, 0, 0, 0, 0);
+      }
+
+      if (isLastMonth) {
+        segmentEnd = new Date(originalEnd);
+      } else {
+        segmentEnd = new Date(
+          currentYear,
+          currentMonth + 1,
+          0,
+          23,
+          59,
+          59,
+          999,
+        );
+      }
+
+      result.push({
+        ...subscription,
+        startDate: segmentStart.toISOString(),
+        endDate: segmentEnd.toISOString(),
+      });
+
+      currentMonth++;
+
+      if (currentMonth > 11) {
+        currentMonth = 0;
+        currentYear++;
+      }
+    }
+  }
+
+  return result;
+};

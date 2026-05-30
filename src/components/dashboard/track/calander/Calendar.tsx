@@ -1,13 +1,27 @@
 import { useEffect, useState } from "react"
-import { monMap, months, week, weekColors, weekColorsDark } from "../../../../staticData"
+import { monMap, week, weekColors, weekColorsDark } from "../../../../staticData"
 import { statusColors } from "../../../../types";
 import { getDaysInMonth, getFirstDayOfMonth } from "../../../../helper";
 import type { RootState } from "../../../../redux/store/store";
 import { useSelector } from "react-redux";
 import RightDrawer from "./RightDrawer";
-import { MdKeyboardArrowLeft, MdKeyboardArrowRight } from "react-icons/md";
 
 interface MonthsI { _id: string, planID: string, startDate: Date | string, endDate: Date | string, status: string }
+
+const months: Record<string, string> = {
+  Jan: "January",
+  Feb: "February",
+  Mar: "March",
+  Apr: "April",
+  May: "May",
+  June: "June",
+  July: "July",
+  Aug: "August",
+  Sep: "September",
+  Oct: "October",
+  Nov: "November",
+  Dec: "December",
+};
 
 const Calendar = ({ month, year, setActiveMonth, subsMonths, activeStartDate }: { 
   month: number, 
@@ -22,24 +36,21 @@ const Calendar = ({ month, year, setActiveMonth, subsMonths, activeStartDate }: 
   const [firstDay, setFirstDay] = useState<number>(0);
   const [open, setOpen] = useState(false);
   const [activeDate, setActiveDate] = useState(1);
-  const dateData = useSelector(
-    (state: RootState) => state.dateData
-  );
   const theme = localStorage.getItem("theme");
 
-  const getStatusColor = (date: number | null): Record<string, string> => {
-    const key = `${date}-${Object.keys(months)[month]}-${year}`;
-    if (key in dateData && dateData[key].status !== 'default') {
-      return {
-        color: statusColors[dateData[key]?.status]?.dot,
-        status: dateData[key].status
-      };
-    }
-    return {
-      color: 'transparent',
-      status: ''
-    };
-  }
+  // const getStatusColor = (date: number | null): Record<string, string> => {
+  //   const key = `${date}-${Object.keys(months)[month]}-${year}`;
+  //   if (key in dateData && dateData[key].status !== 'default') {
+  //     return {
+  //       color: statusColors[dateData[key]?.status]?.dot,
+  //       status: dateData[key].status
+  //     };
+  //   }
+  //   return {
+  //     color: 'transparent',
+  //     status: ''
+  //   };
+  // }
 
   useEffect(() => {
     const res = getDaysInMonth(year, month);
@@ -113,7 +124,7 @@ const Calendar = ({ month, year, setActiveMonth, subsMonths, activeStartDate }: 
                   setActiveDate(index + 1 > firstDay ? index + 1 - firstDay : -1);
                 }}
               >
-                <div className='h-2 w-2 rounded-full absolute top-2 left-2'
+                {/* <div className='h-2 w-2 rounded-full absolute top-2 left-2'
                   style={{ backgroundColor: getStatusColor(index + 1 > firstDay ? index + 1 - firstDay : null)?.color }}
                   title={getStatusColor(index + 1 > firstDay ? index + 1 - firstDay : null)?.status} />
                 <div className="flex items-center justify-center">
@@ -123,7 +134,7 @@ const Calendar = ({ month, year, setActiveMonth, subsMonths, activeStartDate }: 
                   }}>
                     {index + 1 > firstDay ? index + 1 - firstDay : ""}
                   </span>
-                </div>
+                </div> */}
               </div>
             ))}
           </div>

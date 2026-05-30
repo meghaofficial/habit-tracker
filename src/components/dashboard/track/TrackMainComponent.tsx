@@ -1,23 +1,26 @@
-import { useEffect, useRef, useState } from "react"
+import { useRef, useState } from "react";
 import { ProgressPie } from "../../charts/ProgressPie";
 import DailyCalanderTaskSheet from "./DailyCalanderTaskSheet";
 import HabitSection from "./HabitSection";
 import HabitProgress from "./HabitProgress";
 import TargetsList from "./TargetsList";
-// import { WeeklyTargetsAccordion } from "./WeeklyTargetsAccordion";
-import { motion } from "framer-motion";
 import MonthlyNote from "./MonthlyNote";
 import { axiosPrivate } from "../../../api/axios";
 import Calendar from "./calander/Calendar";
 import { monMap } from "../../../staticData";
 import TodayAllTasks from "../../charts/TodayAllTasks";
-import type { Log } from "../../../types";
-import { formatDateString, formatDateString2, formatMonthYearSimple } from "../../../helper";
+import {
+  formatDateString2,
+  formatMonthYearSimple,
+  splitSubscriptionsByMonth,
+} from "../../../helper";
 import { IoIosArrowRoundBack, IoIosArrowRoundForward } from "react-icons/io";
+import type { DateLogI, MonthsI } from "../../../types";
 
-interface MonthsI { _id: string, planID: string, startDate: Date | string, endDate: Date | string, status: string }
-
-function getInclusiveMonthCount(startDateISO: Date | string, endDateISO: Date | string) {
+function getInclusiveMonthCount(
+  startDateISO: Date | string,
+  endDateISO: Date | string,
+) {
   const start = new Date(startDateISO);
   const end = new Date(endDateISO);
   const result = [];
@@ -29,102 +32,18 @@ function getInclusiveMonthCount(startDateISO: Date | string, endDateISO: Date | 
   return result;
 }
 
-type Subscription = {
-  _id: string;
-  userID: string;
-  planID: string;
-  planType: string;
-  startDate: string;
-  endDate: string;
-  status: string;
-  paymentStatus: string;
-  createdAt: string;
-  updatedAt: string;
-  __v: number;
-};
 
-const splitSubscriptionsByMonth = (
-  subscriptions: Subscription[]
-): Subscription[] => {
-  const result: Subscription[] = [];
 
-  for (const subscription of subscriptions) {
-    const originalStart = new Date(subscription.startDate);
-    const originalEnd = new Date(subscription.endDate);
-
-    let currentYear = originalStart.getFullYear();
-    let currentMonth = originalStart.getMonth();
-
-    while (
-      currentYear < originalEnd.getFullYear() ||
-      (currentYear === originalEnd.getFullYear() &&
-        currentMonth <= originalEnd.getMonth())
-    ) {
-      const isFirstMonth =
-        currentYear === originalStart.getFullYear() &&
-        currentMonth === originalStart.getMonth();
-
-      const isLastMonth =
-        currentYear === originalEnd.getFullYear() &&
-        currentMonth === originalEnd.getMonth();
-
-      let segmentStart: Date;
-      let segmentEnd: Date;
-
-      // START DATE
-      if (isFirstMonth) {
-        // preserve exact original start date/time
-        segmentStart = new Date(originalStart);
-      } else {
-        // 1st day of month at 00:00:00
-        segmentStart = new Date(
-          currentYear,
-          currentMonth,
-          1,
-          0,
-          0,
-          0,
-          0
-        );
-      }
-
-      // END DATE
-      if (isLastMonth) {
-        // preserve original end date/time
-        segmentEnd = new Date(originalEnd);
-      } else {
-        // last day of month at 23:59:59.999
-        segmentEnd = new Date(
-          currentYear,
-          currentMonth + 1,
-          0,
-          23,
-          59,
-          59,
-          999
-        );
-      }
-
-      result.push({
-        ...subscription,
-        startDate: segmentStart.toISOString(),
-        endDate: segmentEnd.toISOString(),
-      });
-
-      // move to next month
-      currentMonth++;
-
-      if (currentMonth > 11) {
-        currentMonth = 0;
-        currentYear++;
-      }
-    }
-  }
-
-  return result;
-};
-
-const TrackMainComponent = ({ dashboardData, taskList, activeMonth, setTaskList, setActiveMonth, setDashboardData, log, setLog }: {
+const TrackMainComponent = ({
+  dashboardData,
+  taskList,
+  activeMonth,
+  setTaskList,
+  setActiveMonth,
+  setDashboardData,
+  log,
+  setLog,
+}: {
   dashboardData: {
     _id: string;
     userID: string;
@@ -132,35 +51,51 @@ const TrackMainComponent = ({ dashboardData, taskList, activeMonth, setTaskList,
     year: number;
     totalDays: number;
     firstDay: number;
-  },
+  };
 
-  taskList: { _id: string, taskName: string, monthDashID: string }[],
-  setTaskList: React.Dispatch<React.SetStateAction<{ _id: string, taskName: string, monthDashID: string }[]>>,
-  setActiveMonth: React.Dispatch<React.SetStateAction<MonthsI>>,
-  activeMonth: MonthsI,
-  setDashboardData: React.Dispatch<React.SetStateAction<{
-    _id: string;
-    userID: string;
-    month: number;
-    year: number;
-    totalDays: number;
-    firstDay: number;
-  }>>,
-  log: Log,
-  setLog: React.Dispatch<React.SetStateAction<Log>>,
+  taskList: { _id: string; taskName: string; monthDashID: string }[];
+  setTaskList: React.Dispatch<
+    React.SetStateAction<
+      { _id: string; taskName: string; monthDashID: string }[]
+    >
+  >;
+  setActiveMonth: React.Dispatch<React.SetStateAction<MonthsI>>;
+  activeMonth: MonthsI;
+  setDashboardData: React.Dispatch<
+    React.SetStateAction<{
+      _id: string;
+      userID: string;
+      month: number;
+      year: number;
+      totalDays: number;
+      firstDay: number;
+    }>
+  >;
+  log: DateLogI;
+  setLog: React.Dispatch<React.SetStateAction<DateLogI>>;
   // todayDate: string
 }) => {
   const [active, setActive] = useState<"dashboard" | "calendar">("dashboard");
   const [subsMonths, setSubsMonths] = useState<MonthsI[]>([]);
   const [progress, setProgress] = useState<{
-    overallProgress: { total: number, count: number, progress: string | number },
-    dateLogProgress: { fullDate: Date | string, count: number, progress: string | number }[],
-    taskProgress: { id: string, count: number, progress: string | number }[]
+    overallProgress: {
+      total: number;
+      count: number;
+      progress: string | number;
+    };
+    dateLogProgress: {
+      fullDate: Date | string;
+      count: number;
+      progress: string | number;
+    }[];
+    taskProgress: { id: string; count: number; progress: string | number }[];
   }>({
     overallProgress: { total: 0, count: 0, progress: 0 },
     dateLogProgress: [],
-    taskProgress: []
+    taskProgress: [],
   });
+
+  console.log("activemonth", activeMonth)
 
   const getDashboard = async (month: Date) => {
     // setDashLoading(true);
@@ -176,7 +111,7 @@ const TrackMainComponent = ({ dashboardData, taskList, activeMonth, setTaskList,
     } finally {
       // setDashLoading(false);
     }
-  }
+  };
 
   const getAllSubscription = async () => {
     try {
@@ -189,15 +124,15 @@ const TrackMainComponent = ({ dashboardData, taskList, activeMonth, setTaskList,
     } catch (error) {
       console.error(error);
     }
-  }
+  };
 
   const subsRef = useRef(false);
 
-  useEffect(() => {
-    if (subsRef.current) return;
-    getAllSubscription();
-    subsRef.current = true;
-  }, []);
+  // useEffect(() => {
+  //   if (subsRef.current) return;
+  //   getAllSubscription();
+  //   subsRef.current = true;
+  // }, []);
 
   // For task list sm screen
   const [selectedDate, setSelectedDate] = useState(new Date());
@@ -208,7 +143,7 @@ const TrackMainComponent = ({ dashboardData, taskList, activeMonth, setTaskList,
     setLogLoading(true);
     try {
       const res = await axiosPrivate.get(
-        `/api/get-log-date?monthDashID=${taskList?.[0]?.monthDashID}&fullDate=${getMidnightISO(date)}`
+        `/api/get-log-date?monthDashID=${taskList?.[0]?.monthDashID}&fullDate=${getMidnightISO(date)}`,
       );
 
       if (res?.data?.success) {
@@ -240,9 +175,6 @@ const TrackMainComponent = ({ dashboardData, taskList, activeMonth, setTaskList,
     setSelectedDate(next);
     getLog(next);
   };
-  useEffect(() => {
-    getLog(selectedDate);
-  }, []);
 
   return (
     <div className="py-5">
@@ -282,23 +214,28 @@ const TrackMainComponent = ({ dashboardData, taskList, activeMonth, setTaskList,
           <div className="sm:flex hidden gap-4 mt-4 relative">
             {/* left detail */}
             <div className="bg-black/20 border border-white/10 w-[19.5%] backdrop-blur-2xl light:bg-lightCard rounded-2xl overflow-x-hidden h-25 absolute -top-29 p-3 flex flex-col justify-between">
-              <p className="text-3xl tracking-wider font-bold playfair-display px-3 line-clamp-1" title={
-                `${monMap?.[(new Date(activeMonth?.startDate)).getMonth() + 1]}, ${(new Date(activeMonth?.startDate)).getFullYear()}`
-              }>
-                {monMap?.[(new Date(activeMonth?.startDate)).getMonth() + 1]}, {(new Date(activeMonth?.startDate)).getFullYear()}
+              <p
+                className="text-3xl tracking-wider font-bold playfair-display px-3 line-clamp-1"
+                title={`${monMap?.[new Date(activeMonth?.startDate).getMonth() + 1]}, ${new Date(activeMonth?.startDate).getFullYear()}`}
+              >
+                {monMap?.[new Date(activeMonth?.startDate).getMonth() + 1]},{" "}
+                {new Date(activeMonth?.startDate).getFullYear()}
               </p>
               <div className="flex flex-col items-start px-3">
-                    <span className="text-[10px] text-gray-500">
-                      {activeMonth?.status === "active" && 'Current Plan'}
-                      {activeMonth?.status === "scheduled" && 'Scheduled'}
-                    </span>
-                    <span className="text-[10px] tracking-wider">{formatMonthYearSimple(activeMonth?.startDate)} - {formatMonthYearSimple(activeMonth?.endDate)}</span>
-                    {/* {activeSubsLoading ? (
+                <span className="text-[10px] text-gray-500">
+                  {activeMonth?.status === "active" && "Current Plan"}
+                  {activeMonth?.status === "scheduled" && "Scheduled"}
+                </span>
+                <span className="text-[10px] tracking-wider">
+                  {formatMonthYearSimple(activeMonth?.startDate)} -{" "}
+                  {formatMonthYearSimple(activeMonth?.endDate)}
+                </span>
+                {/* {activeSubsLoading ? (
                       <div className="w-45 h-5 mt-1 rounded bg-gray-500/50 animate-pulse"></div>
                     ) : (
                       <span className="text-[14px]">{formatMonthYearSimple(activeMonth?.startDate)} - {formatMonthYearSimple(activeMonth?.endDate)}</span>
                     )} */}
-                  </div>
+              </div>
               {/* <div className="text-sm google-sans flex items-center gap-3 overflow-x-auto overflow-y-hidden hide-scrollbar">
                 {subsMonths?.map((s, index) => (
                   <button key={index} className={`px-4 py-1 text-nowrap rounded-full cursor-pointer ${activeMonth?.startDate?.toString() === s?.startDate?.toString() && activeMonth?.endDate?.toString() === s?.endDate?.toString() ? 'bg-darkPrimary light:bg-lightPrimary text-white' : `border ${s?.status === "active" ? 'border-darkSuccess' : 'border-white/50'} hover:bg-darkBox/50 light:hover:bg-lightBox/50`}`}
@@ -319,7 +256,14 @@ const TrackMainComponent = ({ dashboardData, taskList, activeMonth, setTaskList,
             </div>
             {/* right detail */}
             <div className="bg-black/20 border border-white/10 w-[14.5%] backdrop-blur-2xl light:bg-lightCard rounded-2xl overflow-x-hidden h-25 absolute -top-29 right-0 overflow-y-hidden">
-              <ProgressPie value={Number.isNaN(Number(progress?.overallProgress?.progress)) ? 0 : Number(progress?.overallProgress?.progress)} type="" />
+              <ProgressPie
+                value={
+                  Number.isNaN(Number(progress?.overallProgress?.progress))
+                    ? 0
+                    : Number(progress?.overallProgress?.progress)
+                }
+                type=""
+              />
             </div>
 
             {/* below sections */}
@@ -327,15 +271,28 @@ const TrackMainComponent = ({ dashboardData, taskList, activeMonth, setTaskList,
               <HabitSection taskList={taskList} />
             </div>
             <div className=" w-[65%] rounded-2xl relative">
-              <DailyCalanderTaskSheet taskList={taskList} setTaskList={setTaskList} dashboardData={dashboardData} progress={progress} setProgress={setProgress} monthStatus={activeMonth?.status} />
+              <DailyCalanderTaskSheet
+                taskList={taskList}
+                setTaskList={setTaskList}
+                dashboardData={dashboardData}
+                progress={progress}
+                setProgress={setProgress}
+                monthStatus={activeMonth?.status}
+              />
             </div>
             <div className="bg-black/20 border border-white/10 backdrop-blur-2xl light:bg-lightCard w-[15%] rounded-2xl overflow-x-hidden">
-              <HabitProgress progress={progress?.taskProgress} total={dashboardData?.totalDays} count={progress?.overallProgress.count} />
+              <HabitProgress
+                progress={progress?.taskProgress}
+                total={dashboardData?.totalDays}
+                count={progress?.overallProgress.count}
+              />
             </div>
           </div>
           {/* sm screen */}
           <div className="sm:hidden flex items-center justify-between">
-            <p className="google-sans text-[25px] bg-darkPrimary/50 font-bold p-2 w-full rounded-lg">{formatDateString2(todayDate)}</p>
+            <p className="google-sans text-[25px] bg-darkPrimary/50 font-bold p-2 w-full rounded-lg">
+              {formatDateString2(todayDate)}
+            </p>
           </div>
           {/* monthly targets */}
           <div className="flex sm:flex-row flex-col gap-4 mt-4">
@@ -347,7 +304,9 @@ const TrackMainComponent = ({ dashboardData, taskList, activeMonth, setTaskList,
                   {logLoading ? (
                     <div className="w-20 h-4 mt-1 rounded bg-gray-500/50 animate-pulse"></div>
                   ) : (
-                    <p className="text-gray-500 mt-1 text-[10px] cursor-default">{formatDateString2(selectedDate.toString())}</p>
+                    <p className="text-gray-500 mt-1 text-[10px] cursor-default">
+                      {formatDateString2(selectedDate.toString())}
+                    </p>
                   )}
                 </div>
                 {!logLoading && (
@@ -365,11 +324,18 @@ const TrackMainComponent = ({ dashboardData, taskList, activeMonth, setTaskList,
                 {logLoading ? (
                   <div className="flex flex-col gap-2 w-full px-5 pb-5">
                     {Array.from({ length: 6 }).map((_, index) => (
-                      <div key={index} className="w-full h-8 mt-1 rounded bg-gray-500/50 animate-pulse"></div>
+                      <div
+                        key={index}
+                        className="w-full h-8 mt-1 rounded bg-gray-500/50 animate-pulse"
+                      ></div>
                     ))}
                   </div>
                 ) : (
-                  <TodayAllTasks taskList={taskList} log={log} setLog={setLog} />
+                  <TodayAllTasks
+                    taskList={taskList}
+                    log={log}
+                    setLog={setLog}
+                  />
                 )}
               </div>
             </div>
@@ -382,9 +348,18 @@ const TrackMainComponent = ({ dashboardData, taskList, activeMonth, setTaskList,
             </div>
             {/* gauge progress */}
             <div className="bg-black/20 backdrop-blur-2xl light:bg-lightCard w-1/3 rounded-2xl sm:block hidden border border-white/10">
-              <p className="font-semibold text-lg px-5 pt-3">Your Monthly Targets Progress</p>
+              <p className="font-semibold text-lg px-5 pt-3">
+                Your Monthly Targets Progress
+              </p>
               <div className="relative left-10 top-10">
-                <ProgressPie value={Number.isNaN(Number(progress?.overallProgress?.progress)) ? 0 : Number(progress?.overallProgress?.progress)} type="analysis" />
+                <ProgressPie
+                  value={
+                    Number.isNaN(Number(progress?.overallProgress?.progress))
+                      ? 0
+                      : Number(progress?.overallProgress?.progress)
+                  }
+                  type="analysis"
+                />
               </div>
             </div>
           </div>
@@ -392,10 +367,16 @@ const TrackMainComponent = ({ dashboardData, taskList, activeMonth, setTaskList,
           {/* <WeeklyTargetsAccordion monthID={dashboardData?._id} /> */}
         </>
       ) : (
-        <Calendar month={(new Date(activeMonth?.startDate)).getMonth()} year={(new Date(activeMonth?.startDate)).getFullYear()} setActiveMonth={setActiveMonth} subsMonths={subsMonths} activeStartDate={activeMonth?.startDate?.toString()} />
+        <Calendar
+          month={new Date(activeMonth?.startDate).getMonth()}
+          year={new Date(activeMonth?.startDate).getFullYear()}
+          setActiveMonth={setActiveMonth}
+          subsMonths={subsMonths}
+          activeStartDate={activeMonth?.startDate?.toString()}
+        />
       )}
     </div>
-  )
-}
+  );
+};
 
-export default TrackMainComponent
+export default TrackMainComponent;
