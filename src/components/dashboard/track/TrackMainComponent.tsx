@@ -95,8 +95,6 @@ const TrackMainComponent = ({
     taskProgress: [],
   });
 
-  console.log("activemonth", activeMonth)
-
   const getDashboard = async (month: Date) => {
     // setDashLoading(true);
     try {

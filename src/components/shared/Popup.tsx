@@ -10,27 +10,26 @@ const Popup: React.FC<PopupProps> = ({ open, setOpen, children }) => {
   if (!open) return null;
 
   return (
-    <div className="fixed inset-0 z-999999 flex items-center justify-center">
-
+    <div className="fixed inset-0 z-999999 overflow-y-auto">
       {/* Overlay */}
       <div
         className="absolute inset-0 bg-black/50"
         onClick={() => setOpen(false)}
       />
 
-      {/* Modal Content */}
-      <div className="relative z-10 bg-darkBg light:bg-lightBg rounded-2xl shadow-xl p-6 w-200 min-h-100">
+      {/* Wrapper */}
+      <div className="relative min-h-screen overflow-y-hidden flex items-center justify-center p-6">
+        {/* Modal */}
+        <div className="relative z-10 w-200 max-w-full rounded-3xl">
+          <button
+            onClick={() => setOpen(false)}
+            className="absolute top-3 right-3 text-gray-500"
+          >
+            ✕
+          </button>
 
-        {/* Close Button */}
-        <button
-          onClick={() => setOpen(false)}
-          className="absolute top-3 right-3 text-gray-500 hover:text-black"
-        >
-          ✕
-        </button>
-
-        {/* Content */}
-        {children || <p>This is a popup</p>}
+          {children}
+        </div>
       </div>
     </div>
   );

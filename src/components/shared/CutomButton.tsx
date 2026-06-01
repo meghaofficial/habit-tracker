@@ -77,6 +77,7 @@ type CustomButtonProps = {
   type?: "default" | "white" | "transparent"; // Restricts types to exact choices
   textSize?: string;
   onClick?: () => void;
+  styling?: string;
 };
 
 export default function CustomButton({
@@ -84,6 +85,7 @@ export default function CustomButton({
   textSize = "12px",
   children,
   onClick,
+  styling
 }: CustomButtonProps) {
   
   // Base styles shared by all button variants
@@ -99,7 +101,7 @@ export default function CustomButton({
   return (
     <button
       onClick={onClick}
-      className={`${baseStyles} ${variants[type]}`}
+      className={`${baseStyles} ${variants[type]} ${styling}`}
     >
       {/* Replaced <p> with <div> to prevent invalid HTML nesting */}
       <div 

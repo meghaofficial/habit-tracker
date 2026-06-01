@@ -1,16 +1,25 @@
-import Logo from "./Logo";
 import CustomButton from "./CutomButton";
 import { useEffect, useState } from "react";
 import { LuSunMedium, LuSunMoon } from "react-icons/lu";
 import type { RootState } from "../../redux/store/store";
-import { useSelector } from "react-redux";
-import { IoMdLogIn } from "react-icons/io";
+import { useDispatch, useSelector } from "react-redux";
+import { IoMdLogIn, IoMdLogOut } from "react-icons/io";
 import AuthForm from "../auth/AuthForm";
+import { axiosPrivate } from "../../api/axios";
+import { removeCreds } from "../../redux/slices/authSlice";
+import { notify } from "../../helper";
+import { useNavigate } from "react-router-dom";
+import Logo from "./Logo";
+import { IoSettingsSharp } from "react-icons/io5";
 
 const NavigationBar = () => {
   const [dark, setDark] = useState(false);
   const [open, setOpen] = useState(false);
+  const [logoutLoading, setLogoutLoading] = useState(false);
   const isLogin = useSelector((state: RootState) => state.auth.username !== "");
+  const dispatch = useDispatch();
+  const navigate = useNavigate();
+
   const toggleTheme = () => {
     const newTheme = !dark;
     setDark(newTheme);
@@ -22,6 +31,22 @@ const NavigationBar = () => {
     } else {
       root.classList.add("light");
       localStorage.setItem("theme", "light");
+    }
+  };
+
+  const handleLogout = async () => {
+    setLogoutLoading(true);
+    try {
+      const res = await axiosPrivate.post("/logout");
+
+      if (res?.data?.success) {
+        dispatch(removeCreds());
+      }
+    } catch (error) {
+      console.error(error);
+      notify.error("Logout failed. Please try again.");
+    } finally {
+      setLogoutLoading(false);
     }
   };
 
@@ -39,8 +64,18 @@ const NavigationBar = () => {
 
   return (
     <>
-      <Logo />
+      <div onClick={() => navigate("/")} className="cursor-pointer">
+        <Logo />
+      </div>
       <div className="flex items-center gap-4">
+        <CustomButton styling="cursor-pointer" onClick={() => navigate("/settings")} type="white">
+          <div className="flex items-center gap-1">
+            <IoSettingsSharp />
+            <span className="sm:block hidden">
+              Settings
+            </span>
+          </div>
+        </CustomButton>
         <CustomButton onClick={toggleTheme} type="transparent">
           <div className="flex items-center gap-1">
             {dark ? <LuSunMoon /> : <LuSunMedium />}
@@ -52,11 +87,13 @@ const NavigationBar = () => {
         <CustomButton
           onClick={() => {
             if (!isLogin) setOpen(true);
+            else handleLogout();
           }}
         >
+          {/* {logoutLoading ? <CircleLoader /> : "Logout"} */}
           <div className="flex items-center gap-1">
-            <span className="sm:block hidden">Login</span>
-            <IoMdLogIn />
+            <span className="sm:block hidden">{!isLogin ? "Login" : "Logout"}</span>
+            {isLogin ? <IoMdLogOut /> : <IoMdLogIn />}
           </div>
         </CustomButton>
       </div>

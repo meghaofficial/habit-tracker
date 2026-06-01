@@ -16,6 +16,7 @@ import type { DashboardI, DateLogI, PlanI, SubscriptionI } from "../../types";
 import { IoMdLogOut } from "react-icons/io";
 import CustomButton from "../shared/CutomButton";
 import { LuSunMedium, LuSunMoon } from "react-icons/lu";
+import NavigationBar from "../shared/NavigationBar";
 
 const Dashboard = () => {
   const [activeTab, setActiveTab] = useState("track");
@@ -98,8 +99,7 @@ const Dashboard = () => {
           setOpenPopup(false);
           setShowDashboard(true);
           await getActiveSubscription();
-        }
-        else {
+        } else {
           setOpenPlan(false);
         }
       }
@@ -145,10 +145,9 @@ const Dashboard = () => {
       if (res?.data?.success) {
         const subscription = res?.data?.subscription;
         setActiveMonth(res?.data?.subscription);
-        const hasUsedFree = !!subscription;
-        setShowFree(hasUsedFree);
+        setShowFree(!!subscription);
         if (subscription) await getDashboard();
-        else await getPlans();
+        // else await getPlans();
       }
     } catch (error) {
       console.error(error);
@@ -159,6 +158,7 @@ const Dashboard = () => {
 
   useEffect(() => {
     getActiveSubscription();
+    getPlans();
   }, []);
 
   useEffect(() => {
@@ -167,7 +167,9 @@ const Dashboard = () => {
 
   return (
     <>
-      <div className="sm:px-6 px-5 sm:pt-4 pt-3 overflow-x-hidden">
+      <div
+        className={`sm:px-6 px-5 sm:pt-4 pt-3 overflow-x-hidden ${!showDashboard && "h-screen overflow-y-hidden"}`}
+      >
         {dashLoading || activeSubsLoading ? (
           <div className="flex items-center justify-center h-screen">
             <PageLoader />
@@ -176,99 +178,162 @@ const Dashboard = () => {
           <>
             {!showDashboard && (
               <>
-                <div className="z-9999 backdrop-blur fixed -top-5 left-0 w-full h-full mt-5 rounded-2xl overflow-x-hidden flex items-center justify-center flex-col">
-                  <div className="absolute top-3 right-3 flex items-center gap-3">
-                    <button
-                      className={`border-none py-1.5 min-w-24 min-h-8 flex items-center justify-center px-4 bg-darkPrimary light:bg-lightPrimary text-white rounded-md text-sm ${!logoutLoading && "cursor-pointer"}`}
-                      onClick={handleLogout}
-                    >
-                      {logoutLoading ? <CircleLoader /> : "Logout"}
-                    </button>
-                    <IoSettingsSharp
-                      className="cursor-pointer text-xl"
-                      onClick={() => navigate("/settings")}
-                    />
-                  </div>
-                  <p className="text-3xl mb-3 font-semibold">
-                    Oops! you don't have any active subscription.
-                  </p>
-                  <p className="mb-5">
-                    To activate, please choose any active plan from the
-                    following.
-                  </p>
-                  <div
-                    className={`grid gap-3 ${showFree ? "grid-cols-1 sm:grid-cols-2 md:grid-cols-3" : "grid-cols-1"}`}
-                  >
-                    {plans
-                      .slice(0, showFree ? plans.length : 1)
-                      .map((plan, i) => (
-                        <div
-                          key={i}
-                          className="glass-card p-5 rounded-lg text-center"
-                        >
-                          <h3>{plan.title}</h3>
-                          <p style={{ fontSize: "22px", margin: "10px 0" }}>
-                            {plan.price}
+                {openPopup ? (
+                  <div className="w-full max-w-xl mx-auto">
+                    <div className="relative overflow-y-auto rounded-[28px] border border-white/10 p-8 backdrop-blur-2xl">
+                      {/* Glow */}
+                      <div className="absolute -top-20 -right-20 h-48 w-48 rounded-full bg-yellow-500/10 blur-3xl" />
+
+                      <div className="relative">
+                        {/* Icon */}
+                        <div className="mx-auto mb-5 flex h-16 w-16 items-center justify-center rounded-2xl border border-yellow-500/20 bg-yellow-500/10">
+                          <span className="text-3xl">⚠️</span>
+                        </div>
+
+                        {/* Heading */}
+                        <h2 className="text-center text-2xl font-bold">
+                          Activate Free Trial
+                        </h2>
+
+                        <p className="mt-3 text-center text-darkSubText">
+                          This action can only be used once and cannot be
+                          reversed.
+                        </p>
+
+                        {/* Important Notice */}
+                        <div className="mt-8 rounded-2xl border border-yellow-500/20 bg-yellow-500/5 p-5">
+                          <p className="text-sm font-semibold text-yellow-400">
+                            Important
                           </p>
-                          <p className="text-gray-400 text-[14px] mb-3.75 w-55">
-                            {plan.desc}
+
+                          <p className="mt-3 text-sm leading-7 text-darkSubText">
+                            Your free trial remains active only until the end of
+                            the current month, regardless of the activation
+                            date.
                           </p>
+
+                          <div className="mt-4 rounded-xl bg-black/20 p-4 text-sm text-gray-400">
+                            <strong>Example:</strong>
+
+                            <ul className="mt-2 space-y-2">
+                              <li>
+                                • Activate on April 4 → valid until April 30
+                              </li>
+                              <li>
+                                • Activate on April 25 → valid until April 30
+                              </li>
+                            </ul>
+                          </div>
+
+                          <p className="mt-4 text-sm text-yellow-300">
+                            For maximum benefit, activate near the beginning of
+                            a month.
+                          </p>
+                        </div>
+
+                        {/* Actions */}
+                        <div className="mt-8 flex gap-3">
                           <button
-                            onClick={() => {
-                              if (i == 0) setOpenPopup(true);
-                            }}
-                            className={`mr-2.5 py-2 px-5 text-sm rounded-md border-none cursor-pointer ${i === 0 ? "bg-darkSuccess light:bg-lightSuccess text-black" : "bg-darkPrimary light:bg-lightPrimary text-white"}`}
+                            onClick={() => setOpenPopup(false)}
+                            className="flex-1 rounded-2xl border border-white/10 py-3 font-medium hover:bg-white/5"
                           >
-                            {i === 0 ? "Activate" : "Choose Plan"}
+                            Cancel
+                          </button>
+
+                          <button
+                            onClick={() =>
+                              handleSubscribe(plansList?.[0]?._id, 0)
+                            }
+                            disabled={freeTrialLoading}
+                            className="flex-1 rounded-2xl bg-darkSuccess py-3 font-semibold text-black transition hover:scale-[1.02]"
+                          >
+                            {freeTrialLoading ? (
+                              <CircleLoader />
+                            ) : (
+                              "Activate Trial"
+                            )}
                           </button>
                         </div>
-                      ))}
+                      </div>
+                    </div>
                   </div>
-                </div>
+                ) : (
+                  <div className="z-9999 backdrop-blur absolute -top-5 left-0 w-full h-full mt-5 rounded-2xl overflow-x-hidden flex items-center sm:justify-center flex-col">
+                    <nav className="flex justify-between items-center py-5 sm:pt-10 pt-7 w-full px-5">
+                      <NavigationBar />
+                    </nav>
+                    <p className="sm:text-3xl text-2xl sm:mt-0 mt-5 mb-3 font-semibold text-center sm:px-0 px-5">
+                      Oops! you don't have any active subscription.
+                    </p>
+                    <p className="sm:mb-5 mb-1 text-center sm:px-0 px-8">
+                      To activate, please choose any active plan from the
+                      following.
+                    </p>
+                    <div
+                      className={`grid gap-3 ${showFree ? "grid-cols-1 sm:grid-cols-2 md:grid-cols-3" : "grid-cols-1"}`}
+                    >
+                      {plansList
+                        .slice(0, showFree ? plans.length : 1)
+                        .map((plan, i) => (
+                          <div
+                            key={i}
+                            className="p-3 flex items-center justify-center w-full"
+                          >
+                            <div
+                              key={i}
+                              className="group relative overflow-hidden sm:w-auto w-[80%] rounded-[30px] border border-white/10 bg-black/20 p-6 backdrop-blur-2xl transition-all duration-500 hover:-translate-y-1 hover:border-white/20 hover:shadow-[0_30px_80px_rgba(99,102,241,0.12)]"
+                            >
+                              {/* Glow */}
+                              <div
+                                className={`absolute -top-10 -right-10 h-40 w-40 rounded-full blur-3xl transition-all duration-500 ${i === 0 ? "bg-darkSuccess/15" : "bg-darkPrimary/15"}`}
+                              />
+
+                              {/* Active Badge */}
+                              {i === 0 && (
+                                <div className="absolute top-5 right-5 rounded-full border border-darkSuccess/30 bg-darkSuccess/10 px-3 py-1 text-xs font-semibold text-darkSuccess">
+                                  ACTIVE
+                                </div>
+                              )}
+
+                              <div className="relative z-10">
+                                <p className="text-sm uppercase tracking-[0.2em] text-gray-500">
+                                  Membership
+                                </p>
+
+                                <h3 className="mt-2 text-3xl font-bold">
+                                  {plan?.planName}
+                                </h3>
+
+                                <div className="mt-6 flex items-end gap-1">
+                                  <span className="text-5xl font-black">
+                                    ₹{plan?.amount}
+                                  </span>
+                                </div>
+
+                                <p className="mt-5 text-[15px] leading-7 text-darkSubText light:text-black">
+                                  {plan?.description}
+                                </p>
+
+                                <div className="my-6 h-px bg-white/10" />
+
+                                <button
+                                  onClick={() => {
+                                    if (i === 0) setOpenPopup(true);
+                                  }}
+                                  className={`w-full rounded-2xl py-3 font-semibold transition-all duration-300 ${i === 0 ? "bg-darkSuccess text-black hover:scale-[1.02]" : "bg-white/5 border border-white/10 hover:bg-white/10"}`}
+                                >
+                                  {i === 0 ? "Activate Plan" : "Choose Plan"}
+                                </button>
+                              </div>
+                            </div>
+                          </div>
+                        ))}
+                    </div>
+                  </div>
+                )}
               </>
             )}
 
-            <Popup open={openPopup} setOpen={setOpenPopup}>
-              <div className="flex items-center justify-evenly h-95 flex-col google-sans">
-                <p>
-                  Are you sure you want to activate your free trial ? This
-                  action can be undone!
-                </p>
-                <p className="text-gray-500 text-sm mt-3 w-[80%] tracking-wider text-justify">
-                  Tip: Use your free trial wisely. It is suggested to activate
-                  you free trial in the beginning of the month, otherwise you
-                  will get advantage of using it for minimum days. For example -
-                  If you activate your free trial on 25th of April then your
-                  activation will only be valid till April 31st. And if you
-                  activate your free trial on 4th of April then also your
-                  activation will be valid till April 31st. Your free trial
-                  activation will be valid till end of the current month no
-                  matter at which date you are activating your free trial.
-                </p>
-                <div className="mt-3 flex items-center justify-center gap-3">
-                  {freeTrialLoading ? (
-                    <button
-                      className={`mr-2.5 py-2.5 px-5 min-w-20 rounded-md border-none bg-darkSuccess light:bg-lightSuccess text-black`}
-                    >
-                      <CircleLoader />
-                    </button>
-                  ) : (
-                    <button
-                      onClick={() => handleSubscribe(plansList?.[0]?._id, 0)}
-                      className={`mr-2.5 py-2 px-5 rounded-md border-none cursor-pointer bg-darkSuccess light:bg-lightSuccess text-black`}
-                    >
-                      Confirm
-                    </button>
-                  )}
-                  <button
-                    onClick={() => setOpenPopup(false)}
-                    className={`mr-2.5 py-2 px-5 rounded-md border-none cursor-pointer bg-red-500 text-black`}
-                  >
-                    Cancel
-                  </button>
-                </div>
-              </div>
-            </Popup>
 
             {/* extent plan popup */}
             <Popup open={openPlan} setOpen={setOpenPlan}>
