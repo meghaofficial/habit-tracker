@@ -6,13 +6,13 @@ import TodayAllTasks from "../../charts/TodayAllTasks"
 import { WeeklyBarChart } from "../../charts/WeeklyBarChart"
 import Calendar from "../track/calander/Calendar"
 import { motion, AnimatePresence } from "framer-motion";
-import type { Log } from "../../../types"
 import { formatDateString } from "../../../helper"
+import type { DateLogI, TaskI } from "../../../types"
 
 const AnalysisMainComponent = ({ taskList, monthDashID, log, setLog, todayDate, setTodayDate }: {
-  taskList: { _id: string, taskName: string, monthDashID: string }[], monthDashID: string,
-  log: Log,
-  setLog: React.Dispatch<React.SetStateAction<Log>>,
+  taskList: TaskI[], monthDashID: string,
+  log: DateLogI,
+  setLog: React.Dispatch<React.SetStateAction<DateLogI>>,
   todayDate: string,
   setTodayDate: React.Dispatch<React.SetStateAction<string>>
 }) => {

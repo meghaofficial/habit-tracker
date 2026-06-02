@@ -1,17 +1,10 @@
-import { useEffect } from "react";
 import { axiosPrivate } from "../../api/axios";
-
-interface Log {
-  _id: string;
-  monthDashID: string;
-  fullDate: Date | string;
-  tasks: string[];
-}
+import type { DateLogI } from "../../types";
 
 const TodayAllTasks = ({ taskList, log, setLog }: {
   taskList: { _id: string, taskName: string, monthDashID: string }[],
-  log: Log,
-  setLog: React.Dispatch<React.SetStateAction<Log>>
+  log: DateLogI,
+  setLog: React.Dispatch<React.SetStateAction<DateLogI>>
 }) => {
 
   function getTodayMidnight() {

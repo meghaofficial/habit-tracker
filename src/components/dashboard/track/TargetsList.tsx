@@ -133,7 +133,7 @@ const TargetsList = ({
               ? "Add monthly target..."
               : "Add weekly target..."
           }
-          className="flex-1 rounded-xl py-3 border border-white/10 bg-white/4 px-4 text-[14px] text-white outline-none placeholder:text-white/25 shadow-[inset_0_1px_2px_rgba(255,255,255,0.06)] backdrop-blur-xl transition-all duration-300 focus:border-[#8B5CF6]/40 focus:bg-white/6 focus:shadow-[0_0_25px_rgba(139,92,246,0.15)] light:text-lightText"
+          className="flex-1 w-[70%] rounded-xl py-3 border border-white/10 bg-white/4 px-4 text-[14px] text-white outline-none placeholder:text-white/25 shadow-[inset_0_1px_2px_rgba(255,255,255,0.06)] backdrop-blur-xl transition-all duration-300 focus:border-[#8B5CF6]/40 focus:bg-white/6 focus:shadow-[0_0_25px_rgba(139,92,246,0.15)] light:text-lightText"
         />
 
         <CustomButton
@@ -145,7 +145,7 @@ const TargetsList = ({
           title={
             targets?.length >= 10 ? "Can not add more than 10 targets" : ""
           }
-          styling="w-[70px] py-2"
+          styling="w-[30%] py-2"
           rounded="rounded-xl"
           textSize="14px"
         >
@@ -156,7 +156,7 @@ const TargetsList = ({
       </div>
 
       {/* Targets */}
-      <div className="relative z-10 mt-6 pr-1 h-[320px] overflow-y-auto hide-scrollbar">
+      <div className="relative z-10 mt-6 pr-1 h-80 overflow-y-auto hide-scrollbar">
         {getTargetsLoading ? (
           <div className="space-y-4">
             {Array.from({ length: 6 }).map((_, i) => (
