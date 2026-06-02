@@ -113,7 +113,7 @@ const TargetsList = ({
   }, [targets]);
 
   return (
-    <div className="relative overflow-hidden rounded-[30px] shadow-[0_20px_60px_rgba(0,0,0,0.18)] backdrop-blur-2xl light:bg-lightCard ">
+    <div className="relative overflow-hidden shadow-[0_20px_60px_rgba(0,0,0,0.18)] backdrop-blur-2xl light:bg-lightCard ">
       {/* Glow */}
       <div className="absolute -right-10 -top-10 h-40 w-40 rounded-full bg-[#8B5CF6]/10 blur-3xl" />
 

@@ -140,3 +140,32 @@ export const splitSubscriptionsByMonth = (
 
   return result;
 };
+
+// NEW NEW
+// Monthly note last updated at
+export function formatTimestamp(isoString: string) {
+  const date = new Date(isoString);
+  const day = String(date.getDate()).padStart(2, "0");
+  const months = [
+    "Jan",
+    "Feb",
+    "Mar",
+    "Apr",
+    "May",
+    "Jun",
+    "Jul",
+    "Aug",
+    "Sep",
+    "Oct",
+    "Nov",
+    "Dec",
+  ];
+  const monthName = months[date.getMonth()];
+  const year = date.getFullYear();
+  let hours = date.getHours();
+  const minutes = String(date.getMinutes()).padStart(2, "0");
+  const ampm = hours >= 12 ? "pm" : "am";
+  hours = hours % 12;
+  hours = hours ? hours : 12; // Handle '0' hours as '12'
+  return `${day}-${monthName}-${year} | ${hours}:${minutes} ${ampm}`;
+}
