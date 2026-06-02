@@ -7,6 +7,8 @@ type CustomButtonProps = {
   onClick?: () => void;
   styling?: string;
   disabled?: boolean;
+  title?: string;
+  rounded?: string;
 };
 
 export default function CustomButton({
@@ -15,10 +17,13 @@ export default function CustomButton({
   children,
   onClick,
   styling,
+  disabled=false,
+  title,
+  rounded="rounded-full"
 }: CustomButtonProps) {
   // Base styles shared by all button variants
   const baseStyles =
-    "relative overflow-hidden rounded-full px-3 py-1.5 text-[18px] font-semibold transition-all duration-300 hover:scale-[1.02] active:scale-[0.98]";
+    `relative overflow-hidden ${rounded} px-3 py-1.5 text-[18px] font-semibold transition-all duration-300 hover:scale-[1.02] active:scale-[0.98]`;
 
   // Variant specific styles
   const variants: Record<string, string> = {
@@ -33,6 +38,8 @@ export default function CustomButton({
     <button
       onClick={onClick}
       className={`${baseStyles} ${variants[type]} ${styling}`}
+      disabled={disabled}
+      title={title}
     >
       {/* Replaced <p> with <div> to prevent invalid HTML nesting */}
       <div
@@ -50,7 +57,8 @@ export const CustomButtonForm = ({
   children,
   onClick,
   styling,
-  disabled=false
+  disabled=false,
+  title
 }: CustomButtonProps) => {
 
   const colorStyling: Record<string, string> = {
@@ -62,6 +70,7 @@ export const CustomButtonForm = ({
     <button
       onClick={onClick}
       disabled={disabled}
+      title={title}
       className={`w-full rounded-2xl text-[${textSize}] py-3 font-semibold transition-all duration-300 ${colorStyling[type]} ${styling}`}
     >
       {children}

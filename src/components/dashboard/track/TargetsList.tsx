@@ -4,6 +4,8 @@ import { PiNotepad } from "react-icons/pi";
 import { axiosPrivate } from "../../../api/axios";
 import CircleLoader from "../../loaders/CircleLoader";
 import { motion, AnimatePresence } from "framer-motion";
+import Card from "../../shared/Card";
+import CustomButton from "../../shared/CutomButton";
 
 interface Target {
   _id: string;
@@ -98,8 +100,6 @@ const TargetsList = ({
     }
   };
 
-  // FIXED: Removed the buggy monthlyTargetRef condition entirely
-  // Also added 'type' and 'week' dependencies so switching tabs updates the data
   useEffect(() => {
     if (!monthID) return;
     getTargets();
@@ -113,12 +113,9 @@ const TargetsList = ({
   }, [targets]);
 
   return (
-    <div className="relative overflow-hidden shadow-[0_20px_60px_rgba(0,0,0,0.18)] backdrop-blur-2xl light:bg-lightCard ">
-      {/* Glow */}
-      <div className="absolute -right-10 -top-10 h-40 w-40 rounded-full bg-[#8B5CF6]/10 blur-3xl" />
-
+    <Card heading="Monthly Targets" cardWidth="sm:w-1/3">
       {/* Progress */}
-      <div className="relative z-10 mb-6">
+      <div className="relative z-10 mb-4 mt-4">
         <div className=" rounded-[22px] border border-white/10 bg-white/4 p-3 shadow-[inset_0_1px_2px_rgba(255,255,255,0.06)] backdrop-blur-xl ">
           <DarkProgressBar progress={Number(progress)} />
         </div>
@@ -136,49 +133,46 @@ const TargetsList = ({
               ? "Add monthly target..."
               : "Add weekly target..."
           }
-          className=" h-13 flex-1 rounded-2xl border border-white/10 bg-white/4 px-4 text-[15px] text-white outline-none placeholder:text-white/25 shadow-[inset_0_1px_2px_rgba(255,255,255,0.06)] backdrop-blur-xl transition-all duration-300 focus:border-[#8B5CF6]/40 focus:bg-white/6 focus:shadow-[0_0_25px_rgba(139,92,246,0.15)] light:text-lightText"
+          className="flex-1 rounded-xl py-3 border border-white/10 bg-white/4 px-4 text-[14px] text-white outline-none placeholder:text-white/25 shadow-[inset_0_1px_2px_rgba(255,255,255,0.06)] backdrop-blur-xl transition-all duration-300 focus:border-[#8B5CF6]/40 focus:bg-white/6 focus:shadow-[0_0_25px_rgba(139,92,246,0.15)] light:text-lightText"
         />
 
-        <button
-          disabled={targets?.length >= 10}
+        <CustomButton
           onClick={() => {
             if (loading) return;
             addTarget();
           }}
+          disabled={targets?.length >= 10}
           title={
             targets?.length >= 10 ? "Can not add more than 10 targets" : ""
           }
-          className={`relative overflow-hidden rounded-2xl px-6 text-[15px] font-semibold transition-all duration-300 ${targets?.length < 10 ? ` bg-linear-to-r from-[#6366F1] via-[#3B82F6] to-[#A855F7] text-white shadow-[0_15px_40px_rgba(99,102,241,0.35)] hover:scale-[1.03] ` : ` bg-white/5 text-white/30 `} `}
+          styling="w-[70px] py-2"
+          rounded="rounded-xl"
+          textSize="14px"
         >
-          {/* Shine */}
-          {targets?.length < 10 && (
-            <div className="absolute inset-0 bg-linear-to-t from-transparent via-white/10 to-white/20 opacity-70" />
-          )}
-
           <span className="relative z-10">
             {loading ? <CircleLoader /> : "Add"}
           </span>
-        </button>
+        </CustomButton>
       </div>
 
       {/* Targets */}
-      <div className="relative z-10 mt-6 max-h-90 overflow-y-auto pr-1">
+      <div className="relative z-10 mt-6 pr-1 h-[320px] overflow-y-auto hide-scrollbar">
         {getTargetsLoading ? (
-          <div className="space-y-3">
-            {Array.from({ length: 5 }).map((_, i) => (
+          <div className="space-y-4">
+            {Array.from({ length: 6 }).map((_, i) => (
               <div
                 key={i}
-                className=" h-16 animate-pulse rounded-2xl border border-white/10 bg-white/4"
+                className="h-10 animate-pulse rounded-lg border border-white/10 bg-white/4"
               />
             ))}
           </div>
         ) : (
-          <>
+          <div>
             {targets?.length > 0 ? (
-              [...targets].reverse().map((target, index) => (
+              targets?.map((target, index) => (
                 <div
                   key={target?._id}
-                  className=" group relative mb-3 overflow-hidden rounded-[22px] border border-white/10 bg-white/4 p-4 shadow-[inset_0_1px_2px_rgba(255,255,255,0.04)] backdrop-blur-xl transition-all duration-300 hover:border-white/20 hover:bg-white/6"
+                  className="group relative mb-3 overflow-hidden rounded-lg border border-white/10 bg-white/4 p-3 shadow-[inset_0_1px_2px_rgba(255,255,255,0.04)] backdrop-blur-xl transition-all duration-300 hover:border-white/20 hover:bg-white/6"
                 >
                   {/* Hover Glow */}
                   <div className="absolute inset-0 opacity-0 transition-opacity duration-300 group-hover:opacity-100">
@@ -188,7 +182,7 @@ const TargetsList = ({
                   <div className="relative z-10 flex items-center justify-between gap-4">
                     {/* Left */}
                     <div className="flex items-center gap-4">
-                      <div className=" flex h-9 w-9 items-center justify-center rounded-xl bg-linear-to-br from-[#6366F1] to-[#A855F7] text-[13px] font-bold text-white shadow-lg ">
+                      <div className=" flex h-6 w-6 items-center justify-center rounded bg-linear-to-br from-[#6366F1] to-[#A855F7] text-[13px] font-bold text-white shadow-lg ">
                         {index + 1}
                       </div>
 
@@ -213,7 +207,7 @@ const TargetsList = ({
 
                         <button
                           onClick={() => removeTarget(target?._id)}
-                          className=" flex h-9 w-9 items-center justify-center rounded-xl bg-white/4 text-white/40 transition-all duration-300 hover:bg-red-500/15 hover:text-red-400 "
+                          className=" flex h-6 w-6 items-center justify-center rounded bg-white/4 text-white/40 transition-all duration-300 hover:bg-red-500/15 hover:text-red-400 "
                         >
                           <RxCross2 className="text-[16px]" />
                         </button>
@@ -223,7 +217,7 @@ const TargetsList = ({
                 </div>
               ))
             ) : (
-              <div className=" flex h-75 flex-col items-center justify-center rounded-[28px] border border-dashed border-white/10 bg-white/3 text-center ">
+              <div className="flex h-80 flex-col items-center justify-center rounded-xl border border-dashed border-white/10 bg-white/3 text-center ">
                 <div className=" flex h-24 w-24 items-center justify-center rounded-full bg-linear-to-br from-[#6366F1]/20 to-[#A855F7]/20 text-[#8B5CF6] shadow-[0_20px_50px_rgba(99,102,241,0.15)] ">
                   <PiNotepad className="text-[54px]" />
                 </div>
@@ -239,10 +233,10 @@ const TargetsList = ({
                 </p>
               </div>
             )}
-          </>
+          </div>
         )}
       </div>
-    </div>
+    </Card>
   );
 };
 

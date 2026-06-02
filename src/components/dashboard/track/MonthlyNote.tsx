@@ -51,7 +51,7 @@ const MonthlyNote = ({ monthID }: { monthID: string }) => {
       <Card
         heading="Monthly Notes"
         subHeading="Reflect on your progress, motivation and goals."
-        cardWidth="w-1/3"
+        cardWidth="sm:w-1/3"
       >
         {lastUpdated && (
           <div

@@ -32,8 +32,6 @@ function getInclusiveMonthCount(
   return result;
 }
 
-
-
 const TrackMainComponent = ({
   dashboardData,
   taskList,
@@ -337,14 +335,8 @@ const TrackMainComponent = ({
                 )}
               </div>
             </div>
-            {/* note */}
             <MonthlyNote monthID={dashboardData?._id} />
-            {/* monthly targets */}
-            <div className="bg-black/20 border border-white/10 backdrop-blur-2xl light:bg-lightCard sm:w-1/3 rounded-2xl p-2">
-              <p className="font-semibold text-lg px-5 py-3">Monthly Targets</p>
-              <TargetsList type="monthly" monthID={dashboardData?._id} />
-            </div>
-            {/* gauge progress */}
+            <TargetsList type="monthly" monthID={dashboardData?._id} />
             <div className="bg-black/20 backdrop-blur-2xl light:bg-lightCard w-1/3 rounded-2xl sm:block hidden border border-white/10">
               <p className="font-semibold text-lg px-5 pt-3">
                 Your Monthly Targets Progress
