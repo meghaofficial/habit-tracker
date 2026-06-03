@@ -21,6 +21,7 @@ import type {
 } from "../../../types";
 import { useIsMobile } from "../../hooks/mobileHook";
 import Card from "../../shared/Card";
+import CustomButton, { CustomButtonForm } from "../../shared/CutomButton";
 
 const TrackMainComponent = ({
   dashboardData,
@@ -225,6 +226,9 @@ const TodayTasksSmScreen = ({
       <Card
         heading={heading}
       >
+        <div className="absolute right-5 top-5">
+          <CustomButton type="transparent">Add Task</CustomButton>
+        </div>
         <div className="flex items-center justify-between pb-3 pt-2">
           {logLoading ? (
               <div className="w-20 h-4 mt-1 rounded bg-gray-500/50 animate-pulse"></div>
