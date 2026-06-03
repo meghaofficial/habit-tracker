@@ -19,6 +19,8 @@ import type {
   TaskI,
   TaskProgressI,
 } from "../../../types";
+import { useIsMobile } from "../../hooks/mobileHook";
+import Card from "../../shared/Card";
 
 const TrackMainComponent = ({
   dashboardData,
@@ -44,7 +46,7 @@ const TrackMainComponent = ({
     dateLogProgress: [],
     taskProgress: [],
   });
-  const [todayDate, setTodayDate] = useState<string>("");
+  const isMobile = useIsMobile();
 
   return (
     <div className="pb-5 pt-1">
@@ -109,17 +111,34 @@ const TrackMainComponent = ({
         </div>
       </div>
       {/* sm screen */}
-      <div className="sm:hidden flex items-center justify-between">
-        {/* <p className="google-sans text-[25px] bg-darkPrimary/50 font-bold p-2 w-full rounded-lg">
-          {formatDateString2(todayDate)}
-        </p> */}
+      <div className="sm:hidden mt-3">
+        <div className="relative overflow-hidden rounded-2xl border border-white/10 bg-black/20 px-5 py-4 backdrop-blur-2xl">
+          <div className="absolute -top-8 -right-8 h-24 w-24 rounded-full bg-darkPrimary/20 blur-3xl" />
+
+          <div className="relative">
+            <p className="text-xs uppercase tracking-[0.2em] text-gray-500">
+              Today
+            </p>
+
+            <p className="google-sans mt-1 text-xl font-bold">
+              {formatDateString2(new Date())}
+            </p>
+          </div>
+        </div>
       </div>
       {/* monthly targets */}
       <div className="flex sm:flex-row flex-col gap-4 mt-4">
         {/* for sm screen */}
-        <div className="bg-black/20 rounded-2xl sm:hidden">
-          <TodayTasksSmScreen taskList={taskList} log={log} setLog={setLog} />
-        </div>
+        {isMobile && (
+          <div className="bg-black/20 rounded-2xl sm:hidden">
+            <TodayTasksSmScreen
+              taskList={taskList}
+              log={log}
+              setLog={setLog}
+              monthDashID={dashboardData?._id}
+            />
+          </div>
+        )}
         <MonthlyNote monthID={dashboardData?._id} />
         <TargetsList type="monthly" monthID={dashboardData?._id} />
         <div className="bg-black/20 backdrop-blur-2xl light:bg-lightCard w-1/3 rounded-2xl sm:block hidden border border-white/10">
@@ -148,19 +167,22 @@ const TodayTasksSmScreen = ({
   taskList,
   log,
   setLog,
+  monthDashID,
 }: {
   taskList: TaskI[];
   log: DateLogI;
   setLog: React.Dispatch<React.SetStateAction<DateLogI>>;
+  monthDashID: string;
 }) => {
   const [selectedDate, setSelectedDate] = useState(new Date());
   const [logLoading, setLogLoading] = useState(false);
+  const [heading, setHeading] = useState("Todays Tasks");
 
   const getLog = async (date: Date) => {
     setLogLoading(true);
     try {
       const res = await axiosPrivate.get(
-        `/api/get-log-date?monthDashID=${taskList?.[0]?.monthDashID}&fullDate=${getMidnightISO(date)}`,
+        `/api/get-log-date?monthDashID=${monthDashID}&fullDate=${getMidnightISO(date)}`,
       );
 
       if (res?.data?.success) {
@@ -191,44 +213,52 @@ const TodayTasksSmScreen = ({
     getLog(next);
   };
 
+  useEffect(() => {
+    if (!monthDashID) return;
+    if (selectedDate.getDate() === (new Date()).getDate()) setHeading("Todays Tasks");
+    else setHeading("Other's Day Tasks");
+    getLog(new Date());
+  }, [selectedDate]);
+
   return (
     <>
-      <div className="flex items-center justify-between py-3">
-        <div className="px-5">
-          <p className="font-semibold text-lg">Todays Tasks</p>
+      <Card
+        heading={heading}
+      >
+        <div className="flex items-center justify-between pb-3 pt-2">
           {logLoading ? (
-            <div className="w-20 h-4 mt-1 rounded bg-gray-500/50 animate-pulse"></div>
-          ) : (
-            <p className="text-gray-500 mt-1 text-[10px] cursor-default">
-              {formatDateString2(selectedDate.toString())}
-            </p>
+              <div className="w-20 h-4 mt-1 rounded bg-gray-500/50 animate-pulse"></div>
+            ) : (
+              <p className="text-gray-500 mt-1 text-[10px] cursor-default">
+                {formatDateString2(selectedDate.toString())}
+              </p>
+            )}
+          {!logLoading && (
+            <div className="flex items-center gap-2 relative">
+              <button onClick={handlePrevDate}>
+                <IoIosArrowRoundBack size={20} />
+              </button>
+              <button onClick={handleNextDate}>
+                <IoIosArrowRoundForward size={20} />
+              </button>
+            </div>
           )}
         </div>
-        {!logLoading && (
-          <div className="px-5 flex items-center gap-2">
-            <button onClick={handlePrevDate}>
-              <IoIosArrowRoundBack size={20} />
-            </button>
-            <button onClick={handleNextDate}>
-              <IoIosArrowRoundForward size={20} />
-            </button>
-          </div>
-        )}
-      </div>
-      <div className="flex items-center justify-center">
-        {logLoading ? (
-          <div className="flex flex-col gap-2 w-full px-5 pb-5">
-            {Array.from({ length: 6 }).map((_, index) => (
-              <div
-                key={index}
-                className="w-full h-8 mt-1 rounded bg-gray-500/50 animate-pulse"
-              ></div>
-            ))}
-          </div>
-        ) : (
-          <TodayAllTasks taskList={taskList} log={log} setLog={setLog} />
-        )}
-      </div>
+        <div className="flex items-center justify-center">
+          {logLoading ? (
+            <div className="flex flex-col gap-2 w-full pb-5">
+              {Array.from({ length: 6 }).map((_, index) => (
+                <div
+                  key={index}
+                  className="w-full h-8 mt-1 rounded bg-gray-500/50 animate-pulse"
+                ></div>
+              ))}
+            </div>
+          ) : (
+            <TodayAllTasks taskList={taskList} log={log} setLog={setLog} />
+          )}
+        </div>
+      </Card>
     </>
   );
 };

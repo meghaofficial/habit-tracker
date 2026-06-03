@@ -7,12 +7,6 @@ const TodayAllTasks = ({ taskList, log, setLog }: {
   setLog: React.Dispatch<React.SetStateAction<DateLogI>>
 }) => {
 
-  function getTodayMidnight() {
-    const date = new Date();
-    date.setUTCHours(0, 0, 0, 0);
-    return date.toISOString();
-  }
-
   const markTask = async (taskID: string, marked: boolean) => {
     if (!log) return;
     try {
@@ -38,28 +32,10 @@ const TodayAllTasks = ({ taskList, log, setLog }: {
     }
   }
 
-  const getLog = async () => {
-    try {
-      const res = await axiosPrivate.get(
-        `/api/get-log-date?monthDashID=${taskList?.[0]?.monthDashID}&fullDate=${getTodayMidnight()}`);
-
-      if (res?.data?.success) {
-        setLog(res?.data?.dateLog);
-      }
-    } catch (error) {
-      // setDateLogs(previousLogs);
-      console.error(error);
-    }
-  }
-
-  // useEffect(() => {
-  //   getLog();
-  // }, []);
-
   return (
     <>
       {/* Task List */}
-      <div className="space-y-1 w-full px-4 pb-4 sm:max-h-70 sm:overflow-y-auto hide-scrollbar">
+      <div className="space-y-1 w-full sm:max-h-70 sm:overflow-y-auto hide-scrollbar">
         {taskList.map((task, index) => (
           <div
             key={task?._id}
