@@ -8,7 +8,11 @@ import MonthlyNote from "./MonthlyNote";
 import { axiosPrivate } from "../../../api/axios";
 import { monMap } from "../../../staticData";
 import TodayAllTasks from "../../charts/TodayAllTasks";
-import { formatDateString2, formatMonthYearSimple } from "../../../helper";
+import {
+  formatDateString2,
+  formatMonthYearSimple,
+  notify,
+} from "../../../helper";
 import { IoIosArrowRoundBack, IoIosArrowRoundForward } from "react-icons/io";
 import type {
   DashboardI,
@@ -21,7 +25,8 @@ import type {
 } from "../../../types";
 import { useIsMobile } from "../../hooks/mobileHook";
 import Card from "../../shared/Card";
-import CustomButton, { CustomButtonForm } from "../../shared/CutomButton";
+import CustomButton from "../../shared/CutomButton";
+import CircleLoader from "../../loaders/CircleLoader";
 
 const TrackMainComponent = ({
   dashboardData,
@@ -137,6 +142,9 @@ const TrackMainComponent = ({
               log={log}
               setLog={setLog}
               monthDashID={dashboardData?._id}
+              monthStatus={activeMonth?.status}
+              setTaskList={setTaskList}
+              setProgress={setProgress}
             />
           </div>
         )}
@@ -169,15 +177,28 @@ const TodayTasksSmScreen = ({
   log,
   setLog,
   monthDashID,
+  monthStatus,
+  setTaskList,
+  setProgress,
 }: {
   taskList: TaskI[];
   log: DateLogI;
   setLog: React.Dispatch<React.SetStateAction<DateLogI>>;
   monthDashID: string;
+  monthStatus: string;
+  setTaskList: React.Dispatch<React.SetStateAction<TaskI[]>>;
+  setProgress: React.Dispatch<
+    React.SetStateAction<{
+      overallProgress: OverallProgressI;
+      dateLogProgress: DateLogProgressI[];
+      taskProgress: TaskProgressI[];
+    }>
+  >;
 }) => {
   const [selectedDate, setSelectedDate] = useState(new Date());
   const [logLoading, setLogLoading] = useState(false);
   const [heading, setHeading] = useState("Todays Tasks");
+  const [addRowLoading, setAddRowLoading] = useState<boolean>(false);
 
   const getLog = async (date: Date) => {
     setLogLoading(true);
@@ -216,27 +237,62 @@ const TodayTasksSmScreen = ({
 
   useEffect(() => {
     if (!monthDashID) return;
-    if (selectedDate.getDate() === (new Date()).getDate()) setHeading("Todays Tasks");
+    if (selectedDate.getDate() === new Date().getDate())
+      setHeading("Todays Tasks");
     else setHeading("Other's Day Tasks");
     getLog(new Date());
   }, [selectedDate]);
 
+  const handleAddRow = async () => {
+    if (monthStatus === "scheduled") {
+      alert(
+        "Can not add task as the subscription for this month is not active",
+      );
+      return;
+    }
+    if (taskList?.length >= 10) {
+      alert("Can't add more than 10 Tasks");
+      return;
+    }
+    setAddRowLoading(true);
+    try {
+      const res = await axiosPrivate.post(
+        `/api/task?monthDashID=${monthDashID}`,
+        { taskName: "" },
+      );
+      if (res?.data?.success) {
+        setTaskList(res?.data?.tasks);
+        setProgress(res?.data?.progress);
+      }
+    } catch (error) {
+      console.error(error);
+    } finally {
+      setAddRowLoading(false);
+    }
+  };
+
   return (
     <>
-      <Card
-        heading={heading}
-      >
-        <div className="absolute right-5 top-5">
-          <CustomButton type="transparent">Add Task</CustomButton>
+      <Card heading={heading}>
+        <div className="absolute right-5 top-5 z-9999">
+          <CustomButton type="transparent" onClick={handleAddRow}>
+            {addRowLoading ? (
+              <p className="px-3">
+                <CircleLoader className="h-4 w-4" />
+              </p>
+            ) : (
+              "Add Task"
+            )}
+          </CustomButton>
         </div>
         <div className="flex items-center justify-between pb-3 pt-2">
           {logLoading ? (
-              <div className="w-20 h-4 mt-1 rounded bg-gray-500/50 animate-pulse"></div>
-            ) : (
-              <p className="text-gray-500 mt-1 text-[10px] cursor-default">
-                {formatDateString2(selectedDate.toString())}
-              </p>
-            )}
+            <div className="w-20 h-4 mt-1 rounded bg-gray-500/50 animate-pulse"></div>
+          ) : (
+            <p className="text-gray-500 mt-1 text-[10px] cursor-default">
+              {formatDateString2(selectedDate.toString())}
+            </p>
+          )}
           {!logLoading && (
             <div className="flex items-center gap-2 relative">
               <button onClick={handlePrevDate}>
@@ -259,7 +315,7 @@ const TodayTasksSmScreen = ({
               ))}
             </div>
           ) : (
-            <TodayAllTasks taskList={taskList} log={log} setLog={setLog} />
+            <TodayAllTasks taskList={taskList} log={log} setLog={setLog} monthDashID={monthDashID} setTaskList={setTaskList} setProgress={setProgress} />
           )}
         </div>
       </Card>

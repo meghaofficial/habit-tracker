@@ -4,21 +4,20 @@ import { LuMinus } from "react-icons/lu";
 import { axiosPrivate } from "../../../api/axios";
 import { notify } from "../../../helper";
 import { RiResetLeftLine } from "react-icons/ri";
+import type { DateLogProgressI, OverallProgressI, TaskI, TaskProgressI } from "../../../types";
 
 const DailyCalanderTaskSheet = (
   {
     taskList,
     setTaskList,
-
     dashboardData,
     progress,
     setProgress,
     monthStatus,
   }:
     {
-      taskList: { _id: string, taskName: string }[],
-      setTaskList: React.Dispatch<React.SetStateAction<{ _id: string, taskName: string, monthDashID: string }[]>>,
-
+      taskList: TaskI[],
+      setTaskList: React.Dispatch<React.SetStateAction<TaskI[]>>,
       dashboardData: {
         _id: string;
         userID: string;
@@ -28,14 +27,14 @@ const DailyCalanderTaskSheet = (
         firstDay: number;
       },
       progress: {
-        overallProgress: { total: number, count: number, progress: string | number },
-        dateLogProgress: { fullDate: Date | string, count: number, progress: string | number }[],
-        taskProgress: { id: string, count: number, progress: string | number }[]
+        overallProgress: OverallProgressI,
+        dateLogProgress: DateLogProgressI[],
+        taskProgress: TaskProgressI[]
       },
       setProgress: React.Dispatch<React.SetStateAction<{
-        overallProgress: { total: number, count: number, progress: string | number },
-        dateLogProgress: { fullDate: Date | string, count: number, progress: string | number }[],
-        taskProgress: { id: string, count: number, progress: string | number }[]
+        overallProgress: OverallProgressI,
+        dateLogProgress: DateLogProgressI[],
+        taskProgress: TaskProgressI[]
       }>>,
       monthStatus: string,
     }

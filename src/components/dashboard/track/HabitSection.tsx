@@ -40,14 +40,16 @@ const HabitSection = ({
   );
 };
 
-const InputData = ({
+export const InputData = ({
   index,
   taskId,
-  taskName
+  taskName,
+  screen="lg"
 }: {
   index: number;
   taskId: string;
   taskName: string;
+  screen?: string;
 }) => {
 
   const [value, setValue] =
@@ -84,8 +86,8 @@ const InputData = ({
   }, [value, taskId]);
 
   return (
-    <div className="text-[12px] px-2 p-1 flex items-center gap-2 border-b border-darkBox/50">
-      <span>{index + 1}</span>
+    <div className={`text-[12px] px-2 p-1 flex items-center gap-2 ${screen === "lg" && 'border-b border-darkBox/50'}`}>
+      <span>{index + 1}.</span>
 
       <input
         type="text"
