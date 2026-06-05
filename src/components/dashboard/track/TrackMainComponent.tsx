@@ -63,15 +63,14 @@ const TrackMainComponent = ({
         <div className="bg-black/20 border border-white/10 w-[19.5%] backdrop-blur-2xl light:bg-lightCard rounded-2xl overflow-x-hidden h-25 absolute -top-29 p-3 flex flex-col justify-between">
           <p
             className="text-3xl tracking-wider font-bold playfair-display px-3 line-clamp-1"
-            title={`${monMap?.[new Date(activeMonth?.startDate).getMonth() + 1]}, ${new Date(activeMonth?.startDate).getFullYear()}`}
           >
-            {monMap?.[new Date(activeMonth?.startDate).getMonth() + 1]},{" "}
-            {new Date(activeMonth?.startDate).getFullYear()}
+            {new Date().getDate()},
+            {monMap?.[new Date(activeMonth?.startDate).getMonth() + 1]}
+            {/* {new Date(activeMonth?.startDate).getFullYear()} */}
           </p>
           <div className="flex flex-col items-start px-3">
             <span className="text-[10px] text-gray-500">
               {activeMonth?.status === "active" && "Current Plan"}
-              {activeMonth?.status === "scheduled" && "Scheduled"}
             </span>
             <span className="text-[10px] tracking-wider">
               {formatMonthYearSimple(activeMonth?.startDate)} -{" "}
