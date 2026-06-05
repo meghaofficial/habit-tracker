@@ -6,6 +6,7 @@ import CircleLoader from "../../loaders/CircleLoader";
 import { motion, AnimatePresence } from "framer-motion";
 import Card from "../../shared/Card";
 import CustomButton from "../../shared/CutomButton";
+import { socket } from "../../../socket/socket";
 
 interface Target {
   _id: string;
@@ -26,6 +27,8 @@ const TargetsList = ({
   const [singleTarget, setSingleTarget] = useState("");
   const [loading, setLoading] = useState(false);
   const [progress, setProgress] = useState("0");
+  const [removeLoading, setRemoveLoading] = useState("");
+  const [addLoading, setAddLoading] = useState("");
 
   const addTarget = async () => {
     if (!singleTarget.trim()) return;
@@ -47,9 +50,8 @@ const TargetsList = ({
     }
   };
 
-  const [removeLoading, setRemoveLoading] = useState(false);
   const removeTarget = async (id: string) => {
-    setRemoveLoading(true);
+    setRemoveLoading(id);
     try {
       const url =
         type === "monthly"
@@ -62,11 +64,12 @@ const TargetsList = ({
     } catch (error) {
       console.error(error);
     } finally {
-      setRemoveLoading(false);
+      setRemoveLoading("");
     }
   };
 
   const markTarget = async (id: string, mark: boolean) => {
+    setAddLoading(id);
     try {
       const url =
         type === "monthly"
@@ -78,6 +81,8 @@ const TargetsList = ({
       }
     } catch (error) {
       console.error(error);
+    } finally {
+      setAddLoading("");
     }
   };
 
@@ -112,13 +117,32 @@ const TargetsList = ({
     setProgress(pr);
   }, [targets]);
 
+  // WEBSOCKET SYNCING
+  useEffect(() => {
+    const onTargetAdded = (data: any) => {
+      setTargets(data?.target?.targets);
+    };
+    const onTargetRemoved = (data: any) => {
+      setTargets(data?.target?.targets);
+    };
+    const onTargetMarked = (data: any) => {
+      setTargets(data?.target?.targets);
+    };
+    socket.on("add-monthly-target", onTargetAdded);
+    socket.on("remove-monthly-target", onTargetRemoved);
+    socket.on("mark-monthly-target", onTargetMarked);
+    return () => {
+      socket.off("add-monthly-target", onTargetAdded);
+      socket.off("remove-monthly-target", onTargetRemoved);
+      socket.on("mark-monthly-target", onTargetMarked);
+    };
+  }, []);
+
   return (
     <Card heading="Monthly Targets" cardWidth="sm:w-1/3">
       {/* Progress */}
       <div className="relative z-10 mb-4 mt-4">
-        <div className=" rounded-[22px] border border-white/10 bg-white/4 p-3 shadow-[inset_0_1px_2px_rgba(255,255,255,0.06)] backdrop-blur-xl ">
-          <DarkProgressBar progress={Number(progress)} />
-        </div>
+        <DarkProgressBar progress={Number(progress)} />
       </div>
 
       {/* Input Section */}
@@ -133,9 +157,8 @@ const TargetsList = ({
               ? "Add monthly target..."
               : "Add weekly target..."
           }
-          className="flex-1 w-[70%] rounded-xl py-3 border border-white/10 bg-white/4 px-4 text-[14px] text-white outline-none placeholder:text-white/25 shadow-[inset_0_1px_2px_rgba(255,255,255,0.06)] backdrop-blur-xl transition-all duration-300 focus:border-[#8B5CF6]/40 focus:bg-white/6 focus:shadow-[0_0_25px_rgba(139,92,246,0.15)] light:text-lightText"
+          className="flex-1 w-[70%] rounded-lg py-2.5 border border-white/10 bg-white/4 px-4 text-[14px] text-white outline-none placeholder:text-white/25 shadow-[inset_0_1px_2px_rgba(255,255,255,0.06)] backdrop-blur-xl transition-all duration-300 focus:border-[#8B5CF6]/40 focus:bg-white/6 focus:shadow-[0_0_25px_rgba(139,92,246,0.15)] light:text-lightText"
         />
-
         <CustomButton
           onClick={() => {
             if (loading) return;
@@ -145,8 +168,8 @@ const TargetsList = ({
           title={
             targets?.length >= 10 ? "Can not add more than 10 targets" : ""
           }
-          styling="w-[30%] py-2"
-          rounded="rounded-xl"
+          styling="w-[25%] py-2"
+          rounded="rounded-lg"
           textSize="14px"
         >
           <span className="relative z-10">
@@ -156,7 +179,7 @@ const TargetsList = ({
       </div>
 
       {/* Targets */}
-      <div className="relative z-10 mt-6 pr-1 h-80 overflow-y-auto hide-scrollbar">
+      <div className="relative z-10 mt-4 pr-1 h-90 overflow-y-auto hide-scrollbar">
         {getTargetsLoading ? (
           <div className="space-y-4">
             {Array.from({ length: 6 }).map((_, i) => (
@@ -182,7 +205,7 @@ const TargetsList = ({
                   <div className="relative z-10 flex items-center justify-between gap-4">
                     {/* Left */}
                     <div className="flex items-center gap-4">
-                      <div className=" flex h-6 w-6 items-center justify-center rounded bg-linear-to-br from-[#6366F1] to-[#A855F7] text-[13px] font-bold text-white shadow-lg ">
+                      <div className=" flex h-5 w-5 items-center justify-center rounded bg-white text-[13px] font-bold text-black shadow-lg ">
                         {index + 1}
                       </div>
 
@@ -194,30 +217,35 @@ const TargetsList = ({
                     </div>
 
                     {/* Actions */}
-                    {!removeLoading && (
-                      <div className="flex items-center gap-3">
-                        <input
-                          type="checkbox"
-                          checked={target?.completed}
-                          onChange={() =>
-                            markTarget(target?._id, !target?.completed)
-                          }
-                          className=" h-5 w-5 cursor-pointer accent-[#8B5CF6] "
-                        />
-
+                    <div className="flex items-center gap-3">
+                      <input
+                        type="checkbox"
+                        checked={target?.completed}
+                        onChange={() => {
+                          if (addLoading) return;
+                          markTarget(target?._id, !target?.completed);
+                        }}
+                        className={`h-4 w-4 ${addLoading ? "cursor-not-allowed" : "cursor-pointer"} accent-[#8B5CF6]`}
+                      />
+                      {removeLoading === target?._id ? (
+                        <CircleLoader />
+                      ) : (
                         <button
-                          onClick={() => removeTarget(target?._id)}
-                          className=" flex h-6 w-6 items-center justify-center rounded bg-white/4 text-white/40 transition-all duration-300 hover:bg-red-500/15 hover:text-red-400 "
+                          onClick={() => {
+                            if (removeLoading) return;
+                            removeTarget(target?._id);
+                          }}
+                          className="flex h-5 w-5 items-center justify-center rounded bg-white/4 text-white/40 transition-all duration-300 hover:bg-red-500/15 hover:text-red-400"
                         >
                           <RxCross2 className="text-[16px]" />
                         </button>
-                      </div>
-                    )}
+                      )}
+                    </div>
                   </div>
                 </div>
               ))
             ) : (
-              <div className="flex h-80 flex-col items-center justify-center rounded-xl border border-dashed border-white/10 bg-white/3 text-center ">
+              <div className="flex h-90 flex-col items-center justify-center rounded-xl border border-dashed border-white/10 bg-white/3 text-center ">
                 <div className=" flex h-24 w-24 items-center justify-center rounded-full bg-linear-to-br from-[#6366F1]/20 to-[#A855F7]/20 text-[#8B5CF6] shadow-[0_20px_50px_rgba(99,102,241,0.15)] ">
                   <PiNotepad className="text-[54px]" />
                 </div>
@@ -261,7 +289,7 @@ function DarkProgressBar({ progress }: ProgressBarProps) {
         className="absolute top-0 left-0 h-full bg-linear-to-r from-violet-500 to-fuchsia-500 rounded-full"
         initial={{ width: 0 }}
         animate={{ width: `${clampedProgress}%` }}
-        transition={{ duration: 0.8, ease: "easeOut" }}
+        transition={{ duration: 0.3, ease: "easeOut" }}
       />
 
       {/* Invisible Anchor Point at the Tip for Tooltip Alignment */}
