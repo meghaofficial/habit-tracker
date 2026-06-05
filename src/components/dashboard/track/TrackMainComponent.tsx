@@ -8,11 +8,7 @@ import MonthlyNote from "./MonthlyNote";
 import { axiosPrivate } from "../../../api/axios";
 import { monMap } from "../../../staticData";
 import TodayAllTasks from "../../charts/TodayAllTasks";
-import {
-  formatDateString2,
-  formatMonthYearSimple,
-  notify,
-} from "../../../helper";
+import { formatDateString2, formatMonthYearSimple } from "../../../helper";
 import { IoIosArrowRoundBack, IoIosArrowRoundForward } from "react-icons/io";
 import type {
   DashboardI,
@@ -27,6 +23,7 @@ import { useIsMobile } from "../../hooks/mobileHook";
 import Card from "../../shared/Card";
 import CustomButton from "../../shared/CutomButton";
 import CircleLoader from "../../loaders/CircleLoader";
+import DonutGraph from "./DonutGraph";
 
 const TrackMainComponent = ({
   dashboardData,
@@ -96,7 +93,7 @@ const TrackMainComponent = ({
 
         {/* below sections */}
         <div className="bg-black/20 border border-white/10 w-[20%] backdrop-blur-2xl light:bg-lightCard rounded-2xl overflow-x-hidden">
-          <HabitSection taskList={taskList} />
+          <HabitSection taskList={taskList} setTaskList={setTaskList} />
         </div>
         <div className=" w-[65%] rounded-2xl relative">
           <DailyCalanderTaskSheet
@@ -120,15 +117,26 @@ const TrackMainComponent = ({
       <div className="sm:hidden mt-3">
         <div className="relative overflow-hidden rounded-2xl border border-white/10 bg-black/20 px-5 py-4 backdrop-blur-2xl">
           <div className="absolute -top-8 -right-8 h-24 w-24 rounded-full bg-darkPrimary/20 blur-3xl" />
+          <div className="flex items-center justify-between">
+            <div className="relative">
+              <p className="text-xs uppercase tracking-[0.2em] text-gray-500">
+                Today
+              </p>
 
-          <div className="relative">
-            <p className="text-xs uppercase tracking-[0.2em] text-gray-500">
-              Today
-            </p>
-
-            <p className="google-sans mt-1 text-xl font-bold">
-              {formatDateString2(new Date())}
-            </p>
+              <p className="google-sans mt-1 text-xl font-bold">
+                {formatDateString2(new Date())}
+              </p>
+            </div>
+            <div>
+              <DonutGraph
+                percentage={
+                  Number.isNaN(Number(progress?.overallProgress?.progress))
+                    ? 0
+                    : Number(progress?.overallProgress?.progress)
+                }
+                size={50}
+              />
+            </div>
           </div>
         </div>
       </div>
@@ -172,7 +180,7 @@ const TrackMainComponent = ({
   );
 };
 
-const TodayTasksSmScreen = ({
+export const TodayTasksSmScreen = ({
   taskList,
   log,
   setLog,
@@ -271,6 +279,10 @@ const TodayTasksSmScreen = ({
     }
   };
 
+  useEffect(() => {
+    window.scrollTo(0, 0);
+  }, []);
+
   return (
     <>
       <Card heading={heading}>
@@ -315,7 +327,14 @@ const TodayTasksSmScreen = ({
               ))}
             </div>
           ) : (
-            <TodayAllTasks taskList={taskList} log={log} setLog={setLog} monthDashID={monthDashID} setTaskList={setTaskList} setProgress={setProgress} />
+            <TodayAllTasks
+              taskList={taskList}
+              log={log}
+              setLog={setLog}
+              monthDashID={monthDashID}
+              setTaskList={setTaskList}
+              setProgress={setProgress}
+            />
           )}
         </div>
       </Card>

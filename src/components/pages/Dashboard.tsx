@@ -301,8 +301,8 @@ const Dashboard = () => {
             <nav className="flex justify-between items-center p-0 sm:mb-0 mb-7 sm:pt-5 pt-4 w-full">
               <NavigationBar />
             </nav>
-            <div className="flex items-center justify-center w-full">
-              <div className="flex items-center gap-2 rounded-2xl w-full border border-white/10 bg-black/20 p-1 backdrop-blur-xl light:bg-lightCard">
+            <div className="flex items-center justify-center w-full sm:mt-4">
+              <div className="flex items-center gap-2 rounded-2xl sm:w-fit w-full border border-white/10 bg-black/20 p-1 backdrop-blur-xl light:bg-lightCard">
                 {[
                   { key: "track", label: "Monthly Habit" },
                   { key: "analysis", label: "Analysis" },

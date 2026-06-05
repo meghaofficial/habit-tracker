@@ -1,16 +1,19 @@
 import { axiosPrivate } from "../../../api/axios";
 import { useEffect, useRef, useState } from "react";
 import { notify } from "../../../helper";
+import { socket } from "../../../socket/socket";
+import type { TaskI } from "../../../types";
 
 const HabitSection = ({
-  taskList
+  taskList,
+  setTaskList,
 }: {
   taskList: {
-    _id: string,
-    taskName: string
-  }[]
+    _id: string;
+    taskName: string;
+  }[];
+  setTaskList: React.Dispatch<React.SetStateAction<TaskI[]>>;
 }) => {
-
   return (
     <div>
       <p
@@ -33,6 +36,7 @@ const HabitSection = ({
             index={index}
             taskId={task._id}
             taskName={task.taskName}
+            setTaskList={setTaskList}
           />
         </div>
       ))}
@@ -44,16 +48,16 @@ export const InputData = ({
   index,
   taskId,
   taskName,
-  screen="lg"
+  screen = "lg",
+  setTaskList,
 }: {
   index: number;
   taskId: string;
   taskName: string;
   screen?: string;
+  setTaskList: React.Dispatch<React.SetStateAction<TaskI[]>>;
 }) => {
-
-  const [value, setValue] =
-    useState<string>(taskName);
+  const [value, setValue] = useState<string>(taskName);
 
   const prevValueRef = useRef(taskName);
 
@@ -62,31 +66,41 @@ export const InputData = ({
   }, [taskName]);
 
   useEffect(() => {
-
-    if (value === prevValueRef.current)
-      return;
+    if (value === prevValueRef.current) return;
 
     const timeout = setTimeout(() => {
-
-      axiosPrivate.patch(
-        `/api/task?taskID=${taskId}`,
-        {
-          taskName: value
-        }
-      ).catch(() =>
-        notify.error("Please try again.")
-      );
-
+      axiosPrivate
+        .patch(`/api/task?taskID=${taskId}`, {
+          taskName: value,
+        })
+        .catch(() => notify.error("Please try again."));
     }, 500);
 
     prevValueRef.current = value;
-
     return () => clearTimeout(timeout);
-
   }, [value, taskId]);
 
+  useEffect(() => {
+    setValue(taskName);
+  }, [taskName]);
+
+  // WEBSOCKET SYNCING
+  useEffect(() => {
+    const onTaskUpdate = (data: any) => {
+      setTaskList((prev) =>
+        prev.map((task) => (task._id === data.task._id ? data.task : task)),
+      );
+    };
+    socket.on("update-task", onTaskUpdate);
+    return () => {
+      socket.off("update-task", onTaskUpdate);
+    };
+  }, []);
+
   return (
-    <div className={`text-[12px] px-2 p-1 flex items-center gap-2 ${screen === "lg" && 'border-b border-darkBox/50'}`}>
+    <div
+      className={`text-[12px] px-2 p-1 flex items-center gap-2 ${screen === "lg" && "border-b border-darkBox/50"}`}
+    >
       <span>{index + 1}.</span>
 
       <input
@@ -94,12 +108,10 @@ export const InputData = ({
         className="outline-none w-full py-1"
         title={value}
         value={value}
-        onChange={(e) =>
-          setValue(e.target.value)
-        }
+        onChange={(e) => setValue(e.target.value)}
       />
     </div>
   );
 };
 
-export default HabitSection
+export default HabitSection;

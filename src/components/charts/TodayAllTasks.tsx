@@ -91,6 +91,7 @@ const TodayAllTasks = ({
                 taskId={task?._id}
                 taskName={task?.taskName}
                 screen="sm"
+                setTaskList={setTaskList}
               />
 
               <div className="flex items-center gap-2">
@@ -100,7 +101,7 @@ const TodayAllTasks = ({
                   onChange={() =>
                     markTask(task?._id, !log.tasks.includes(task?._id))
                   }
-                  className="w-4 h-4 accent-darkPrimary cursor-pointer"
+                  className="w-4 h-4 accent-darkPrimary cursor-pointer relative"
                 />
                 {removeRowID === task?._id ? (
                   <button className="cursor-not-allowed smText p-2 animate-pulse bg-gray-400 rounded-sm"></button>
