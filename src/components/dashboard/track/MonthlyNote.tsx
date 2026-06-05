@@ -2,6 +2,7 @@ import { useEffect, useRef, useState } from "react";
 import { axiosPrivate } from "../../../api/axios";
 import { formatTimestamp, notify } from "../../../helper";
 import Card from "../../shared/Card";
+import { socket } from "../../../socket/socket";
 
 const MonthlyNote = ({ monthID }: { monthID: string }) => {
   const [monthlyNote, setMonthlyNote] = useState("");
@@ -46,6 +47,22 @@ const MonthlyNote = ({ monthID }: { monthID: string }) => {
     return () => clearTimeout(timeout);
   }, [monthlyNote, monthID]);
 
+  // WEBSOCKET SYNCING
+  useEffect(() => {
+    const onNoteUpdate = (data: any) => {
+      serverNoteRef.current = data.note.note;
+
+      setMonthlyNote(data.note.note);
+      setLastUpdates(data.note.updatedAt);
+    };
+
+    socket.on("update-monthly-note", onNoteUpdate);
+
+    return () => {
+      socket.off("update-monthly-note", onNoteUpdate);
+    };
+  }, []);
+
   return (
     <>
       <Card
@@ -54,9 +71,7 @@ const MonthlyNote = ({ monthID }: { monthID: string }) => {
         cardWidth="sm:w-1/3"
       >
         {lastUpdated && (
-          <div
-            className=" relative z-10 mt-4 inline-flex items-center gap-2 rounded-full border border-white/10 light:border-black/10 bg-white/5 light:bg-black/5 px-4 py-2 text-[12px] text-darkSubText backdrop-blur-xl light:text-lightSubText "
-          >
+          <div className=" relative z-10 mt-4 inline-flex items-center gap-2 rounded-full border border-white/10 light:border-black/10 bg-white/5 light:bg-black/5 px-4 py-2 text-[12px] text-darkSubText backdrop-blur-xl light:text-lightSubText ">
             <div className="h-2 w-2 rounded-full bg-darkSuccess" />
             Last updated • {formatTimestamp(lastUpdated)}
           </div>
