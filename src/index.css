@@ -52,18 +52,7 @@ tspan{
   --color-lightCard: #ffffff;
   --color-lightBox: #e2e8f0;
   --color-lightSuccess: #16a34a;
-  --color-lightBorder: #e2e8f0;
-
-
-
-  --color-backg: #fffcf9;
-  --color-headerText: #587988;
-  --color-progressBg: #fff5f2;
-  --color-headerBg: #b2cbd7;
-  --color-lightPink: #fff5f2;
-  --color-subHeaderBg: #ebc2b9;
-  --color-subHeaderText: #bf787b;
-  --color-smHeaderBg: #f8e2dd;
+  --color-lightBorder: #E5E5E5;
 }
 
 .MuiChartsLegend-item:first-child{

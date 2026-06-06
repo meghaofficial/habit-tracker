@@ -55,15 +55,13 @@ const TrackMainComponent = ({
     <div className="pb-5 pt-1">
       <div className="sm:flex hidden gap-4 mt-4">
         <div className="w-[20%]"></div>
-        <div className="bg-black/20 border border-white/10 w-[65%] rounded-2xl h-25"></div>
+        <div className="bg-black/20 border border-white/10 light:border-lightBorder light:bg-lightCard w-[65%] rounded-2xl h-25"></div>
         <div className="w-[15%]"></div>
       </div>
       <div className="sm:flex hidden gap-4 mt-4 relative">
         {/* left detail */}
-        <div className="bg-black/20 border border-white/10 w-[19.5%] backdrop-blur-2xl light:bg-lightCard rounded-2xl overflow-x-hidden h-25 absolute -top-29 p-3 flex flex-col justify-between">
-          <p
-            className="text-3xl tracking-wider font-bold playfair-display px-3 line-clamp-1"
-          >
+        <div className="bg-black/20 border border-white/10 w-[19.5%] backdrop-blur-2xl light:bg-lightCard light:border-lightBorder rounded-2xl overflow-x-hidden h-25 absolute -top-29 p-3 flex flex-col justify-between">
+          <p className="text-3xl tracking-wider font-bold playfair-display px-3 line-clamp-1">
             {new Date().getDate()},
             {monMap?.[new Date(activeMonth?.startDate).getMonth() + 1]}
             {/* {new Date(activeMonth?.startDate).getFullYear()} */}
@@ -79,7 +77,7 @@ const TrackMainComponent = ({
           </div>
         </div>
         {/* right detail */}
-        <div className="bg-black/20 border border-white/10 w-[14.5%] backdrop-blur-2xl light:bg-lightCard rounded-2xl overflow-x-hidden h-25 absolute -top-29 right-0 overflow-y-hidden">
+        <div className="bg-black/20 border border-white/10 w-[14.5%] backdrop-blur-2xl light:bg-lightCard light:border-lightBorder rounded-2xl overflow-x-hidden h-25 absolute -top-29 right-0 overflow-y-hidden">
           <ProgressPie
             value={
               Number.isNaN(Number(progress?.overallProgress?.progress))
@@ -91,10 +89,10 @@ const TrackMainComponent = ({
         </div>
 
         {/* below sections */}
-        <div className="bg-black/20 border border-white/10 w-[20%] backdrop-blur-2xl light:bg-lightCard rounded-2xl overflow-x-hidden">
+        <div className="bg-black/20 border border-white/10 w-[20%] light:bg-lightCard light:border-lightBorder rounded-2xl overflow-x-hidden">
           <HabitSection taskList={taskList} setTaskList={setTaskList} />
         </div>
-        <div className=" w-[65%] rounded-2xl relative">
+        <div className="w-[65%] rounded-2xl relative">
           <DailyCalanderTaskSheet
             taskList={taskList}
             setTaskList={setTaskList}
@@ -104,7 +102,7 @@ const TrackMainComponent = ({
             monthStatus={activeMonth?.status}
           />
         </div>
-        <div className="bg-black/20 border border-white/10 backdrop-blur-2xl light:bg-lightCard w-[15%] rounded-2xl overflow-x-hidden">
+        <div className="bg-black/20 border border-white/10 backdrop-blur-2xl light:border-lightBorder light:bg-lightCard w-[15%] rounded-2xl overflow-x-hidden">
           <HabitProgress
             progress={progress?.taskProgress}
             total={dashboardData?.totalDays}

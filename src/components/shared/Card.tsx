@@ -21,9 +21,8 @@ const Card = ({
 }: CardProps) => {
   return (
     <div
-      className={`relative overflow-x-hidden rounded-2xl h-fit google-sans border border-white/10 ${cardWidth} light:border-black/10 bg-black/20 light:bg-white/20 p-5 shadow-[0_20px_60px_rgba(0,0,0,0.18)] backdrop-blur-2xl ${styling}`}
+      className={`relative overflow-x-hidden rounded-2xl h-fit google-sans border border-white/10 ${cardWidth} light:border-black/10 bg-black/20 light:bg-lightCard p-5 ${styling}`}
     >
-      <div className="absolute -right-10 -top-10 h-40 w-40 rounded-full bg-[#8B5CF6]/10 blur-3xl" />
       <div className="relative z-10 flex items-start justify-between">
         <div>
           <p className="text-[22px] font-bold text-white light:text-lightText">

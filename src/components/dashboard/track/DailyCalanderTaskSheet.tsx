@@ -226,10 +226,10 @@ const DailyCalanderTaskSheet = ({
 
   return (
     <div className="relative">
-      <div className="flex flex-col w-full relative border border-white/10 bg-black/20 backdrop-blur-2xl rounded-2xl light:bg-lightCard">
+      <div className="flex flex-col w-full relative border border-white/10 bg-black/20 rounded-2xl light:border-lightBorder light:bg-lightCard">
         <div className="w-full">
           {/* Week Header */}
-          <div className="font-semibold p-2 text-[10px] text-white/90 tracking-wide flex items-center w-full border-b border-darkBox/50">
+          <div className="font-semibold p-2 text-[10px] text-white/90 light:text-black tracking-wide flex items-center w-full light:border-lightBorder border-b border-darkBox/50">
             <p className={`${totalD > 28 ? "w-[22%]" : "w-[25%]"} text-center`}>
               WEEK 1
             </p>
@@ -246,7 +246,7 @@ const DailyCalanderTaskSheet = ({
           </div>
 
           {/* Week Letters */}
-          <div className="p-2 text-[10px] flex items-center w-full border-b border-darkBox/50">
+          <div className="p-2 text-[10px] flex items-center w-full border-b border-darkBox/50 light:border-lightBorder">
             {Array.from({ length: 4 }).map((_, weekIndex) => (
               <div
                 key={weekIndex}
@@ -271,7 +271,7 @@ const DailyCalanderTaskSheet = ({
           </div>
 
           {/* Date Numbers */}
-          <div className="p-2 text-[10px] tracking-wider text-white/55 flex items-center w-full border-b border-darkBox/50">
+          <div className="p-2 text-[10px] tracking-wider text-white/55 light:text-black flex items-center w-full border-b border-darkBox/50 light:border-lightBorder">
             <div
               className={`flex items-center justify-evenly ${totalD > 28 ? "w-[22%]" : "w-[25%]"} text-center`}
             >
@@ -331,7 +331,7 @@ const DailyCalanderTaskSheet = ({
                 taskList?.map((task) => (
                   <div
                     key={task?._id}
-                    className="p-2 flex items-center w-full border-b border-darkBox/50 relative"
+                    className="p-2 flex items-center w-full border-b border-darkBox/50 light:border-lightBorder relative"
                   >
                     {removeRowID === task?._id ? (
                       <button className="absolute -right-2 cursor-not-allowed smText p-2 animate-pulse bg-gray-400 rounded"></button>
@@ -391,7 +391,7 @@ const DailyCalanderTaskSheet = ({
           )}
 
           <div
-            className="absolute h-4 w-4 flex items-center justify-center -right-2 bottom-2 cursor-pointer border rounded border-darkBox/50 text-white/70 bg-red-600"
+            className="absolute h-4 w-4 flex items-center justify-center -right-2 bottom-2 cursor-pointer border rounded border-darkBox/50 light:border-lightBorder text-white/70 bg-red-600"
             onClick={handleReset}
           >
             <RiResetLeftLine size={12} />

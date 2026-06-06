@@ -6,6 +6,8 @@ type Props = {
 };
 
 export const ProgressPie = ({ value, type }: Props) => {
+
+  const theme = localStorage.getItem("theme");
   const isAnalysis = type === "analysis";
 
   return (
@@ -42,11 +44,11 @@ export const ProgressPie = ({ value, type }: Props) => {
         ]}
         width={isAnalysis ? 250 : 100}
         height={250}
-        sx={{
-          "& .MuiChartsLegend-label": {
-            fontSize: !isAnalysis && 6,
-          },
-        }}
+        // sx={{
+        //   "& .MuiChartsLegend-label": {
+        //     fontSize: !isAnalysis && 6,
+        //   },
+        // }}
       />
 
       {/* Center Label */}

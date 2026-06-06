@@ -87,7 +87,7 @@ function App() {
           }}
         ></div>
       </div>
-      <div className="main-content">
+      <div className="main-content light:bg-[#F5F5F6]">
         {isAuthLoading ? (
           <div className="flex items-center justify-center h-screen">
             <PageLoader />

@@ -139,132 +139,142 @@ const TargetsList = ({
   }, []);
 
   return (
-    <Card heading="Monthly Targets" cardWidth="sm:w-1/3">
-      {/* Progress */}
-      <div className="relative z-10 mb-4 mt-4">
-        <DarkProgressBar progress={Number(progress)} />
-      </div>
-
-      {/* Input Section */}
-      <div className="relative z-10 flex gap-3">
-        <input
-          disabled={targets?.length >= 10}
-          type="text"
-          value={singleTarget}
-          onChange={(e) => setSingleTarget(e.target.value)}
-          placeholder={
-            type === "monthly"
-              ? "Add monthly target..."
-              : "Add weekly target..."
-          }
-          className="flex-1 w-[70%] rounded-lg py-2.5 border border-white/10 bg-white/4 px-4 text-[14px] text-white outline-none placeholder:text-white/25 shadow-[inset_0_1px_2px_rgba(255,255,255,0.06)] backdrop-blur-xl transition-all duration-300 focus:border-[#8B5CF6]/40 focus:bg-white/6 focus:shadow-[0_0_25px_rgba(139,92,246,0.15)] light:text-lightText"
-        />
-        <CustomButton
-          onClick={() => {
-            if (loading) return;
-            addTarget();
-          }}
-          disabled={targets?.length >= 10}
-          title={
-            targets?.length >= 10 ? "Can not add more than 10 targets" : ""
-          }
-          styling="w-[25%] py-2"
-          rounded="rounded-lg"
-          textSize="14px"
-        >
-          <span className="relative z-10">
-            {loading ? <CircleLoader /> : "Add"}
-          </span>
-        </CustomButton>
-      </div>
-
-      {/* Targets */}
-      <div className="relative z-10 mt-4 pr-1 h-90 overflow-y-auto hide-scrollbar">
-        {getTargetsLoading ? (
-          <div className="space-y-4">
-            {Array.from({ length: 6 }).map((_, i) => (
-              <div
-                key={i}
-                className="h-10 animate-pulse rounded-lg border border-white/10 bg-white/4"
-              />
-            ))}
+    <>
+      <div
+        className={`relative overflow-x-hidden rounded-2xl h-fit google-sans border border-white/10 sm:w-1/3 light:border-black/10 bg-black/20 light:bg-lightCard p-5`}
+      >
+        <div className="flex items-center justify-between mb-4">
+          <p className="text-[22px] font-bold text-white light:text-lightText">
+            Monthly Targets
+          </p>
+          <div className="w-[25%] flex items-center gap-2">
+            <DarkProgressBar progress={Number(progress)} />
+            <p className="text-[13px] font-semibold">{targets.filter(t => t.completed).length}/{targets?.length}</p>
           </div>
-        ) : (
-          <div>
-            {targets?.length > 0 ? (
-              targets?.map((target, index) => (
-                <div
-                  key={target?._id}
-                  className="group relative mb-3 overflow-hidden rounded-lg border border-white/10 bg-white/4 p-3 shadow-[inset_0_1px_2px_rgba(255,255,255,0.04)] backdrop-blur-xl transition-all duration-300 hover:border-white/20 hover:bg-white/6"
-                >
-                  {/* Hover Glow */}
-                  <div className="absolute inset-0 opacity-0 transition-opacity duration-300 group-hover:opacity-100">
-                    <div className="absolute inset-0 bg-linear-to-r from-[#6366F1]/5 via-transparent to-[#A855F7]/5" />
-                  </div>
+        </div>
+        <div className={`overflow-y-auto hide-scrollbar`}>
+          {/* Input Section */}
+          <div className="relative z-10 flex gap-3">
+            <input
+              disabled={targets?.length >= 10}
+              type="text"
+              value={singleTarget}
+              onChange={(e) => setSingleTarget(e.target.value)}
+              placeholder={
+                type === "monthly"
+                  ? "Add monthly target..."
+                  : "Add weekly target..."
+              }
+              className="flex-1 w-[70%] rounded-lg py-2.5 border border-white/10 bg-white/4 px-4 text-[14px] text-white outline-none placeholder:text-white/25 transition-all duration-300 focus:border-[#8B5CF6]/40 focus:bg-white/6 focus:shadow-[0_0_25px_rgba(139,92,246,0.15)] light:text-lightText"
+            />
+            <CustomButton
+              onClick={() => {
+                if (loading) return;
+                addTarget();
+              }}
+              disabled={targets?.length >= 10}
+              title={
+                targets?.length >= 10 ? "Can not add more than 10 targets" : ""
+              }
+              styling="w-auto py-2"
+              rounded="rounded-lg"
+              textSize="13px"
+            >
+              <span className="relative z-10 text-nowrap font-normal">
+                {loading ? <CircleLoader /> : "Add Target"}
+              </span>
+            </CustomButton>
+          </div>
 
-                  <div className="relative z-10 flex items-center justify-between gap-4">
-                    {/* Left */}
-                    <div className="flex items-center gap-4">
-                      <div className=" flex h-5 w-5 items-center justify-center rounded bg-white text-[13px] font-bold text-black shadow-lg ">
-                        {index + 1}
+          {/* Targets */}
+          <div className="relative z-10 mt-4 pr-1 h-90 overflow-y-auto hide-scrollbar">
+            {getTargetsLoading ? (
+              <div className="space-y-4">
+                {Array.from({ length: 6 }).map((_, i) => (
+                  <div
+                    key={i}
+                    className="h-10 animate-pulse rounded-lg border border-white/10 bg-white/4"
+                  />
+                ))}
+              </div>
+            ) : (
+              <div>
+                {targets?.length > 0 ? (
+                  targets?.map((target, index) => (
+                    <div
+                      key={target?._id}
+                      className="group relative mb-3 overflow-hidden rounded-lg border border-white/10 bg-white/4 p-3 shadow-[inset_0_1px_2px_rgba(255,255,255,0.04)] backdrop-blur-xl transition-all duration-300 hover:border-white/20 hover:bg-white/6"
+                    >
+                      {/* Hover Glow */}
+                      <div className="absolute inset-0 opacity-0 transition-opacity duration-300 group-hover:opacity-100">
+                        <div className="absolute inset-0 bg-linear-to-r from-[#6366F1]/5 via-transparent to-[#A855F7]/5" />
                       </div>
 
-                      <span
-                        className={`max-w-55 text-[15px] font-medium transition-all duration-300 line-clamp-1 ${target?.completed ? "text-white/35 line-through" : "text-white light:text-lightText"} `}
-                      >
-                        {target?.value}
-                      </span>
+                      <div className="relative z-10 flex items-center justify-between gap-4">
+                        {/* Left */}
+                        <div className="flex items-center gap-4">
+                          <div className=" flex h-5 w-5 items-center justify-center rounded bg-white text-[13px] font-bold text-black shadow-lg ">
+                            {index + 1}
+                          </div>
+
+                          <span
+                            className={`max-w-55 text-[15px] font-medium transition-all duration-300 line-clamp-1 ${target?.completed ? "text-white/35 line-through" : "text-white light:text-lightText"} `}
+                          >
+                            {target?.value}
+                          </span>
+                        </div>
+
+                        {/* Actions */}
+                        <div className="flex items-center gap-3">
+                          <input
+                            type="checkbox"
+                            checked={target?.completed}
+                            onChange={() => {
+                              if (addLoading) return;
+                              markTarget(target?._id, !target?.completed);
+                            }}
+                            className={`h-4 w-4 ${addLoading ? "cursor-not-allowed" : "cursor-pointer"} accent-[#8B5CF6]`}
+                          />
+                          {removeLoading === target?._id ? (
+                            <CircleLoader />
+                          ) : (
+                            <button
+                              onClick={() => {
+                                if (removeLoading) return;
+                                removeTarget(target?._id);
+                              }}
+                              className="flex h-5 w-5 items-center justify-center rounded bg-white/4 text-white/40 transition-all duration-300 hover:bg-red-500/15 hover:text-red-400"
+                            >
+                              <RxCross2 className="text-[16px]" />
+                            </button>
+                          )}
+                        </div>
+                      </div>
+                    </div>
+                  ))
+                ) : (
+                  <div className="flex h-90 flex-col items-center justify-center rounded-xl border border-dashed border-white/10 bg-white/3 text-center ">
+                    <div className=" flex h-24 w-24 items-center justify-center rounded-full bg-linear-to-br from-[#6366F1]/20 to-[#A855F7]/20 text-[#8B5CF6] shadow-[0_20px_50px_rgba(99,102,241,0.15)] ">
+                      <PiNotepad className="text-[54px]" />
                     </div>
 
-                    {/* Actions */}
-                    <div className="flex items-center gap-3">
-                      <input
-                        type="checkbox"
-                        checked={target?.completed}
-                        onChange={() => {
-                          if (addLoading) return;
-                          markTarget(target?._id, !target?.completed);
-                        }}
-                        className={`h-4 w-4 ${addLoading ? "cursor-not-allowed" : "cursor-pointer"} accent-[#8B5CF6]`}
-                      />
-                      {removeLoading === target?._id ? (
-                        <CircleLoader />
-                      ) : (
-                        <button
-                          onClick={() => {
-                            if (removeLoading) return;
-                            removeTarget(target?._id);
-                          }}
-                          className="flex h-5 w-5 items-center justify-center rounded bg-white/4 text-white/40 transition-all duration-300 hover:bg-red-500/15 hover:text-red-400"
-                        >
-                          <RxCross2 className="text-[16px]" />
-                        </button>
-                      )}
-                    </div>
+                    <p className="mt-6 text-[20px] font-bold text-white light:text-lightText">
+                      No Targets Yet
+                    </p>
+
+                    <p className="mt-2 max-w-70 text-[14px] leading-7 text-darkSubText light:text-lightSubText">
+                      {type === "monthly"
+                        ? "Add monthly goals to stay focused and productive."
+                        : "Create weekly targets and build consistency."}
+                    </p>
                   </div>
-                </div>
-              ))
-            ) : (
-              <div className="flex h-90 flex-col items-center justify-center rounded-xl border border-dashed border-white/10 bg-white/3 text-center ">
-                <div className=" flex h-24 w-24 items-center justify-center rounded-full bg-linear-to-br from-[#6366F1]/20 to-[#A855F7]/20 text-[#8B5CF6] shadow-[0_20px_50px_rgba(99,102,241,0.15)] ">
-                  <PiNotepad className="text-[54px]" />
-                </div>
-
-                <p className="mt-6 text-[20px] font-bold text-white light:text-lightText">
-                  No Targets Yet
-                </p>
-
-                <p className="mt-2 max-w-70 text-[14px] leading-7 text-darkSubText light:text-lightSubText">
-                  {type === "monthly"
-                    ? "Add monthly goals to stay focused and productive."
-                    : "Create weekly targets and build consistency."}
-                </p>
+                )}
               </div>
             )}
           </div>
-        )}
+        </div>
       </div>
-    </Card>
+    </>
   );
 };
 
@@ -280,13 +290,13 @@ function DarkProgressBar({ progress }: ProgressBarProps) {
 
   return (
     <div
-      className="relative w-full h-3 bg-darkBox/50 rounded-full cursor-pointer"
+      className="relative w-full h-1.5 bg-[#A3A3A3] rounded-full cursor-pointer"
       onMouseEnter={() => setIsHovered(true)}
       onMouseLeave={() => setIsHovered(false)}
     >
       {/* Animated Progress Fill */}
       <motion.div
-        className="absolute top-0 left-0 h-full bg-linear-to-r from-violet-500 to-fuchsia-500 rounded-full"
+        className="absolute top-0 left-0 h-full bg-linear-to-r bg-white light:bg-black rounded-full"
         initial={{ width: 0 }}
         animate={{ width: `${clampedProgress}%` }}
         transition={{ duration: 0.3, ease: "easeOut" }}

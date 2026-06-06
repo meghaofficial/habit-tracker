@@ -24,7 +24,7 @@ const HabitSection = ({
       </p>
 
       <p
-        className="smText p-2.5 text-center border-b border-darkBg bg-darkPrimary light:bg-lightPrimary"
+        className="smText p-2.5 text-center border-b border-darkBg bg-darkPrimary light:bg-lightPrimary text-white"
         style={{ fontWeight: "bold" }}
       >
         HABITS
@@ -99,7 +99,7 @@ export const InputData = ({
 
   return (
     <div
-      className={`text-[12px] px-2 p-1 flex items-center gap-2 ${screen === "lg" && "border-b border-darkBox/50"}`}
+      className={`text-[12px] px-2 p-1 flex items-center gap-2 ${screen === "lg" && "border-b border-darkBox/50 light:border-lightBorder"}`}
     >
       <span>{index + 1}.</span>
 
