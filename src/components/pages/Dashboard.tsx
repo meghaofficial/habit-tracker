@@ -17,6 +17,14 @@ import type {
 } from "../../types";
 import { CustomButtonForm } from "../shared/CutomButton";
 import NavigationBar from "../shared/NavigationBar";
+import { useIsMobile } from "../hooks/mobileHook";
+
+const MASTER_MENU = [
+  { key: "track", label: "Monthly Habit" },
+  { key: "analysis", label: "Analysis" },
+  { key: "calandar", label: "Calandar" },
+  { key: "history", label: "History" },
+];
 
 const Dashboard = () => {
   const [activeTab, setActiveTab] = useState("track");
@@ -51,6 +59,8 @@ const Dashboard = () => {
     mostConsistentHabits: [],
     leastConsistentHabits: [],
   });
+  const [navMenu, setNavMenu] = useState(MASTER_MENU);
+  const isMobile = useIsMobile();
 
   const handleSubscribe = async (planID: string, amount: number) => {
     setFreeTrialLoading(true);
@@ -145,6 +155,14 @@ const Dashboard = () => {
       getStreak();
     }
   }, [dashboardData?._id]);
+
+  useEffect(() => {
+    if (isMobile) {
+      setNavMenu(MASTER_MENU.filter((item) => item.key !== "calandar"));
+    } else {
+      setNavMenu(MASTER_MENU);
+    }
+  }, [window.innerWidth]);
 
   return (
     <>
@@ -335,18 +353,14 @@ const Dashboard = () => {
             </nav>
             <div className="flex items-center justify-center w-full sm:mt-4">
               <div className="flex items-center gap-2 rounded-2xl sm:w-fit w-full border border-white/10 bg-black/20 p-1 backdrop-blur-xl light:bg-lightCard">
-                {[
-                  { key: "track", label: "Monthly Habit" },
-                  { key: "analysis", label: "Analysis" },
-                  { key: "history", label: "History" },
-                ].map((tab) => (
+                {navMenu.map((tab) => (
                   <button
                     key={tab.key}
                     onClick={() => setActiveTab(tab.key)}
                     className={`rounded-xl w-full text-nowrap sm:px-5 px-3 py-2.5 text-sm font-medium transition-all duration-300 ${
                       activeTab === tab.key
                         ? "bg-darkPrimary light:bg-lightPrimary text-white shadow-lg"
-                        : "text-gray-400 hover:text-white hover:bg-white/5"
+                        : "text-gray-400 hover:text-white light:hover:text-black hover:bg-white/5"
                     }`}
                   >
                     {tab.label}

@@ -19,12 +19,23 @@ const months: Record<string, string> = {
   Dec: "December",
 };
 
-export default function RightDrawer({ open, setOpen, activeDate, year, month }: { open: boolean, setOpen: React.Dispatch<React.SetStateAction<boolean>>, activeDate: number, year: number, month: number }) {
-
+export default function RightDrawer({
+  open,
+  setOpen,
+  activeDate,
+  year,
+  month,
+}: {
+  open: boolean;
+  setOpen: React.Dispatch<React.SetStateAction<boolean>>;
+  activeDate: number;
+  year: number;
+  month: number;
+}) {
   const [activeStatus, setActiveStatus] = useState("");
 
   const [localNote, setLocalNote] = useState("");
-  const theme = localStorage.getItem("theme");
+  const theme = useSelector((state: RootState) => state.theme);
 
   // useEffect(() => {
   //   const timer = setTimeout(() => {
@@ -62,57 +73,70 @@ export default function RightDrawer({ open, setOpen, activeDate, year, month }: 
   // }, [open]);
 
   return (
-      <AnimatePresence>
-        {open && (
-          <>
-            {/* Overlay */}
-            <motion.div
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 0.4 }}
-              exit={{ opacity: 0 }}
-              onClick={() => setOpen(false)}
-              className="fixed inset-0 bg-black"
-            />
+    <AnimatePresence>
+      {open && (
+        <>
+          {/* Overlay */}
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 0.4 }}
+            exit={{ opacity: 0 }}
+            onClick={() => setOpen(false)}
+            className="fixed inset-0 bg-black"
+          />
 
-            {/* Drawer */}
-            <motion.div
-              initial={{ x: "100%" }}
-              animate={{ x: 0 }}
-              exit={{ x: "100%" }}
-              transition={{ type: "spring", stiffness: 300, damping: 30 }}
-              className="fixed top-0 right-0 h-full w-100 bg-darkCard light:bg-lightCard shadow-2xl p-4 z-999"
-            >
-              <div className="flex justify-between items-center mb-4">
-                <h2 className="text-lg font-semibold">{`${activeDate}-${Object.keys(months)[month]}-${year}`}</h2>
-                <button onClick={() => setOpen(false)}>✕</button>
-              </div>
+          {/* Drawer */}
+          <motion.div
+            initial={{ x: "100%" }}
+            animate={{ x: 0 }}
+            exit={{ x: "100%" }}
+            transition={{ type: "spring", stiffness: 300, damping: 30 }}
+            className="fixed top-0 right-0 h-full w-100 bg-darkCard light:bg-lightCard shadow-2xl p-4 z-999"
+          >
+            <div className="flex justify-between items-center mb-4">
+              <h2 className="text-lg font-semibold">{`${activeDate}-${Object.keys(months)[month]}-${year}`}</h2>
+              <button onClick={() => setOpen(false)}>✕</button>
+            </div>
 
-              <div className="flex items-center gap-2 text-[10px]">
-                {Object.entries(statusColors).map(([key, value], index) => (
+            <div className="flex items-center gap-2 text-[10px]">
+              {Object.entries(statusColors).map(([key, value], index) => (
+                <div
+                  key={index}
+                  className="flex items-center gap-2 p-2 rounded cursor-pointer"
+                  style={{
+                    backgroundColor: theme === "dark" ? value.dbg : value.bg,
+                    border:
+                      activeStatus === key
+                        ? `1px solid ${theme === "dark" ? value.ddot : value.dot}`
+                        : "",
+                  }}
+                  onClick={() => setActiveStatus(key)}
+                >
                   <div
-                    key={index}
-                    className='flex items-center gap-2 p-2 rounded cursor-pointer'
-                    style={{ backgroundColor: theme === "dark" ? value.dbg : value.bg, border: activeStatus === key ? `1px solid ${theme === "dark" ? value.ddot : value.dot}` : '' }}
-                    onClick={() => setActiveStatus(key)}
-                  >
-                    <div className={`h-2 w-2 rounded-full`} style={{ backgroundColor: theme === "dark" ? value.ddot : value.dot }}></div>
-                    <span>{key}</span>
-                  </div>
-                ))}
-              </div>
+                    className={`h-2 w-2 rounded-full`}
+                    style={{
+                      backgroundColor:
+                        theme === "dark" ? value.ddot : value.dot,
+                    }}
+                  ></div>
+                  <span>{key}</span>
+                </div>
+              ))}
+            </div>
 
-              <p className="mt-5 text-[12px] text-gray-600">Write about something different happened today!</p>
-              <textarea
-                className="resize-none outline-none border rounded-2xl border-gray-700 text-[12px] p-3 mt-1 w-full h-50"
-                placeholder="Note"
-                name="note"
-                onChange={(e) => setLocalNote(e.target.value)}
-                value={localNote}
-              />
-
-            </motion.div>
-          </>
-        )}
-      </AnimatePresence>
+            <p className="mt-5 text-[12px] text-gray-600">
+              Write about something different happened today!
+            </p>
+            <textarea
+              className="resize-none outline-none border rounded-2xl border-gray-700 text-[12px] p-3 mt-1 w-full h-50"
+              placeholder="Note"
+              name="note"
+              onChange={(e) => setLocalNote(e.target.value)}
+              value={localNote}
+            />
+          </motion.div>
+        </>
+      )}
+    </AnimatePresence>
   );
 }

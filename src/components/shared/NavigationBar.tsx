@@ -11,21 +11,23 @@ import { notify } from "../../helper";
 import { useNavigate } from "react-router-dom";
 import Logo from "./Logo";
 import { IoSettingsSharp } from "react-icons/io5";
+import { setTheme } from "../../redux/slices/themeSlice";
 
 const NavigationBar = () => {
+  const dispatch = useDispatch();
+  const navigate = useNavigate();
   const [dark, setDark] = useState(false);
   const [open, setOpen] = useState(false);
   const [logoutLoading, setLogoutLoading] = useState(false);
   const isLogin = useSelector((state: RootState) => state.auth.username !== "");
-  const dispatch = useDispatch();
-  const navigate = useNavigate();
+  const theme = useSelector((state: RootState) => state.theme);
 
   const toggleTheme = () => {
-    const newTheme = !dark;
-    setDark(newTheme);
+    const newTheme = theme.theme === "dark" ? "light" : "dark";
+    dispatch(setTheme({ theme: newTheme }));
     const root = window.document.documentElement;
 
-    if (newTheme) {
+    if (newTheme === "dark") {
       root.classList.remove("light");
       localStorage.setItem("theme", "dark");
     } else {
@@ -68,19 +70,21 @@ const NavigationBar = () => {
         <Logo />
       </div>
       <div className="flex items-center gap-4">
-        <CustomButton styling="cursor-pointer" onClick={() => navigate("/settings")} type="white">
+        <CustomButton
+          styling="cursor-pointer"
+          onClick={() => navigate("/settings")}
+          type="white"
+        >
           <div className="flex items-center gap-1">
             <IoSettingsSharp />
-            <span className="sm:block hidden">
-              Settings
-            </span>
+            <span className="sm:block hidden">Settings</span>
           </div>
         </CustomButton>
         <CustomButton onClick={toggleTheme} type="transparent">
           <div className="flex items-center gap-1">
-            {dark ? <LuSunMoon /> : <LuSunMedium />}
+            {theme.theme === "dark" ? <LuSunMoon /> : <LuSunMedium />}
             <span className="sm:block hidden">
-              {dark ? "Dark Theme" : "Light Theme"}
+              {theme.theme === "dark" ? "Dark Theme" : "Light Theme"}
             </span>
           </div>
         </CustomButton>
@@ -92,7 +96,9 @@ const NavigationBar = () => {
         >
           {/* {logoutLoading ? <CircleLoader /> : "Logout"} */}
           <div className="flex items-center gap-1">
-            <span className="sm:block hidden">{!isLogin ? "Login" : "Logout"}</span>
+            <span className="sm:block hidden">
+              {!isLogin ? "Login" : "Logout"}
+            </span>
             {isLogin ? <IoMdLogOut /> : <IoMdLogIn />}
           </div>
         </CustomButton>

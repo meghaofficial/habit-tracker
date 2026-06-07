@@ -1,10 +1,33 @@
 import { BarChart } from "@mui/x-charts/BarChart";
+import { useSelector } from "react-redux";
+import { createTheme, ThemeProvider } from "@mui/material/styles";
 
-export const WeeklyBarChart = ({ data, maxValue }: { data: {date: string, week: string, range: string, weekDays: string[], taskDone: number[] }, maxValue: number }) => {
+export const WeeklyBarChart = ({
+  data,
+  maxValue,
+}: {
+  data: {
+    date: string;
+    week: string;
+    range: string;
+    weekDays: string[];
+    taskDone: number[];
+  };
+  maxValue: number;
+}) => {
+  const themeMode = useSelector((state: RootState) => state.theme); // "light" or "dark"
+
+  const theme = createTheme({
+    palette: {
+      mode: themeMode,
+    },
+  });
+  // const theme = useSelector((state: RootState) => state.theme);
 
   return (
     <div className="w-full h-70">
       <BarChart
+        key={theme}
         xAxis={[
           {
             scaleType: "band",
@@ -16,7 +39,7 @@ export const WeeklyBarChart = ({ data, maxValue }: { data: {date: string, week: 
           {
             min: 0,
             max: maxValue,
-            label: "Tasks"
+            label: "Tasks",
           },
         ]}
         series={[
@@ -28,13 +51,13 @@ export const WeeklyBarChart = ({ data, maxValue }: { data: {date: string, week: 
         borderRadius={6}
         sx={{
           "& .MuiChartsAxis-line, & .MuiChartsAxis-tick": {
-            stroke: "white !important",
+            stroke: `${theme === "dark" ? "white" : "black"} !important`,
           },
           "& .MuiChartsAxis-label": {
-            fill: "white !important",
+            fill: `${theme === "dark" ? "white" : "black"} !important`,
           },
           "& .MuiChartsAxis-tickLabel": {
-            fill: "white !important",
+            fill: `${theme === "dark" ? "white" : "black"} !important`,
           },
         }}
       />

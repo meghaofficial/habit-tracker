@@ -1,4 +1,5 @@
 import { PieChart } from "@mui/x-charts/PieChart";
+import { useSelector } from "react-redux";
 
 type Props = {
   value: number;
@@ -6,7 +7,7 @@ type Props = {
 };
 
 export const ProgressPie = ({ value, type }: Props) => {
-  const theme = localStorage.getItem("theme");
+  const theme = useSelector((state: RootState) => state.theme);
   const isAnalysis = type === "analysis";
 
   return (

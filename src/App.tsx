@@ -13,6 +13,7 @@ import PageLoader from "./components/loaders/PageLoader";
 import { ToastContainer } from "react-toastify";
 import Settings from "./components/pages/Settings";
 import { socket } from "./socket/socket";
+import { setTheme } from "./redux/slices/themeSlice";
 
 function App() {
   const dispatch = useDispatch();
@@ -21,11 +22,11 @@ function App() {
   );
   const [isAuthLoading, setIsAuthLoading] = useState(false);
   const user = useSelector((state: RootState) => state.auth);
+  const theme = useSelector((state: RootState) => state.theme);
 
   useEffect(() => {
-    const savedTheme = localStorage.getItem("theme");
     const root = window.document.documentElement;
-    if (savedTheme === "dark") {
+    if (theme === "dark") {
       root.classList.remove("light");
     } else {
       root.classList.add("light");
