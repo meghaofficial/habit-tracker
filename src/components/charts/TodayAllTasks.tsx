@@ -10,6 +10,7 @@ import type {
 import { InputData } from "../dashboard/track/HabitSection";
 import { notify } from "../../helper";
 import { LuMinus } from "react-icons/lu";
+import CircleLoader from "../loaders/CircleLoader";
 
 const TodayAllTasks = ({
   taskList,
@@ -33,8 +34,11 @@ const TodayAllTasks = ({
   >;
 }) => {
   const [removeRowID, setRemoveRowID] = useState<string | null>(null);
+  const [addTaskLoading, setAddTaskLoading] = useState("");
+
   const markTask = async (taskID: string, marked: boolean) => {
     if (!log) return;
+    setAddTaskLoading(taskID);
     try {
       const res = await axiosPrivate.patch(
         `/api/date-logs?monthDashID=${log?.monthDashID}&fullDate=${log?.fullDate}&taskID=${taskID}`,
@@ -53,8 +57,9 @@ const TodayAllTasks = ({
         });
       }
     } catch (error) {
-      // setDateLogs(previousLogs);
       console.error(error);
+    } finally {
+      setAddTaskLoading("");
     }
   };
 
@@ -95,14 +100,18 @@ const TodayAllTasks = ({
               />
 
               <div className="flex items-center gap-2">
-                <input
-                  type="checkbox"
-                  checked={log.tasks.includes(task?._id)}
-                  onChange={() =>
-                    markTask(task?._id, !log.tasks.includes(task?._id))
-                  }
-                  className="w-4 h-4 accent-darkPrimary cursor-pointer relative"
-                />
+                {addTaskLoading === task?._id ? (
+                  <CircleLoader />
+                ) : (
+                  <input
+                    type="checkbox"
+                    checked={log.tasks.includes(task?._id)}
+                    onChange={() =>
+                      markTask(task?._id, !log.tasks.includes(task?._id))
+                    }
+                    className="w-4 h-4 accent-darkPrimary cursor-pointer relative"
+                  />
+                )}
                 {removeRowID === task?._id ? (
                   <button className="cursor-not-allowed smText p-2 animate-pulse bg-gray-400 rounded-sm"></button>
                 ) : (

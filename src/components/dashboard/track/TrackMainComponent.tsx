@@ -33,7 +33,7 @@ const TrackMainComponent = ({
   setTaskList,
   log,
   setLog,
-  streakData
+  streakData,
 }: {
   dashboardData: DashboardI;
   taskList: TaskI[];
@@ -41,7 +41,7 @@ const TrackMainComponent = ({
   activeMonth: MonthsI;
   log: DateLogI;
   setLog: React.Dispatch<React.SetStateAction<DateLogI>>;
-  streakData: StreakI
+  streakData: StreakI;
 }) => {
   const [progress, setProgress] = useState<{
     overallProgress: OverallProgressI;
@@ -92,15 +92,18 @@ const TrackMainComponent = ({
           </div>
         </div>
         {/* right detail */}
-        <div className="bg-black/20 border border-white/10 w-[14.5%] backdrop-blur-2xl light:bg-lightCard light:border-lightBorder rounded-2xl overflow-x-hidden h-25 absolute -top-29 right-0 overflow-y-hidden">
-          <ProgressPie
-            value={
-              Number.isNaN(Number(progress?.overallProgress?.progress))
-                ? 0
-                : Number(progress?.overallProgress?.progress)
-            }
-            type=""
-          />
+        <div className="bg-black/20 border border-white/10 w-[14.5%] backdrop-blur-2xl light:bg-lightCard light:border-lightBorder rounded-2xl overflow-x-hidden h-25 absolute -top-29 right-0 overflow-y-hidden flex">
+          <div>
+            <p className="text-[14px] text-nowrap absolute top-3 left-3 text-gray-500">
+              Monthly Streak
+            </p>
+            <p className="text-[40px] font-bold absolute bottom-0 left-3">
+              {streakData.streak}
+            </p>
+          </div>
+          <div className="absolute right-0 bottom-3">
+            <span className="text-[40px] leading-none">🔥</span>
+          </div>
         </div>
 
         {/* below sections */}
@@ -137,7 +140,7 @@ const TrackMainComponent = ({
             </p>
           </div>
           <div className="relative mt-2 w-[40%] overflow-hidden rounded-2xl border border-white/10 bg-black/20 h-20 light:bg-lightCard light:border-lightBorder flex">
-            <div className="">
+            <div>
               <p className="text-[10px] text-nowrap absolute top-3 left-3 text-gray-500">
                 Monthly Streak
               </p>
@@ -146,9 +149,7 @@ const TrackMainComponent = ({
               </p>
             </div>
             <div className="absolute right-3 bottom-3">
-              <span className="text-[20px] leading-none">
-                🔥
-              </span>
+              <span className="text-[20px] leading-none">🔥</span>
             </div>
           </div>
         </div>
@@ -158,7 +159,7 @@ const TrackMainComponent = ({
           <div className="relative mt-2 w-1/2 overflow-hidden rounded-2xl border border-white/10 bg-black/20 h-20 light:bg-lightCard light:border-lightBorder flex">
             <div className="">
               <p className="text-[10px] text-nowrap absolute top-3 left-3 text-gray-500">
-                Today's Progress
+                Daily View
               </p>
               <p className="text-[20px] font-bold absolute bottom-3 left-3 tracking-widest">
                 {getTodayProgress().count}/{taskList?.length}
@@ -180,7 +181,7 @@ const TrackMainComponent = ({
           <div className="relative mt-2 w-1/2 overflow-hidden rounded-2xl border border-white/10 bg-black/20 h-20 light:bg-lightCard light:border-lightBorder flex">
             <div className="">
               <p className="text-[10px] text-nowrap absolute top-3 left-3 text-gray-500">
-                Month's Progress
+                Monthly View
               </p>
               <p className="text-[20px] font-bold absolute bottom-3 left-3">
                 {progress?.overallProgress?.count}/
@@ -219,20 +220,50 @@ const TrackMainComponent = ({
         )}
         <MonthlyNote monthID={dashboardData?._id} />
         <TargetsList type="monthly" monthID={dashboardData?._id} />
-        <div className="bg-black/20 backdrop-blur-2xl light:bg-lightCard w-1/3 rounded-2xl sm:block hidden border border-white/10">
-          <p className="font-semibold text-lg px-5 pt-3">
-            Your Monthly Targets Progress
-          </p>
-          <div className="relative left-10 top-10">
-            <ProgressPie
-              value={
-                Number.isNaN(Number(progress?.overallProgress?.progress))
-                  ? 0
-                  : Number(progress?.overallProgress?.progress)
-              }
-              type="analysis"
-            />
-          </div>
+        <div className="sm:flex flex-col gap-4 hidden w-1/3">
+          <Card
+            heading="Daily View"
+            subHeading="Your productivity breakdown for today."
+            bodyHeight="h-40"
+          >
+            <div className="flex items-center justify-center">
+              <p className="text-[40px] font-bold tracking-widest w-full text-center playfair-display">
+                {getTodayProgress().count}/{taskList?.length}
+              </p>
+              <div className="w-full">
+                <ProgressPie
+                  value={
+                    Number.isNaN(Number(getTodayProgress().progress))
+                      ? 0
+                      : Number(getTodayProgress().progress)
+                  }
+                  type="analysis"
+                />
+              </div>
+            </div>
+          </Card>
+          <Card
+            heading="Monthly View"
+            subHeading="Your cumulative performance this month."
+            bodyHeight="h-40"
+          >
+            <div className="flex items-center justify-center">
+              <p className="text-[40px] font-bold tracking-widest w-full text-center playfair-display">
+                {progress?.overallProgress?.count}/
+                {progress?.overallProgress?.total}
+              </p>
+              <div className="w-full">
+                <ProgressPie
+                  value={
+                    Number.isNaN(Number(progress?.overallProgress?.progress))
+                      ? 0
+                      : Number(progress?.overallProgress?.progress)
+                  }
+                  type="analysis"
+                />
+              </div>
+            </div>
+          </Card>
         </div>
       </div>
       {/* weekly targets */}
@@ -309,8 +340,11 @@ export const TodayTasksSmScreen = ({
     if (selectedDate.getDate() === new Date().getDate())
       setHeading("Todays Tasks");
     else setHeading("Other's Day Tasks");
-    getLog(new Date());
   }, [selectedDate]);
+
+  useEffect(() => {
+    getLog(new Date());
+  }, []);
 
   const handleAddRow = async () => {
     if (monthStatus === "scheduled") {

@@ -41,7 +41,7 @@ const DonutGraph = ({
           cx={size / 2}
           cy={size / 2}
           r={radius}
-          className="stroke-white/10 fill-transparent"
+          className="stroke-white/10 fill-transparent light:stroke-black/10"
           strokeWidth={strokeWidth}
         />
         

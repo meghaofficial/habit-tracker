@@ -424,7 +424,7 @@ const DailyCalanderTaskSheet = ({
                       return (
                         <div key={dayIndex} title={d?.progress?.toString()}>
                           <div
-                            className={`h-14 w-2.5 flex items-end bg-white/5 border border-white/10 rounded-t-[3px]`}
+                            className={`h-14 w-2.5 flex items-end bg-white/5 border border-white/10 light:bg-black/5 light:border-black/10 rounded-t-[3px]`}
                           >
                             <div
                               className={`w-2.5 bg-darkSuccess shadow-[0_0_5px_rgba(74,222,128,0.5)] light:bg-lightSuccess rounded-t-[3px]`}
@@ -451,7 +451,7 @@ const DailyCalanderTaskSheet = ({
                       return (
                         <div key={dayIndex} title={d?.progress?.toString()}>
                           <div
-                            className={`h-14 w-2.5 flex items-end bg-white/5 border border-white/10 rounded-t-[3px]`}
+                            className={`h-14 w-2.5 flex items-end light:bg-black/5 light:border-black/10 bg-white/5 border border-white/10 rounded-t-[3px]`}
                           >
                             <div
                               className={`w-2.5 bg-darkSuccess shadow-[0_0_5px_rgba(74,222,128,0.5)] light:bg-lightSuccess rounded-t-[3px]`}
@@ -504,7 +504,7 @@ const CheckboxCell = React.memo(
     return (
       <span
         className={`h-4 w-4 rounded cursor-pointer ${
-          checked ? "bg-darkSuccess" : "bg-white/5 border border-white/10"
+          checked ? "bg-darkSuccess" : "bg-white/5 border border-white/10 light:bg-black/5 light:border-black/10"
         }`}
         onClick={handleClick}
       />

@@ -166,7 +166,7 @@ const TargetsList = ({
                   ? "Add monthly target..."
                   : "Add weekly target..."
               }
-              className="flex-1 w-[70%] rounded-lg py-2.5 border border-white/10 bg-white/4 px-4 text-[14px] text-white outline-none placeholder:text-white/25 transition-all duration-300 focus:border-[#8B5CF6]/40 focus:bg-white/6 focus:shadow-[0_0_25px_rgba(139,92,246,0.15)] light:text-lightText"
+              className="flex-1 w-[70%] rounded-lg py-2.5 border border-white/10 bg-white/4 light:bg-black/5 light:border-black/10 px-4 text-[14px] text-white outline-none placeholder:text-white/25 light:placeholder:text-black/25 transition-all duration-300 focus:border-[#8B5CF6]/40 focus:bg-white/6 focus:shadow-[0_0_25px_rgba(139,92,246,0.15)] light:text-lightText"
             />
             <CustomButton
               onClick={() => {
@@ -194,7 +194,7 @@ const TargetsList = ({
                 {Array.from({ length: 6 }).map((_, i) => (
                   <div
                     key={i}
-                    className="h-10 animate-pulse rounded-lg border border-white/10 bg-white/4"
+                    className="h-10 animate-pulse rounded-lg border border-white/10 bg-white/4 light:bg-black/5 light:border-black/10"
                   />
                 ))}
               </div>
@@ -204,7 +204,7 @@ const TargetsList = ({
                   targets?.map((target, index) => (
                     <div
                       key={target?._id}
-                      className="group relative mb-3 overflow-hidden rounded-lg border border-white/10 bg-white/4 p-3 shadow-[inset_0_1px_2px_rgba(255,255,255,0.04)] backdrop-blur-xl transition-all duration-300 hover:border-white/20 hover:bg-white/6"
+                      className="group light:bg-black/5 light:border-black/10 relative mb-3 overflow-hidden rounded-lg border border-white/10 bg-white/4 p-3 shadow-[inset_0_1px_2px_rgba(255,255,255,0.04)] backdrop-blur-xl transition-all duration-300 hover:border-white/20 hover:bg-white/6"
                     >
                       {/* Hover Glow */}
                       <div className="absolute inset-0 opacity-0 transition-opacity duration-300 group-hover:opacity-100">
@@ -214,12 +214,12 @@ const TargetsList = ({
                       <div className="relative z-10 flex items-center justify-between gap-4">
                         {/* Left */}
                         <div className="flex items-center gap-4">
-                          <div className=" flex h-5 w-5 items-center justify-center rounded bg-white text-[13px] font-bold text-black shadow-lg ">
+                          <div className=" flex h-5 w-5 items-center justify-center rounded bg-white shadow-lg text-[13px] font-bold text-black">
                             {index + 1}
                           </div>
 
                           <span
-                            className={`max-w-55 text-[15px] font-medium transition-all duration-300 line-clamp-1 ${target?.completed ? "text-white/35 line-through" : "text-white light:text-lightText"} `}
+                            className={`max-w-55 text-[15px] font-medium transition-all duration-300 line-clamp-1 ${target?.completed ? "text-white/35 light:text-black/35 line-through" : "text-white light:text-lightText"} `}
                           >
                             {target?.value}
                           </span>
@@ -248,7 +248,7 @@ const TargetsList = ({
                                 if (removeLoading) return;
                                 removeTarget(target?._id);
                               }}
-                              className="flex h-5 w-5 items-center justify-center rounded bg-white/4 text-white/40 transition-all duration-300 hover:bg-red-500/15 hover:text-red-400"
+                              className="flex h-5 w-5 items-center justify-center rounded bg-white/4 text-white/40 light:text-black/40 transition-all duration-300 hover:bg-red-500/15 hover:text-red-400"
                             >
                               <RxCross2 className="text-[16px]" />
                             </button>
