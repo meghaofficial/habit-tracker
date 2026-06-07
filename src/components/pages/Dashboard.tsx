@@ -7,13 +7,19 @@ import CircleLoader from "../loaders/CircleLoader";
 import { plans } from "../../staticData";
 import Popup from "../shared/Popup";
 import PageLoader from "../loaders/PageLoader";
-import type { DashboardI, DateLogI, PlanI, SubscriptionI } from "../../types";
+import type {
+  DashboardI,
+  DateLogI,
+  PlanI,
+  SubscriptionI,
+  StreakI,
+  TaskI,
+} from "../../types";
 import { CustomButtonForm } from "../shared/CutomButton";
 import NavigationBar from "../shared/NavigationBar";
 
 const Dashboard = () => {
   const [activeTab, setActiveTab] = useState("track");
-  // const username = useSelector((state: RootState) => state.auth.username);
   const [openPopup, setOpenPopup] = useState(false);
   const [freeTrialLoading, setFreeTrialLoading] = useState(false);
   const [plansList, setPlansList] = useState<PlanI[]>([]);
@@ -28,9 +34,7 @@ const Dashboard = () => {
     totalDays: 0,
     firstDay: 0,
   });
-  const [taskList, setTaskList] = useState<
-    { _id: string; taskName: string; monthDashID: string }[]
-  >([]);
+  const [taskList, setTaskList] = useState<TaskI[]>([]);
   const [openPlan, setOpenPlan] = useState(false);
   const [activeMonth, setActiveMonth] = useState<SubscriptionI | any>({});
   const [log, setLog] = useState<DateLogI>({
@@ -41,6 +45,12 @@ const Dashboard = () => {
   });
   const [todayDate, setTodayDate] = useState("");
   const [activeSubsLoading, setActiveSubsLoading] = useState(false);
+  const [streakData, setStreakData] = useState<StreakI>({
+    streak: 0,
+    longestStreak: 0,
+    mostConsistentHabits: [],
+    leastConsistentHabits: [],
+  });
 
   const handleSubscribe = async (planID: string, amount: number) => {
     setFreeTrialLoading(true);
@@ -109,10 +119,32 @@ const Dashboard = () => {
     }
   };
 
+  const getStreak = async () => {
+    // setDashLoading(true);
+    try {
+      const res = await axiosPrivate.get(
+        `/api/get-streak?monthDashID=${dashboardData?._id}`,
+      );
+      if (res?.data?.success) {
+        setStreakData(res?.data?.data);
+      }
+    } catch (error) {
+      console.error(error);
+    } finally {
+      // setDashLoading(false);
+    }
+  };
+
   useEffect(() => {
     getActiveSubscription();
     getPlans();
   }, []);
+
+  useEffect(() => {
+    if (dashboardData?._id) {
+      getStreak();
+    }
+  }, [dashboardData?._id]);
 
   return (
     <>
@@ -331,6 +363,7 @@ const Dashboard = () => {
                 activeMonth={activeMonth}
                 log={log}
                 setLog={setLog}
+                streakData={streakData}
               />
             )}
             {activeTab === "analysis" && (
@@ -341,6 +374,7 @@ const Dashboard = () => {
                 setLog={setLog}
                 todayDate={todayDate}
                 setTodayDate={setTodayDate}
+                streakData={streakData}
               />
             )}
           </>

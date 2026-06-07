@@ -24,6 +24,7 @@ import Card from "../../shared/Card";
 import CustomButton from "../../shared/CutomButton";
 import CircleLoader from "../../loaders/CircleLoader";
 import DonutGraph from "./DonutGraph";
+import { type StreakI } from "../../../types";
 
 const TrackMainComponent = ({
   dashboardData,
@@ -32,6 +33,7 @@ const TrackMainComponent = ({
   setTaskList,
   log,
   setLog,
+  streakData
 }: {
   dashboardData: DashboardI;
   taskList: TaskI[];
@@ -39,6 +41,7 @@ const TrackMainComponent = ({
   activeMonth: MonthsI;
   log: DateLogI;
   setLog: React.Dispatch<React.SetStateAction<DateLogI>>;
+  streakData: StreakI
 }) => {
   const [progress, setProgress] = useState<{
     overallProgress: OverallProgressI;
@@ -55,7 +58,7 @@ const TrackMainComponent = ({
     const d = new Date();
     const custom = d.toISOString().split("T")[0];
     const matched = progress.dateLogProgress.find(
-      (p) => p.fullDate.split("T")[0] === custom,
+      (p: DateLogProgressI) => p.fullDate.toString().split("T")[0] === custom,
     );
     return {
       count: matched?.count,
@@ -124,20 +127,6 @@ const TrackMainComponent = ({
       </div>
       {/* sm screen */}
       <div className="sm:hidden mt-3">
-        {/* today date & all */}
-        {/* <div className="relative overflow-hidden rounded-2xl border border-white/10 bg-black/20 px-5 py-4 light:bg-lightCard light:border-lightBorder">
-          <div className="flex items-center justify-between">
-            <div className="relative">
-              <p className="text-xs uppercase tracking-[0.2em] text-gray-500">
-                Today
-              </p>
-
-              <p className="google-sans mt-1 text-xl font-bold">
-                {formatDateString2(new Date())}
-              </p>
-            </div>
-          </div>
-        </div> */}
         <div className="flex items-center gap-2">
           <div className="relative mt-2 w-[60%] overflow-hidden rounded-2xl border border-white/10 bg-black/20 h-20 light:bg-lightCard light:border-lightBorder flex flex-col items-start ps-4 justify-center">
             <p className="text-xs uppercase tracking-[0.2em] text-gray-500">
@@ -153,7 +142,7 @@ const TrackMainComponent = ({
                 Monthly Streak
               </p>
               <p className="text-[20px] font-bold absolute bottom-3 left-3">
-                5
+                {streakData.streak}
               </p>
             </div>
             <div className="absolute right-3 bottom-3">

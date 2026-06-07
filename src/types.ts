@@ -197,3 +197,10 @@ export interface TaskProgressI {
   count: number;
   progress: string | number;
 }
+
+export interface StreakI {
+  streak: number;
+  longestStreak: number;
+  mostConsistentHabits: string[];
+  leastConsistentHabits: string[];
+}

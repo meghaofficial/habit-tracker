@@ -7,14 +7,15 @@ import { WeeklyBarChart } from "../../charts/WeeklyBarChart"
 import Calendar from "../track/calander/Calendar"
 import { motion, AnimatePresence } from "framer-motion";
 import { formatDateString } from "../../../helper"
-import type { DateLogI, TaskI } from "../../../types"
+import type { DateLogI, TaskI, StreakI } from "../../../types"
 
-const AnalysisMainComponent = ({ taskList, monthDashID, log, setLog, todayDate, setTodayDate }: {
+const AnalysisMainComponent = ({ taskList, monthDashID, log, setLog, todayDate, setTodayDate, streakData }: {
   taskList: TaskI[], monthDashID: string,
   log: DateLogI,
   setLog: React.Dispatch<React.SetStateAction<DateLogI>>,
   todayDate: string,
-  setTodayDate: React.Dispatch<React.SetStateAction<string>>
+  setTodayDate: React.Dispatch<React.SetStateAction<string>>,
+  streakData: StreakI,
 }) => {
 
   const [todayProgress, setTodayProgress] = useState("0");
@@ -26,9 +27,6 @@ const AnalysisMainComponent = ({ taskList, monthDashID, log, setLog, todayDate, 
   const [monthlyAna, setMonthlyAna] = useState<{ dates: number[], tasks: number[] }>({
     dates: [], tasks: []
   });
-  const [streakData, setStreakData] = useState<{ streak: number, longestStreak: number, mostConsistentHabits: string[], leastConsistentHabits: string[] }>({
-    streak: 0, longestStreak: 0, mostConsistentHabits: [], leastConsistentHabits: []
-  })
 
   const getTodaysActivity = async () => {
     // setDashLoading(true);
@@ -73,25 +71,10 @@ const AnalysisMainComponent = ({ taskList, monthDashID, log, setLog, todayDate, 
     }
   }
 
-  const getStreak = async () => {
-    // setDashLoading(true);
-    try {
-      const res = await axiosPrivate.get(`/api/get-streak?monthDashID=${monthDashID}`);
-      if (res?.data?.success) {
-        setStreakData(res?.data?.data);
-      }
-    } catch (error) {
-      console.error(error);
-    } finally {
-      // setDashLoading(false);
-    }
-  }
-
   useEffect(() => {
     getTodaysActivity();
     getWeeklyActivity();
     getMonthlyActivity();
-    getStreak();
   }, [log?.tasks]);
 
   return (
