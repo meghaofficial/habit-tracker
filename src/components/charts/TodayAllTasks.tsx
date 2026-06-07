@@ -83,7 +83,7 @@ const TodayAllTasks = ({
         {taskList.map((task, index) => (
           <div
             key={task?._id}
-            className="bg-darkBox/20 px-3 py-1 rounded-lg transition flex items-center w-full gap-2"
+            className="bg-darkBox/20 light:bg-black/5 border border-white/10 light:border-black/10 px-3 py-1 rounded-lg transition flex items-center w-full gap-2"
           >
             <div className="flex items-center justify-between w-full">
               <InputData

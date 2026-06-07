@@ -51,6 +51,18 @@ const TrackMainComponent = ({
   });
   const isMobile = useIsMobile();
 
+  const getTodayProgress = () => {
+    const d = new Date();
+    const custom = d.toISOString().split("T")[0];
+    const matched = progress.dateLogProgress.find(
+      (p) => p.fullDate.split("T")[0] === custom,
+    );
+    return {
+      count: matched?.count,
+      progress: matched?.progress,
+    };
+  };
+
   return (
     <div className="pb-5 pt-1">
       <div className="sm:flex hidden gap-4 mt-4">
@@ -112,8 +124,8 @@ const TrackMainComponent = ({
       </div>
       {/* sm screen */}
       <div className="sm:hidden mt-3">
-        <div className="relative overflow-hidden rounded-2xl border border-white/10 bg-black/20 px-5 py-4 backdrop-blur-2xl">
-          <div className="absolute -top-8 -right-8 h-24 w-24 rounded-full bg-darkPrimary/20 blur-3xl" />
+        {/* today date & all */}
+        {/* <div className="relative overflow-hidden rounded-2xl border border-white/10 bg-black/20 px-5 py-4 light:bg-lightCard light:border-lightBorder">
           <div className="flex items-center justify-between">
             <div className="relative">
               <p className="text-xs uppercase tracking-[0.2em] text-gray-500">
@@ -124,14 +136,77 @@ const TrackMainComponent = ({
                 {formatDateString2(new Date())}
               </p>
             </div>
-            <div>
+          </div>
+        </div> */}
+        <div className="flex items-center gap-2">
+          <div className="relative mt-2 w-[60%] overflow-hidden rounded-2xl border border-white/10 bg-black/20 h-20 light:bg-lightCard light:border-lightBorder flex flex-col items-start ps-4 justify-center">
+            <p className="text-xs uppercase tracking-[0.2em] text-gray-500">
+              Today
+            </p>
+            <p className="google-sans mt-1 text-xl font-bold">
+              {formatDateString2(new Date())}
+            </p>
+          </div>
+          <div className="relative mt-2 w-[40%] overflow-hidden rounded-2xl border border-white/10 bg-black/20 h-20 light:bg-lightCard light:border-lightBorder flex">
+            <div className="">
+              <p className="text-[10px] text-nowrap absolute top-3 left-3 text-gray-500">
+                Monthly Streak
+              </p>
+              <p className="text-[20px] font-bold absolute bottom-3 left-3">
+                5
+              </p>
+            </div>
+            <div className="absolute right-3 bottom-3">
+              <span className="text-[20px] leading-none">
+                🔥
+              </span>
+            </div>
+          </div>
+        </div>
+        {/* overall & todays progress */}
+        <div className="flex items-center gap-2">
+          {/* todays progress */}
+          <div className="relative mt-2 w-1/2 overflow-hidden rounded-2xl border border-white/10 bg-black/20 h-20 light:bg-lightCard light:border-lightBorder flex">
+            <div className="">
+              <p className="text-[10px] text-nowrap absolute top-3 left-3 text-gray-500">
+                Today's Progress
+              </p>
+              <p className="text-[20px] font-bold absolute bottom-3 left-3 tracking-widest">
+                {getTodayProgress().count}/{taskList?.length}
+              </p>
+            </div>
+            <div className="absolute right-3 bottom-3">
+              <DonutGraph
+                percentage={
+                  Number.isNaN(Number(getTodayProgress().progress))
+                    ? 0
+                    : Number(getTodayProgress().progress)
+                }
+                size={30}
+                textSize={10}
+              />
+            </div>
+          </div>
+          {/* overall progress */}
+          <div className="relative mt-2 w-1/2 overflow-hidden rounded-2xl border border-white/10 bg-black/20 h-20 light:bg-lightCard light:border-lightBorder flex">
+            <div className="">
+              <p className="text-[10px] text-nowrap absolute top-3 left-3 text-gray-500">
+                Month's Progress
+              </p>
+              <p className="text-[20px] font-bold absolute bottom-3 left-3">
+                {progress?.overallProgress?.count}/
+                {progress?.overallProgress?.total}
+              </p>
+            </div>
+            <div className="absolute right-3 bottom-3">
               <DonutGraph
                 percentage={
                   Number.isNaN(Number(progress?.overallProgress?.progress))
                     ? 0
                     : Number(progress?.overallProgress?.progress)
                 }
-                size={50}
+                size={30}
+                textSize={10}
               />
             </div>
           </div>

@@ -4,12 +4,14 @@ interface DonutGraphProps {
   percentage: number; // Value from 0 to 100
   size?: number;      // Overall width/height in pixels
   strokeWidth?: number; // Thickness of the donut ring
+  textSize?: number;
 }
 
 const DonutGraph = ({
   percentage = 0,
   size = 120,
-  strokeWidth = 4, // Keeps the edge thin
+  strokeWidth = 1.5, // Keeps the edge thin
+  textSize=12
 }: DonutGraphProps) => {
   // Clamp percentage between 0 and 100
   const validPercentage = Math.max(0, Math.min(100, percentage));
@@ -57,9 +59,9 @@ const DonutGraph = ({
       </svg>
 
       {/* Centered Percentage Label */}
-      <div className="absolute flex flex-col items-center justify-center">
-        <span className="font-semibold text-[12px] text-gray-500 light:text-gray-800">{validPercentage}%</span>
-      </div>
+      {/* <div className="absolute flex flex-col items-center justify-center">
+        <span className="text-gray-500 light:text-gray-800" style={{ fontSize: `${textSize}px` }}>{validPercentage}%</span>
+      </div> */}
     </div>
   );
 };

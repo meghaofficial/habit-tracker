@@ -4,7 +4,6 @@ import { PiNotepad } from "react-icons/pi";
 import { axiosPrivate } from "../../../api/axios";
 import CircleLoader from "../../loaders/CircleLoader";
 import { motion, AnimatePresence } from "framer-motion";
-import Card from "../../shared/Card";
 import CustomButton from "../../shared/CutomButton";
 import { socket } from "../../../socket/socket";
 
@@ -144,12 +143,14 @@ const TargetsList = ({
         className={`relative overflow-x-hidden rounded-2xl h-fit google-sans border border-white/10 sm:w-1/3 light:border-black/10 bg-black/20 light:bg-lightCard p-5`}
       >
         <div className="flex items-center justify-between mb-4">
-          <p className="text-[22px] font-bold text-white light:text-lightText">
+          <p className="text-[18px] font-bold text-white light:text-lightText">
             Monthly Targets
           </p>
           <div className="w-[25%] flex items-center gap-2">
             <DarkProgressBar progress={Number(progress)} />
-            <p className="text-[13px] font-semibold">{targets.filter(t => t.completed).length}/{targets?.length}</p>
+            <p className="text-[13px] font-semibold">
+              {targets.filter((t) => t.completed).length}/{targets?.length}
+            </p>
           </div>
         </div>
         <div className={`overflow-y-auto hide-scrollbar`}>
@@ -187,7 +188,7 @@ const TargetsList = ({
           </div>
 
           {/* Targets */}
-          <div className="relative z-10 mt-4 pr-1 h-90 overflow-y-auto hide-scrollbar">
+          <div className="relative z-10 mt-4 pr-1 h-96.5 overflow-y-auto hide-scrollbar">
             {getTargetsLoading ? (
               <div className="space-y-4">
                 {Array.from({ length: 6 }).map((_, i) => (
@@ -226,15 +227,19 @@ const TargetsList = ({
 
                         {/* Actions */}
                         <div className="flex items-center gap-3">
-                          <input
-                            type="checkbox"
-                            checked={target?.completed}
-                            onChange={() => {
-                              if (addLoading) return;
-                              markTarget(target?._id, !target?.completed);
-                            }}
-                            className={`h-4 w-4 ${addLoading ? "cursor-not-allowed" : "cursor-pointer"} accent-[#8B5CF6]`}
-                          />
+                          {addLoading === target?._id ? (
+                            <CircleLoader />
+                          ) : (
+                            <input
+                              type="checkbox"
+                              checked={target?.completed}
+                              onChange={() => {
+                                if (addLoading) return;
+                                markTarget(target?._id, !target?.completed);
+                              }}
+                              className={`h-4 w-4 ${addLoading ? "cursor-not-allowed" : "cursor-pointer"} accent-[#8B5CF6]`}
+                            />
+                          )}
                           {removeLoading === target?._id ? (
                             <CircleLoader />
                           ) : (
@@ -253,7 +258,7 @@ const TargetsList = ({
                     </div>
                   ))
                 ) : (
-                  <div className="flex h-90 flex-col items-center justify-center rounded-xl border border-dashed border-white/10 bg-white/3 text-center ">
+                  <div className="flex h-96 flex-col items-center justify-center rounded-xl border border-dashed border-white/10 bg-white/3 text-center ">
                     <div className=" flex h-24 w-24 items-center justify-center rounded-full bg-linear-to-br from-[#6366F1]/20 to-[#A855F7]/20 text-[#8B5CF6] shadow-[0_20px_50px_rgba(99,102,241,0.15)] ">
                       <PiNotepad className="text-[54px]" />
                     </div>
@@ -262,7 +267,7 @@ const TargetsList = ({
                       No Targets Yet
                     </p>
 
-                    <p className="mt-2 max-w-70 text-[14px] leading-7 text-darkSubText light:text-lightSubText">
+                    <p className="px-4 mt-2 max-w-70 text-[14px] leading-6 text-darkSubText light:text-lightSubText">
                       {type === "monthly"
                         ? "Add monthly goals to stay focused and productive."
                         : "Create weekly targets and build consistency."}

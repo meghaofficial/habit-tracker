@@ -25,7 +25,7 @@ const Card = ({
     >
       <div className="relative z-10 flex items-start justify-between">
         <div>
-          <p className="text-[22px] font-bold text-white light:text-lightText">
+          <p className="text-[18px] font-bold text-white light:text-lightText">
             {heading}
           </p>
           {subHeading && (
