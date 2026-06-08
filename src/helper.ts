@@ -2,12 +2,6 @@ import { toast } from "react-toastify";
 import type { SubscriptionI } from "./types";
 // import debounce from 'lodash.debounce';
 
-export const getDaysInMonth = (year: number, month: number) =>
-  new Date(year, month + 1, 0).getDate();
-
-export const getFirstDayOfMonth = (year: number, month: number) =>
-  new Date(year, month, 1).getDay();
-
 export const notify = {
   success: (msg: string) => toast.success(msg),
   error: (msg: string) => toast.error(msg),

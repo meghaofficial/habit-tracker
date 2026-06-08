@@ -64,6 +64,7 @@ export const WeeklyBarChart = ({
       },
     },
     yaxis: {
+      max: maxValue,
       labels: {
         style: {
           colors: theme === "dark" ? "#fff" : '#000000',

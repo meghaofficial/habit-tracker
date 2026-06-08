@@ -327,7 +327,7 @@ const DailyCalanderTaskSheet = ({
             </div>
           ) : (
             <>
-              {taskList.length > 0 &&
+              {taskList?.length > 0 &&
                 taskList?.map((task) => (
                   <div
                     key={task?._id}

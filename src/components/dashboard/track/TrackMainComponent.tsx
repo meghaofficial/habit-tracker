@@ -98,7 +98,7 @@ const TrackMainComponent = ({
               Monthly Streak
             </p>
             <p className="text-[40px] font-bold absolute bottom-0 left-3">
-              {streakData.streak}
+              {streakData?.streak}
             </p>
           </div>
           <div className="absolute right-0 bottom-3">
@@ -145,7 +145,7 @@ const TrackMainComponent = ({
                 Monthly Streak
               </p>
               <p className="text-[20px] font-bold absolute bottom-3 left-3">
-                {streakData.streak}
+                {streakData?.streak}
               </p>
             </div>
             <div className="absolute right-3 bottom-3">

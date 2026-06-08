@@ -2,7 +2,7 @@ import React from 'react';
 import Chart from 'react-apexcharts';
 import { useSelector } from 'react-redux';
 
-export const MonthlyLineChart = ({ data }: { data: { dates: number[], tasks: number[] } }) => {
+export const MonthlyLineChart = ({ data, maxValue }: { data: { dates: number[], tasks: number[], maxValue: number } }) => {
 
   const theme = useSelector((state: RootState) => state.theme).theme;
 
@@ -55,12 +55,11 @@ export const MonthlyLineChart = ({ data }: { data: { dates: number[], tasks: num
           fontWeight: 500,
         },
       },
-      axisBorder: { show: true, color: '#E5E7EB' },
+      axisBorder: { show: true, color: theme === "dark" ? "#fff" : '#000000' },
       axisTicks: { show: false, color: '#E5E7EB' },
     },
     yaxis: {
-      min: 0,
-      max: 6,
+      max: maxValue,
       tickAmount: 3,
       labels: {
         style: {
@@ -76,7 +75,7 @@ export const MonthlyLineChart = ({ data }: { data: { dates: number[], tasks: num
           fontWeight: 500,
         },
       },
-      axisBorder: { show: true, color: '#E5E7EB' },
+      axisBorder: { show: true, color: theme === "dark" ? "#fff" : '#000000' },
       axisTicks: { show: false, color: '#E5E7EB' },
     },
     grid: {

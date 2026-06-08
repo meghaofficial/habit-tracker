@@ -219,7 +219,8 @@ const TargetsList = ({
                           </div>
 
                           <span
-                            className={`max-w-55 text-[15px] font-medium transition-all duration-300 line-clamp-1 ${target?.completed ? "text-white/35 light:text-black/35 line-through" : "text-white light:text-lightText"} `}
+                            className={`max-w-55 text-[12px] font-medium transition-all duration-300 line-clamp-1 ${target?.completed ? "text-white/35 light:text-black/35 line-through" : "text-white light:text-lightText"} `}
+                            title={target?.value}
                           >
                             {target?.value}
                           </span>

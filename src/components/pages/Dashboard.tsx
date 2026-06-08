@@ -18,6 +18,7 @@ import type {
 import { CustomButtonForm } from "../shared/CutomButton";
 import NavigationBar from "../shared/NavigationBar";
 import { useIsMobile } from "../hooks/mobileHook";
+import Calendar from "../dashboard/track/calander/Calendar";
 
 const MASTER_MENU = [
   { key: "track", label: "Monthly Habit" },
@@ -390,6 +391,9 @@ const Dashboard = () => {
                 setTodayDate={setTodayDate}
                 streakData={streakData}
               />
+            )}
+            {activeTab === "calandar" && (
+              <Calendar />
             )}
           </>
         )}

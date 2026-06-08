@@ -203,15 +203,12 @@ const AnalysisMainComponent = ({
               {formatDateString(weeklyAna?.date)}
             </p>
           }
+          styling="mb-3"
         >
           <div className="flex items-center justify-center mt-5 pe-7">
-            <MonthlyLineChart data={monthlyAna} />
+            <MonthlyLineChart data={monthlyAna} maxValue={taskList?.length} />
           </div>
         </Card>
-        <Calendar
-          year={new Date().getFullYear()}
-          month={new Date().getMonth()}
-        />
       </div>
     </>
   );
