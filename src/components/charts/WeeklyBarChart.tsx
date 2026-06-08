@@ -22,7 +22,6 @@ export const WeeklyBarChart = ({
       mode: themeMode,
     },
   });
-  // const theme = useSelector((state: RootState) => state.theme);
 
   return (
     <div className="w-full h-70">
