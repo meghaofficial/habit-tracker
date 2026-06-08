@@ -124,99 +124,74 @@ const AnalysisMainComponent = ({
             </div>
           </Card>
 
-          <div className="bg-black/20 rounded-2xl p-4 grid grid-cols-2 gap-4">
-            <div className="rounded-2xl bg-black/20 p-4 flex flex-col justify-between min-h-37.5">
-              <div>
-                <span className="text-[13px] tracking-wide text-gray-500">
-                  Streak
-                </span>
-              </div>
+          <Card heading="" cardWidth="w-full">
+            <div className="grid grid-cols-2 gap-4">
+              {[
+                {
+                  title: "Streak",
+                  logo: "🔥",
+                  data: (
+                    <span className="text-[64px] leading-none font-bold google-sans">
+                      {streakData?.streak}
+                    </span>
+                  ),
+                },
+                {
+                  title: "Longest Streak",
+                  logo: "🫡",
+                  data: (
+                    <span className="text-[64px] leading-none font-bold google-sans">
+                      {streakData?.longestStreak}
+                    </span>
+                  ),
+                },
+                {
+                  title: "Weakest Habit",
+                  logo:
+                    streakData?.mostConsistentHabits?.length > 0 ? "🤗" : "😥",
+                  data: (
+                    <RotatingText
+                      words={
+                        streakData?.mostConsistentHabits?.length > 0
+                          ? streakData?.mostConsistentHabits
+                          : ["None"]
+                      }
+                    />
+                  ),
+                },
+                {
+                  title: "Streak",
+                  logo:
+                    streakData?.leastConsistentHabits?.length > 0 ? "😒" : "😓",
+                  data: (
+                    <RotatingText
+                      words={
+                        streakData?.leastConsistentHabits?.length > 0
+                          ? streakData?.leastConsistentHabits
+                          : ["None"]
+                      }
+                    />
+                  ),
+                },
+              ].map((d, index) => (
+                <div className="rounded-2xl bg-white/5 border border-white/10 light:bg-black/5 light:border-black/10 p-4 flex flex-col justify-between min-h-40">
+                  <div>
+                    <span className="text-[13px] tracking-wide text-gray-500">
+                      {d.title}
+                    </span>
+                  </div>
 
-              <div className="flex items-end justify-between mt-4">
-                <span className="text-[64px] leading-none font-bold google-sans">
-                  {streakData?.streak}
-                </span>
+                  <div className="flex items-end justify-between mt-4">
+                    {d.data}
 
-                <span className="text-[44px] leading-none">🔥</span>
-              </div>
+                    <span className="text-[44px] leading-none">{d.logo}</span>
+                  </div>
+                </div>
+              ))}
             </div>
-
-            <div className="rounded-2xl bg-black/20 p-4 flex flex-col justify-between min-h-37.5">
-              <div>
-                <span className="text-[13px] tracking-wide text-gray-500">
-                  Longest Streak
-                </span>
-              </div>
-
-              <div className="flex items-end justify-between mt-4">
-                <span className="text-[52px] leading-none font-bold google-sans">
-                  {streakData?.longestStreak}
-                </span>
-
-                <span className="text-[40px] leading-none">🫡</span>
-              </div>
-            </div>
-
-            <div className="rounded-2xl bg-black/20 p-4 flex flex-col justify-between min-h-35">
-              <div>
-                <span className="text-[13px] tracking-wide text-gray-500">
-                  Most Consistent Habit
-                </span>
-              </div>
-
-              <div className="flex items-end justify-between gap-3 mt-4">
-                <RotatingText
-                  words={
-                    streakData?.mostConsistentHabits?.length > 0
-                      ? streakData?.mostConsistentHabits
-                      : ["None"]
-                  }
-                />
-
-                <span className="text-[38px] leading-none shrink-0">
-                  {streakData?.mostConsistentHabits?.length > 0 ? "🤗" : "😥"}
-                </span>
-              </div>
-            </div>
-
-            <div className="rounded-2xl bg-black/20 p-4 flex flex-col justify-between min-h-35">
-              <div>
-                <span className="text-[13px] tracking-wide text-gray-500">
-                  Weakest Habit
-                </span>
-              </div>
-
-              <div className="flex items-end justify-between gap-3 mt-4">
-                <RotatingText
-                  words={
-                    streakData?.leastConsistentHabits?.length > 0
-                      ? streakData?.leastConsistentHabits
-                      : ["None"]
-                  }
-                />
-
-                <span className="text-[38px] leading-none shrink-0">
-                  {streakData?.leastConsistentHabits?.length > 0 ? "😒" : "😓"}
-                </span>
-              </div>
-            </div>
-          </div>
+          </Card>
         </div>
         {/* curr month progress */}
-        {/* <div className="bg-black/20 rounded-2xl">
-          <div className="flex items-center justify-between">
-            <p className="font-semibold text-lg px-5 py-3">Monthly Activity</p>
-            <p
-              className="text-gray-500 text-[10px] px-5 py-3 cursor-default"
-              title="Today's Date"
-            >
-              {formatDateString(weeklyAna?.date)}
-            </p>
-          </div>
-          <div className="flex items-center justify-center mt-5 pe-5">
-            <MonthlyLineChart data={monthlyAna} />
-          </div>
-        </div> */}
         <Card
           heading="Monthly Activity"
           cardWidth="w-full"

@@ -110,7 +110,7 @@ export const WeeklyBarChart = ({
         options={options} 
         series={series} 
         type="bar" 
-        height={350}
+        height={274}
       />
     </div>
   );
