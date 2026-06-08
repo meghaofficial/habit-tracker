@@ -1,6 +1,6 @@
-import { BarChart } from "@mui/x-charts/BarChart";
 import { useSelector } from "react-redux";
-import { createTheme, ThemeProvider } from "@mui/material/styles";
+import React from 'react';
+import Chart from 'react-apexcharts';
 
 export const WeeklyBarChart = ({
   data,
@@ -15,50 +15,102 @@ export const WeeklyBarChart = ({
   };
   maxValue: number;
 }) => {
-  const themeMode = useSelector((state: RootState) => state.theme); // "light" or "dark"
 
-  const theme = createTheme({
-    palette: {
-      mode: themeMode,
+  const theme = useSelector((state: RootState) => state.theme).theme;
+
+  const options = {
+    chart: {
+      type: 'bar',
+      toolbar: {
+        show: false,
+      },
     },
-  });
+    colors: ['#6366F1'],
+    plotOptions: {
+      bar: {
+        borderRadius: 8,
+        borderRadiusApplication: 'end',
+        columnWidth: '70%',
+      },
+    },
+    dataLabels: {
+      enabled: false,
+    },
+    xaxis: {
+      categories: data?.weekDays,
+      labels: {
+        style: {
+          colors: theme === "dark" ? "#fff" : '#000000',
+          fontSize: '12px',
+        },
+      },
+      title: {
+        text: 'Days',
+        style: {
+          color: theme === "dark" ? "#fff" : '#000000',
+          fontSize: '14px',
+          fontWeight: 500,
+          fontFamily: 'inherit',
+        },
+      },
+      axisBorder: {
+        show: true,
+        color: theme === "dark" ? "#fff" : '#000000',
+        height: 1,
+      },
+      axisTicks: {
+        show: false,
+        color: theme === "dark" ? "#fff" : '#000000',
+      },
+    },
+    yaxis: {
+      labels: {
+        style: {
+          colors: theme === "dark" ? "#fff" : '#000000',
+          fontSize: '12px',
+        },
+      },
+      tickAmount: 3,
+      title: {
+        text: 'Tasks',
+        style: {
+          color: theme === "dark" ? "#fff" : '#000000',
+          fontSize: '14px',
+          fontWeight: 500,
+          fontFamily: 'inherit',
+        },
+      },
+      axisBorder: {
+        show: true,
+        color: theme === "dark" ? "#fff" : '#000000',
+      },
+      axisTicks: {
+        show: false,
+        color: '#000000',
+      },
+    },
+    grid: {
+      show: false,
+    },
+    tooltip: {
+      enabled: true, 
+    },
+  };
+
+  const series = [
+    {
+      name: 'Tasks Completed',
+      data: data?.taskDone,
+    },
+  ];
 
   return (
-    <div className="w-full h-70">
-      <BarChart
-        key={theme}
-        xAxis={[
-          {
-            scaleType: "band",
-            data: data?.weekDays,
-            label: "Days",
-          },
-        ]}
-        yAxis={[
-          {
-            min: 0,
-            max: maxValue,
-            label: "Tasks",
-          },
-        ]}
-        series={[
-          {
-            data: data?.taskDone,
-            color: "#6366f1",
-          },
-        ]}
-        borderRadius={6}
-        sx={{
-          "& .MuiChartsAxis-line, & .MuiChartsAxis-tick": {
-            stroke: `${theme === "dark" ? "white" : "black"} !important`,
-          },
-          "& .MuiChartsAxis-label": {
-            fill: `${theme === "dark" ? "white" : "black"} !important`,
-          },
-          "& .MuiChartsAxis-tickLabel": {
-            fill: `${theme === "dark" ? "white" : "black"} !important`,
-          },
-        }}
+    <div className="w-full">
+      <Chart 
+        options={options} 
+        series={series} 
+        type="bar" 
+        height={350}
       />
     </div>
   );

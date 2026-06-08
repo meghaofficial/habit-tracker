@@ -89,7 +89,7 @@ const AnalysisMainComponent = ({
 
   return (
     <>
-      <div className="sm:hidden rounded-2xl border border-white/10 bg-black/20 p-6 backdrop-blur-2xl my-4">
+      <div className="sm:hidden rounded-2xl border border-white/10 bg-black/20 light:bg-black/5 light:border-black/10 p-6 my-4">
         <div className="flex flex-col items-center text-center">
           <div className="mb-4 flex h-16 w-16 items-center justify-center rounded-2xl bg-darkPrimary/15 text-3xl">
             <IoDesktopOutline />
@@ -120,10 +120,7 @@ const AnalysisMainComponent = ({
             }
           >
             <div className="flex items-center justify-center mt-5 pe-7">
-              <WeeklyBarChart
-                data={weeklyAna}
-                maxValue={taskList?.length}
-              />
+              <WeeklyBarChart data={weeklyAna} maxValue={taskList?.length} />
             </div>
           </Card>
 
@@ -206,7 +203,7 @@ const AnalysisMainComponent = ({
           </div>
         </div>
         {/* curr month progress */}
-        <div className="bg-black/20 rounded-2xl">
+        {/* <div className="bg-black/20 rounded-2xl">
           <div className="flex items-center justify-between">
             <p className="font-semibold text-lg px-5 py-3">Monthly Activity</p>
             <p
@@ -219,7 +216,23 @@ const AnalysisMainComponent = ({
           <div className="flex items-center justify-center mt-5 pe-5">
             <MonthlyLineChart data={monthlyAna} />
           </div>
-        </div>
+        </div> */}
+        <Card
+          heading="Monthly Activity"
+          cardWidth="w-full"
+          rightOfHeading={
+            <p
+              className="text-gray-500 text-[10px] cursor-default"
+              title="Today's Date"
+            >
+              {formatDateString(weeklyAna?.date)}
+            </p>
+          }
+        >
+          <div className="flex items-center justify-center mt-5 pe-7">
+            <MonthlyLineChart data={monthlyAna} />
+          </div>
+        </Card>
         <Calendar
           year={new Date().getFullYear()}
           month={new Date().getMonth()}
