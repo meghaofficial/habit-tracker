@@ -146,7 +146,7 @@ const AnalysisMainComponent = ({
                   ),
                 },
                 {
-                  title: "Weakest Habit",
+                  title: "Most Consistent Habit",
                   logo:
                     streakData?.mostConsistentHabits?.length > 0 ? "🤗" : "😥",
                   data: (
@@ -160,7 +160,7 @@ const AnalysisMainComponent = ({
                   ),
                 },
                 {
-                  title: "Streak",
+                  title: "Weakest Habit",
                   logo:
                     streakData?.leastConsistentHabits?.length > 0 ? "😒" : "😓",
                   data: (
@@ -174,7 +174,7 @@ const AnalysisMainComponent = ({
                   ),
                 },
               ].map((d, index) => (
-                <div className="rounded-2xl bg-white/5 border border-white/10 light:bg-black/5 light:border-black/10 p-4 flex flex-col justify-between min-h-40">
+                <div className="rounded-2xl bg-white/5 border border-white/10 light:bg-black/5 light:border-black/10 p-4 flex flex-col justify-between min-h-40" key={index}>
                   <div>
                     <span className="text-[13px] tracking-wide text-gray-500">
                       {d.title}

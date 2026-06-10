@@ -4,7 +4,6 @@ import TrackMainComponent from "../dashboard/track/TrackMainComponent";
 import { formattedText, notify } from "../../helper";
 import { axiosPrivate } from "../../api/axios";
 import CircleLoader from "../loaders/CircleLoader";
-import { plans } from "../../staticData";
 import Popup from "../shared/Popup";
 import PageLoader from "../loaders/PageLoader";
 import type {
@@ -79,7 +78,7 @@ const Dashboard = () => {
           setOpenPlan(false);
         }
         setShowDashboard(true);
-        // await getActiveSubscription();
+        await getActiveSubscription();
       }
     } catch (error) {
       console.error(error);
@@ -89,7 +88,7 @@ const Dashboard = () => {
     }
   };
 
-  const getPlans = async () => {
+  const getPlans = async (showFree: boolean) => {
     try {
       const res = await axiosPrivate.get(
         `/api/get-plans?type=${showFree ? "free" : "paid"}`,
@@ -125,16 +124,12 @@ const Dashboard = () => {
         const hasUsedFree = !res?.data?.hasUsedFree;
         setShowFree(!hasUsedFree);
         if (subscription) await getDashboard();
-        return true;
-      } else return false;
-    } catch (error) {
-      if ((error as any).response.status === 404) {
-        setShowFree(!(error as any).response?.data?.hasUsedFree);
+        if (!subscription) await getPlans(hasUsedFree);
       }
+    } catch (error) {
       if ((error as any).response.status === 500) {
         setFallback(true);
       }
-      return false;
     } finally {
       setActiveSubsLoading(false);
     }
@@ -157,14 +152,7 @@ const Dashboard = () => {
   };
 
   useEffect(() => {
-    const init = async () => {
-      const success = await getActiveSubscription();
-      if (success) {
-        await getPlans();
-      }
-    };
-
-    init();
+    getActiveSubscription();
   }, []);
 
   useEffect(() => {
@@ -276,7 +264,7 @@ const Dashboard = () => {
                         following.
                       </p>
                       <div
-                        className={`grid gap-3 ${!showFree ? "grid-cols-1 sm:grid-cols-2" : "grid-cols-1"}`}
+                        className={`grid gap-3 ${showFree ? "grid-cols-1 sm:grid-cols-2" : "grid-cols-1"}`}
                       >
                         {plansList.map((plan, i) => (
                           <div
@@ -285,7 +273,7 @@ const Dashboard = () => {
                           >
                             <div
                               key={i}
-                              className="group relative overflow-hidden w-full rounded-[30px] border border-white/10 bg-black p-6 backdrop-blur-2xl transition-all duration-500 hover:-translate-y-1 hover:border-white/20 hover:shadow-[0_30px_80px_rgba(99,102,241,0.12)]"
+                              className="group relative overflow-hidden w-full max-w-100 rounded-[30px] border border-white/10 bg-black p-6 backdrop-blur-2xl transition-all duration-500 hover:-translate-y-1 hover:border-white/20 hover:shadow-[0_30px_80px_rgba(99,102,241,0.12)]"
                             >
                               <div className="relative z-10">
                                 <p className="text-sm uppercase tracking-[0.2em] text-gray-500">

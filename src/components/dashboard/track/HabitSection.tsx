@@ -7,12 +7,14 @@ import type { TaskI } from "../../../types";
 const HabitSection = ({
   taskList,
   setTaskList,
+  getLogLoading,
 }: {
   taskList: {
     _id: string;
     taskName: string;
   }[];
   setTaskList: React.Dispatch<React.SetStateAction<TaskI[]>>;
+  getLogLoading: boolean;
 }) => {
   return (
     <div>
@@ -30,16 +32,27 @@ const HabitSection = ({
         HABITS
       </p>
 
-      {taskList?.map((task, index) => (
-        <div key={task._id}>
-          <InputData
-            index={index}
-            taskId={task._id}
-            taskName={task.taskName}
-            setTaskList={setTaskList}
-          />
+      {getLogLoading ? (
+        <div className="p-2 flex flex-col gap-3">
+          {Array.from({ length: 5 }).map((_, index) => (
+            <div
+              key={index}
+              className="w-full bg-gray-500/50 h-7 rounded-lg animate-pulse"
+            ></div>
+          ))}
         </div>
-      ))}
+      ) : (
+        taskList?.map((task, index) => (
+          <div key={task._id}>
+            <InputData
+              index={index}
+              taskId={task._id}
+              taskName={task.taskName}
+              setTaskList={setTaskList}
+            />
+          </div>
+        ))
+      )}
     </div>
   );
 };

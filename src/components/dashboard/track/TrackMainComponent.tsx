@@ -52,6 +52,7 @@ const TrackMainComponent = ({
     dateLogProgress: [],
     taskProgress: [],
   });
+    const [getLogLoading, setGetLogLoading] = useState(false);
   const isMobile = useIsMobile();
 
   const getTodayProgress = () => {
@@ -79,7 +80,6 @@ const TrackMainComponent = ({
           <p className="text-3xl tracking-wider font-bold playfair-display px-3 line-clamp-1">
             {new Date().getDate()},
             {monMap?.[new Date(activeMonth?.startDate).getMonth() + 1]}
-            {/* {new Date(activeMonth?.startDate).getFullYear()} */}
           </p>
           <div className="flex flex-col items-start px-3">
             <span className="text-[10px] text-gray-500">
@@ -108,7 +108,7 @@ const TrackMainComponent = ({
 
         {/* below sections */}
         <div className="bg-black/20 border border-white/10 w-[20%] light:bg-lightCard light:border-lightBorder rounded-2xl overflow-x-hidden">
-          <HabitSection taskList={taskList} setTaskList={setTaskList} />
+          <HabitSection taskList={taskList} setTaskList={setTaskList} getLogLoading={getLogLoading} />
         </div>
         <div className="w-[65%] rounded-2xl relative">
           <DailyCalanderTaskSheet
@@ -118,6 +118,8 @@ const TrackMainComponent = ({
             progress={progress}
             setProgress={setProgress}
             monthStatus={activeMonth?.status}
+            getLogLoading={getLogLoading}
+            setGetLogLoading={setGetLogLoading}
           />
         </div>
         <div className="bg-black/20 border border-white/10 backdrop-blur-2xl light:border-lightBorder light:bg-lightCard w-[15%] rounded-2xl overflow-x-hidden">
@@ -125,6 +127,7 @@ const TrackMainComponent = ({
             progress={progress?.taskProgress}
             total={dashboardData?.totalDays}
             count={progress?.overallProgress.count}
+            getLogLoading={getLogLoading}
           />
         </div>
       </div>
@@ -228,7 +231,7 @@ const TrackMainComponent = ({
           >
             <div className="flex items-center justify-center">
               <p className="text-[40px] font-bold tracking-widest w-full text-center playfair-display">
-                {getTodayProgress().count}/{taskList?.length}
+                {getTodayProgress().count || 0}/{taskList?.length}
               </p>
               <div className="w-full">
                 <ProgressPie

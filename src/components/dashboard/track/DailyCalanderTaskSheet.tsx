@@ -21,6 +21,8 @@ const DailyCalanderTaskSheet = ({
   progress,
   setProgress,
   monthStatus,
+  getLogLoading,
+  setGetLogLoading
 }: {
   taskList: TaskI[];
   setTaskList: React.Dispatch<React.SetStateAction<TaskI[]>>;
@@ -38,6 +40,8 @@ const DailyCalanderTaskSheet = ({
     }>
   >;
   monthStatus: string;
+  getLogLoading: boolean;
+  setGetLogLoading: React.Dispatch<React.SetStateAction<boolean>>;
 }) => {
   const totalD = dashboardData?.totalDays || 0;
   const firstDay = dashboardData?.firstDay || 0;
@@ -89,7 +93,6 @@ const DailyCalanderTaskSheet = ({
     }
   };
 
-  const [getLogLoading, setGetLogLoading] = useState(false);
   const getDateLogs = async () => {
     setGetLogLoading(true);
     try {
@@ -503,8 +506,10 @@ const CheckboxCell = React.memo(
 
     return (
       <span
-        className={`h-4 w-4 rounded cursor-pointer ${
-          checked ? "bg-darkSuccess" : "bg-white/5 border border-white/10 light:bg-black/5 light:border-black/10"
+        className={`h-4 w-4 rounded cursor-pointer border ${
+          new Date(fullDate).getDate() === new Date().getUTCDate() ? "border-darkSuccess shadow-[0_0_10px_rgba(34,197,94,0.8)]" : "border-white/10 light:border-black/10"
+        } ${
+          checked ? "bg-darkSuccess" : "bg-white/5 light:bg-black/5"
         }`}
         onClick={handleClick}
       />

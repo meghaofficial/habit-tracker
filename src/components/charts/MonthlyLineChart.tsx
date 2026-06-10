@@ -1,12 +1,12 @@
-import React from 'react';
 import Chart from 'react-apexcharts';
 import { useSelector } from 'react-redux';
+import type { RootState } from '../../redux/store/store';
 
-export const MonthlyLineChart = ({ data, maxValue }: { data: { dates: number[], tasks: number[], maxValue: number } }) => {
+export const MonthlyLineChart = ({ data, maxValue }: { data: { dates: number[], tasks: number[] }, maxValue: number }) => {
 
   const theme = useSelector((state: RootState) => state.theme).theme;
 
-  const options = {
+  const options: any = {
     chart: {
       type: 'area',
       toolbar: {
@@ -59,6 +59,7 @@ export const MonthlyLineChart = ({ data, maxValue }: { data: { dates: number[], 
       axisTicks: { show: false, color: '#E5E7EB' },
     },
     yaxis: {
+      min: 0,
       max: maxValue,
       tickAmount: 3,
       labels: {

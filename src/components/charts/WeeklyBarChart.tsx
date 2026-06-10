@@ -1,6 +1,6 @@
 import { useSelector } from "react-redux";
-import React from 'react';
 import Chart from 'react-apexcharts';
+import type { RootState } from "../../redux/store/store";
 
 export const WeeklyBarChart = ({
   data,
@@ -18,7 +18,7 @@ export const WeeklyBarChart = ({
 
   const theme = useSelector((state: RootState) => state.theme).theme;
 
-  const options = {
+  const options: any = {
     chart: {
       type: 'bar',
       toolbar: {
@@ -64,6 +64,7 @@ export const WeeklyBarChart = ({
       },
     },
     yaxis: {
+      min: 0,
       max: maxValue,
       labels: {
         style: {
