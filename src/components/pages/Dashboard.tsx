@@ -19,6 +19,8 @@ import { CustomButtonForm } from "../shared/CutomButton";
 import NavigationBar from "../shared/NavigationBar";
 import { useIsMobile } from "../hooks/mobileHook";
 import Calendar from "../dashboard/track/calander/Calendar";
+import HistoryMainComponent from "../dashboard/history/HistoryMainComponent";
+import Fallback from "../shared/Fallback";
 
 const MASTER_MENU = [
   { key: "track", label: "Monthly Habit" },
@@ -61,6 +63,7 @@ const Dashboard = () => {
     leastConsistentHabits: [],
   });
   const [navMenu, setNavMenu] = useState(MASTER_MENU);
+  const [fallback, setFallback] = useState(false);
   const isMobile = useIsMobile();
 
   const handleSubscribe = async (planID: string, amount: number) => {
@@ -72,11 +75,11 @@ const Dashboard = () => {
         notify.success(res?.data?.message);
         if (amount === 0) {
           setOpenPopup(false);
-          setShowDashboard(true);
-          await getActiveSubscription();
         } else {
           setOpenPlan(false);
         }
+        setShowDashboard(true);
+        // await getActiveSubscription();
       }
     } catch (error) {
       console.error(error);
@@ -89,7 +92,7 @@ const Dashboard = () => {
   const getPlans = async () => {
     try {
       const res = await axiosPrivate.get(
-        `/api/get-plans?type=${!showFree ? "free" : "paid"}`,
+        `/api/get-plans?type=${showFree ? "free" : "paid"}`,
       );
       if (res?.data?.success) {
         setPlansList(res?.data?.plans || []);
@@ -107,7 +110,6 @@ const Dashboard = () => {
         setShowDashboard(true);
       }
     } catch (error) {
-      console.error(error);
     } finally {
       setDashLoading(false);
     }
@@ -119,12 +121,20 @@ const Dashboard = () => {
       const res = await axiosPrivate.get("/api/active-subscription");
       if (res?.data?.success) {
         const subscription = res?.data?.subscription;
-        setActiveMonth(res?.data?.subscription);
-        setShowFree(!!subscription);
+        setActiveMonth(subscription);
+        const hasUsedFree = !res?.data?.hasUsedFree;
+        setShowFree(!hasUsedFree);
         if (subscription) await getDashboard();
-      }
+        return true;
+      } else return false;
     } catch (error) {
-      console.error(error);
+      if ((error as any).response.status === 404) {
+        setShowFree(!(error as any).response?.data?.hasUsedFree);
+      }
+      if ((error as any).response.status === 500) {
+        setFallback(true);
+      }
+      return false;
     } finally {
       setActiveSubsLoading(false);
     }
@@ -147,8 +157,14 @@ const Dashboard = () => {
   };
 
   useEffect(() => {
-    getActiveSubscription();
-    getPlans();
+    const init = async () => {
+      const success = await getActiveSubscription();
+      if (success) {
+        await getPlans();
+      }
+    };
+
+    init();
   }, []);
 
   useEffect(() => {
@@ -167,6 +183,7 @@ const Dashboard = () => {
 
   return (
     <>
+    {fallback ? <Fallback /> : (
       <div
         className={`sm:px-6 px-5 sm:pt-4 pt-3 overflow-x-hidden ${!showDashboard && "h-screen overflow-y-hidden"}`}
       >
@@ -259,54 +276,51 @@ const Dashboard = () => {
                         following.
                       </p>
                       <div
-                        className={`grid gap-3 ${showFree ? "grid-cols-1 sm:grid-cols-2 md:grid-cols-3" : "grid-cols-1"}`}
+                        className={`grid gap-3 ${!showFree ? "grid-cols-1 sm:grid-cols-2" : "grid-cols-1"}`}
                       >
-                        {plansList
-                          .slice(0, showFree ? plans.length : 1)
-                          .map((plan, i) => (
+                        {plansList.map((plan, i) => (
+                          <div
+                            key={i}
+                            className="p-3 flex items-center justify-center w-full"
+                          >
                             <div
                               key={i}
-                              className="p-3 flex items-center justify-center w-full"
+                              className="group relative overflow-hidden w-full rounded-[30px] border border-white/10 bg-black p-6 backdrop-blur-2xl transition-all duration-500 hover:-translate-y-1 hover:border-white/20 hover:shadow-[0_30px_80px_rgba(99,102,241,0.12)]"
                             >
-                              <div
-                                key={i}
-                                className="group relative overflow-hidden sm:w-auto w-[80%] rounded-[30px] border border-white/10 bg-black p-6 backdrop-blur-2xl transition-all duration-500 hover:-translate-y-1 hover:border-white/20 hover:shadow-[0_30px_80px_rgba(99,102,241,0.12)]"
-                              >
-                                {/* Glow */}
-                                <div
-                                  className={`absolute -top-10 -right-10 h-40 w-40 rounded-full blur-3xl transition-all duration-500 ${i === 0 ? "bg-darkSuccess/15" : "bg-darkPrimary/15"}`}
-                                />
-                                <div className="absolute top-5 right-5 rounded-full border border-darkSuccess/30 bg-darkSuccess/10 px-3 py-1 text-xs font-semibold text-darkSuccess">
-                                  ACTIVE
+                              <div className="relative z-10">
+                                <p className="text-sm uppercase tracking-[0.2em] text-gray-500">
+                                  Membership
+                                </p>
+                                <h3 className="mt-2 text-3xl font-bold">
+                                  {formattedText(plan?.planName)}
+                                </h3>
+                                <div className="mt-6 flex items-end gap-1">
+                                  <span className="text-5xl font-black">
+                                    ₹{plan?.amount}
+                                  </span>
+                                  <span className="text-gray-500 text-[12px]">
+                                    Full Amount
+                                  </span>
                                 </div>
-
-                                <div className="relative z-10">
-                                  <p className="text-sm uppercase tracking-[0.2em] text-gray-500">
-                                    Membership
-                                  </p>
-                                  <h3 className="mt-2 text-3xl font-bold">
-                                    {plan?.planName}
-                                  </h3>
-                                  <div className="mt-6 flex items-end gap-1">
-                                    <span className="text-5xl font-black">
-                                      ₹{plan?.amount}
-                                    </span>
-                                  </div>
-                                  <p className="mt-5 text-[15px] leading-7 text-darkSubText light:text-black">
-                                    {plan?.description}
-                                  </p>
-                                  <div className="my-6 h-px bg-white/10" />
-                                  <CustomButtonForm
-                                    type="success"
-                                    styling="w-1/2"
-                                    onClick={() => setOpenPopup(true)}
-                                  >
-                                    Activate Plan
-                                  </CustomButtonForm>
-                                </div>
+                                <p className="mt-5 text-[15px] leading-7 text-darkSubText light:text-black">
+                                  {plan?.description}
+                                </p>
+                                <div className="my-6 h-px bg-white/10" />
+                                <CustomButtonForm
+                                  type="success"
+                                  styling="w-1/2"
+                                  onClick={() => {
+                                    if (plansList.length > 1) {
+                                      handleSubscribe(plan?._id, plan?.amount);
+                                    } else setOpenPopup(true);
+                                  }}
+                                >
+                                  Activate Plan
+                                </CustomButtonForm>
                               </div>
                             </div>
-                          ))}
+                          </div>
+                        ))}
                       </div>
                     </div>
                   )}
@@ -392,12 +406,12 @@ const Dashboard = () => {
                 streakData={streakData}
               />
             )}
-            {activeTab === "calandar" && (
-              <Calendar />
-            )}
+            {activeTab === "calandar" && <Calendar />}
+            {activeTab === "history" && <HistoryMainComponent />}
           </>
         )}
       </div>
+      )}
     </>
   );
 };
