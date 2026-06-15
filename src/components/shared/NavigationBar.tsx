@@ -8,7 +8,7 @@ import AuthForm from "../auth/AuthForm";
 import { axiosPrivate } from "../../api/axios";
 import { removeCreds } from "../../redux/slices/authSlice";
 import { notify } from "../../helper";
-import { useNavigate } from "react-router-dom";
+import { useLocation, useNavigate } from "react-router-dom";
 import Logo from "./Logo";
 import { IoSettingsSharp } from "react-icons/io5";
 import { setTheme } from "../../redux/slices/themeSlice";
@@ -16,9 +16,8 @@ import { setTheme } from "../../redux/slices/themeSlice";
 const NavigationBar = () => {
   const dispatch = useDispatch();
   const navigate = useNavigate();
-  const [dark, setDark] = useState(false);
+  const location = useLocation();
   const [open, setOpen] = useState(false);
-  const [logoutLoading, setLogoutLoading] = useState(false);
   const isLogin = useSelector((state: RootState) => state.auth.username !== "");
   const theme = useSelector((state: RootState) => state.theme);
 
@@ -37,7 +36,6 @@ const NavigationBar = () => {
   };
 
   const handleLogout = async () => {
-    setLogoutLoading(true);
     try {
       const res = await axiosPrivate.post("/logout");
 
@@ -47,8 +45,6 @@ const NavigationBar = () => {
     } catch (error) {
       console.error(error);
       notify.error("Logout failed. Please try again.");
-    } finally {
-      setLogoutLoading(false);
     }
   };
 
@@ -70,16 +66,18 @@ const NavigationBar = () => {
         <Logo />
       </div>
       <div className="flex items-center gap-4">
-        <CustomButton
-          styling="cursor-pointer"
-          onClick={() => navigate("/settings")}
-          type="white"
-        >
-          <div className="flex items-center gap-1">
-            <IoSettingsSharp />
-            <span className="sm:block hidden">Settings</span>
-          </div>
-        </CustomButton>
+        {location.pathname !== "/settings" && (
+          <CustomButton
+            styling="cursor-pointer"
+            onClick={() => navigate("/settings")}
+            type="white"
+          >
+            <div className="flex items-center gap-1">
+              <IoSettingsSharp />
+              <span className="sm:block hidden">Settings</span>
+            </div>
+          </CustomButton>
+        )}
         <CustomButton onClick={toggleTheme} type="transparent">
           <div className="flex items-center gap-1">
             {theme.theme === "dark" ? <LuSunMoon /> : <LuSunMedium />}

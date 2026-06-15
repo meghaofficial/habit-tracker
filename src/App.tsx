@@ -13,7 +13,6 @@ import PageLoader from "./components/loaders/PageLoader";
 import { ToastContainer } from "react-toastify";
 import Settings from "./components/pages/Settings";
 import { socket } from "./socket/socket";
-import { setTheme } from "./redux/slices/themeSlice";
 
 function App() {
   const dispatch = useDispatch();

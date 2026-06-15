@@ -96,8 +96,7 @@ const Calendar = () => {
             <div className="text-5xl mb-4">🚀</div>
             <h2 className="text-2xl font-bold google-sans">Coming Soon</h2>
             <p className="mt-3 text-center text-gray-500 max-w-md text-[14px]">
-              We're working on something exciting. This feature will be
-              available in the next few days.
+              We're working on this feature where you can add a note on a day. This feature will be available in the next few days.
             </p>
           </div>
         </div>

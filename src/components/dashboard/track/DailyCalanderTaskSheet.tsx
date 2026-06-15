@@ -22,7 +22,7 @@ const DailyCalanderTaskSheet = ({
   setProgress,
   monthStatus,
   getLogLoading,
-  setGetLogLoading
+  setGetLogLoading,
 }: {
   taskList: TaskI[];
   setTaskList: React.Dispatch<React.SetStateAction<TaskI[]>>;
@@ -214,7 +214,7 @@ const DailyCalanderTaskSheet = ({
     const onTaskRemoved = (data: any) => {
       setTaskList(data?.tasks);
       setProgress(data?.progress);
-    }
+    };
 
     socket.on("task-marked", onTaskMarked);
     socket.on("add-task", onTaskAdded);
@@ -392,13 +392,14 @@ const DailyCalanderTaskSheet = ({
                 ))}
             </>
           )}
-
-          <div
-            className="absolute h-4 w-4 flex items-center justify-center -right-2 bottom-2 cursor-pointer border rounded border-darkBox/50 light:border-lightBorder text-white/70 bg-red-600"
-            onClick={handleReset}
-          >
-            <RiResetLeftLine size={12} />
-          </div>
+          {!getLogLoading && (
+            <div
+              className="absolute h-4 w-4 flex items-center justify-center -right-2 bottom-2 cursor-pointer border rounded border-darkBox/50 light:border-lightBorder text-white/70 bg-red-600"
+              onClick={handleReset}
+            >
+              <RiResetLeftLine size={12} />
+            </div>
+          )}
         </div>
       </div>
       {/* Day wise (column wise progress) */}
@@ -437,7 +438,9 @@ const DailyCalanderTaskSheet = ({
                           <span className="text-[6px]">
                             {Number.isNaN(Number(d?.progress))
                               ? "0"
-                              : d?.progress === "100.00" ? "100" : d?.progress}
+                              : d?.progress === "100.00"
+                                ? "100"
+                                : d?.progress}
                             %
                           </span>
                         </div>
@@ -464,7 +467,9 @@ const DailyCalanderTaskSheet = ({
                           <span className="text-[6px]">
                             {Number.isNaN(Number(d?.progress))
                               ? 0
-                              : d?.progress === "100.00" ? "100" : d?.progress}
+                              : d?.progress === "100.00"
+                                ? "100"
+                                : d?.progress}
                             %
                           </span>
                         </div>
@@ -507,10 +512,10 @@ const CheckboxCell = React.memo(
     return (
       <span
         className={`h-4 w-4 rounded cursor-pointer border ${
-          new Date(fullDate).getDate() === new Date().getUTCDate() ? "border-darkSuccess shadow-[0_0_10px_rgba(34,197,94,0.8)]" : "border-white/10 light:border-black/10"
-        } ${
-          checked ? "bg-darkSuccess" : "bg-white/5 light:bg-black/5"
-        }`}
+          new Date(fullDate).getDate() === new Date().getUTCDate()
+            ? "border-darkSuccess shadow-[0_0_10px_rgba(34,197,94,0.8)]"
+            : "border-white/10 light:border-black/10"
+        } ${checked ? "bg-darkSuccess" : "bg-white/5 light:bg-black/5"}`}
         onClick={handleClick}
       />
     );
