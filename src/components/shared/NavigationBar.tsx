@@ -66,7 +66,7 @@ const NavigationBar = () => {
         <Logo />
       </div>
       <div className="flex items-center gap-4">
-        {location.pathname !== "/settings" && (
+        {isLogin && location.pathname !== "/settings" && (
           <CustomButton
             styling="cursor-pointer"
             onClick={() => navigate("/settings")}
@@ -88,11 +88,10 @@ const NavigationBar = () => {
         </CustomButton>
         <CustomButton
           onClick={() => {
-            if (!isLogin) setOpen(true);
+            if (!isLogin) navigate("/login");
             else handleLogout();
           }}
         >
-          {/* {logoutLoading ? <CircleLoader /> : "Logout"} */}
           <div className="flex items-center gap-1">
             <span className="sm:block hidden">
               {!isLogin ? "Login" : "Logout"}
@@ -101,7 +100,7 @@ const NavigationBar = () => {
           </div>
         </CustomButton>
       </div>
-      <AuthForm open={open} setOpen={setOpen} />
+      {/* <AuthForm open={open} setOpen={setOpen} /> */}
     </>
   );
 };

@@ -1,4 +1,4 @@
-import { Route, Routes } from "react-router-dom";
+import { Navigate, Route, Routes } from "react-router-dom";
 import "./App.css";
 import PageNotFound from "./components/shared/PageNotFound";
 import { useDispatch, useSelector } from "react-redux";
@@ -14,6 +14,7 @@ import { ToastContainer } from "react-toastify";
 import Settings from "./components/pages/Settings";
 import { socket } from "./socket/socket";
 import NoInternetConnection from "./components/shared/NoInternetConnection";
+import AuthForm from "./components/auth/AuthForm";
 
 function App() {
   const dispatch = useDispatch();
@@ -50,7 +51,6 @@ function App() {
           dispatch(removeCreds());
         }
       } catch (err) {
-        console.log("User not logged in", err);
         dispatch(removeCreds());
       } finally {
         setIsAuthLoading(false);
@@ -86,7 +86,7 @@ function App() {
 
   return (
     <>
-      {isOnline ? (
+      {!isOnline ? (
         <NoInternetConnection />
       ) : (
         <>
@@ -122,7 +122,18 @@ function App() {
                     element={isLogin ? <Dashboard /> : <HomePage />}
                   />
                   <Route path="/demo" element={<Demo />} />
-                  <Route path="/settings" element={<Settings />} />
+                  <Route
+                    path="/settings"
+                    element={
+                      isLogin ? <Settings /> : <Navigate to="/" replace />
+                    }
+                  />
+                  <Route
+                    path="/login"
+                    element={
+                      !isLogin ? <AuthForm /> : <Navigate to="/" replace />
+                    }
+                  />
                   <Route path="/*" element={<PageNotFound />} />
                 </Routes>
               </div>

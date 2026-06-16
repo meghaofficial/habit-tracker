@@ -32,11 +32,22 @@ const Settings = () => {
     new: "",
   });
   const [pwdLoading, setPwdLoading] = useState(false);
-  const [errMsg, setErrMsg] = useState("");
+  const [errMsg, setErrMsg] = useState<{
+    usernameErr: string;
+    oldPwdErr: string;
+    newPwdErr: string;
+  }>({
+    usernameErr: "",
+    oldPwdErr: "",
+    newPwdErr: "",
+  });
 
   const handleUpdateUsername = async () => {
     if (!username.trim()) {
-      setErrMsg("Username cannot be empty");
+      setErrMsg((prev) => ({
+        ...prev,
+        usernameErr: "Username cannot be empty",
+      }));
       return;
     }
     setUnameLoading(true);
@@ -53,14 +64,14 @@ const Settings = () => {
     } catch {
       notify.error("Please try again.");
     } finally {
-      setErrMsg("");
+      setErrMsg((prev) => ({ ...prev, usernameErr: "" }));
       setUnameLoading(false);
     }
   };
 
   const handleUpdatePassword = async () => {
     if (!pwds.old.trim() || !pwds.new.trim()) {
-      notify.error("Passwords cannot be empty");
+      setErrMsg((prev) => ({ ...prev, oldPwdErr: "This field is required", newPwdErr: "This field is required" }));
       return;
     }
     setPwdLoading(true);
@@ -147,12 +158,12 @@ const Settings = () => {
                           value={username}
                           onChange={(e) => {
                             setUsername(e.target.value);
-                            setErrMsg("");
+                            setErrMsg((prev) => ({ ...prev, usernameErr: "" }));
                           }}
                         />
-                        {errMsg && (
+                        {errMsg.usernameErr && (
                           <p className="absolute text-[10px] pt-0.5 text-red-500">
-                            {errMsg}
+                            {errMsg.usernameErr}
                           </p>
                         )}
                       </div>
@@ -184,27 +195,42 @@ const Settings = () => {
           {active === "Change Password" && (
             <div>
               <h1 className="text-2xl font-semibold mb-6">Change Password</h1>
+              <div className="relative w-full">
+                <input
+                  className="mt-1 w-full bg-white/5 light:bg-black/5 border border-white/10 light:border-black/10 rounded-lg p-2 text-[13px]"
+                  placeholder="Old Password"
+                  value={pwds.old}
+                  onChange={(e) => {
+                    setPwds((prev) => ({ ...prev, old: e.target.value }));
+                    setErrMsg((prev) => ({ ...prev, oldPwdErr: "" }));
+                  }}
+                />
+                {errMsg.oldPwdErr && (
+                  <p className="text-[10px] pt-0.5 text-red-500">
+                    {errMsg.oldPwdErr}
+                  </p>
+                )}
+              </div>
 
-              <input
-                className="mt-1 w-full bg-white/5 light:bg-black/5 border border-white/10 light:border-black/10 rounded-lg p-2 text-[13px]"
-                placeholder="Old Password"
-                value={pwds.old}
-                onChange={(e) =>
-                  setPwds((prev) => ({ ...prev, old: e.target.value }))
-                }
-              />
-
-              <input
-                className="my-3 mb-5 w-full text-[13px] bg-white/5 light:bg-black/5 border border-white/10 light:border-black/10 rounded-lg p-2"
-                placeholder="New Password"
-                value={pwds.new}
-                onChange={(e) =>
-                  setPwds((prev) => ({ ...prev, new: e.target.value }))
-                }
-              />
+              <div className="relative w-full my-3 mb-5">
+                <input
+                  className="w-full text-[13px] bg-white/5 light:bg-black/5 border border-white/10 light:border-black/10 rounded-lg p-2"
+                  placeholder="New Password"
+                  value={pwds.new}
+                  onChange={(e) => {
+                    setPwds((prev) => ({ ...prev, new: e.target.value }));
+                    setErrMsg((prev) => ({ ...prev, newPwdErr: "" }));
+                  }}
+                />
+                {errMsg.newPwdErr && (
+                  <p className="text-[10px] pt-0.5 text-red-500">
+                    {errMsg.newPwdErr}
+                  </p>
+                )}
+              </div>
 
               <button
-                className={`px-4 py-2 text-[13px] bg-yellow-500/20 border border-yellow-500/30 rounded-lg ${!pwdLoading && "hover:bg-yellow-500/30 cursor-pointer"}`}
+                className={`px-3 py-1.5 text-[13px] bg-yellow-500/20 border border-yellow-500/30 rounded-lg ${!pwdLoading && "hover:bg-yellow-500/30 cursor-pointer"}`}
                 onClick={() => !pwdLoading && handleUpdatePassword()}
               >
                 {pwdLoading ? <CircleLoader /> : "Change Password"}

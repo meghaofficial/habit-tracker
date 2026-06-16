@@ -254,11 +254,6 @@ const HomePage = () => {
           </footer>
         </div>
       </div>
-
-      {/* auth form */}
-      {/* <div>
-        <AuthForm open={open} setOpen={setOpen} />
-      </div> */}
     </>
   );
 };
