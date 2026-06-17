@@ -1,10 +1,10 @@
 import { useEffect, useState } from "react";
 import { FaRegEye, FaRegEyeSlash } from "react-icons/fa6";
 import { useDispatch } from "react-redux";
-// import { setCreds } from "../../redux/slices/authSlice";
-// import { axiosPublic } from "../../api/axios";
-// import CircleLoader from "../loaders/CircleLoader";
-// import { notify } from "../../helper";
+import { setCreds } from "../../redux/slices/authSlice";
+import { axiosPublic } from "../../api/axios";
+import CircleLoader from "../loaders/CircleLoader";
+import { notify } from "../../helper";
 import axios from "axios";
 
 // const AuthForm = () => {
@@ -227,7 +227,7 @@ import axios from "axios";
 
 // export default AuthForm
 
-import React from "react";
+import { RxCross2 } from "react-icons/rx";
 
 const AuthForm = () => {
   const [showPassword, setShowPassword] = useState(false);
@@ -240,6 +240,8 @@ const AuthForm = () => {
   const [loginActive, setLoginActive] = useState(true);
   const [signupLoading, setSignupLoading] = useState(false);
   const [loginLoading, setLoginLoading] = useState(false);
+
+  const [openOTP, setOpenOTP] = useState(false);
 
   const handleSignup = async () => {
     setSignupLoading(true);
@@ -254,12 +256,13 @@ const AuthForm = () => {
       });
 
       if (res?.data?.success) {
-        notify.success(res?.data?.message || "Account created successfully");
-        setLoginActive(true);
+        notify.success(res?.data?.message);
+        if (!openOTP) setOpenOTP(true);
+        // setLoginActive(true);
       }
     } catch (error) {
       console.error(error);
-      notify.error("Registration failed. Please try again.");
+      notify.error((error as any)?.response?.error);
     } finally {
       setSignupLoading(false);
     }
@@ -281,23 +284,23 @@ const AuthForm = () => {
           email: "",
           password: "",
         });
-        setOpen(false);
+        // setOpen(false);
       } else {
         notify.error(res.data.message);
       }
     } catch (error) {
       if (axios.isAxiosError(error)) {
         notify.error(error.response?.data.message);
-      } else {
-        notify.error("Login failed. Please try again.");
       }
+      // else {
+      //   notify.error("Login failed. Please try again.");
+      // }
     } finally {
       setLoginLoading(false);
     }
   };
 
-  const handleSubmit = async (e: React.SubmitEvent<HTMLFormElement>) => {
-    e.preventDefault();
+  const handleSubmit = async () => {
     if (signupLoading || loginLoading) return;
     if (loginActive) await handleLogin();
     else await handleSignup();
@@ -333,109 +336,295 @@ const AuthForm = () => {
               actions into meaningful long-term growth.
             </p>
           </div>
-
           <div className="max-w-md mx-auto relative overflow-hidden rounded-4xl border border-white/10 bg-black/20 backdrop-blur-2xl p-8 shadow-[0_30px_80px_rgba(0,0,0,0.25)]">
             {/* Glow */}
             <div className="absolute -right-20 -top-20 h-56 w-56 rounded-full bg-darkPrimary/10 blur-3xl" />
+            {openOTP ? (
+              <OTPComponent
+                email={formData.email}
+                setOpenOTP={setOpenOTP}
+                handleSignup={handleSignup}
+                setLoginActive={setLoginActive}
+              />
+            ) : (
+              <div className="relative">
+                {/* Header */}
+                <div className="text-center">
+                  <h2 className="text-3xl font-bold google-sans">
+                    Welcome Back
+                  </h2>
 
-            <div className="relative">
-              {/* Header */}
-              <div className="text-center">
-                <h2 className="text-3xl font-bold google-sans">Welcome Back</h2>
-
-                <p className="mt-2 text-sm text-gray-500">
-                  Continue your habit-building journey
-                </p>
-              </div>
-
-              {/* Form */}
-              <div className="mt-8 space-y-4">
-                <div>
-                  <label className="text-sm text-gray-400">Email Address</label>
-
-                  <input
-                    type="email"
-                    placeholder="john@example.com"
-                    className="mt-2 w-full rounded-2xl border border-white/10 bg-white/5 px-4 py-3 outline-none transition-all focus:border-darkPrimary focus:bg-white/10"
-                    value={formData.email}
-                    onChange={(e) =>
-                      setFormData((prev) => ({
-                        ...prev,
-                        email: e.target.value,
-                      }))
-                    }
-                  />
+                  <p className="mt-2 text-sm text-gray-500">
+                    Continue your habit-building journey
+                  </p>
                 </div>
 
-                <div>
-                  <label className="text-sm text-gray-400">Password</label>
+                {/* Form */}
+                <div className="mt-8 space-y-4">
+                  {!loginActive && (
+                    <div>
+                      <label className="text-sm text-gray-400">Username</label>
 
-                  <div className="relative">
+                      <input
+                        type="text"
+                        placeholder="John Doe"
+                        className="mt-2 w-full rounded-2xl border border-white/10 bg-white/5 px-4 py-3 outline-none transition-all focus:border-darkPrimary focus:bg-white/10"
+                        value={formData.username}
+                        onChange={(e) =>
+                          setFormData((prev) => ({
+                            ...prev,
+                            username: e.target.value,
+                          }))
+                        }
+                        required
+                      />
+                    </div>
+                  )}
+
+                  <div>
+                    <label className="text-sm text-gray-400">
+                      Email Address
+                    </label>
+
                     <input
-                      type={showPassword ? "text" : "password"}
-                      placeholder="••••••••"
+                      type="email"
+                      placeholder="john@example.com"
                       className="mt-2 w-full rounded-2xl border border-white/10 bg-white/5 px-4 py-3 outline-none transition-all focus:border-darkPrimary focus:bg-white/10"
-                      value={formData.password}
+                      value={formData.email}
                       onChange={(e) =>
                         setFormData((prev) => ({
                           ...prev,
-                          password: e.target.value,
+                          email: e.target.value,
                         }))
                       }
                     />
-                    <span
-                      onClick={() => setShowPassword(!showPassword)}
-                      className="absolute right-3 top-5.5 cursor-pointer text-gray-500"
-                    >
-                      {showPassword ? (
-                        <FaRegEye size={18} />
-                      ) : (
-                        <FaRegEyeSlash size={18} />
-                      )}
-                    </span>
                   </div>
-                </div>
 
-                <div className="flex justify-between items-center text-sm">
-                  <label className="flex items-center gap-2 text-gray-400 cursor-pointer">
-                    <input type="checkbox" />
-                    Remember me
-                  </label>
+                  <div>
+                    <label className="text-sm text-gray-400">Password</label>
 
-                  <button className="text-darkPrimary hover:underline">
-                    Forgot password?
+                    <div className="relative">
+                      <input
+                        type={showPassword ? "text" : "password"}
+                        placeholder="••••••••"
+                        className="mt-2 w-full rounded-2xl border border-white/10 bg-white/5 px-4 py-3 outline-none transition-all focus:border-darkPrimary focus:bg-white/10"
+                        value={formData.password}
+                        onChange={(e) =>
+                          setFormData((prev) => ({
+                            ...prev,
+                            password: e.target.value,
+                          }))
+                        }
+                      />
+                      <span
+                        onClick={() => setShowPassword(!showPassword)}
+                        className="absolute right-3 top-5.5 cursor-pointer text-gray-500"
+                      >
+                        {showPassword ? (
+                          <FaRegEye size={18} />
+                        ) : (
+                          <FaRegEyeSlash size={18} />
+                        )}
+                      </span>
+                    </div>
+                  </div>
+
+                  <div className="flex justify-between items-center text-sm">
+                    <label className="flex items-center gap-2 text-gray-400 cursor-pointer">
+                      <input type="checkbox" />
+                      Remember me
+                    </label>
+
+                    <button className="text-darkPrimary hover:underline">
+                      Forgot password?
+                    </button>
+                  </div>
+
+                  <button
+                    className="w-full mt-2 rounded-2xl bg-darkPrimary py-3 font-semibold text-white transition-all hover:scale-[1.02] hover:shadow-[0_10px_30px_rgba(91,92,246,0.35)]"
+                    onClick={handleSubmit}
+                  >
+                    {!signupLoading && !loginLoading ? (
+                      loginActive ? (
+                        "Sign In"
+                      ) : (
+                        "Sign Up"
+                      )
+                    ) : (
+                      <CircleLoader />
+                    )}
                   </button>
-                </div>
 
-                <button className="w-full mt-2 rounded-2xl bg-darkPrimary py-3 font-semibold text-white transition-all hover:scale-[1.02] hover:shadow-[0_10px_30px_rgba(91,92,246,0.35)]" onClick={handleSubmit}>
-                  {(!signupLoading && !loginLoading) ? loginActive ? 'Sign In' : 'Sign Up' : <CircleLoader />}
-                </button>
-
-                {/* Divider */}
-                {/* <div className="flex items-center gap-4 py-2">
+                  {/* Divider */}
+                  {/* <div className="flex items-center gap-4 py-2">
                   <div className="h-px flex-1 bg-white/10" />
                   <span className="text-xs text-gray-500">OR</span>
                   <div className="h-px flex-1 bg-white/10" />
                 </div> */}
 
-                {/* Google */}
-                {/* <button className="w-full rounded-2xl border border-white/10 bg-white/5 py-3 transition-all hover:bg-white/10">
+                  {/* Google */}
+                  {/* <button className="w-full rounded-2xl border border-white/10 bg-white/5 py-3 transition-all hover:bg-white/10">
                   Continue with Google
                 </button> */}
-              </div>
+                </div>
 
-              {/* Footer */}
-              <div className="mt-8 text-center text-sm text-gray-500">
-                Don't have an account?
-                <button className="ml-1 text-darkPrimary font-medium hover:underline">
-                  Create one
-                </button>
+                {/* Footer */}
+                <div className="mt-8 text-center text-sm text-gray-500">
+                  {loginActive
+                    ? "Don't have an account?"
+                    : "Already have an account?"}
+                  <button
+                    className="ml-1 text-darkPrimary font-medium hover:underline"
+                    onClick={() => setLoginActive((prev) => !prev)}
+                  >
+                    {loginActive ? "Create One" : "Sign In"}
+                  </button>
+                </div>
               </div>
-            </div>
+            )}
           </div>
         </div>
       </div>
     </>
+  );
+};
+
+const OTPComponent = ({
+  email,
+  setOpenOTP,
+  handleSignup,
+  setLoginActive
+}: {
+  email: string;
+  setOpenOTP: React.Dispatch<React.SetStateAction<boolean>>;
+  handleSignup: () => {};
+  setLoginActive: React.Dispatch<React.SetStateAction<boolean>>;
+}) => {
+  const [timeLeft, setTimeLeft] = useState(600);
+  const [isTimeUp, setIsTimeUp] = useState(false);
+  const [otp, setOtp] = useState("");
+
+  useEffect(() => {
+    if (timeLeft <= 0) {
+      setIsTimeUp(true);
+      return;
+    }
+    const timerId = setInterval(() => {
+      setTimeLeft((prevTime) => prevTime - 1);
+    }, 1000);
+    return () => clearInterval(timerId);
+  }, [timeLeft]);
+
+  const formatTime = (seconds: number) => {
+    const minutes = Math.floor(seconds / 60);
+    const secs = seconds % 60;
+    return `${String(minutes).padStart(2, "0")}:${String(secs).padStart(2, "0")}`;
+  };
+
+  const handleResend = async () => {
+    await handleSignup();
+    setTimeLeft(600);
+    setIsTimeUp(false);
+  };
+
+  const handleCancelOTP = async () => {
+    setOpenOTP(false);
+    try {
+      await axiosPublic.delete(`/cancel-signup-otp`, { data: { email } });
+    } catch (error) {
+      console.error(error);
+    }
+  };
+
+  const handleVerifyOTP = async () => {
+    try {
+      const res = await axiosPublic.post(`/verify-signup-otp`, {
+        email,
+        enteredOTP: otp,
+      });
+      if (res?.data?.success) {
+        setOpenOTP(false);
+        setLoginActive(true);
+      }
+    } catch (error) {
+      console.error(error);
+    }
+  };
+
+  useEffect(() => {
+    if (!email) setOpenOTP(false);
+  }, [email]);
+
+  return (
+    <div className="mt-4 relative">
+      {/* Icon */}
+      <div className="flex justify-center">
+        <div className="h-18 w-18 rounded-3xl bg-darkPrimary/10 border border-darkPrimary/20 flex items-center justify-center text-3xl">
+          ✉️
+        </div>
+      </div>
+
+      <RxCross2
+        className="cursor-pointer absolute right-0 -top-4 text-gray-500 hover:text-white light:text-black"
+        onClick={handleCancelOTP}
+      />
+
+      {/* Heading */}
+      <div className="text-center mt-5">
+        <h2 className="text-3xl font-bold google-sans">Verify Your Email</h2>
+
+        <p className="mt-2 text-gray-500 text-sm">
+          We've sent a verification code to
+        </p>
+
+        <p className="mt-1 font-medium">{email}</p>
+      </div>
+
+      {/* OTP Inputs */}
+      <div className="flex justify-center gap-3 mt-8">
+        <input
+          inputMode="numeric"
+          maxLength={6}
+          className=" h-14 w-full rounded-2xl tracking-widest border border-white/10 bg-white/5 text-center text-xl font-bold outline-none transition-all focus:border-darkPrimary focus:bg-white/10"
+          value={otp}
+          onChange={(e) => {
+            const value = e.target.value.replace(/[^0-9]/g, "");
+            setOtp(value);
+          }}
+        />
+      </div>
+
+      {/* Timer */}
+      <div className="mt-6 flex justify-center">
+        <div className=" rounded-full border border-white/10 bg-white/5 px-4 py-2 text-sm ">
+          ⏳ Expires in{" "}
+          <span className="font-semibold">{formatTime(timeLeft)}</span>
+        </div>
+      </div>
+
+      {/* Verify Button */}
+      <button
+        className="w-full mt-8 rounded-2xl bg-darkPrimary py-3 font-semibold text-white transition-all hover:scale-[1.02]"
+        onClick={handleVerifyOTP}
+      >
+        Verify Account
+      </button>
+
+      {/* Resend */}
+      <div className="mt-5 text-center">
+        <p className="text-gray-500 text-sm">Didn't receive the code?</p>
+
+        <button
+          className={`mt-2 ${isTimeUp ? "text-darkPrimary hover:underline" : "text-darkPrimary/50"} font-medium`}
+          onClick={() => {
+            if (!isTimeUp) return;
+            handleResend();
+          }}
+        >
+          Resend OTP
+        </button>
+      </div>
+    </div>
   );
 };
 
