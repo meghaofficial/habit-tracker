@@ -41,6 +41,8 @@ const Settings = () => {
     oldPwdErr: "",
     newPwdErr: "",
   });
+  const [changeWOtp, setChangeWOtp] = useState(false);
+  const [otp, setOtp] = useState("");
 
   const handleUpdateUsername = async () => {
     if (!username.trim()) {
@@ -71,7 +73,11 @@ const Settings = () => {
 
   const handleUpdatePassword = async () => {
     if (!pwds.old.trim() || !pwds.new.trim()) {
-      setErrMsg((prev) => ({ ...prev, oldPwdErr: "This field is required", newPwdErr: "This field is required" }));
+      setErrMsg((prev) => ({
+        ...prev,
+        oldPwdErr: "This field is required",
+        newPwdErr: "This field is required",
+      }));
       return;
     }
     setPwdLoading(true);
@@ -97,6 +103,21 @@ const Settings = () => {
     }
   };
 
+  const handleSendOtp = async () => {
+    setChangeWOtp((prev) => !prev);
+    // try {
+
+    //   const res = await axiosPrivate.post("/change-password-otp", { enteredOTP: otp });
+    //   if (res.data.success) {
+    //     setOtp("");
+    //     setChangeWOtp(false);
+    //   }
+
+    // } catch (error) {
+    //   notify.error((error as any).response.data.message);
+    // }
+  };
+
   return (
     <>
       <nav className="flex justify-between items-center py-5 sm:pt-5 mt-4 w-full px-5">
@@ -119,7 +140,7 @@ const Settings = () => {
               onClick={() => setActive(item)}
               className={`cursor-pointer px-4 py-2 rounded-lg text-[14px] transition ${
                 active === item
-                  ? "bg-white/10 text-[#a955f7]"
+                  ? "bg-white/10 light:bg-black/10 text-[#a955f7] font-bold"
                   : "hover:bg-white/5 text-gray-400"
               }`}
             >
@@ -194,47 +215,93 @@ const Settings = () => {
           {/* SECURITY */}
           {active === "Change Password" && (
             <div>
-              <h1 className="text-2xl font-semibold mb-6">Change Password</h1>
-              <div className="relative w-full">
-                <input
-                  className="mt-1 w-full bg-white/5 light:bg-black/5 border border-white/10 light:border-black/10 rounded-lg p-2 text-[13px]"
-                  placeholder="Old Password"
-                  value={pwds.old}
-                  onChange={(e) => {
-                    setPwds((prev) => ({ ...prev, old: e.target.value }));
-                    setErrMsg((prev) => ({ ...prev, oldPwdErr: "" }));
-                  }}
-                />
-                {errMsg.oldPwdErr && (
-                  <p className="text-[10px] pt-0.5 text-red-500">
-                    {errMsg.oldPwdErr}
-                  </p>
-                )}
+              <div className="flex items-center justify-between mb-6">
+                <h1 className="text-2xl font-semibold">Change Password</h1>
+                <p
+                  className="text-[12px] hover:underline text-blue-600 cursor-pointer"
+                  onClick={handleSendOtp}
+                >
+                  {changeWOtp ? "Change with old password" : "Change with Otp"}
+                </p>
               </div>
 
-              <div className="relative w-full my-3 mb-5">
-                <input
-                  className="w-full text-[13px] bg-white/5 light:bg-black/5 border border-white/10 light:border-black/10 rounded-lg p-2"
-                  placeholder="New Password"
-                  value={pwds.new}
-                  onChange={(e) => {
-                    setPwds((prev) => ({ ...prev, new: e.target.value }));
-                    setErrMsg((prev) => ({ ...prev, newPwdErr: "" }));
-                  }}
-                />
-                {errMsg.newPwdErr && (
-                  <p className="text-[10px] pt-0.5 text-red-500">
-                    {errMsg.newPwdErr}
-                  </p>
-                )}
-              </div>
+              {!changeWOtp ? (
+                <>
+                  <div className="relative w-full">
+                    <input
+                      className="mt-1 w-full bg-white/5 light:bg-black/5 border border-white/10 light:border-black/10 rounded-lg p-2 text-[13px]"
+                      placeholder="Old Password"
+                      value={pwds.old}
+                      onChange={(e) => {
+                        setPwds((prev) => ({ ...prev, old: e.target.value }));
+                        setErrMsg((prev) => ({ ...prev, oldPwdErr: "" }));
+                      }}
+                    />
+                    {errMsg.oldPwdErr && (
+                      <p className="text-[10px] pt-0.5 text-red-500">
+                        {errMsg.oldPwdErr}
+                      </p>
+                    )}
+                  </div>
 
-              <button
-                className={`px-3 py-1.5 text-[13px] bg-yellow-500/20 border border-yellow-500/30 rounded-lg ${!pwdLoading && "hover:bg-yellow-500/30 cursor-pointer"}`}
-                onClick={() => !pwdLoading && handleUpdatePassword()}
-              >
-                {pwdLoading ? <CircleLoader /> : "Change Password"}
-              </button>
+                  <div className="relative w-full my-3 mb-5">
+                    <input
+                      className="w-full text-[13px] bg-white/5 light:bg-black/5 border border-white/10 light:border-black/10 rounded-lg p-2"
+                      placeholder="New Password"
+                      value={pwds.new}
+                      onChange={(e) => {
+                        setPwds((prev) => ({ ...prev, new: e.target.value }));
+                        setErrMsg((prev) => ({ ...prev, newPwdErr: "" }));
+                      }}
+                    />
+                    {errMsg.newPwdErr && (
+                      <p className="text-[10px] pt-0.5 text-red-500">
+                        {errMsg.newPwdErr}
+                      </p>
+                    )}
+                  </div>
+
+                  <button
+                    className={`px-3 py-1.5 text-[13px] bg-yellow-500/20 border border-yellow-500/30 rounded-lg ${!pwdLoading && "hover:bg-yellow-500/30 cursor-pointer"}`}
+                    onClick={() => !pwdLoading && handleUpdatePassword()}
+                  >
+                    {pwdLoading ? <CircleLoader /> : "Change Password"}
+                  </button>
+                </>
+              ) : (
+                <>
+                  <p className="text-[12px] text-gray-500 mb-4">
+                    OTP has been sent to {user.email} & will be valid till 10.
+                    min
+                  </p>
+                  <div className="flex items-start gap-3">
+                    <div className="relative w-1/2">
+                      <input
+                        className="w-full bg-white/5 light:bg-black/5 border border-white/10 light:border-black/10 rounded-lg p-2 text-[13px]"
+                        placeholder="Enter OTP"
+                        maxLength={6}
+                        value={otp}
+                        onChange={(e) => {
+                          const value = e.target.value.replace(/[^0-9]/g, "");
+                          setOtp(value);
+                        }}
+                      />
+                      {errMsg.oldPwdErr && (
+                        <p className="text-[10px] pt-0.5 text-red-500">
+                          {errMsg.oldPwdErr}
+                        </p>
+                      )}
+                    </div>
+                    <button
+                      className={`px-5 py-2 text-[13px] bg-yellow-500/20 text-nowrap border border-yellow-500/30 rounded-lg ${!pwdLoading && "hover:bg-yellow-500/30 cursor-pointer"}`}
+                      onClick={() => !pwdLoading && handleUpdatePassword()}
+                    >
+                      {/* {pwdLoading ? <CircleLoader /> : "Change Password"} */}
+                      Verify
+                    </button>
+                  </div>
+                </>
+              )}
             </div>
           )}
 
@@ -272,13 +339,28 @@ const Settings = () => {
             <div>
               <h1 className="text-2xl font-semibold mb-6">Notifications</h1>
 
-              <div className="flex justify-between items-center">
-                <span>Email Notifications</span>
-                <input
-                  type="checkbox"
-                  className="accent-purple-500"
-                  defaultChecked
-                />
+              <div className="flex flex-col gap-8">
+                {[
+                  { label: "Daily Reminders", checked: true },
+                  { label: "Weekly Summary", checked: true },
+                  { label: "Monthly Summary", checked: true },
+                  { label: "Daily Reminders", checked: true },
+                  { label: "Daily Reminders", checked: true },
+                  { label: "Daily Reminders", checked: true },
+                ].map((data, index) => (
+                  <div
+                    className="flex justify-between items-center"
+                    key={index}
+                  >
+                    <span>{data.label}</span>
+                    <input
+                      type="checkbox"
+                      className="accent-purple-500"
+                      // defaultChecked
+                      checked={data.checked}
+                    />
+                  </div>
+                ))}
               </div>
             </div>
           )}
