@@ -1,32 +1,22 @@
 import { useEffect, useState } from "react";
 import { axiosPrivate } from "../../../api/axios";
 import { MonthlyLineChart } from "../../charts/MonthlyLineChart";
-import { ProgressPie } from "../../charts/ProgressPie";
-import TodayAllTasks from "../../charts/TodayAllTasks";
 import { WeeklyBarChart } from "../../charts/WeeklyBarChart";
-import Calendar from "../track/calander/Calendar";
 import { motion, AnimatePresence } from "framer-motion";
 import { formatDateString } from "../../../helper";
 import type { DateLogI, TaskI, StreakI } from "../../../types";
 import { IoDesktopOutline } from "react-icons/io5";
 import Card from "../../shared/Card";
-import { useSelector } from "react-redux";
 
 const AnalysisMainComponent = ({
   taskList,
   monthDashID,
   log,
-  setLog,
-  todayDate,
-  setTodayDate,
   streakData,
 }: {
   taskList: TaskI[];
   monthDashID: string;
   log: DateLogI;
-  setLog: React.Dispatch<React.SetStateAction<DateLogI>>;
-  todayDate: string;
-  setTodayDate: React.Dispatch<React.SetStateAction<string>>;
   streakData: StreakI;
 }) => {
   const [weeklyAna, setWeeklyAna] = useState<{

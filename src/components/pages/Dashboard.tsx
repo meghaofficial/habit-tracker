@@ -388,9 +388,6 @@ const Dashboard = () => {
                 taskList={taskList}
                 monthDashID={dashboardData?._id}
                 log={log}
-                setLog={setLog}
-                todayDate={todayDate}
-                setTodayDate={setTodayDate}
                 streakData={streakData}
               />
             )}
