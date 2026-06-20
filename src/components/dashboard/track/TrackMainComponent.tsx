@@ -25,6 +25,8 @@ import CustomButton from "../../shared/CutomButton";
 import CircleLoader from "../../loaders/CircleLoader";
 import DonutGraph from "./DonutGraph";
 import { type StreakI } from "../../../types";
+import { useSelector } from "react-redux";
+import type { RootState } from "../../../redux/store/store";
 
 const TrackMainComponent = ({
   dashboardData,
@@ -52,8 +54,9 @@ const TrackMainComponent = ({
     dateLogProgress: [],
     taskProgress: [],
   });
-    const [getLogLoading, setGetLogLoading] = useState(false);
+  const [getLogLoading, setGetLogLoading] = useState(false);
   const isMobile = useIsMobile();
+  const user = useSelector((state: RootState) => state.auth);
 
   const getTodayProgress = () => {
     const d = new Date();
@@ -77,7 +80,18 @@ const TrackMainComponent = ({
       <div className="sm:flex hidden gap-4 mt-4 relative">
         {/* left detail */}
         <div className="bg-black/20 border border-white/10 w-[19.5%] backdrop-blur-2xl light:bg-lightCard light:border-lightBorder rounded-2xl overflow-x-hidden h-25 absolute -top-29 p-3 flex flex-col justify-between">
-          <p className="text-3xl tracking-wider font-bold playfair-display px-3 line-clamp-1">
+          <div className="flex gap-4">
+            <div className="border border-white/10 light:border-black/10 rounded-full h-10 w-10 flex items-center justify-center">
+              <div className="h-9 w-9 border border-white/10 light:border-black/10 bg-white/5 light:bg-black/5 rounded-full flex items-center justify-center uppercase">{user.username.slice(0, 1)}</div>
+            </div>
+            <div>
+              <p className="font-bold playfair-display">
+              Hello, <br /> {user.username}
+            </p>
+            <span className="text-[10px] text-gray-500">{user.email}</span>
+            </div>
+          </div>
+          {/* <p className="text-3xl tracking-wider font-bold playfair-display px-3 line-clamp-1">
             {new Date().getDate()},
             {monMap?.[new Date(activeMonth?.startDate).getMonth() + 1]}
           </p>
@@ -89,11 +103,11 @@ const TrackMainComponent = ({
               {formatMonthYearSimple(activeMonth?.startDate)} -{" "}
               {formatMonthYearSimple(activeMonth?.endDate)}
             </span>
-          </div>
+          </div> */}
         </div>
         {/* right detail */}
-        <div className="bg-black/20 border border-white/10 w-[14.5%] backdrop-blur-2xl light:bg-lightCard light:border-lightBorder rounded-2xl overflow-x-hidden h-25 absolute -top-29 right-0 overflow-y-hidden flex">
-          <div>
+        <div className="bg-black/20 border border-white/10 w-[14.5%] backdrop-blur-2xl light:bg-lightCard light:border-lightBorder rounded-2xl overflow-x-hidden h-25 absolute -top-29 py-2 right-0 overflow-y-hidden flex flex-col justify-between">
+          {/* <div>
             <p className="text-[14px] text-nowrap absolute top-3 left-3 text-gray-500">
               Monthly Streak
             </p>
@@ -103,12 +117,31 @@ const TrackMainComponent = ({
           </div>
           <div className="absolute right-0 bottom-3">
             <span className="text-[40px] leading-none">🔥</span>
+          </div> */}
+          <p className="text-2xl tracking-wider font-bold playfair-display px-3 line-clamp-1">
+            {new Date().getDate()},
+            {monMap?.[new Date(activeMonth?.startDate).getMonth() + 1]}
+          </p>
+          <div className="flex flex-col items-start px-3">
+            <span className="text-[10px] text-gray-500">
+              {activeMonth?.status === "active" && "Current Plan"}
+            </span>
+            <p className="text-[9px] mt-0.5 tracking-wider text-nowrap">
+              <span className="text-gray-500">Started at -</span> {formatMonthYearSimple(activeMonth?.startDate)}
+            </p>
+            <p className="text-[9px] tracking-wider text-nowrap">
+              <span className="text-gray-500">Ended at&nbsp; -</span> {formatMonthYearSimple(activeMonth?.endDate)}
+            </p>
           </div>
         </div>
 
         {/* below sections */}
         <div className="bg-black/20 border border-white/10 w-[20%] light:bg-lightCard light:border-lightBorder rounded-2xl overflow-x-hidden">
-          <HabitSection taskList={taskList} setTaskList={setTaskList} getLogLoading={getLogLoading} />
+          <HabitSection
+            taskList={taskList}
+            setTaskList={setTaskList}
+            getLogLoading={getLogLoading}
+          />
         </div>
         <div className="w-[65%] rounded-2xl relative">
           <DailyCalanderTaskSheet

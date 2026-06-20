@@ -53,7 +53,6 @@ const Dashboard = () => {
     fullDate: new Date(),
     tasks: [],
   });
-  const [todayDate, setTodayDate] = useState("");
   const [activeSubsLoading, setActiveSubsLoading] = useState(false);
   const [streakData, setStreakData] = useState<StreakI>({
     streak: 0,

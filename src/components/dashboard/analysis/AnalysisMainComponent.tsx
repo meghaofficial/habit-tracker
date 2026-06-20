@@ -7,6 +7,7 @@ import { formatDateString } from "../../../helper";
 import type { DateLogI, TaskI, StreakI } from "../../../types";
 import { IoDesktopOutline } from "react-icons/io5";
 import Card from "../../shared/Card";
+import HeatMap from "./HeatMap";
 
 const AnalysisMainComponent = ({
   taskList,
@@ -117,24 +118,24 @@ const AnalysisMainComponent = ({
           <Card heading="" cardWidth="w-full">
             <div className="grid grid-cols-2 gap-4">
               {[
-                {
-                  title: "Streak",
-                  logo: "🔥",
-                  data: (
-                    <span className="text-[64px] leading-none font-bold google-sans">
-                      {streakData?.streak}
-                    </span>
-                  ),
-                },
-                {
-                  title: "Longest Streak",
-                  logo: "🫡",
-                  data: (
-                    <span className="text-[64px] leading-none font-bold google-sans">
-                      {streakData?.longestStreak}
-                    </span>
-                  ),
-                },
+                // {
+                //   title: "Streak",
+                //   logo: "🔥",
+                //   data: (
+                //     <span className="text-[64px] leading-none font-bold google-sans">
+                //       {streakData?.streak}
+                //     </span>
+                //   ),
+                // },
+                // {
+                //   title: "Longest Streak",
+                //   logo: "🫡",
+                //   data: (
+                //     <span className="text-[64px] leading-none font-bold google-sans">
+                //       {streakData?.longestStreak}
+                //     </span>
+                //   ),
+                // },
                 {
                   title: "Most Consistent Habit",
                   logo:
@@ -164,7 +165,10 @@ const AnalysisMainComponent = ({
                   ),
                 },
               ].map((d, index) => (
-                <div className="rounded-2xl bg-white/5 border border-white/10 light:bg-black/5 light:border-black/10 p-4 flex flex-col justify-between min-h-40" key={index}>
+                <div
+                  className="rounded-2xl bg-white/5 border border-white/10 light:bg-black/5 light:border-black/10 p-4 flex flex-col justify-between min-h-40"
+                  key={index}
+                >
                   <div>
                     <span className="text-[13px] tracking-wide text-gray-500">
                       {d.title}
@@ -178,6 +182,18 @@ const AnalysisMainComponent = ({
                   </div>
                 </div>
               ))}
+            </div>
+            <div className="rounded-2xl bg-white/5 border border-white/10 light:bg-black/5 light:border-black/10 p-4 flex flex-col justify-evenly min-h-40 mt-4">
+              <div>
+                <span className="text-[13px] tracking-wide text-gray-500">
+                  Heatmap
+                </span>
+              </div>
+
+              <div className="flex items-end justify-between mt-4">
+                <HeatMap />
+                {/* <span className="text-[44px] leading-none">logo</span> */}
+              </div>
             </div>
           </Card>
         </div>
