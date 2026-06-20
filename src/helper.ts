@@ -1,6 +1,5 @@
 import { toast } from "react-toastify";
 import type { SubscriptionI } from "./types";
-// import debounce from 'lodash.debounce';
 
 export const notify = {
   success: (msg: string) => toast.success(msg),
@@ -162,18 +161,4 @@ export function formatTimestamp(isoString: string) {
   hours = hours % 12;
   hours = hours ? hours : 12; // Handle '0' hours as '12'
   return `${day}-${monthName}-${year} | ${hours}:${minutes} ${ampm}`;
-}
-function getInclusiveMonthCount(
-  startDateISO: Date | string,
-  endDateISO: Date | string,
-) {
-  const start = new Date(startDateISO);
-  const end = new Date(endDateISO);
-  const result = [];
-  const current = new Date(start.getFullYear(), start.getMonth(), 1);
-  while (current <= end) {
-    result.push(current.getMonth() + 1);
-    current.setMonth(current.getMonth() + 1);
-  }
-  return result;
 }

@@ -43,6 +43,11 @@ const Settings = () => {
   });
   const [changeWOtp, setChangeWOtp] = useState(false);
   const [otp, setOtp] = useState("");
+  const [sendOTPLoading, setSendOTPLoading] = useState(false);
+  const [verifyOtpLoading, setVerifyOtpLoading] = useState(false);
+  const [changePwdAfterVerify, setChangePwdAfterVerify] = useState(false);
+  const [changePwdLoading, setChangePwdLoading] = useState(false);
+  const [newPwd, setNewPwd] = useState("");
 
   const handleUpdateUsername = async () => {
     if (!username.trim()) {
@@ -104,18 +109,55 @@ const Settings = () => {
   };
 
   const handleSendOtp = async () => {
-    setChangeWOtp((prev) => !prev);
-    // try {
+    setSendOTPLoading(true);
+    try {
+      const res = await axiosPrivate.post("/forgot-password", {
+        email: user.email,
+      });
+      if (res.data.success) {
+        notify.success(res.data.message);
+      }
+    } catch (error) {
+      notify.error((error as any).response.data.message);
+    } finally {
+      setSendOTPLoading(false);
+    }
+  };
 
-    //   const res = await axiosPrivate.post("/change-password-otp", { enteredOTP: otp });
-    //   if (res.data.success) {
-    //     setOtp("");
-    //     setChangeWOtp(false);
-    //   }
+  const handleVerifyOtp = async () => {
+    setVerifyOtpLoading(true);
+    try {
+      const res = await axiosPrivate.post("/verify-change-pwd-otp", {
+        email: user.email,
+        enteredOTP: otp,
+      });
+      if (res.data.success) {
+        notify.success(res.data.message);
+        setChangePwdAfterVerify(true);
+      }
+    } catch (error) {
+      notify.error((error as any).response.data.message);
+    } finally {
+      setVerifyOtpLoading(false);
+    }
+  };
 
-    // } catch (error) {
-    //   notify.error((error as any).response.data.message);
-    // }
+  const handleChangePassword = async () => {
+    setChangePwdLoading(true);
+    try {
+      const res = await axiosPrivate.post("/reset-password", {
+        email: user.email,
+        new_password: newPwd,
+      });
+      if (res.data.success) {
+        notify.success(res.data.message);
+        setChangeWOtp(false);
+      }
+    } catch (error) {
+      notify.error((error as any).response.data.message);
+    } finally {
+      setChangePwdLoading(false);
+    }
   };
 
   return (
@@ -215,14 +257,32 @@ const Settings = () => {
           {/* SECURITY */}
           {active === "Change Password" && (
             <div>
+              {/* <div className="w-20 rounded-lg h-5 animate-pulse bg-white/10 light:bg-black/10"></div> */}
               <div className="flex items-center justify-between mb-6">
                 <h1 className="text-2xl font-semibold">Change Password</h1>
-                <p
-                  className="text-[12px] hover:underline text-blue-600 cursor-pointer"
-                  onClick={handleSendOtp}
-                >
-                  {changeWOtp ? "Change with old password" : "Change with Otp"}
-                </p>
+                {changeWOtp ? (
+                  <p
+                    className="text-[12px] hover:underline text-blue-600 cursor-pointer"
+                    onClick={() => setChangeWOtp(false)}
+                  >
+                    Change with old password
+                  </p>
+                ) : (
+                  <p
+                    className="text-[12px] hover:underline text-blue-600 cursor-pointer"
+                    onClick={() => {
+                      if (sendOTPLoading) return;
+                      setChangeWOtp(true);
+                      handleSendOtp();
+                    }}
+                  >
+                    {sendOTPLoading ? (
+                      <div className="w-20 rounded-lg h-5 animate-pulse bg-white/10 light:bg-black/10"></div>
+                    ) : (
+                      <p>Change with Otp</p>
+                    )}
+                  </p>
+                )}
               </div>
 
               {!changeWOtp ? (
@@ -233,7 +293,10 @@ const Settings = () => {
                       placeholder="Old Password"
                       value={pwds.old}
                       onChange={(e) => {
-                        setPwds((prev) => ({ ...prev, old: e.target.value }));
+                        setPwds((prev) => ({
+                          ...prev,
+                          old: e.target.value,
+                        }));
                         setErrMsg((prev) => ({ ...prev, oldPwdErr: "" }));
                       }}
                     />
@@ -250,7 +313,10 @@ const Settings = () => {
                       placeholder="New Password"
                       value={pwds.new}
                       onChange={(e) => {
-                        setPwds((prev) => ({ ...prev, new: e.target.value }));
+                        setPwds((prev) => ({
+                          ...prev,
+                          new: e.target.value,
+                        }));
                         setErrMsg((prev) => ({ ...prev, newPwdErr: "" }));
                       }}
                     />
@@ -268,10 +334,40 @@ const Settings = () => {
                     {pwdLoading ? <CircleLoader /> : "Change Password"}
                   </button>
                 </>
+              ) : sendOTPLoading ? (
+                <div className="w-full rounded-lg h-20 animate-pulse bg-white/10 light:bg-black/10"></div>
+              ) : changePwdAfterVerify ? (
+                <>
+                  <p className="text-[12px] text-gray-500 mb-4">
+                    Account has been verified. Do not refresh or close this tab for successful password change.
+                  </p>
+                  <div className="flex items-start gap-3">
+                    <div className="relative w-1/2">
+                      <input
+                      type="text"
+                        className="w-full bg-white/5 light:bg-black/5 border border-white/10 light:border-black/10 rounded-lg p-2 text-[13px]"
+                        placeholder="Enter new password"
+                        value={newPwd}
+                        onChange={(e) => {
+                          const value = e.target.value;
+                          setNewPwd(value);
+                        }}
+                      />
+                    </div>
+                    <button
+                      className={`px-5 py-2 text-[13px] bg-green-500/20 text-nowrap border border-green-500/30 rounded-lg ${!changePwdLoading && "hover:bg-green-500/30 cursor-pointer"}`}
+                      onClick={() =>
+                        !changePwdLoading && newPwd && handleChangePassword()
+                      }
+                    >
+                      {changePwdLoading ? <CircleLoader /> : "Submit"}
+                    </button>
+                  </div>
+                </>
               ) : (
                 <>
                   <p className="text-[12px] text-gray-500 mb-4">
-                    OTP has been sent to {user.email} & will be valid till 10.
+                    OTP has been sent to {user.email} & will be valid till 10
                     min
                   </p>
                   <div className="flex items-start gap-3">
@@ -286,18 +382,14 @@ const Settings = () => {
                           setOtp(value);
                         }}
                       />
-                      {errMsg.oldPwdErr && (
-                        <p className="text-[10px] pt-0.5 text-red-500">
-                          {errMsg.oldPwdErr}
-                        </p>
-                      )}
                     </div>
                     <button
                       className={`px-5 py-2 text-[13px] bg-yellow-500/20 text-nowrap border border-yellow-500/30 rounded-lg ${!pwdLoading && "hover:bg-yellow-500/30 cursor-pointer"}`}
-                      onClick={() => !pwdLoading && handleUpdatePassword()}
+                      onClick={() =>
+                        !verifyOtpLoading && otp && handleVerifyOtp()
+                      }
                     >
-                      {/* {pwdLoading ? <CircleLoader /> : "Change Password"} */}
-                      Verify
+                      {verifyOtpLoading ? <CircleLoader /> : "Verify"}
                     </button>
                   </div>
                 </>
