@@ -95,11 +95,8 @@ const Subscription = () => {
 
   useEffect(() => {
     getActiveSubscription();
-  }, []);
-
-  useEffect(() => {
     getAllSubs();
-  }, [scheduledList]);
+  }, []);
 
   return (
     <>
@@ -181,15 +178,26 @@ const Subscription = () => {
         <div className="bg-red-500/5 w-full border border-red-500/10 rounded-2xl p-4">
           <h1 className="font-semibold text-red-500">Expired Subscriptions</h1>
           <div className="mt-2">
-            {expiredList?.map((exp, index) => (
-              <div className="flex items-center justify-between mt-2" key={index}>
-                <p className="text-[12px]">
-                  {formatMonthYearSimple(exp?.startDate)} -{" "}
-                  {formatMonthYearSimple(exp?.endDate)}
-                </p>
-                <p className="text-[12px] capitalize">{exp?.planType}</p>
+            {expiredList?.length > 0 ? (
+              <>
+                {expiredList?.map((exp, index) => (
+                  <div
+                    className="flex items-center justify-between mt-2"
+                    key={index}
+                  >
+                    <p className="text-[12px]">
+                      {formatMonthYearSimple(exp?.startDate)} -{" "}
+                      {formatMonthYearSimple(exp?.endDate)}
+                    </p>
+                    <p className="text-[12px] capitalize">{exp?.planType}</p>
+                  </div>
+                ))}
+              </>
+            ) : (
+              <div className="h-50 flex items-center justify-center text-gray-500/50">
+                No subscription expired
               </div>
-            ))}
+            )}
           </div>
         </div>
         <div className="bg-yellow-500/5 w-full border border-yellow-500/10 rounded-2xl p-4">
@@ -197,15 +205,26 @@ const Subscription = () => {
             Scheduled Subscriptions
           </h1>
           <div className="mt-2">
-            {scheduledList?.map((sch, index) => (
-              <div className="flex items-center justify-between mt-2" key={index}>
-                <p className="text-[12px]">
-                  {formatMonthYearSimple(sch?.startDate)} -{" "}
-                  {formatMonthYearSimple(sch?.endDate)}
-                </p>
-                <p className="text-[12px] capitalize">{sch?.planType}</p>
+            {scheduledList?.length > 0 ? (
+              <>
+                {scheduledList?.map((sch, index) => (
+                  <div
+                    className="flex items-center justify-between mt-2"
+                    key={index}
+                  >
+                    <p className="text-[12px]">
+                      {formatMonthYearSimple(sch?.startDate)} -{" "}
+                      {formatMonthYearSimple(sch?.endDate)}
+                    </p>
+                    <p className="text-[12px] capitalize">{sch?.planType}</p>
+                  </div>
+                ))}
+              </>
+            ) : (
+              <div className="h-50 flex items-center justify-center text-gray-500/50">
+                No subscription scheduled
               </div>
-            ))}
+            )}
           </div>
         </div>
       </div>

@@ -118,7 +118,8 @@ const Settings = () => {
         notify.success(res.data.message);
       }
     } catch (error) {
-      notify.error((error as any).response.data.message);
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      notify.error((error as any)?.response?.data?.message || "An unexpected error occurred");
     } finally {
       setSendOTPLoading(false);
     }
@@ -136,7 +137,8 @@ const Settings = () => {
         setChangePwdAfterVerify(true);
       }
     } catch (error) {
-      notify.error((error as any).response.data.message);
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      notify.error((error as any)?.response?.data?.message || "An unexpected error occurred");
     } finally {
       setVerifyOtpLoading(false);
     }
@@ -154,7 +156,8 @@ const Settings = () => {
         setChangeWOtp(false);
       }
     } catch (error) {
-      notify.error((error as any).response.data.message);
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      notify.error((error as any)?.response?.data?.message || "An unexpected error occurred");
     } finally {
       setChangePwdLoading(false);
     }
