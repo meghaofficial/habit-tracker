@@ -354,7 +354,7 @@ const Dashboard = () => {
               <NavigationBar />
             </nav>
             <div className="flex items-center justify-center w-full sm:mt-4">
-              <div className="flex items-center gap-2 rounded-2xl sm:w-fit w-full border border-white/10 bg-black/20 light:border-black/10 p-1 backdrop-blur-xl light:bg-lightCard">
+              <div className="flex items-center gap-2 rounded-2xl sm:w-fit w-full border border-white/10 bg-black/20 light:border-black/10 p-1 backdrop-blur-xl light:bg-lightCard overflow-x-auto">
                 {navMenu.map((tab) => (
                   <button
                     key={tab.key}

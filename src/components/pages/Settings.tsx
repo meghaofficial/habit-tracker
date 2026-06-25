@@ -16,7 +16,7 @@ const sections = [
   "Change Password",
   "Subscription",
   // "Notifications",
-  "Support",
+  "Help",
 ];
 
 const Settings = () => {
@@ -119,7 +119,10 @@ const Settings = () => {
       }
     } catch (error) {
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      notify.error((error as any)?.response?.data?.message || "An unexpected error occurred");
+      notify.error(
+        (error as any)?.response?.data?.message ||
+          "An unexpected error occurred",
+      );
     } finally {
       setSendOTPLoading(false);
     }
@@ -138,7 +141,10 @@ const Settings = () => {
       }
     } catch (error) {
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      notify.error((error as any)?.response?.data?.message || "An unexpected error occurred");
+      notify.error(
+        (error as any)?.response?.data?.message ||
+          "An unexpected error occurred",
+      );
     } finally {
       setVerifyOtpLoading(false);
     }
@@ -157,7 +163,10 @@ const Settings = () => {
       }
     } catch (error) {
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      notify.error((error as any)?.response?.data?.message || "An unexpected error occurred");
+      notify.error(
+        (error as any)?.response?.data?.message ||
+          "An unexpected error occurred",
+      );
     } finally {
       setChangePwdLoading(false);
     }
@@ -168,30 +177,31 @@ const Settings = () => {
       <nav className="flex justify-between items-center py-5 sm:pt-5 mt-4 w-full px-5">
         <NavigationBar />
       </nav>
-      <div className="min-h-screen flex google-sans p-2 px-5 pb-4 gap-4">
+      <div className="min-h-screen flex sm:flex-row flex-col google-sans p-2 px-5 pb-4 gap-4">
         {/* Sidebar */}
-        <div className="w-64 border rounded-3xl bg-black/20 light:bg-lightCard light:border-black/10  border-white/10 p-6 space-y-4">
-          <div className="flex items-center gap-3 mb-6">
+        <div className="sm:w-64 w-full border rounded-3xl bg-black/20 light:bg-lightCard light:border-black/10  border-white/10 p-6 space-y-4">
+          <div className="sm:flex hidden items-center gap-3 mb-6">
             <IoIosArrowBack
               className="cursor-pointer light:text-black"
               onClick={() => navigate("/")}
             />
             <h2 className="text-xl font-semibold light:text-black">Settings</h2>
           </div>
-
-          {sections.map((item) => (
-            <div
-              key={item}
-              onClick={() => setActive(item)}
-              className={`cursor-pointer px-4 py-2 rounded-lg text-[14px] transition ${
-                active === item
-                  ? "bg-white/10 light:bg-black/10 text-[#a955f7] font-bold"
-                  : "hover:bg-white/5 text-gray-400"
-              }`}
-            >
-              {item}
-            </div>
-          ))}
+          <div className="flex sm:flex-col flex-row w-full gap-5 justify-evenly">
+            {sections.map((item) => (
+              <div
+                key={item}
+                onClick={() => setActive(item)}
+                className={`cursor-pointer px-4 py-2 rounded-lg text-[14px] transition ${
+                  active === item
+                    ? "bg-white/10 light:bg-black/10 text-[#a955f7] font-bold"
+                    : "hover:bg-white/5 text-gray-400"
+                }`}
+              >
+                {item}
+              </div>
+            ))}
+          </div>
         </div>
 
         {/* Content */}
@@ -420,9 +430,7 @@ const Settings = () => {
             )}
 
             {/* SUBSCRIPTION */}
-            {active === "Subscription" && (
-              <Subscription />
-            )}
+            {active === "Subscription" && <Subscription />}
 
             {/* NOTIFICATIONS */}
             {active === "Notifications" && (
@@ -455,13 +463,13 @@ const Settings = () => {
               </div>
             )}
 
-            {/* SUPPORT */}
-            {active === "Support" && (
+            {/* Help */}
+            {active === "Help" && (
               <div>
-                <h1 className="text-2xl font-semibold mb-6">Support</h1>
+                <h1 className="text-2xl font-semibold mb-6">Help</h1>
 
-                <p className="text-gray-400">Contact</p>
-                <p className="text-blue-400">support@habitflow.ai</p>
+                <p className="text-gray-400 text-[12px]">Contact</p>
+                <p className="text-blue-400">habitify@habitflow.ai</p>
               </div>
             )}
           </div>

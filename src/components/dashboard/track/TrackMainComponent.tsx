@@ -82,13 +82,15 @@ const TrackMainComponent = ({
         <div className="bg-black/20 border border-white/10 w-[19.5%] backdrop-blur-2xl light:bg-lightCard light:border-lightBorder rounded-2xl overflow-x-hidden h-25 absolute -top-29 p-3 flex flex-col justify-between">
           <div className="flex gap-4">
             <div className="border border-white/10 light:border-black/10 rounded-full h-10 w-10 flex items-center justify-center">
-              <div className="h-9 w-9 border border-white/10 light:border-black/10 bg-white/5 light:bg-black/5 rounded-full flex items-center justify-center uppercase">{user.username.slice(0, 1)}</div>
+              <div className="h-9 w-9 border border-white/10 light:border-black/10 bg-white/5 light:bg-black/5 rounded-full flex items-center justify-center uppercase">
+                {user.username.slice(0, 1)}
+              </div>
             </div>
             <div>
               <p className="font-bold playfair-display">
-              Hello, <br /> {user.username}
-            </p>
-            <span className="text-[10px] text-gray-500">{user.email}</span>
+                Hello, <br /> {user.username}
+              </p>
+              <span className="text-[10px] text-gray-500">{user.email}</span>
             </div>
           </div>
           {/* <p className="text-3xl tracking-wider font-bold playfair-display px-3 line-clamp-1">
@@ -107,17 +109,6 @@ const TrackMainComponent = ({
         </div>
         {/* right detail */}
         <div className="bg-black/20 border border-white/10 w-[14.5%] backdrop-blur-2xl light:bg-lightCard light:border-lightBorder rounded-2xl overflow-x-hidden h-25 absolute -top-29 py-2 right-0 overflow-y-hidden flex flex-col justify-between">
-          {/* <div>
-            <p className="text-[14px] text-nowrap absolute top-3 left-3 text-gray-500">
-              Monthly Streak
-            </p>
-            <p className="text-[40px] font-bold absolute bottom-0 left-3">
-              {streakData?.streak || 0}
-            </p>
-          </div>
-          <div className="absolute right-0 bottom-3">
-            <span className="text-[40px] leading-none">🔥</span>
-          </div> */}
           <p className="text-2xl tracking-wider font-bold playfair-display px-3 line-clamp-1">
             {new Date().getDate()},
             {monMap?.[new Date(activeMonth?.startDate).getMonth() + 1]}
@@ -127,10 +118,12 @@ const TrackMainComponent = ({
               {activeMonth?.status === "active" && "Current Plan"}
             </span>
             <p className="text-[9px] mt-0.5 tracking-wider text-nowrap">
-              <span className="text-gray-500">Started at -</span> {formatMonthYearSimple(activeMonth?.startDate)}
+              <span className="text-gray-500">Started at -</span>{" "}
+              {formatMonthYearSimple(activeMonth?.startDate)}
             </p>
             <p className="text-[9px] tracking-wider text-nowrap">
-              <span className="text-gray-500">Ended at&nbsp; -</span> {formatMonthYearSimple(activeMonth?.endDate)}
+              <span className="text-gray-500">Ended at&nbsp; -</span>{" "}
+              {formatMonthYearSimple(activeMonth?.endDate)}
             </p>
           </div>
         </div>
@@ -166,28 +159,18 @@ const TrackMainComponent = ({
       </div>
       {/* sm screen */}
       <div className="sm:hidden mt-3">
-        <div className="flex items-center gap-2">
-          <div className="relative mt-2 w-[60%] overflow-hidden rounded-2xl border border-white/10 bg-black/20 h-20 light:bg-lightCard light:border-lightBorder flex flex-col items-start ps-4 justify-center">
-            <p className="text-xs uppercase tracking-[0.2em] text-gray-500">
-              Today
-            </p>
-            <p className="google-sans mt-1 text-xl font-bold">
-              {formatDateString2(new Date())}
-            </p>
+        <div className="relative mt-2 w-full overflow-hidden rounded-2xl border border-white/10 bg-black/20 h-20 light:bg-lightCard light:border-lightBorder flex items-center gap-4 ps-4">
+          <div className="h-9 w-9 border border-white/10 light:border-black/10 bg-white/5 light:bg-black/5 rounded-full flex items-center justify-center uppercase">
+            {user.username.slice(0, 1)}
           </div>
-          <div className="relative mt-2 w-[40%] overflow-hidden rounded-2xl border border-white/10 bg-black/20 h-20 light:bg-lightCard light:border-lightBorder flex">
-            <div>
-              <p className="text-[10px] text-nowrap absolute top-3 left-3 text-gray-500">
-                Monthly Streak
-              </p>
-              <p className="text-[20px] font-bold absolute bottom-3 left-3">
-                {streakData?.streak}
-              </p>
-            </div>
-            <div className="absolute right-3 bottom-3">
-              <span className="text-[20px] leading-none">🔥</span>
-            </div>
+          <div>
+            <p className="google-sans text-xl font-bold">{user.username}</p>
+            <p className="text-xs mt-1 text-gray-500">{user?.email}</p>
           </div>
+          {/* <p className="text-xs text-gray-500">Today</p>
+          <p className="google-sans mt-1 text-xl font-bold">
+            {formatDateString2(new Date())}
+          </p> */}
         </div>
         {/* overall & todays progress */}
         <div className="flex items-center gap-2">
@@ -436,7 +419,7 @@ export const TodayTasksSmScreen = ({
               {formatDateString2(selectedDate.toString())}
             </p>
           )}
-          {!logLoading && (
+          {/* {!logLoading && (
             <div className="flex items-center gap-2 relative">
               <button onClick={handlePrevDate}>
                 <IoIosArrowRoundBack size={20} />
@@ -445,7 +428,7 @@ export const TodayTasksSmScreen = ({
                 <IoIosArrowRoundForward size={20} />
               </button>
             </div>
-          )}
+          )} */}
         </div>
         <div className="flex items-center justify-center">
           {logLoading ? (

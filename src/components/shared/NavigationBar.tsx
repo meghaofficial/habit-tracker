@@ -4,7 +4,6 @@ import { LuSunMedium, LuSunMoon } from "react-icons/lu";
 import type { RootState } from "../../redux/store/store";
 import { useDispatch, useSelector } from "react-redux";
 import { IoMdLogIn, IoMdLogOut } from "react-icons/io";
-import AuthForm from "../auth/AuthForm";
 import { axiosPrivate } from "../../api/axios";
 import { removeCreds } from "../../redux/slices/authSlice";
 import { notify } from "../../helper";
