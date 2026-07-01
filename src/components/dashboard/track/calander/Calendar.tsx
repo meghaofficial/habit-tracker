@@ -38,18 +38,10 @@ const months: Record<string, string> = {
 const Calendar = () => {
   const [open, setOpen] = useState(false);
   const [activeDate, setActiveDate] = useState(1);
-  const theme = useSelector((state: RootState) => state.theme);
+  const theme = useSelector((state: RootState) => state.theme).theme;
 
   const realToday = new Date();
   const [currentViewDate, setCurrentViewDate] = useState<Date>(new Date());
-
-  // const currDate = new Date();
-  // const month = currDate.getUTCMonth();
-  // const monthStr = monMap[month+1];
-  // const year = currDate.getFullYear();
-  // const todayDate = currDate.getDate();
-  // const totalDays = new Date(year, month + 1, 0).getDate();
-  // const firstDay = new Date(year, month, 1).getDay();
 
   const month = currentViewDate.getMonth(); // Using local month to keep consistency with local year/date
   const year = currentViewDate.getFullYear();
@@ -57,6 +49,7 @@ const Calendar = () => {
   const monthStr = monMap[month + 1];
   const totalDays = new Date(year, month + 1, 0).getDate();
   const firstDay = new Date(year, month, 1).getDay();
+  const [activeStatus, setActiveStatus] = useState("default");
 
   const isLookingAtCurrentMonth =
     year === realToday.getFullYear() && month === realToday.getMonth();
@@ -90,15 +83,55 @@ const Calendar = () => {
 
   return (
     <div className="flex items-start mt-4 mb-3 gap-3">
-      <Card heading="Added Notes" cardWidth="w-1/4" bodyHeight="h-[702px]">
-        <div className="flex items-center justify-center mt-3 overflow-y-auto">
-          <div className="flex flex-col items-center justify-center py-20 px-1">
+      <Card
+        heading="Select Date to Add Note"
+        cardWidth="w-1/4"
+        bodyHeight="h-[702px]"
+      >
+        <div className="mt-5 overflow-y-auto">
+          <div className="flex flex-wrap items-center gap-2 text-[10px]">
+            {Object.entries(statusColors).map(([key, value], index) => (
+              <div
+                key={index}
+                className="flex items-center gap-2 p-2 rounded-full cursor-pointer"
+                style={{
+                  backgroundColor: theme === "dark" ? value.dbg : value.bg,
+                  border:
+                    activeStatus === key
+                      ? `1px solid ${theme === "dark" ? value.ddot : value.dot}`
+                      : "",
+                }}
+                onClick={() => setActiveStatus(key)}
+              >
+                <div
+                  className={`h-2 w-2 rounded-full`}
+                  style={{
+                    backgroundColor: theme === "dark" ? value.ddot : value.dot,
+                  }}
+                ></div>
+                <span>{key}</span>
+              </div>
+            ))}
+          </div>
+          <input
+            type="text"
+            placeholder="Title"
+            className="mt-4 text-[11px] p-2 google-sans tracking-wide border border-black/10 dark:border-white/10 bg-white/3 light:bg-black/5 w-full rounded-lg outline-none"
+          />
+          <textarea
+            className="bg-white/3 light:bg-black/5 outline-none resize-none w-full rounded-xl mt-2 h-30 text-[11px] p-2 google-sans tracking-wide"
+            placeholder="Describe"
+            style={{
+              border: `1px solid ${theme === "dark" ? statusColors[activeStatus].ddot : statusColors[activeStatus].dot}`,
+            }}
+          ></textarea>
+          {/* <div className="flex flex-col items-center justify-center py-20 px-1">
             <div className="text-5xl mb-4">🚀</div>
             <h2 className="text-2xl font-bold google-sans">Coming Soon</h2>
             <p className="mt-3 text-center text-gray-500 max-w-md text-[14px]">
               We're working on this feature where you can add a note on a day. This feature will be available in the next few days.
             </p>
-          </div>
+          </div> */}
         </div>
       </Card>
       <div className="w-3/4">
