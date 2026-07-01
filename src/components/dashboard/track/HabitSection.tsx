@@ -74,9 +74,9 @@ export const InputData = ({
 
   const prevValueRef = useRef(taskName);
 
-  useEffect(() => {
-    prevValueRef.current = taskName;
-  }, [taskName]);
+  // useEffect(() => {
+  //   prevValueRef.current = taskName;
+  // }, [taskName]);
 
   useEffect(() => {
     if (value === prevValueRef.current) return;

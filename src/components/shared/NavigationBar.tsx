@@ -1,5 +1,4 @@
 import CustomButton from "./CutomButton";
-import { useEffect, useState } from "react";
 import { LuSunMedium, LuSunMoon } from "react-icons/lu";
 import type { RootState } from "../../redux/store/store";
 import { useDispatch, useSelector } from "react-redux";
@@ -16,7 +15,6 @@ const NavigationBar = () => {
   const dispatch = useDispatch();
   const navigate = useNavigate();
   const location = useLocation();
-  const [open, setOpen] = useState(false);
   const isLogin = useSelector((state: RootState) => state.auth.username !== "");
   const theme = useSelector((state: RootState) => state.theme);
 
@@ -46,18 +44,6 @@ const NavigationBar = () => {
       notify.error("Logout failed. Please try again.");
     }
   };
-
-  useEffect(() => {
-    if (open) {
-      document.body.style.overflow = "hidden";
-    } else {
-      document.body.style.overflow = "auto";
-    }
-
-    return () => {
-      document.body.style.overflow = "auto";
-    };
-  }, [open]);
 
   return (
     <>
@@ -99,7 +85,6 @@ const NavigationBar = () => {
           </div>
         </CustomButton>
       </div>
-      {/* <AuthForm open={open} setOpen={setOpen} /> */}
     </>
   );
 };

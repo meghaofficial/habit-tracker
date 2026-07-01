@@ -9,7 +9,7 @@ import { axiosPrivate } from "../../../api/axios";
 import { monMap } from "../../../staticData";
 import TodayAllTasks from "../../charts/TodayAllTasks";
 import { formatDateString2, formatMonthYearSimple } from "../../../helper";
-import { IoIosArrowRoundBack, IoIosArrowRoundForward } from "react-icons/io";
+// import { IoIosArrowRoundBack, IoIosArrowRoundForward } from "react-icons/io";
 import type {
   DashboardI,
   DateLogI,
@@ -36,6 +36,8 @@ const TrackMainComponent = ({
   log,
   setLog,
   streakData,
+  dateLogs,
+  setDateLogs,
 }: {
   dashboardData: DashboardI;
   taskList: TaskI[];
@@ -44,6 +46,8 @@ const TrackMainComponent = ({
   log: DateLogI;
   setLog: React.Dispatch<React.SetStateAction<DateLogI>>;
   streakData: StreakI;
+  dateLogs: DateLogI[];
+  setDateLogs: React.Dispatch<React.SetStateAction<DateLogI[]>>;
 }) => {
   const [progress, setProgress] = useState<{
     overallProgress: OverallProgressI;
@@ -146,6 +150,8 @@ const TrackMainComponent = ({
             monthStatus={activeMonth?.status}
             getLogLoading={getLogLoading}
             setGetLogLoading={setGetLogLoading}
+            dateLogs={dateLogs}
+            setDateLogs={setDateLogs}
           />
         </div>
         <div className="bg-black/20 border border-white/10 backdrop-blur-2xl light:border-lightBorder light:bg-lightCard w-[15%] rounded-2xl overflow-x-hidden">
@@ -341,18 +347,18 @@ export const TodayTasksSmScreen = ({
     newDate.setUTCHours(0, 0, 0, 0);
     return newDate.toISOString();
   }
-  const handlePrevDate = () => {
-    const prev = new Date(selectedDate);
-    prev.setDate(prev.getDate() - 1);
-    setSelectedDate(prev);
-    getLog(prev);
-  };
-  const handleNextDate = () => {
-    const next = new Date(selectedDate);
-    next.setDate(next.getDate() + 1);
-    setSelectedDate(next);
-    getLog(next);
-  };
+  // const handlePrevDate = () => {
+  //   const prev = new Date(selectedDate);
+  //   prev.setDate(prev.getDate() - 1);
+  //   setSelectedDate(prev);
+  //   getLog(prev);
+  // };
+  // const handleNextDate = () => {
+  //   const next = new Date(selectedDate);
+  //   next.setDate(next.getDate() + 1);
+  //   setSelectedDate(next);
+  //   getLog(next);
+  // };
 
   useEffect(() => {
     if (!monthDashID) return;

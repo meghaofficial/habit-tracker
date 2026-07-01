@@ -1,35 +1,3 @@
-export type TaskData = {
-  taskID: string;
-  task?: string;
-  count: number;
-  progress: number;
-};
-type TaskwiseState = TaskData[];
-type ProgressState = {
-  totalDaysWorked: number;
-  progressPercent: number;
-};
-export type DayData = {
-  count: number;
-  progress: number;
-};
-export type DaywiseState = Record<number, DayData>;
-export type MonthData = {
-  firstDay: number;
-  overallTotalDays: number;
-  totalDaysInMonth: number;
-  totalTasks: number; // total no of rows
-  daywise: DaywiseState;
-  taskwise: TaskwiseState;
-  progress: ProgressState;
-  checkboxKeys: string[];
-};
-
-export type TargetType = {
-  goal: string;
-  isDone: boolean;
-};
-
 export const statusColors: Record<
   string,
   { dot: string; bg: string; ddot: string; dbg: string }
@@ -203,4 +171,9 @@ export interface StreakI {
   longestStreak: number;
   mostConsistentHabits: string[];
   leastConsistentHabits: string[];
+}
+
+export interface HeatMapI {
+  date: Date;
+  count: number
 }

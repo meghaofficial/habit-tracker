@@ -52,7 +52,7 @@ const MonthlyNote = ({ monthID }: { monthID: string }) => {
     const onNoteUpdate = (data: any) => {
       serverNoteRef.current = data.note.note;
 
-      setMonthlyNote(data.note.note);
+      // setMonthlyNote(data.note.note);
       setLastUpdates(data.note.updatedAt);
     };
 

@@ -4,7 +4,7 @@ import { MonthlyLineChart } from "../../charts/MonthlyLineChart";
 import { WeeklyBarChart } from "../../charts/WeeklyBarChart";
 import { motion, AnimatePresence } from "framer-motion";
 import { formatDateString } from "../../../helper";
-import type { DateLogI, TaskI, StreakI } from "../../../types";
+import type { DateLogI, TaskI, StreakI, HeatMapI } from "../../../types";
 import { IoDesktopOutline } from "react-icons/io5";
 import Card from "../../shared/Card";
 import HeatMap from "./HeatMap";
@@ -14,11 +14,13 @@ const AnalysisMainComponent = ({
   monthDashID,
   log,
   streakData,
+  dateLogs
 }: {
   taskList: TaskI[];
   monthDashID: string;
   log: DateLogI;
   streakData: StreakI;
+  dateLogs: DateLogI[];
 }) => {
   const [weeklyAna, setWeeklyAna] = useState<{
     date: string;
@@ -40,6 +42,8 @@ const AnalysisMainComponent = ({
     dates: [],
     tasks: [],
   });
+
+  const [heatMapData, setHeatMapData] = useState<HeatMapI[]>([]);
 
   const getWeeklyActivity = async () => {
     // setDashLoading(true);
@@ -77,6 +81,11 @@ const AnalysisMainComponent = ({
     getWeeklyActivity();
     getMonthlyActivity();
   }, [log?.tasks]);
+
+  useEffect(() => {
+    const arr = dateLogs.map(d => ({ date: d?.fullDate, count: d?.tasks?.length }));
+    setHeatMapData(arr);
+  }, [dateLogs]);
 
   return (
     <>
@@ -186,13 +195,12 @@ const AnalysisMainComponent = ({
             <div className="rounded-2xl bg-white/5 border border-white/10 light:bg-black/5 light:border-black/10 p-4 flex flex-col justify-evenly min-h-40 mt-4">
               <div>
                 <span className="text-[13px] tracking-wide text-gray-500">
-                  Heatmap
+                  No of task completed per day
                 </span>
               </div>
 
               <div className="flex items-end justify-between mt-4">
-                <HeatMap />
-                {/* <span className="text-[44px] leading-none">logo</span> */}
+                <HeatMap heatMapData={heatMapData} />
               </div>
             </div>
           </Card>

@@ -23,6 +23,8 @@ const DailyCalanderTaskSheet = ({
   monthStatus,
   getLogLoading,
   setGetLogLoading,
+    dateLogs,
+  setDateLogs,
 }: {
   taskList: TaskI[];
   setTaskList: React.Dispatch<React.SetStateAction<TaskI[]>>;
@@ -42,12 +44,14 @@ const DailyCalanderTaskSheet = ({
   monthStatus: string;
   getLogLoading: boolean;
   setGetLogLoading: React.Dispatch<React.SetStateAction<boolean>>;
+  dateLogs: DateLogI[];
+  setDateLogs: React.Dispatch<React.SetStateAction<DateLogI[]>>;
 }) => {
   const totalD = dashboardData?.totalDays || 0;
   const firstDay = dashboardData?.firstDay || 0;
   const [addRowLoading, setAddRowLoading] = useState<boolean>(false);
   const [removeRowID, setRemoveRowID] = useState<string | null>(null);
-  const [dateLogs, setDateLogs] = useState<DateLogI[]>([]);
+  // const [dateLogs, setDateLogs] = useState<DateLogI[]>([]);
   const rowLimit = 10;
 
   const handleDeleteRow = async (taskId: string) => {
