@@ -283,7 +283,7 @@ const DailyCalanderTaskSheet = ({
               className={`flex items-center justify-evenly ${totalD > 28 ? "w-[22%]" : "w-[25%]"} text-center`}
             >
               {daysNums.slice(0, 7).map((d, index) => (
-                <p key={index} className={`${d === new Date().getUTCDate() && 'font-bold text-white'}`}>{d}</p>
+                <p key={index} className={`${d === new Date().getDate() && 'font-bold text-white'}`}>{d}</p>
               ))}
             </div>
 
@@ -291,7 +291,7 @@ const DailyCalanderTaskSheet = ({
               className={`flex items-center justify-evenly ${totalD > 28 ? "w-[22%]" : "w-[25%]"} text-center`}
             >
               {daysNums.slice(7, 14).map((d, index) => (
-                <p key={index} className={`${d === new Date().getUTCDate() && 'font-bold text-white'}`}>{d}</p>
+                <p key={index} className={`${d === new Date().getDate() && 'font-bold text-white'}`}>{d}</p>
               ))}
             </div>
 
@@ -299,7 +299,7 @@ const DailyCalanderTaskSheet = ({
               className={`flex items-center justify-evenly ${totalD > 28 ? "w-[22%]" : "w-[25%]"} text-center`}
             >
               {daysNums.slice(14, 21).map((d, index) => (
-                <p key={index} className={`${d === new Date().getUTCDate() && 'font-bold text-white'}`}>{d}</p>
+                <p key={index} className={`${d === new Date().getDate() && 'font-bold text-white'}`}>{d}</p>
               ))}
             </div>
 
@@ -307,7 +307,7 @@ const DailyCalanderTaskSheet = ({
               className={`flex items-center justify-evenly ${totalD > 28 ? "w-[22%]" : "w-[25%]"} text-center`}
             >
               {daysNums.slice(21, 28).map((d, index) => (
-                <p key={index} className={`${d === new Date().getUTCDate() && 'font-bold  text-white'}`}>{d}</p>
+                <p key={index} className={`${d === new Date().getDate() && 'font-bold  text-white'}`}>{d}</p>
               ))}
             </div>
 
@@ -315,7 +315,7 @@ const DailyCalanderTaskSheet = ({
               <div className="flex items-center justify-evenly w-[12%] text-center">
                 {Array.from({ length: totalD - 28 }, (_, i) => 29 + i).map(
                   (num) => (
-                    <p key={num} className={`${num === new Date().getUTCDate() && 'font-bold  text-white'}`}>{num}</p>
+                    <p key={num} className={`${num === new Date().getDate() && 'font-bold  text-white'}`}>{num}</p>
                   ),
                 )}
               </div>
@@ -510,7 +510,7 @@ const CheckboxCell = React.memo(
     logID: string;
   }) => {
 
-    const allowed = new Date(fullDate).getUTCDate() === new Date().getUTCDate();
+    const allowed = new Date(fullDate).getDate() === new Date().getDate();
 
     const handleClick = useCallback(() => {
       if (!allowed) return;
