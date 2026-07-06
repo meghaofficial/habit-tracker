@@ -1,5 +1,4 @@
 import { PieChart } from "@mui/x-charts/PieChart";
-import { useSelector } from "react-redux";
 
 type Props = {
   value: number;
@@ -7,14 +6,12 @@ type Props = {
 };
 
 export const ProgressPie = ({ value, type }: Props) => {
-  const theme = useSelector((state: RootState) => state.theme);
   const isAnalysis = type === "analysis";
 
   return (
     <div
-      className={`${
-        isAnalysis ? "w-full h-40 overflow-y-hidden" : "h-20 top-1.5"
-      } flex items-center justify-center relative`}
+      className={`${isAnalysis ? "w-full h-40 overflow-y-hidden" : "h-20 top-1.5"
+        } flex items-center justify-center relative`}
     >
       <PieChart
         series={[
@@ -43,7 +40,7 @@ export const ProgressPie = ({ value, type }: Props) => {
         ]}
         width={isAnalysis ? 150 : 100}
         height={250}
-        slotProps={{ legend: { hidden: true } }}
+      // slotProps={{ legend: { hidden: true } }}
       />
 
       {/* Center Label */}
