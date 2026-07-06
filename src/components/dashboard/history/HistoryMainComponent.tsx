@@ -1,18 +1,17 @@
 import { useState } from "react";
 import Card from "../../shared/Card";
-import { motion, AnimatePresence } from "framer-motion";
-import { 
-  FiArchive, 
-  FiCheck, 
-  FiX, 
-  FiMinus, 
-  FiTrendingUp, 
-  FiTarget, 
-  FiFileText, 
-  FiCalendar, 
-  FiAward, 
-  FiAlertCircle, 
-  FiBarChart2 
+import { motion } from "framer-motion";
+import {
+  FiArchive,
+  FiCheck,
+  FiX,
+  FiMinus,
+  FiTarget,
+  FiFileText,
+  FiCalendar,
+  FiAward,
+  FiAlertCircle,
+  FiBarChart2
 } from "react-icons/fi";
 
 interface PastHabit {
@@ -76,8 +75,8 @@ const mockHistoryData: PastMonthData[] = [
       // Generate realistic daily patterns for 5 habits
       acc[day] = {
         h1: day % 15 === 0 ? "missed" : "completed",
-        h2: [2, 4, 7, 9, 11, 14, 16, 18, 21, 23, 25, 28, 30].includes(day) 
-          ? "completed" 
+        h2: [2, 4, 7, 9, 11, 14, 16, 18, 21, 23, 25, 28, 30].includes(day)
+          ? "completed"
           : ([6, 13, 20, 27].includes(day) ? "missed" : "skipped"),
         h3: day < 15 ? (day % 3 === 0 ? "missed" : "completed") : (day % 2 === 0 ? "completed" : "missed"),
         h4: day % 6 === 0 ? "missed" : "completed",
@@ -222,11 +221,10 @@ const HistoryMainComponent = () => {
                   <button
                     key={data.id}
                     onClick={() => setSelectedMonthId(data.id)}
-                    className={`w-full flex items-center justify-between p-3.5 rounded-2xl transition-all duration-300 border ${
-                      isActive 
-                        ? "bg-gradient-to-r from-yellow-500/10 to-orange-500/10 border-yellow-500/50 shadow-md" 
+                    className={`w-full flex items-center justify-between p-3.5 rounded-2xl transition-all duration-300 border ${isActive
+                        ? "bg-gradient-to-r from-yellow-500/10 to-orange-500/10 border-yellow-500/50 shadow-md"
                         : "bg-white/[0.02] border-white/5 hover:bg-white/[0.05] hover:border-white/10"
-                    }`}
+                      }`}
                   >
                     <div className="flex items-center gap-3">
                       <FiCalendar className={isActive ? "text-yellow-400" : "text-gray-500"} />
@@ -239,11 +237,10 @@ const HistoryMainComponent = () => {
                         </p>
                       </div>
                     </div>
-                    <span className={`text-xs font-bold px-2.5 py-1 rounded-lg border ${
-                      isActive 
-                        ? "bg-yellow-500/20 text-yellow-300 border-yellow-500/30" 
+                    <span className={`text-xs font-bold px-2.5 py-1 rounded-lg border ${isActive
+                        ? "bg-yellow-500/20 text-yellow-300 border-yellow-500/30"
                         : "bg-white/5 text-gray-400 border-white/5"
-                    }`}>
+                      }`}>
                       {data.overallProgress}%
                     </span>
                   </button>
@@ -259,11 +256,11 @@ const HistoryMainComponent = () => {
             <h3 className="text-xs font-bold text-gray-400 uppercase tracking-widest">
               Performance Summary
             </h3>
-            
+
             {/* Overall Radial Meter */}
             <div className="flex flex-col items-center justify-center bg-white/[0.01] border border-white/5 rounded-2xl p-5 relative overflow-hidden group">
               <div className="absolute top-0 right-0 w-24 h-24 bg-yellow-500/5 rounded-full blur-2xl group-hover:bg-yellow-500/10 transition-all duration-500" />
-              
+
               <svg height={radius * 2} width={radius * 2} className="transform -rotate-90">
                 {/* Background Ring */}
                 <circle
@@ -296,7 +293,7 @@ const HistoryMainComponent = () => {
                   </linearGradient>
                 </defs>
               </svg>
-              
+
               <div className="absolute text-center">
                 <span className="text-2xl font-black text-white">{selectedData.overallProgress}%</span>
                 <p className="text-[9px] text-gray-500 font-bold uppercase tracking-widest mt-0.5">Score</p>
@@ -351,7 +348,7 @@ const HistoryMainComponent = () => {
 
       {/* Right Content Area: Month Details */}
       <div className="w-full lg:w-[72%] flex flex-col gap-6">
-        
+
         {/* Header Ribbon / Archived Notice */}
         <Card heading="" cardWidth="w-full">
           <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 p-1">
@@ -464,7 +461,7 @@ const HistoryMainComponent = () => {
                       {Array.from({ length: daysInMonth }).map((_, index) => {
                         const day = index + 1;
                         const status = selectedData.dailyMatrix[day]?.[habit.id] || "skipped";
-                        
+
                         return (
                           <td key={index} className="px-1.5 py-3 text-center">
                             <div className="flex items-center justify-center">
@@ -509,7 +506,7 @@ const HistoryMainComponent = () => {
               {missedTasksList.length > 0 ? (
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3.5 p-4">
                   {missedTasksList.map((miss, index) => (
-                    <div 
+                    <div
                       key={index}
                       className="flex items-center justify-between p-3.5 bg-rose-500/[0.02] border border-rose-500/10 hover:border-rose-500/25 rounded-2xl transition-all"
                     >
