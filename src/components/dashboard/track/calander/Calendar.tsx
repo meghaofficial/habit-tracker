@@ -187,96 +187,85 @@ const Calendar = () => {
     <div className="flex items-start mt-4 mb-3 gap-3">
       {/* Left */}
       <Card
-        heading="Select Date to Add Note"
+        heading=""
         cardWidth="w-1/4"
         bodyHeight="h-[702px]"
       >
-        <div className="space-y-5 overflow-y-auto">
+        <div className="space-y-5 overflow-y-auto overflow-x-hidden">
           {activeDataList?.id && !toggleUpdate ? (
             <>
-              <div className="mt-5 rounded-3xl border border-white/10 light:border-black/10 bg-white/3 light:bg-black/5 backdrop-blur-md overflow-hidden">
+              <div className="">
                 {/* Header */}
-                <div className="flex items-center justify-between px-5 py-4 border-b border-white/10 light:border-black/10">
-                  <div>
-                    <p className="text-xs opacity-60 tracking-wider uppercase">
+                <div className="border-b border-white/10 light:border-black/10 pb-3">
+                  <div className="flex items-center justify-between">
+                    <p className="text-[10px] opacity-60 tracking-wider uppercase">
                       Task Details
                     </p>
-
-                    <h2 className="text-lg font-semibold mt-1">
-                      {activeDataList.title}
-                    </h2>
-                  </div>
-
-                  <button
-                    className="flex items-center gap-2 rounded-xl px-4 py-2 text-xs transition-all hover:scale-105"
-                    style={{
-                      background:
-                        theme === "dark"
-                          ? "rgba(255,255,255,.05)"
-                          : "rgba(0,0,0,.05)",
-                    }}
-                    onClick={() => setToggleUpdate(true)}
-                  >
-                    ✏️ Update
-                  </button>
-                </div>
-
-                {/* Body */}
-                <div className="space-y-5 p-5">
-                  {/* Status */}
-                  <div className="flex items-center justify-between">
-                    <span className="text-[11px] opacity-60 uppercase tracking-wider">
-                      Status
-                    </span>
-
-                    <div
-                      className="flex items-center gap-2 px-3 py-1 rounded-full"
+                    <button
+                      className="flex items-center gap-2 rounded-xl px-4 py-2 text-xs transition-all hover:scale-105"
                       style={{
                         background:
                           theme === "dark"
-                            ? statusColors[activeDataList.status].dbg
-                            : statusColors[activeDataList.status].bg,
-
-                        border: `1px solid ${
-                          theme === "dark"
-                            ? statusColors[activeDataList.status].ddot
-                            : statusColors[activeDataList.status].dot
-                        }`,
+                            ? "rgba(255,255,255,.05)"
+                            : "rgba(0,0,0,.05)",
                       }}
+                      onClick={() => setToggleUpdate(true)}
                     >
+                      Update
+                    </button>
+                  </div>
+                  <h2 className="text-lg font-semibold mt-1">
+                    {activeDataList.title}
+                  </h2>
+                </div>
+
+                {/* Body */}
+                <div className="space-y-5 py-5">
+                  {/* Title */}
+                  <div>
+                    <div className="flex items-center justify-between">
+                      <p className="text-[11px] opacity-60 uppercase tracking-wider">
+                        Title
+                      </p>
                       <div
-                        className="h-2 w-2 rounded-full"
+                        className="flex items-center gap-2 px-3 py-1 -mt-1 rounded-full"
                         style={{
                           background:
                             theme === "dark"
+                              ? statusColors[activeDataList.status].dbg
+                              : statusColors[activeDataList.status].bg,
+
+                          border: `1px solid ${
+                            theme === "dark"
                               ? statusColors[activeDataList.status].ddot
-                              : statusColors[activeDataList.status].dot,
+                              : statusColors[activeDataList.status].dot
+                          }`,
                         }}
-                      />
+                      >
+                        <div
+                          className="h-2 w-2 rounded-full"
+                          style={{
+                            background:
+                              theme === "dark"
+                                ? statusColors[activeDataList.status].ddot
+                                : statusColors[activeDataList.status].dot,
+                          }}
+                        />
 
-                      <span className="text-xs font-medium">
-                        {activeDataList.status}
-                      </span>
+                        <span className="text-[10px] tracking-wide capitalize">
+                          {activeDataList.status}
+                        </span>
+                      </div>
                     </div>
-                  </div>
-
-                  {/* Title */}
-                  <div>
-                    <p className="text-[11px] opacity-60 uppercase tracking-wider">
-                      Title
-                    </p>
-
                     <p className="mt-2 text-sm font-medium">
                       {activeDataList.title}
                     </p>
                   </div>
-
                   {/* Description */}
                   <div>
                     <p className="text-[11px] opacity-60 uppercase tracking-wider">
                       Description
                     </p>
-
                     <p className="mt-2 text-sm leading-7 opacity-90 whitespace-pre-wrap">
                       {activeDataList.description}
                     </p>
@@ -284,7 +273,7 @@ const Calendar = () => {
                 </div>
 
                 {/* Footer */}
-                <div className="flex items-center justify-between px-5 py-4 border-t border-white/10 light:border-black/10 text-[11px] opacity-60">
+                <div className="flex items-center justify-between py-4 border-t border-white/10 light:border-black/10 text-[11px] opacity-60">
                   <span>Updated At</span>
 
                   <span>
