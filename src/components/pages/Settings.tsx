@@ -327,7 +327,7 @@ const Settings = () => {
                             whileHover={{ scale: 1.02 }}
                             whileTap={{ scale: 0.98 }}
                             disabled={unameLoading}
-                            className="px-6 py-3 text-sm bg-purple-600 hover:bg-purple-500 disabled:bg-purple-800 text-white rounded-xl font-semibold shadow-lg shadow-purple-600/25 transition cursor-pointer flex items-center justify-center min-w-[80px]"
+                            className="px-6 py-3 text-sm bg-purple-600 hover:bg-purple-500 disabled:bg-purple-800 text-white rounded-xl font-semibold shadow-lg shadow-purple-600/25 transition cursor-pointer flex items-center justify-center min-w-20"
                             onClick={handleUpdateUsername}
                           >
                             {unameLoading ? <CircleLoader /> : "Save"}

@@ -175,5 +175,14 @@ export interface StreakI {
 
 export interface HeatMapI {
   date: Date;
-  count: number
+  count: number;
+}
+
+export interface CalandarDataI {
+  id?: string;
+  date?: Date | null;
+  status: string;
+  title: string;
+  description: string;
+  updatedAt?: string;
 }
