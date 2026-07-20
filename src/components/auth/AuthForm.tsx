@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import React, { useEffect, useState } from "react";
 import { FaRegEye, FaRegEyeSlash } from "react-icons/fa6";
 import { useDispatch } from "react-redux";
 import { setCreds } from "../../redux/slices/authSlice";
@@ -49,7 +49,7 @@ const AuthForm = () => {
     try {
       const { email, password } = formData;
       if (!email || !password) return;
-
+      
       const res = await axiosPublic.post("/login", { email, password });
 
       if (res?.data?.success) {
@@ -69,15 +69,13 @@ const AuthForm = () => {
       if (axios.isAxiosError(error)) {
         notify.error(error.response?.data.message);
       }
-      // else {
-      //   notify.error("Login failed. Please try again.");
-      // }
     } finally {
       setLoginLoading(false);
     }
   };
 
-  const handleSubmit = async () => {
+  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
     if (signupLoading || loginLoading) return;
     if (loginActive) await handleLogin();
     else await handleSignup();
@@ -94,6 +92,7 @@ const AuthForm = () => {
   return (
     <>
       <div className="min-h-screen pb-8 mt-30 flex items-center justify-center px-4 relative overflow-hidden">
+
         <div className="w-full max-w-5xl relative z-10">
           <div className="text-center mb-12">
             <p className="text-xs uppercase tracking-[0.35em] text-darkPrimary font-bold">
@@ -137,7 +136,7 @@ const AuthForm = () => {
                 </div>
 
                 {/* Form */}
-                <div className="mt-8 space-y-4">
+                <form onSubmit={handleSubmit} className="mt-8 space-y-4">
                   {!loginActive && (
                     <div>
                       <label className="text-sm text-gray-400">Username</label>
@@ -217,20 +216,19 @@ const AuthForm = () => {
                     </button>
                   </div>
 
-                  <button
-                    className="w-full mt-2 rounded-2xl bg-darkPrimary py-3 font-semibold text-white transition-all hover:scale-[1.02] hover:shadow-[0_10px_30px_rgba(91,92,246,0.35)]"
-                    onClick={handleSubmit}
-                  >
-                    {!signupLoading && !loginLoading ? (
-                      loginActive ? (
-                        "Sign In"
-                      ) : (
-                        "Sign Up"
-                      )
-                    ) : (
+                  {/* signup and login button */}
+                  {signupLoading || loginLoading ? (
+                    <div className="w-full mt-2 rounded-2xl bg-darkPrimary py-3 font-semibold text-white transition-all hover:scale-[1.02] hover:shadow-[0_10px_30px_rgba(91,92,246,0.35)]">
                       <CircleLoader />
-                    )}
-                  </button>
+                    </div>
+                  ) : (
+                    <input
+                      type="submit"
+                      value={loginActive ? "Sign In" : "Sign Up"}
+                      disabled={signupLoading || loginLoading}
+                      className="w-full mt-2 rounded-2xl bg-darkPrimary py-3 font-semibold text-white transition-all hover:scale-[1.02] hover:shadow-[0_10px_30px_rgba(91,92,246,0.35)]"
+                    />
+                  )}
 
                   {/* Divider */}
                   {/* <div className="flex items-center gap-4 py-2">
@@ -243,7 +241,7 @@ const AuthForm = () => {
                   {/* <button className="w-full rounded-2xl border border-white/10 bg-white/5 py-3 transition-all hover:bg-white/10">
                   Continue with Google
                 </button> */}
-                </div>
+                </form>
 
                 {/* Footer */}
                 <div className="mt-8 text-center text-sm text-gray-500">
@@ -270,7 +268,7 @@ const OTPComponent = ({
   email,
   setOpenOTP,
   handleSignup,
-  setLoginActive
+  setLoginActive,
 }: {
   email: string;
   setOpenOTP: React.Dispatch<React.SetStateAction<boolean>>;

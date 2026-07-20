@@ -18,20 +18,20 @@ const TodayAllTasks = ({
   setLog,
   monthDashID,
   setTaskList,
-  setProgress,
+  // setProgress,
 }: {
   taskList: { _id: string; taskName: string; monthDashID: string }[];
   log: DateLogI;
   setLog: React.Dispatch<React.SetStateAction<DateLogI>>;
   monthDashID: string;
   setTaskList: React.Dispatch<React.SetStateAction<TaskI[]>>;
-  setProgress: React.Dispatch<
-    React.SetStateAction<{
-      overallProgress: OverallProgressI;
-      dateLogProgress: DateLogProgressI[];
-      taskProgress: TaskProgressI[];
-    }>
-  >;
+  // setProgress: React.Dispatch<
+  //   React.SetStateAction<{
+  //     overallProgress: OverallProgressI;
+  //     dateLogProgress: DateLogProgressI[];
+  //     taskProgress: TaskProgressI[];
+  //   }>
+  // >;
 }) => {
   const [removeRowID, setRemoveRowID] = useState<string | null>(null);
   const [addTaskLoading, setAddTaskLoading] = useState("");
@@ -71,7 +71,7 @@ const TodayAllTasks = ({
       );
       if (res?.data?.success) {
         setTaskList(res?.data?.tasks);
-        setProgress(res?.data?.progress);
+        // setProgress(res?.data?.progress);
       }
     } catch (error) {
       console.error(error);

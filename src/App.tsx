@@ -15,6 +15,10 @@ import Settings from "./components/pages/Settings";
 import { socket } from "./socket/socket";
 import NoInternetConnection from "./components/shared/NoInternetConnection";
 import AuthForm from "./components/auth/AuthForm";
+import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
+import { ReactQueryDevtools } from '@tanstack/react-query-devtools'
+
+const queryClient = new QueryClient()
 
 function App() {
   const dispatch = useDispatch();
@@ -85,7 +89,7 @@ function App() {
   }, []);
 
   return (
-    <>
+    <QueryClientProvider client={queryClient}>
       {!isOnline ? (
         <NoInternetConnection />
       ) : (
@@ -143,7 +147,11 @@ function App() {
           </div>
         </>
       )}
-    </>
+      {/* <button
+        onClick={() => setIsOpen(!isOpen)}
+      >{`${isOpen ? 'Close' : 'Open'} the devtools panel`}</button> */}
+      <ReactQueryDevtools initialIsOpen={false} />
+    </QueryClientProvider>
   );
 }
 

@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 
 interface DonutGraphProps {
   percentage: number; // Value from 0 to 100

@@ -27,16 +27,16 @@ import DonutGraph from "./DonutGraph";
 import { type StreakI } from "../../../types";
 import { useSelector } from "react-redux";
 import type { RootState } from "../../../redux/store/store";
+import { useQuery } from "@tanstack/react-query";
+import { getDateLogs, getTasks } from "../../../api/dashboardApi";
 
 const TrackMainComponent = ({
   dashboardData,
-  taskList,
+  // taskList,
   activeMonth,
   setTaskList,
   log,
   setLog,
-  streakData,
-  dateLogs,
   setDateLogs,
 }: {
   dashboardData: DashboardI;
@@ -49,23 +49,26 @@ const TrackMainComponent = ({
   dateLogs: DateLogI[];
   setDateLogs: React.Dispatch<React.SetStateAction<DateLogI[]>>;
 }) => {
-  const [progress, setProgress] = useState<{
-    overallProgress: OverallProgressI;
-    dateLogProgress: DateLogProgressI[];
-    taskProgress: TaskProgressI[];
-  }>({
-    overallProgress: { total: 0, count: 0, progress: 0 },
-    dateLogProgress: [],
-    taskProgress: [],
-  });
-  const [getLogLoading, setGetLogLoading] = useState(false);
   const isMobile = useIsMobile();
   const user = useSelector((state: RootState) => state.auth);
+
+  const dateLogsData = useQuery({
+    queryKey: ["date_logs", dashboardData?._id],
+    queryFn: () => getDateLogs(dashboardData!._id),
+    enabled: !!dashboardData?._id,
+  });
+  const taskListData = useQuery({
+    queryKey: ["tasks", dashboardData?._id],
+    queryFn: () => getTasks(dashboardData?._id),
+    enabled: !!dashboardData?._id, // only when we want to trigger
+  });
+  const progress = dateLogsData.data?.progress;
+  const taskList: TaskI[] = taskListData?.data?.tasks;
 
   const getTodayProgress = () => {
     const d = new Date();
     const custom = d.toISOString().split("T")[0];
-    const matched = progress.dateLogProgress.find(
+    const matched = progress?.dateLogProgress?.find(
       (p: DateLogProgressI) => p.fullDate.toString().split("T")[0] === custom,
     );
     return {
@@ -76,15 +79,10 @@ const TrackMainComponent = ({
 
   return (
     <div className="pb-5 pt-1">
-      <div className="sm:flex hidden gap-4 mt-4">
-        <div className="w-[20%]"></div>
-        <div className="bg-black/20 border border-white/10 light:border-lightBorder light:bg-lightCard w-[65%] rounded-2xl h-25"></div>
-        <div className="w-[15%]"></div>
-      </div>
       <div className="sm:flex hidden gap-4 mt-4 relative">
         {/* left detail */}
-        <div className="bg-black/20 border border-white/10 w-[19.5%] backdrop-blur-2xl light:bg-lightCard light:border-lightBorder rounded-2xl overflow-x-hidden h-25 absolute -top-29 p-3 flex flex-col justify-between">
-          <div className="flex gap-4">
+        <div className="bg-black/20 border border-white/10 w-[19.5%] backdrop-blur-2xl light:bg-lightCard light:border-lightBorder rounded-2xl overflow-x-hidden absolute p-3 flex flex-col justify-between">
+          <div className="flex gap-4 border-b border-white/10 pb-3">
             <div className="border border-white/10 light:border-black/10 rounded-full h-10 w-10 flex items-center justify-center">
               <div className="h-9 w-9 border border-white/10 light:border-black/10 bg-white/5 light:bg-black/5 rounded-full flex items-center justify-center uppercase">
                 {user.username.slice(0, 1)}
@@ -97,23 +95,29 @@ const TrackMainComponent = ({
               <span className="text-[10px] text-gray-500">{user.email}</span>
             </div>
           </div>
-          {/* <p className="text-3xl tracking-wider font-bold playfair-display px-3 line-clamp-1">
-            {new Date().getDate()},
-            {monMap?.[new Date(activeMonth?.startDate).getMonth() + 1]}
-          </p>
-          <div className="flex flex-col items-start px-3">
-            <span className="text-[10px] text-gray-500">
-              {activeMonth?.status === "active" && "Current Plan"}
-            </span>
-            <span className="text-[10px] tracking-wider">
-              {formatMonthYearSimple(activeMonth?.startDate)} -{" "}
-              {formatMonthYearSimple(activeMonth?.endDate)}
-            </span>
-          </div> */}
+          <div className="mt-2">
+            <p className="text-2xl tracking-wider font-bold playfair-display px-3 line-clamp-1">
+              {new Date().getDate()},
+              {monMap?.[new Date(activeMonth?.startDate).getMonth() + 1]}
+            </p>
+            <div className="flex flex-col items-start px-3">
+              <span className="text-[10px] text-gray-500">
+                {activeMonth?.status === "active" && "Current Plan"}
+              </span>
+              {/* <p className="text-[9px] mt-0.5 tracking-wider text-nowrap">
+                <span className="text-gray-500">Started at -</span>{" "}
+                {formatMonthYearSimple(activeMonth?.startDate)}
+              </p>
+              <p className="text-[9px] tracking-wider text-nowrap">
+                <span className="text-gray-500">Ended at&nbsp; -</span>{" "}
+                {formatMonthYearSimple(activeMonth?.endDate)}
+              </p> */}
+            </div>
+          </div>
         </div>
         {/* right detail */}
-        <div className="bg-black/20 border border-white/10 w-[14.5%] backdrop-blur-2xl light:bg-lightCard light:border-lightBorder rounded-2xl overflow-x-hidden h-25 absolute -top-29 py-2 right-0 overflow-y-hidden flex flex-col justify-between">
-          <p className="text-2xl tracking-wider font-bold playfair-display px-3 line-clamp-1">
+        <div className="bg-black/20 border border-white/10 w-[14.5%] backdrop-blur-2xl light:bg-lightCard light:border-lightBorder rounded-2xl overflow-x-hidden h-25 absolute py-2 right-0 overflow-y-hidden flex flex-col justify-between">
+          {/* <p className="text-2xl tracking-wider font-bold playfair-display px-3 line-clamp-1">
             {new Date().getDate()},
             {monMap?.[new Date(activeMonth?.startDate).getMonth() + 1]}
           </p>
@@ -129,37 +133,35 @@ const TrackMainComponent = ({
               <span className="text-gray-500">Ended at&nbsp; -</span>{" "}
               {formatMonthYearSimple(activeMonth?.endDate)}
             </p>
-          </div>
+          </div> */}
+          Lorem ipsum dolor sit amet consectetur adipisicing elit. Omnis
+          excepturi eveniet officiis distinctio fugiat totam! Dolor totam sit
+          quam, harum reiciendis aliquid odit cupiditate eaque temporibus quod
+          alias ullam nemo eligendi quis non? Minus soluta, fuga eveniet
+          molestias harum hic nisi, obcaecati assumenda quibusdam, dolores earum
+          autem esse illo ratione.
         </div>
 
         {/* below sections */}
-        <div className="bg-black/20 border border-white/10 w-[20%] light:bg-lightCard light:border-lightBorder rounded-2xl overflow-x-hidden">
+        <div className="bg-black/20 border border-white/10 w-[20%] light:bg-lightCard light:border-lightBorder rounded-2xl overflow-x-hidden relative top-47 h-full">
           <HabitSection
-            taskList={taskList}
             setTaskList={setTaskList}
-            getLogLoading={getLogLoading}
+            dashboardID={dashboardData?._id}
+            loading={dateLogsData.isPending}
           />
         </div>
-        <div className="w-[65%] rounded-2xl relative">
+        <div className="w-[65%] rounded-2xl">
           <DailyCalanderTaskSheet
-            taskList={taskList}
-            setTaskList={setTaskList}
             dashboardData={dashboardData}
-            progress={progress}
-            setProgress={setProgress}
             monthStatus={activeMonth?.status}
-            getLogLoading={getLogLoading}
-            setGetLogLoading={setGetLogLoading}
-            dateLogs={dateLogs}
-            setDateLogs={setDateLogs}
           />
         </div>
-        <div className="bg-black/20 border border-white/10 backdrop-blur-2xl light:border-lightBorder light:bg-lightCard w-[15%] rounded-2xl overflow-x-hidden">
+        <div className="bg-black/20 border border-white/10 backdrop-blur-2xl light:border-lightBorder light:bg-lightCard w-[15%] rounded-2xl overflow-x-hidden relative top-47 h-full">
           <HabitProgress
             progress={progress?.taskProgress}
             total={dashboardData?.totalDays}
             count={progress?.overallProgress.count}
-            getLogLoading={getLogLoading}
+            loading={dateLogsData.isPending}
           />
         </div>
       </div>
@@ -173,10 +175,6 @@ const TrackMainComponent = ({
             <p className="google-sans text-xl font-bold">{user.username}</p>
             <p className="text-xs mt-1 text-gray-500">{user?.email}</p>
           </div>
-          {/* <p className="text-xs text-gray-500">Today</p>
-          <p className="google-sans mt-1 text-xl font-bold">
-            {formatDateString2(new Date())}
-          </p> */}
         </div>
         {/* overall & todays progress */}
         <div className="flex items-center gap-2">
@@ -239,7 +237,7 @@ const TrackMainComponent = ({
               monthDashID={dashboardData?._id}
               monthStatus={activeMonth?.status}
               setTaskList={setTaskList}
-              setProgress={setProgress}
+              // setProgress={setProgress}
             />
           </div>
         )}
@@ -304,7 +302,7 @@ export const TodayTasksSmScreen = ({
   monthDashID,
   monthStatus,
   setTaskList,
-  setProgress,
+  // setProgress,
 }: {
   taskList: TaskI[];
   log: DateLogI;
@@ -312,13 +310,13 @@ export const TodayTasksSmScreen = ({
   monthDashID: string;
   monthStatus: string;
   setTaskList: React.Dispatch<React.SetStateAction<TaskI[]>>;
-  setProgress: React.Dispatch<
-    React.SetStateAction<{
-      overallProgress: OverallProgressI;
-      dateLogProgress: DateLogProgressI[];
-      taskProgress: TaskProgressI[];
-    }>
-  >;
+  // setProgress: React.Dispatch<
+  //   React.SetStateAction<{
+  //     overallProgress: OverallProgressI;
+  //     dateLogProgress: DateLogProgressI[];
+  //     taskProgress: TaskProgressI[];
+  //   }>
+  // >;
 }) => {
   const [selectedDate, setSelectedDate] = useState(new Date());
   const [logLoading, setLogLoading] = useState(false);
@@ -390,7 +388,7 @@ export const TodayTasksSmScreen = ({
       );
       if (res?.data?.success) {
         setTaskList(res?.data?.tasks);
-        setProgress(res?.data?.progress);
+        // setProgress(res?.data?.progress);
       }
     } catch (error) {
       console.error(error);
@@ -453,7 +451,7 @@ export const TodayTasksSmScreen = ({
               setLog={setLog}
               monthDashID={monthDashID}
               setTaskList={setTaskList}
-              setProgress={setProgress}
+              // setProgress={setProgress}
             />
           )}
         </div>

@@ -127,17 +127,23 @@ export interface MonthlyNoteI {
   note: string;
 }
 
+export interface TargetI {
+  _id: string;
+  value: string;
+  completed: boolean;
+}
+
 export interface MonthlyTargetsI {
   _id: string;
   monthDashID: string;
-  targets: { _id: string; value: string; completed: boolean }[];
+  targets: TargetI[];
 }
 
 export interface WeeklyTargetsI {
   _id: string;
   monthDashID: string;
   week: number;
-  targets: { _id: string; value: string; completed: boolean }[];
+  targets: TargetI[];
 }
 
 export interface MonthsI {
@@ -164,6 +170,12 @@ export interface TaskProgressI {
   id: string;
   count: number;
   progress: string | number;
+}
+
+export interface ProgressI {
+  overallProgress: OverallProgressI;
+  dateLogProgress: DateLogProgressI[];
+  taskProgress: TaskProgressI[];
 }
 
 export interface StreakI {

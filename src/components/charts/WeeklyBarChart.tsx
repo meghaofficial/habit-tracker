@@ -95,7 +95,7 @@ export const WeeklyBarChart = ({
       show: false,
     },
     tooltip: {
-      enabled: true, 
+      enabled: true,
     },
   };
 
@@ -108,11 +108,11 @@ export const WeeklyBarChart = ({
 
   return (
     <div className="w-full">
-      <Chart 
-        options={options} 
-        series={series} 
-        type="bar" 
-        height={274}
+      <Chart
+        options={options}
+        series={series}
+        type="bar"
+        height={350}
       />
     </div>
   );

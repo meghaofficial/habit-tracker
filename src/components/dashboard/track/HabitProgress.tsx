@@ -2,12 +2,12 @@ const HabitProgress = ({
   progress,
   total,
   count,
-  getLogLoading,
+  loading,
 }: {
   progress: { id: string; count: number; progress: string | number }[];
   total: number;
   count: number;
-  getLogLoading: boolean;
+  loading: boolean;
 }) => {
   return (
     <div className="">
@@ -31,7 +31,7 @@ const HabitProgress = ({
         </span>
       </p>
       {/* task input */}
-      {getLogLoading ? (
+      {loading ? (
         <div className="p-2 flex flex-col gap-3">
           {Array.from({ length: 5 }).map((_, index) => (
             <div
@@ -43,7 +43,7 @@ const HabitProgress = ({
       ) : (
         progress?.map((p, index) => (
           <div
-            className="text-[12px] flex items-center border-b border-darkBox/50 light:border-lightBorder  py-[5.6px]"
+            className={`text-[12px] flex items-center ${index < progress.length-1 && 'border-b'} border-darkBox/50 light:border-lightBorder py-[5.6px]`}
             key={index}
           >
             <div

@@ -3,19 +3,26 @@ import { useEffect, useRef, useState } from "react";
 import { notify } from "../../../helper";
 import { socket } from "../../../socket/socket";
 import type { TaskI } from "../../../types";
+import { useQuery } from "@tanstack/react-query";
+import { getTasks } from "../../../api/dashboardApi";
 
 const HabitSection = ({
-  taskList,
   setTaskList,
-  getLogLoading,
+  loading,
+  dashboardID,
 }: {
-  taskList: {
-    _id: string;
-    taskName: string;
-  }[];
   setTaskList: React.Dispatch<React.SetStateAction<TaskI[]>>;
-  getLogLoading: boolean;
+  loading: boolean;
+  dashboardID: string;
 }) => {
+  const taskListData = useQuery({
+    queryKey: ["tasks", dashboardID],
+    queryFn: () => getTasks(dashboardID),
+    enabled: !!dashboardID,
+  });
+
+  const taskList: TaskI[] = taskListData?.data?.tasks;
+
   return (
     <div>
       <p
@@ -32,7 +39,7 @@ const HabitSection = ({
         HABITS
       </p>
 
-      {getLogLoading ? (
+      {loading ? (
         <div className="p-2 flex flex-col gap-3">
           {Array.from({ length: 5 }).map((_, index) => (
             <div
@@ -49,6 +56,7 @@ const HabitSection = ({
               taskId={task._id}
               taskName={task.taskName}
               setTaskList={setTaskList}
+              len={taskList.length}
             />
           </div>
         ))
@@ -63,20 +71,18 @@ export const InputData = ({
   taskName,
   screen = "lg",
   setTaskList,
+  len
 }: {
   index: number;
   taskId: string;
   taskName: string;
   screen?: string;
   setTaskList: React.Dispatch<React.SetStateAction<TaskI[]>>;
+  len: number;
 }) => {
   const [value, setValue] = useState<string>(taskName);
 
   const prevValueRef = useRef(taskName);
-
-  // useEffect(() => {
-  //   prevValueRef.current = taskName;
-  // }, [taskName]);
 
   useEffect(() => {
     if (value === prevValueRef.current) return;
@@ -112,7 +118,7 @@ export const InputData = ({
 
   return (
     <div
-      className={`text-[12px] px-2 p-1 flex items-center gap-2 ${screen === "lg" && "border-b border-darkBox/50 light:border-lightBorder"}`}
+      className={`text-[12px] px-2 p-1 flex items-center gap-2 ${index < len-1 && 'border-b'} border-darkBox/50 light:border-lightBorder`}
     >
       <span>{index + 1}.</span>
 
