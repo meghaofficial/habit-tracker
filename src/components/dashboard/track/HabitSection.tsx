@@ -56,11 +56,12 @@ const HabitSection = ({
               taskId={task._id}
               taskName={task.taskName}
               setTaskList={setTaskList}
-              len={taskList.length}
             />
           </div>
         ))
       )}
+      <div className="h-10 flex items-center justify-between px-2">
+      </div>
     </div>
   );
 };
@@ -69,16 +70,12 @@ export const InputData = ({
   index,
   taskId,
   taskName,
-  screen = "lg",
   setTaskList,
-  len
 }: {
   index: number;
   taskId: string;
   taskName: string;
-  screen?: string;
   setTaskList: React.Dispatch<React.SetStateAction<TaskI[]>>;
-  len: number;
 }) => {
   const [value, setValue] = useState<string>(taskName);
 
@@ -118,7 +115,7 @@ export const InputData = ({
 
   return (
     <div
-      className={`text-[12px] px-2 p-1 flex items-center gap-2 ${index < len-1 && 'border-b'} border-darkBox/50 light:border-lightBorder`}
+      className={`text-[12px] px-2 p-1 flex items-center gap-2 border-b border-darkBox/50 light:border-lightBorder`}
     >
       <span>{index + 1}.</span>
 

@@ -43,7 +43,7 @@ const HabitProgress = ({
       ) : (
         progress?.map((p, index) => (
           <div
-            className={`text-[12px] flex items-center ${index < progress.length-1 && 'border-b'} border-darkBox/50 light:border-lightBorder py-[5.6px]`}
+            className={`text-[12px] flex items-center border-b border-darkBox/50 light:border-lightBorder py-[5.6px]`}
             key={index}
           >
             <div
@@ -66,6 +66,8 @@ const HabitProgress = ({
           </div>
         ))
       )}
+      <div className="h-10 flex items-center justify-between px-2">
+      </div>
     </div>
   );
 };

@@ -38,7 +38,7 @@ export const ProgressPie = ({ value, type }: Props) => {
             cornerRadius: 5,
           },
         ]}
-        width={isAnalysis ? 150 : 100}
+        width={isAnalysis ? 10 : 10}
         height={250}
       // slotProps={{ legend: { hidden: true } }}
       />

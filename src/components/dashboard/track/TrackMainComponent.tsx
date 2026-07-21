@@ -9,15 +9,12 @@ import { axiosPrivate } from "../../../api/axios";
 import { monMap } from "../../../staticData";
 import TodayAllTasks from "../../charts/TodayAllTasks";
 import { formatDateString2, formatMonthYearSimple } from "../../../helper";
-// import { IoIosArrowRoundBack, IoIosArrowRoundForward } from "react-icons/io";
 import type {
   DashboardI,
   DateLogI,
   DateLogProgressI,
   MonthsI,
-  OverallProgressI,
   TaskI,
-  TaskProgressI,
 } from "../../../types";
 import { useIsMobile } from "../../hooks/mobileHook";
 import Card from "../../shared/Card";
@@ -29,10 +26,10 @@ import { useSelector } from "react-redux";
 import type { RootState } from "../../../redux/store/store";
 import { useQuery } from "@tanstack/react-query";
 import { getDateLogs, getTasks } from "../../../api/dashboardApi";
+import { TargetsSection } from "./DailyCalanderTaskSheet";
 
 const TrackMainComponent = ({
   dashboardData,
-  // taskList,
   activeMonth,
   setTaskList,
   log,
@@ -77,69 +74,152 @@ const TrackMainComponent = ({
     };
   };
 
+  const totalD = dashboardData?.totalDays || 0;
+  const hasWeek5 = totalD > 28;
+
   return (
     <div className="pb-5 pt-1">
       <div className="sm:flex hidden gap-4 mt-4 relative">
         {/* left detail */}
-        <div className="bg-black/20 border border-white/10 w-[19.5%] backdrop-blur-2xl light:bg-lightCard light:border-lightBorder rounded-2xl overflow-x-hidden absolute p-3 flex flex-col justify-between">
-          <div className="flex gap-4 border-b border-white/10 pb-3">
-            <div className="border border-white/10 light:border-black/10 rounded-full h-10 w-10 flex items-center justify-center">
-              <div className="h-9 w-9 border border-white/10 light:border-black/10 bg-white/5 light:bg-black/5 rounded-full flex items-center justify-center uppercase">
-                {user.username.slice(0, 1)}
+        <div className="bg-black/20 border border-white/10 w-[19.5%] backdrop-blur-2xl light:bg-lightCard light:border-lightBorder rounded-2xl overflow-x-hidden absolute p-3 flex flex-col justify-between h-43">
+          <div className="h-full flex flex-col justify-between">
+            {/* User */}
+            <div className="flex items-center gap-3 border-b border-white/10 light:border-black/10 pb-3">
+              <div className="h-10 w-10 rounded-full border border-white/10 light:border-black/10 bg-white/5 light:bg-black/5 flex items-center justify-center">
+                <span className="text-sm font-semibold uppercase playfair-display">
+                  {user.username.slice(0, 1)}
+                </span>
+              </div>
+
+              <div className="min-w-0 flex-1">
+                <h2 className="truncate text-sm font-bold playfair-display">
+                  {user.username}
+                </h2>
+                <p className="truncate text-[10px] text-gray-500">
+                  {user.email}
+                </p>
               </div>
             </div>
-            <div>
-              <p className="font-bold playfair-display">
-                Hello, <br /> {user.username}
-              </p>
-              <span className="text-[10px] text-gray-500">{user.email}</span>
-            </div>
-          </div>
-          <div className="mt-2">
-            <p className="text-2xl tracking-wider font-bold playfair-display px-3 line-clamp-1">
-              {new Date().getDate()},
-              {monMap?.[new Date(activeMonth?.startDate).getMonth() + 1]}
-            </p>
-            <div className="flex flex-col items-start px-3">
-              <span className="text-[10px] text-gray-500">
-                {activeMonth?.status === "active" && "Current Plan"}
-              </span>
-              {/* <p className="text-[9px] mt-0.5 tracking-wider text-nowrap">
-                <span className="text-gray-500">Started at -</span>{" "}
-                {formatMonthYearSimple(activeMonth?.startDate)}
-              </p>
-              <p className="text-[9px] tracking-wider text-nowrap">
-                <span className="text-gray-500">Ended at&nbsp; -</span>{" "}
-                {formatMonthYearSimple(activeMonth?.endDate)}
-              </p> */}
+
+            {/* Plan */}
+            <div className="flex items-center justify-between px-1 pt-2">
+              <div>
+                <p className="text-[9px] uppercase tracking-[0.2em] text-gray-500">
+                  {activeMonth?.status === "active"
+                    ? "Current Plan"
+                    : "Dashboard"}
+                </p>
+
+                <div className="mt-1 flex items-end gap-1">
+                  <span className="text-4xl font-bold leading-none playfair-display">
+                    {new Date().getDate()}
+                  </span>
+
+                  <span className="pb-0.5 text-sm text-gray-400">
+                    {monMap?.[new Date(activeMonth?.startDate).getMonth() + 1]}
+                  </span>
+                </div>
+              </div>
+
+              <div className="text-right text-[9px] space-y-1">
+                <p>
+                  <span className="text-gray-500">Start</span>
+                  <br />
+                  {formatMonthYearSimple(activeMonth?.startDate)}
+                </p>
+
+                <p>
+                  <span className="text-gray-500">End</span>
+                  <br />
+                  {formatMonthYearSimple(activeMonth?.endDate)}
+                </p>
+              </div>
             </div>
           </div>
         </div>
         {/* right detail */}
-        <div className="bg-black/20 border border-white/10 w-[14.5%] backdrop-blur-2xl light:bg-lightCard light:border-lightBorder rounded-2xl overflow-x-hidden h-25 absolute py-2 right-0 overflow-y-hidden flex flex-col justify-between">
-          {/* <p className="text-2xl tracking-wider font-bold playfair-display px-3 line-clamp-1">
-            {new Date().getDate()},
-            {monMap?.[new Date(activeMonth?.startDate).getMonth() + 1]}
-          </p>
-          <div className="flex flex-col items-start px-3">
-            <span className="text-[10px] text-gray-500">
-              {activeMonth?.status === "active" && "Current Plan"}
-            </span>
-            <p className="text-[9px] mt-0.5 tracking-wider text-nowrap">
-              <span className="text-gray-500">Started at -</span>{" "}
-              {formatMonthYearSimple(activeMonth?.startDate)}
-            </p>
-            <p className="text-[9px] tracking-wider text-nowrap">
-              <span className="text-gray-500">Ended at&nbsp; -</span>{" "}
-              {formatMonthYearSimple(activeMonth?.endDate)}
-            </p>
-          </div> */}
-          Lorem ipsum dolor sit amet consectetur adipisicing elit. Omnis
-          excepturi eveniet officiis distinctio fugiat totam! Dolor totam sit
-          quam, harum reiciendis aliquid odit cupiditate eaque temporibus quod
-          alias ullam nemo eligendi quis non? Minus soluta, fuga eveniet
-          molestias harum hic nisi, obcaecati assumenda quibusdam, dolores earum
-          autem esse illo ratione.
+        <div className="bg-black/20 border border-white/10 w-[14.5%] backdrop-blur-2xl light:bg-lightCard light:border-lightBorder rounded-2xl overflow-x-hidden h-43 absolute py-2 right-0 overflow-y-hidden flex flex-col justify-between">
+          <div className="h-full flex flex-col justify-between">
+            {/* Daily */}
+            <div className="px-5 py-1">
+              <div className="flex items-center justify-between">
+                <p className="text-[10px] uppercase tracking-widest text-gray-500">
+                  Today
+                </p>
+
+                <span className="text-[9px] text-gray-500">
+                  {Math.round(
+                    ((getTodayProgress().count || 0) /
+                      (taskList?.length || 1)) *
+                      100,
+                  )}
+                  %
+                </span>
+              </div>
+
+              <div className="flex items-end gap-1 mt-1">
+                <span className="text-2xl font-bold playfair-display">
+                  {getTodayProgress().count || 0}
+                </span>
+                <span className="text-[11px] text-gray-500 mb-1">
+                  / {taskList?.length || 0}
+                </span>
+              </div>
+
+              <div className="mt-2 h-1 rounded-full bg-white/10 overflow-hidden">
+                <div
+                  className="h-full rounded-full bg-violet-500"
+                  style={{
+                    width: `${
+                      taskList?.length
+                        ? (getTodayProgress().count / taskList.length) * 100
+                        : 0
+                    }%`,
+                  }}
+                />
+              </div>
+            </div>
+            {/* Monthly */}
+            <div className="pt-2 pb-1 border-t border-white/10 px-5">
+              <div className="flex items-center justify-between">
+                <p className="text-[10px] uppercase tracking-widest text-gray-500">
+                  Month
+                </p>
+                <span className="text-[9px] text-gray-500">
+                  {Math.round(
+                    ((progress?.overallProgress?.count || 0) /
+                      (progress?.overallProgress?.total || 1)) *
+                      100,
+                  )}
+                  %
+                </span>
+              </div>
+
+              <div className="flex items-end gap-1 mt-1">
+                <span className="text-2xl font-bold playfair-display">
+                  {progress?.overallProgress?.count || 0}
+                </span>
+                <span className="text-[11px] text-gray-500 mb-1">
+                  / {progress?.overallProgress?.total || 0}
+                </span>
+              </div>
+
+              <div className="mt-2 h-1 rounded-full bg-white/10 overflow-hidden">
+                <div
+                  className="h-full rounded-full bg-emerald-500"
+                  style={{
+                    width: `${
+                      progress?.overallProgress?.total
+                        ? (progress.overallProgress.count /
+                            progress.overallProgress.total) *
+                          100
+                        : 0
+                    }%`,
+                  }}
+                />
+              </div>
+            </div>
+          </div>
         </div>
 
         {/* below sections */}
@@ -241,9 +321,20 @@ const TrackMainComponent = ({
             />
           </div>
         )}
-        <MonthlyNote monthID={dashboardData?._id} />
-        <TargetsList type="monthly" monthID={dashboardData?._id} />
-        <div className="sm:flex flex-col gap-4 hidden w-1/3">
+        {dashboardData?._id && (
+          <div className="flex gap-4 w-full">
+            <div className="w-[70%]">
+              <TargetsSection
+                monthID={dashboardData._id}
+                totalWeeks={hasWeek5 ? 5 : 4}
+              />
+            </div>
+            <MonthlyNote monthID={dashboardData?._id} />
+          </div>
+        )}
+        {/* <MonthlyNote monthID={dashboardData?._id} /> */}
+        {/* <TargetsList type="monthly" monthID={dashboardData?._id} /> */}
+        {/* <div className="sm:flex flex-col gap-4 hidden w-1/3">
           <Card
             heading="Daily View"
             subHeading="Your productivity breakdown for today."
@@ -287,10 +378,8 @@ const TrackMainComponent = ({
               </div>
             </div>
           </Card>
-        </div>
+        </div> */}
       </div>
-      {/* weekly targets */}
-      {/* <WeeklyTargetsAccordion monthID={dashboardData?._id} /> */}
     </div>
   );
 };

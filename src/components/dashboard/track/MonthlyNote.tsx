@@ -1,8 +1,8 @@
 import { useEffect, useRef, useState } from "react";
 import { axiosPrivate } from "../../../api/axios";
 import { formatTimestamp, notify } from "../../../helper";
-import Card from "../../shared/Card";
 import { socket } from "../../../socket/socket";
+import { FiEdit3 } from "react-icons/fi";
 
 const MonthlyNote = ({ monthID }: { monthID: string }) => {
   const [monthlyNote, setMonthlyNote] = useState("");
@@ -51,8 +51,6 @@ const MonthlyNote = ({ monthID }: { monthID: string }) => {
   useEffect(() => {
     const onNoteUpdate = (data: any) => {
       serverNoteRef.current = data.note.note;
-
-      // setMonthlyNote(data.note.note);
       setLastUpdates(data.note.updatedAt);
     };
 
@@ -64,49 +62,69 @@ const MonthlyNote = ({ monthID }: { monthID: string }) => {
   }, []);
 
   return (
-    <>
-      <Card
-        heading="Monthly Notes"
-        subHeading="Reflect on your progress, motivation and goals."
-        cardWidth="sm:w-1/3"
-      >
-        {lastUpdated ? (
-          <div className="relative z-10 mt-4 inline-flex items-center gap-2 rounded-full border border-white/10 light:border-black/10 bg-white/5 light:bg-black/5 px-4 py-2 text-[12px] text-darkSubText light:text-lightSubText ">
-            <div className="h-2 w-2 rounded-full bg-darkSuccess" />
-            Last updated • {formatTimestamp(lastUpdated)}
+    <div className="relative overflow-hidden rounded-2xl border border-white/10 bg-black/20 sm:w-1/3 w-full flex flex-col justify-between">
+      {/* Background Gradient Overlay */}
+      <div className="absolute inset-0 bg-linear-to-br from-violet-500/3 via-transparent to-transparent pointer-events-none" />
+
+      <div>
+        {/* Header */}
+        <div className="relative flex items-center justify-between px-4 py-3 border-b border-white/8">
+          <div className="flex items-center gap-3">
+            <div className="w-8 h-8 rounded-lg bg-linear-to-br from-violet-500/20 to-purple-500/20 flex items-center justify-center border border-violet-500/20 text-violet-400">
+              <FiEdit3 size={14} />
+            </div>
+            <div>
+              <p className="text-sm font-bold text-white">Monthly Notes</p>
+              <p className="text-[10px] text-gray-500">
+                Reflect on your progress &amp; goals
+              </p>
+            </div>
           </div>
-        ) : (
-          <div className="relative z-10 mt-4 inline-flex items-center gap-2 rounded-full border border-white/10 light:border-black/10 bg-white/5 light:bg-black/5 px-4 py-2 text-[12px] text-darkSubText light:text-lightSubText ">
-            <div className="h-2 w-2 rounded-full bg-darkSuccess" />
-            Last updated • Not Available
-          </div>
-        )}
-        <div className="relative z-10 mt-5">
+
+          {/* Last updated badge */}
+          {lastUpdated ? (
+            <span className="text-[10px] text-violet-300/90 bg-violet-500/10 border border-violet-500/20 px-2.5 py-1 rounded-lg font-medium flex items-center gap-1.5 shrink-0">
+              <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse" />
+              {formatTimestamp(lastUpdated)}
+            </span>
+          ) : (
+            <span className="text-[10px] text-gray-400 bg-white/5 border border-white/10 px-2.5 py-1 rounded-lg font-medium flex items-center gap-1.5 shrink-0">
+              <span className="w-1.5 h-1.5 rounded-full bg-gray-500" />
+              Not Available
+            </span>
+          )}
+        </div>
+
+        {/* Content Body */}
+        <div className="relative p-4 flex flex-col gap-3">
           <textarea
             value={monthlyNote}
             onChange={(e) => setMonthlyNote(e.target.value)}
             placeholder="Write your thoughts, goals, wins, lessons or motivation for this month..."
-            className="h-80 text-[12px] w-full resize-none rounded-2xl border border-white/10 dark:border-black/10 bg-white/3 light:bg-black/5 px-3 py-2 leading-7 text-white outline-none placeholder:text-white/25 shadow-[inset_0_1px_2px_rgba(255,255,255,0.06)] transition-all duration-300 focus:border-[#8B5CF6]/40 focus:bg-white/5 focus:shadow-[0_0_25px_rgba(139,92,246,0.15)] light:text-lightText light:placeholder:text-lightSubText "
+            className="w-full h-70 text-[12px] leading-relaxed resize-none rounded-xl bg-white/5 border border-white/10 p-3 text-white placeholder:text-white/20 outline-none focus:border-violet-500/40 focus:bg-white/8 transition-all duration-200 hide-scrollbar"
           />
-        </div>
-        <div className="relative z-10 mt-4 flex items-center justify-between">
-          <p className="text-[12px] text-darkSubText light:text-lightSubText">
-            {monthlyNote?.length || 0} characters
-          </p>
 
-          <div className="flex items-center gap-1">
-            {[1, 2, 3].map((i) => (
-              <div
-                key={i}
-                className="h-2 w-2 rounded-full bg-[#8B5CF6]"
-                style={{ opacity: i / 3 }}
-              />
-            ))}
+          {/* Footer */}
+          <div className="flex items-center justify-between text-[11px] text-gray-500 pt-0.5">
+            <span className="text-[10px] font-medium text-gray-400">
+              {monthlyNote?.length || 0} characters
+            </span>
+
+            <div className="flex items-center gap-1">
+              {[1, 2, 3].map((i) => (
+                <div
+                  key={i}
+                  className="h-1.5 w-1.5 rounded-full bg-violet-400"
+                  style={{ opacity: i / 3 }}
+                />
+              ))}
+            </div>
           </div>
         </div>
-      </Card>
-    </>
+      </div>
+    </div>
   );
 };
 
 export default MonthlyNote;
+

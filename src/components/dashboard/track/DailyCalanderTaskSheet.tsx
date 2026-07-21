@@ -29,6 +29,7 @@ import {
   resetDateLogs,
   toggleTask,
 } from "../../../api/dashboardApi";
+import MonthlyNote from "./MonthlyNote";
 
 // Main Component
 const DailyCalanderTaskSheet = ({
@@ -408,11 +409,10 @@ const DailyCalanderTaskSheet = ({
               {chunk.map((d) => (
                 <span
                   key={d}
-                  className={`text-[9px] font-bold transition-all ${
-                    d === todayDate
-                      ? "text-white bg-indigo-500 rounded-full w-4 h-4 flex items-center justify-center text-[8px]"
-                      : "text-gray-500"
-                  }`}
+                  className={`text-[9px] font-bold transition-all ${d === todayDate
+                    ? "text-white bg-indigo-500 rounded-full w-4 h-4 flex items-center justify-center text-[8px]"
+                    : "text-gray-500"
+                    }`}
                 >
                   {d}
                 </span>
@@ -425,11 +425,10 @@ const DailyCalanderTaskSheet = ({
                 (d) => (
                   <span
                     key={d}
-                    className={`text-[9px] font-bold ${
-                      d === todayDate
-                        ? "text-white bg-indigo-500 rounded-full w-4 h-4 flex items-center justify-center text-[8px]"
-                        : "text-gray-500"
-                    }`}
+                    className={`text-[9px] font-bold ${d === todayDate
+                      ? "text-white bg-indigo-500 rounded-full w-4 h-4 flex items-center justify-center text-[8px]"
+                      : "text-gray-500"
+                      }`}
                   >
                     {d}
                   </span>
@@ -527,20 +526,12 @@ const DailyCalanderTaskSheet = ({
           )}
         </div>
       </div>
-
-      {/* ── Targets Section ── */}
-      {dashboardData?._id && (
-        <TargetsSection
-          monthID={dashboardData._id}
-          totalWeeks={hasWeek5 ? 5 : 4}
-        />
-      )}
     </div>
   );
 };
 
 // ─── Targets Section ──────────────────────────────────────────────────────────
-const TargetsSection = ({
+export const TargetsSection = ({
   monthID,
   totalWeeks,
 }: {
@@ -559,13 +550,13 @@ const TargetsSection = ({
   ];
 
   return (
-    <div className="relative overflow-hidden rounded-2xl border border-white/10 bg-black/20">
+    <div className="relative overflow-hidden rounded-2xl w-full border border-white/10 bg-black/20">
       <div className="absolute inset-0 bg-gradient-to-br from-violet-500/3 via-transparent to-transparent pointer-events-none" />
 
       {/* Header */}
       <div className="relative flex items-center justify-between px-4 py-3 border-b border-white/8">
         <div className="flex items-center gap-3">
-          <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-violet-500/20 to-purple-500/20 flex items-center justify-center border border-violet-500/20 text-violet-400">
+          <div className="w-8 h-8 rounded-lg bg-linear-to-br from-indigo-500/20 to-violet-500/20 flex items-center justify-center border border-violet-500/20 text-violet-400">
             <FiTarget size={14} />
           </div>
           <div>
@@ -583,11 +574,10 @@ const TargetsSection = ({
           <button
             key={tab.key}
             onClick={() => setActiveTab(tab.key)}
-            className={`shrink-0 text-[11px] font-semibold px-3 py-1.5 rounded-xl transition-all duration-200 cursor-pointer ${
-              activeTab === tab.key
-                ? "bg-violet-500/20 text-violet-300 border border-violet-500/30"
-                : "text-gray-500 hover:text-gray-300 hover:bg-white/5 border border-transparent"
-            }`}
+            className={`shrink-0 text-[11px] font-semibold px-3 py-1.5 rounded-xl transition-all duration-200 cursor-pointer ${activeTab === tab.key
+              ? "bg-violet-500/20 text-violet-300 border border-violet-500/30"
+              : "text-gray-500 hover:text-gray-300 hover:bg-white/5 border border-transparent"
+              }`}
           >
             {tab.label}
           </button>
@@ -791,21 +781,19 @@ const InlineTargetsList = ({
                 animate={{ opacity: 1, y: 0 }}
                 exit={{ opacity: 0, height: 0, marginBottom: 0 }}
                 transition={{ duration: 0.2 }}
-                className={`flex items-center gap-2.5 p-2.5 rounded-xl border transition-all duration-200 group ${
-                  target.completed
-                    ? "bg-emerald-500/8 border-emerald-500/20"
-                    : "bg-white/[0.02] border-white/8 hover:border-white/15"
-                }`}
+                className={`flex items-center gap-2.5 p-2.5 rounded-xl border transition-all duration-200 group ${target.completed
+                  ? "bg-emerald-500/8 border-emerald-500/20"
+                  : "bg-white/[0.02] border-white/8 hover:border-white/15"
+                  }`}
               >
                 {/* Checkbox */}
                 <button
                   onClick={() => markTarget(target._id, !target.completed)}
                   disabled={markLoading === target._id}
-                  className={`w-5 h-5 shrink-0 rounded-md border flex items-center justify-center transition-all duration-200 cursor-pointer ${
-                    target.completed
-                      ? "bg-emerald-500/30 border-emerald-500/50 text-emerald-400"
-                      : "bg-white/5 border-white/15 hover:border-violet-500/40"
-                  }`}
+                  className={`w-5 h-5 shrink-0 rounded-md border flex items-center justify-center transition-all duration-200 cursor-pointer ${target.completed
+                    ? "bg-emerald-500/30 border-emerald-500/50 text-emerald-400"
+                    : "bg-white/5 border-white/15 hover:border-violet-500/40"
+                    }`}
                 >
                   {markLoading === target._id ? (
                     <span className="w-2.5 h-2.5 rounded-full border border-emerald-400 border-t-transparent animate-spin" />
@@ -816,11 +804,10 @@ const InlineTargetsList = ({
 
                 {/* Text */}
                 <p
-                  className={`flex-1 text-[12px] leading-tight ${
-                    target.completed
-                      ? "line-through text-gray-500"
-                      : "text-white/80"
-                  }`}
+                  className={`flex-1 text-[12px] leading-tight ${target.completed
+                    ? "line-through text-gray-500"
+                    : "text-white/80"
+                    }`}
                 >
                   {target.value}
                 </p>
@@ -876,17 +863,15 @@ const CheckboxCell = React.memo(
     return (
       <span
         onClick={handleClick}
-        className={`h-4 w-4 rounded transition-all duration-200 ${
-          isToday ? "cursor-pointer" : "cursor-default"
-        } ${
-          checked
+        className={`h-4 w-4 rounded transition-all duration-200 ${isToday ? "cursor-pointer" : "cursor-default"
+          } ${checked
             ? isToday
               ? "bg-emerald-400 shadow-[0_0_6px_rgba(74,222,128,0.4)]"
               : "bg-emerald-400/40"
             : isToday
               ? "bg-white/8 border border-white/20 hover:border-indigo-400/50 hover:bg-indigo-500/10"
               : "bg-white/5 border border-white/8"
-        }`}
+          }`}
       />
     );
   },
