@@ -17,7 +17,7 @@ import type {
 import { CustomButtonForm } from "../shared/CutomButton";
 import NavigationBar from "../shared/NavigationBar";
 import { useIsMobile } from "../hooks/mobileHook";
-import Calendar from "../dashboard/track/calander/Calendar";
+import Calendar from "../dashboard/calander/Calendar";
 import HistoryMainComponent from "../dashboard/history/HistoryMainComponent";
 import Fallback from "../shared/Fallback";
 
@@ -388,7 +388,6 @@ const Dashboard = () => {
                   setLog={setLog}
                   streakData={streakData}
                   dateLogs={dateLogs}
-                  setDateLogs={setDateLogs}
                 />
               )}
               {activeTab === "analysis" && (

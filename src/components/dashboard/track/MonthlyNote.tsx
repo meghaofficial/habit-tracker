@@ -62,7 +62,7 @@ const MonthlyNote = ({ monthID }: { monthID: string }) => {
   }, []);
 
   return (
-    <div className="relative overflow-hidden rounded-2xl border border-white/10 bg-black/20 sm:w-1/3 w-full flex flex-col justify-between">
+    <div className="relative overflow-hidden rounded-2xl border border-white/10 bg-black/20 w-full flex flex-col justify-between">
       {/* Background Gradient Overlay */}
       <div className="absolute inset-0 bg-linear-to-br from-violet-500/3 via-transparent to-transparent pointer-events-none" />
 

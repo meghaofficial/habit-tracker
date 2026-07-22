@@ -1,13 +1,13 @@
 import { useEffect, useState } from "react";
-import { monMap, week } from "../../../../staticData";
-import { statusColors, type CalandarDataI } from "../../../../types";
-import type { RootState } from "../../../../redux/store/store";
+import { monMap, week } from "../../../staticData";
+import { statusColors, type CalandarDataI } from "../../../types";
+import type { RootState } from "../../../redux/store/store";
 import { useSelector } from "react-redux";
-import Card from "../../../shared/Card";
+import Card from "../../shared/Card";
 import { MdKeyboardArrowLeft, MdKeyboardArrowRight } from "react-icons/md";
-import { formatTimestamp, notify } from "../../../../helper";
-import { axiosPrivate } from "../../../../api/axios";
-import CircleLoader from "../../../loaders/CircleLoader";
+import { formatTimestamp, notify } from "../../../helper";
+import { axiosPrivate } from "../../../api/axios";
+import CircleLoader from "../../loaders/CircleLoader";
 import { motion } from "framer-motion";
 
 const Calendar = () => {

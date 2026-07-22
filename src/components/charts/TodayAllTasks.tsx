@@ -2,10 +2,7 @@ import { useState } from "react";
 import { axiosPrivate } from "../../api/axios";
 import type {
   DateLogI,
-  DateLogProgressI,
-  OverallProgressI,
   TaskI,
-  TaskProgressI,
 } from "../../types";
 import { InputData } from "../dashboard/track/HabitSection";
 import { notify } from "../../helper";
@@ -18,20 +15,12 @@ const TodayAllTasks = ({
   setLog,
   monthDashID,
   setTaskList,
-  // setProgress,
 }: {
   taskList: { _id: string; taskName: string; monthDashID: string }[];
   log: DateLogI;
   setLog: React.Dispatch<React.SetStateAction<DateLogI>>;
   monthDashID: string;
   setTaskList: React.Dispatch<React.SetStateAction<TaskI[]>>;
-  // setProgress: React.Dispatch<
-  //   React.SetStateAction<{
-  //     overallProgress: OverallProgressI;
-  //     dateLogProgress: DateLogProgressI[];
-  //     taskProgress: TaskProgressI[];
-  //   }>
-  // >;
 }) => {
   const [removeRowID, setRemoveRowID] = useState<string | null>(null);
   const [addTaskLoading, setAddTaskLoading] = useState("");
@@ -95,7 +84,6 @@ const TodayAllTasks = ({
                 index={index}
                 taskId={task?._id}
                 taskName={task?.taskName}
-                screen="sm"
                 setTaskList={setTaskList}
               />
 

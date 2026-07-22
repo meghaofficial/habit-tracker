@@ -1,8 +1,8 @@
 import { motion, AnimatePresence } from "framer-motion";
-import { statusColors } from "../../../../types";
+import { statusColors } from "../../../types";
 import { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import type { RootState } from "../../../../redux/store/store";
+import type { RootState } from "../../../redux/store/store";
 
 const months: Record<string, string> = {
   Jan: "January",

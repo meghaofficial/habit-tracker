@@ -1,10 +1,9 @@
-import { axiosPrivate } from "../../../api/axios";
 import { useEffect, useRef, useState } from "react";
 import { notify } from "../../../helper";
 import { socket } from "../../../socket/socket";
 import type { TaskI } from "../../../types";
-import { useQuery } from "@tanstack/react-query";
-import { getTasks } from "../../../api/dashboardApi";
+import { useMutation, useQuery } from "@tanstack/react-query";
+import { getTasks, updateTaskName } from "../../../api/dashboardApi";
 
 const HabitSection = ({
   setTaskList,
@@ -60,8 +59,7 @@ const HabitSection = ({
           </div>
         ))
       )}
-      <div className="h-10 flex items-center justify-between px-2">
-      </div>
+      <div className="h-10 flex items-center justify-between px-2"></div>
     </div>
   );
 };
@@ -78,27 +76,57 @@ export const InputData = ({
   setTaskList: React.Dispatch<React.SetStateAction<TaskI[]>>;
 }) => {
   const [value, setValue] = useState<string>(taskName);
-
   const prevValueRef = useRef(taskName);
+  const [saveStatus, setSaveStatus] = useState<"idle" | "saving" | "saved">(
+    "idle",
+  );
+  const timeoutRef = useRef(0);
+
+  const updateTaskMutation = useMutation({
+    mutationFn: updateTaskName,
+    onMutate: () => {
+      setSaveStatus("saving");
+      if (timeoutRef.current) {
+        clearTimeout(timeoutRef.current);
+      }
+    },
+    onSuccess: () => {
+      setSaveStatus("saved");
+      timeoutRef.current = setTimeout(() => {
+        setSaveStatus("idle");
+      }, 1000);
+    },
+    onError: () => {
+      notify.error("Please try again.");
+    },
+  });
 
   useEffect(() => {
     if (value === prevValueRef.current) return;
-
     const timeout = setTimeout(() => {
-      axiosPrivate
-        .patch(`/api/task?taskID=${taskId}`, {
-          taskName: value,
-        })
-        .catch(() => notify.error("Please try again."));
+      updateTaskMutation.mutate({
+        taskId,
+        taskName: value,
+      });
     }, 500);
 
     prevValueRef.current = value;
+
     return () => clearTimeout(timeout);
   }, [value, taskId]);
 
   useEffect(() => {
     setValue(taskName);
+    prevValueRef.current = taskName;
   }, [taskName]);
+
+  useEffect(() => {
+    return () => {
+      if (timeoutRef.current) {
+        clearTimeout(timeoutRef.current);
+      }
+    };
+  }, []);
 
   // WEBSOCKET SYNCING
   useEffect(() => {
@@ -124,8 +152,35 @@ export const InputData = ({
         className="outline-none w-full py-1"
         title={value}
         value={value}
-        onChange={(e) => setValue(e.target.value)}
+        onChange={(e) => {
+          setValue(e.target.value);
+          setSaveStatus("saving");
+        }}
+        disabled={updateTaskMutation.isPending}
       />
+
+      {saveStatus === "saving" && (
+        <span className="text-gray-500 text-[8px] tracking-wider">
+          Saving...
+        </span>
+      )}
+      {saveStatus === "saved" && (
+        <>
+          <svg
+            className="h-3 w-3 text-green-500"
+            fill="none"
+            stroke="currentColor"
+            strokeWidth={2}
+            viewBox="0 0 24 24"
+          >
+            <path d="M5 13l4 4L19 7" />
+          </svg>
+
+          <span className="text-green-600 text-[8px] tracking-wider -ms-1">
+            Saved
+          </span>
+        </>
+      )}
     </div>
   );
 };

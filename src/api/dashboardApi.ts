@@ -51,7 +51,7 @@ export const toggleTask = async ({
 }) => {
   const res = await axiosPrivate.patch(
     `/api/date-logs?monthDashID=${dashboardID}&fullDate=${fullDate}&taskID=${taskID}`,
-    { marked }
+    { marked },
   );
 
   return res.data;
@@ -60,8 +60,23 @@ export const toggleTask = async ({
 // Reset dashboard
 export const resetDateLogs = async (dashboardID: string) => {
   const res = await axiosPrivate.patch(
-    `/api/reset-date-log?monthDashID=${dashboardID}`
+    `/api/reset-date-log?monthDashID=${dashboardID}`,
   );
+
+  return res.data;
+};
+
+// Update taskname
+export const updateTaskName = async ({
+  taskId,
+  taskName,
+}: {
+  taskId: string;
+  taskName: string;
+}) => {
+  const res = await axiosPrivate.patch(`/api/task?taskID=${taskId}`, {
+    taskName,
+  });
 
   return res.data;
 };
