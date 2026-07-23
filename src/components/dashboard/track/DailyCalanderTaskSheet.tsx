@@ -1,18 +1,9 @@
 import React, { useCallback, useEffect, useState } from "react";
 import { daysNums, weekLetters } from "../../../staticData";
 import { notify } from "../../../helper";
-import type {
-  DashboardI,
-  DateLogI,
-  ProgressI,
-  TaskI,
-} from "../../../types";
+import type { DashboardI, DateLogI, ProgressI, TaskI } from "../../../types";
 import { socket } from "../../../socket/socket";
-import {
-  FiCalendar,
-  FiPlus,
-  FiTrash2,
-} from "react-icons/fi";
+import { FiCalendar, FiPlus, FiTrash2 } from "react-icons/fi";
 import { RiResetLeftLine } from "react-icons/ri";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import {
@@ -85,6 +76,10 @@ const DailyCalanderTaskSheet = ({
       notify.error("Please try again.");
     },
   });
+
+  const toggleID = toggleTaskMutation.isPending
+    ? toggleTaskMutation.variables?.taskID
+    : "";
 
   const resetDateLogsMutation = useMutation({
     mutationFn: resetDateLogs,
@@ -402,10 +397,11 @@ const DailyCalanderTaskSheet = ({
               {chunk.map((d) => (
                 <span
                   key={d}
-                  className={`text-[9px] font-bold transition-all ${d === todayDate
-                    ? "text-white bg-indigo-500 rounded-full w-4 h-4 flex items-center justify-center text-[8px]"
-                    : "text-gray-500"
-                    }`}
+                  className={`text-[9px] font-bold transition-all ${
+                    d === todayDate
+                      ? "text-white bg-indigo-500 rounded-full w-4 h-4 flex items-center justify-center text-[8px]"
+                      : "text-gray-500"
+                  }`}
                 >
                   {d}
                 </span>
@@ -418,10 +414,11 @@ const DailyCalanderTaskSheet = ({
                 (d) => (
                   <span
                     key={d}
-                    className={`text-[9px] font-bold ${d === todayDate
-                      ? "text-white bg-indigo-500 rounded-full w-4 h-4 flex items-center justify-center text-[8px]"
-                      : "text-gray-500"
-                      }`}
+                    className={`text-[9px] font-bold ${
+                      d === todayDate
+                        ? "text-white bg-indigo-500 rounded-full w-4 h-4 flex items-center justify-center text-[8px]"
+                        : "text-gray-500"
+                    }`}
                   >
                     {d}
                   </span>
@@ -552,15 +549,17 @@ const CheckboxCell = React.memo(
     return (
       <span
         onClick={handleClick}
-        className={`h-4 w-4 rounded transition-all duration-200 ${isToday ? "cursor-pointer" : "cursor-default"
-          } ${checked
+        className={`h-4 w-4 rounded transition-all duration-200 ${
+          isToday ? "cursor-pointer" : "cursor-default"
+        } ${
+          checked
             ? isToday
               ? "bg-emerald-400 shadow-[0_0_6px_rgba(74,222,128,0.4)]"
               : "bg-emerald-400/40"
             : isToday
               ? "bg-white/8 border border-white/20 hover:border-indigo-400/50 hover:bg-indigo-500/10"
               : "bg-white/5 border border-white/8"
-          }`}
+        }`}
       />
     );
   },

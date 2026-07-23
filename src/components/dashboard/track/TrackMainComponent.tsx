@@ -55,7 +55,7 @@ const TrackMainComponent = ({
 
   const getTodayProgress = () => {
     const d = new Date();
-    const custom = d.toISOString().split("T")[0];
+    const custom = d.toString().split("T")[0];
     const matched = progress?.dateLogProgress?.find(
       (p: DateLogProgressI) => p.fullDate.toString().split("T")[0] === custom,
     );
