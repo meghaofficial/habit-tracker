@@ -92,3 +92,94 @@ export const getDateLogByDate = async (monthDashID: string) => {
 
   return res.data;
 };
+
+
+// Get targets
+export const getTargets = async ({
+  type,
+  monthID,
+  week,
+}: {
+  type: string;
+  monthID: string;
+  week?: number;
+}) => {
+  const url =
+    type === "monthly"
+      ? `/api/monthly-targets?monthDashID=${monthID}`
+      : `/api/weekly-targets?monthDashID=${monthID}&week=${week}`;
+
+  const res = await axiosPrivate.get(url);
+
+  return res.data;
+};
+
+// Add target
+export const addTarget = async ({
+  type,
+  monthID,
+  week,
+  target,
+}: {
+  type: string;
+  monthID: string;
+  week?: number;
+  target: string;
+}) => {
+  const url =
+    type === "monthly"
+      ? `/api/add-monthly-target?monthDashID=${monthID}`
+      : `/api/add-weekly-target?monthDashID=${monthID}&week=${week}`;
+
+  const res = await axiosPrivate.patch(url, {
+    target,
+  });
+
+  return res.data;
+};
+
+// Mark target
+export const markTarget = async ({
+  type,
+  monthID,
+  week,
+  targetID,
+  mark,
+}: {
+  type: string;
+  monthID: string;
+  week?: number;
+  targetID: string;
+  mark: boolean;
+}) => {
+  const url =
+    type === "monthly"
+      ? `/api/mark-monthly-target?monthDashID=${monthID}&targetID=${targetID}`
+      : `/api/mark-weekly-target?monthDashID=${monthID}&week=${week}&targetID=${targetID}`;
+
+  const res = await axiosPrivate.patch(url, { mark });
+
+  return res.data;
+};
+
+// Removing target
+export const removeTarget = async ({
+  type,
+  monthID,
+  week,
+  targetID,
+}: {
+  type: string;
+  monthID: string;
+  week?: number;
+  targetID: string;
+}) => {
+  const url =
+    type === "monthly"
+      ? `/api/remove-monthly-target?monthDashID=${monthID}&targetID=${targetID}`
+      : `/api/remove-weekly-target?monthDashID=${monthID}&week=${week}&targetID=${targetID}`;
+
+  const res = await axiosPrivate.patch(url);
+
+  return res.data;
+};
