@@ -16,7 +16,7 @@ const MonthlyNote = ({ monthID }: { monthID: string }) => {
   );
   const timeoutRef = useRef(0);
 
-  const { data: noteData, isPending } = useQuery({
+  const { data: noteData } = useQuery({
     queryKey: ["monthly-note", monthID],
     queryFn: () => getMonthlyNote({ monthID }),
   });
