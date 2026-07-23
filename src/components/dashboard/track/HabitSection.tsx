@@ -4,6 +4,7 @@ import { socket } from "../../../socket/socket";
 import type { TaskI } from "../../../types";
 import { useMutation, useQuery } from "@tanstack/react-query";
 import { getTasks, updateTaskName } from "../../../api/dashboardApi";
+import Saving from "../../shared/Saving";
 
 const HabitSection = ({
   setTaskList,
@@ -159,28 +160,7 @@ export const InputData = ({
         disabled={updateTaskMutation.isPending}
       />
 
-      {saveStatus === "saving" && (
-        <span className="text-gray-500 text-[8px] tracking-wider">
-          Saving...
-        </span>
-      )}
-      {saveStatus === "saved" && (
-        <>
-          <svg
-            className="h-3 w-3 text-green-500"
-            fill="none"
-            stroke="currentColor"
-            strokeWidth={2}
-            viewBox="0 0 24 24"
-          >
-            <path d="M5 13l4 4L19 7" />
-          </svg>
-
-          <span className="text-green-600 text-[8px] tracking-wider -ms-1">
-            Saved
-          </span>
-        </>
-      )}
+      <Saving saveStatus={saveStatus} />
     </div>
   );
 };

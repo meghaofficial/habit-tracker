@@ -183,3 +183,34 @@ export const removeTarget = async ({
 
   return res.data;
 };
+
+// Get monthly note
+export const getMonthlyNote = async ({
+  monthID,
+}: {
+  monthID: string;
+}) => {
+  const res = await axiosPrivate.get(
+    `/api/monthly-note?monthDashID=${monthID}`
+  );
+
+  return res.data;
+};
+
+// Update monthly note
+export const updateMonthlyNote = async ({
+  monthID,
+  note,
+}: {
+  monthID: string;
+  note: string;
+}) => {
+  const res = await axiosPrivate.put(
+    `/api/monthly-note?monthDashID=${monthID}`,
+    {
+      note,
+    }
+  );
+
+  return res.data;
+};
