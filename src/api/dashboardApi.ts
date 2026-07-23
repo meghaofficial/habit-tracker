@@ -80,3 +80,15 @@ export const updateTaskName = async ({
 
   return res.data;
 };
+
+// Getting log by date
+export const getDateLogByDate = async (monthDashID: string) => {
+  const newDate = new Date();
+  newDate.setUTCHours(0, 0, 0, 0);
+  const isoMidnight = newDate.toISOString();
+  const res = await axiosPrivate.get(
+    `/api/get-log-date?monthDashID=${monthDashID}&fullDate=${isoMidnight}`,
+  );
+
+  return res.data;
+};
