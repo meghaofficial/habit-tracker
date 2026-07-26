@@ -29,12 +29,12 @@ const TargetsSection = ({
 
   return (
     <div className="relative overflow-hidden rounded-2xl w-full border border-white/10 bg-black/20">
-      <div className="absolute inset-0 bg-linear-to-br from-violet-500/3 via-transparent to-transparent pointer-events-none" />
+      <div className="absolute inset-0 bg-linear-to-br from-indigo-500/3 via-transparent to-transparent pointer-events-none" />
 
       {/* Header */}
       <div className="relative flex items-center justify-between px-4 py-3 border-b border-white/8">
         <div className="flex items-center gap-3">
-          <div className="w-8 h-8 rounded-lg bg-linear-to-br from-indigo-500/20 to-violet-500/20 flex items-center justify-center border border-violet-500/20 text-violet-400">
+          <div className="w-8 h-8 rounded-lg bg-linear-to-br from-indigo-500/20 to-indigo-500/20 flex items-center justify-center border border-indigo-500/20 text-indigo-400">
             <FiTarget size={14} />
           </div>
           <div>
@@ -54,7 +54,7 @@ const TargetsSection = ({
             onClick={() => setActiveTab(tab.key)}
             className={`shrink-0 text-[11px] font-semibold px-3 py-1.5 rounded-xl transition-all duration-200 cursor-pointer ${
               activeTab === tab.key
-                ? "bg-violet-500/20 text-violet-300 border border-violet-500/30"
+                ? "bg-indigo-500/20 text-indigo-300 border border-indigo-500/30"
                 : "text-gray-500 hover:text-gray-300 hover:bg-white/5 border border-transparent"
             }`}
           >
@@ -184,13 +184,13 @@ const InlineTargetsList = ({
         <div className="flex items-center gap-3">
           <div className="flex-1 h-1.5 bg-white/5 rounded-full overflow-hidden">
             <motion.div
-              className="h-full bg-linear-to-r from-violet-500 to-purple-400 rounded-full"
+              className="h-full bg-linear-to-r from-indigo-500 to-purple-400 rounded-full"
               initial={{ width: 0 }}
               animate={{ width: `${progress}%` }}
               transition={{ duration: 0.5, ease: "easeOut" }}
             />
           </div>
-          <span className="text-[10px] font-bold text-violet-400 shrink-0">
+          <span className="text-[10px] font-bold text-indigo-400 shrink-0">
             {completedCount}/{targets.length} done
           </span>
         </div>
@@ -211,7 +211,7 @@ const InlineTargetsList = ({
                 ? "Add a monthly target…"
                 : "Add a weekly target…"
           }
-          className="flex-1 rounded-xl py-2 px-3 text-[12px] bg-white/5 border border-white/10 text-white placeholder:text-white/20 outline-none focus:border-violet-500/40 focus:bg-white/8 transition-all duration-200"
+          className="flex-1 rounded-xl py-2 px-3 text-[12px] bg-white/5 border border-white/10 text-white placeholder:text-white/20 outline-none focus:border-indigo-500/40 focus:bg-white/8 transition-all duration-200"
         />
         <button
           onClick={() => {
@@ -221,10 +221,10 @@ const InlineTargetsList = ({
           disabled={
             addTargetMutation.isPending || !input.trim() || targets.length >= 10
           }
-          className="flex items-center gap-1.5 px-3 py-2 rounded-xl bg-violet-500/20 border border-violet-500/30 text-violet-300 text-[11px] font-semibold hover:bg-violet-500/30 transition-colors duration-200 disabled:opacity-40 cursor-pointer disabled:cursor-not-allowed"
+          className="flex items-center gap-1.5 px-3 py-2 rounded-xl bg-indigo-500/20 border border-indigo-500/30 text-indigo-300 text-[11px] font-semibold hover:bg-indigo-500/30 transition-colors duration-200 disabled:opacity-40 cursor-pointer disabled:cursor-not-allowed"
         >
           {addTargetMutation.isPending ? (
-            <span className="w-3.5 h-3.5 rounded-full border border-violet-300 border-t-transparent animate-spin" />
+            <span className="w-3.5 h-3.5 rounded-full border border-indigo-300 border-t-transparent animate-spin" />
           ) : (
             <FiPlus size={13} />
           )}
@@ -275,7 +275,7 @@ const InlineTargetsList = ({
                   className={`w-5 h-5 shrink-0 rounded-md border flex items-center justify-center transition-all duration-200 cursor-pointer ${
                     target.completed
                       ? "bg-emerald-500/30 border-emerald-500/50 text-emerald-400"
-                      : "bg-white/5 border-white/15 hover:border-violet-500/40"
+                      : "bg-white/5 border-white/15 hover:border-indigo-500/40"
                   }`}
                 >
                   {markLoading === target._id ? (

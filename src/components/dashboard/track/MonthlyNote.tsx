@@ -92,13 +92,13 @@ const MonthlyNote = ({ monthID }: { monthID: string }) => {
     <div className="relative overflow-hidden rounded-2xl border border-white/10 bg-black/20 w-full flex flex-col justify-between">
 
       {/* Background Gradient Overlay */}
-      <div className="absolute inset-0 bg-linear-to-br from-violet-500/3 via-transparent to-transparent pointer-events-none" />
+      <div className="absolute inset-0 bg-linear-to-br from-indigo-500/3 via-transparent to-transparent pointer-events-none" />
 
       <div>
         {/* Header */}
         <div className="relative flex items-center justify-between px-4 py-3 border-b border-white/8">
           <div className="flex items-center gap-3">
-            <div className="w-8 h-8 rounded-lg bg-linear-to-br from-violet-500/20 to-purple-500/20 flex items-center justify-center border border-violet-500/20 text-violet-400">
+            <div className="w-8 h-8 rounded-lg bg-indigo-500/20 flex items-center justify-center border border-indigo-500/20 text-indigo-400">
               <FiEdit3 size={14} />
             </div>
             <div>
@@ -111,7 +111,7 @@ const MonthlyNote = ({ monthID }: { monthID: string }) => {
 
           {/* Last updated badge */}
           {lastUpdated ? (
-            <span className="text-[10px] text-violet-300/90 bg-violet-500/10 border border-violet-500/20 px-2.5 py-1 rounded-lg font-medium flex items-center gap-1.5 shrink-0">
+            <span className="text-[10px] text-indigo-300/90 bg-indigo-500/10 border border-indigo-500/20 px-2.5 py-1 rounded-lg font-medium flex items-center gap-1.5 shrink-0">
               <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse" />
               {formatTimestamp(lastUpdated)}
             </span>
@@ -135,7 +135,7 @@ const MonthlyNote = ({ monthID }: { monthID: string }) => {
               setSaveStatus("saving");
             }}
             placeholder="Write your thoughts, goals, wins, lessons or motivation for this month..."
-            className="w-full h-70 text-[12px] leading-relaxed resize-none rounded-xl bg-white/5 border border-white/10 p-3 text-white placeholder:text-white/20 outline-none focus:border-violet-500/40 focus:bg-white/8 transition-all duration-200 hide-scrollbar"
+            className="w-full h-70 text-[12px] leading-relaxed resize-none rounded-xl bg-white/5 border border-white/10 p-3 text-white placeholder:text-white/20 outline-none focus:border-indigo-500/40 focus:bg-white/8 transition-all duration-200 hide-scrollbar"
           />
 
           {/* Footer */}
@@ -148,7 +148,7 @@ const MonthlyNote = ({ monthID }: { monthID: string }) => {
               {[1, 2, 3].map((i) => (
                 <div
                   key={i}
-                  className="h-1.5 w-1.5 rounded-full bg-violet-400"
+                  className="h-1.5 w-1.5 rounded-full bg-indigo-400"
                   style={{ opacity: i / 3 }}
                 />
               ))}

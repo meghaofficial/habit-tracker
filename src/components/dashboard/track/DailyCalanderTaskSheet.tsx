@@ -340,7 +340,7 @@ const DailyCalanderTaskSheet = ({
           ))}
           {hasWeek5 && (
             <div className={`${colW5} flex justify-center`}>
-              <span className="text-[9px] font-bold tracking-widest text-violet-400/70 bg-violet-500/8 border border-violet-500/15 rounded-md px-2 py-0.5">
+              <span className="text-[9px] font-bold tracking-widest text-indigo-400/70 bg-indigo-500/8 border border-indigo-500/15 rounded-md px-2 py-0.5">
                 WEEK 5
               </span>
             </div>
