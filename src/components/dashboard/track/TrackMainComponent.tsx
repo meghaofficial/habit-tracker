@@ -56,21 +56,22 @@ const TrackMainComponent = ({
     overallProgress: {
       total: 0,
       count: 0,
-      progress: 0
+      progress: 0,
     },
     dateLogProgress: [],
-    taskProgress: []
+    taskProgress: [],
   });
   const taskList: TaskI[] = taskListData?.data?.tasks;
 
   const getTodayProgress = () => {
-    if (!progress) return {
-      count: 0,
-      progress: 0,
-    };
+    if (!progress)
+      return {
+        count: 0,
+        progress: 0,
+      };
     const d = new Date();
     // const custom = d.toISOString().split("T")[0];
-    const custom = d.toLocaleDateString('en-CA', { timeZone: 'Asia/Kolkata' });
+    const custom = d.toLocaleDateString("en-CA", { timeZone: "Asia/Kolkata" });
     const matched = progress?.dateLogProgress?.find(
       (p: DateLogProgressI) => p.fullDate.toString().split("T")[0] === custom,
     );
@@ -81,12 +82,12 @@ const TrackMainComponent = ({
   };
 
   useEffect(() => {
-  if (!dateLogsData.data) return;
+    if (!dateLogsData.data) return;
 
-  // Do whatever you want with the data
-  setProgress(dateLogsData.data.progress);
-  // setDateLogs(dateLogsData.data.dateLogs);
-}, [dateLogsData.data]);
+    // Do whatever you want with the data
+    setProgress(dateLogsData.data.progress);
+    // setDateLogs(dateLogsData.data.dateLogs);
+  }, [dateLogsData.data]);
 
   const totalD = dashboardData?.totalDays || 0;
   const hasWeek5 = totalD > 28;

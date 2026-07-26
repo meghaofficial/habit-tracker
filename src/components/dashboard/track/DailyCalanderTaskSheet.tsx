@@ -50,7 +50,14 @@ const DailyCalanderTaskSheet = ({
   // React Query Mutations
   const addTaskMutation = useMutation({
     mutationFn: addTask,
-    onSuccess: () => {
+    onSuccess: (data) => {
+      const pr = data.progress
+      setProgress((prev) => ({
+          ...prev,
+          overallProgress: pr.overallProgress,
+          dateLogProgress: prev.dateLogProgress.map((d, index) => ({ ...d, progress: pr.dateLogProgress[index].progress })),
+          taskProgress: [ ...prev.taskProgress, { id: data.task._id, count: 0, progress: "0" } ]
+        }));
       queryClient.invalidateQueries({
         queryKey: ["tasks", dashboardData?._id],
       });
@@ -59,7 +66,15 @@ const DailyCalanderTaskSheet = ({
 
   const deleteTaskMutation = useMutation({
     mutationFn: removeTask,
-    onSuccess: () => {
+    onSuccess: (data) => {
+      const pr = data.progress
+      console.log("or", pr)
+      setProgress((prev) => ({
+          ...prev,
+          overallProgress: pr.overallProgress,
+          dateLogProgress: prev.dateLogProgress.map((d, index) => ({ ...d, progress: pr.dateLogProgress[index].progress })),
+          taskProgress: prev.taskProgress.filter(d => d?.id !== removeRowID)
+        }));
       queryClient.invalidateQueries({
         queryKey: ["tasks", dashboardData?._id],
       });
@@ -535,7 +550,7 @@ const CheckboxCell = React.memo(
             d.id === pr.taskProgress.id ? pr.taskProgress : d
           )
         }));
-        setCurrCheckVal((prev) => !prev);
+        setCurrCheckVal(prev => !prev);
       },
       onError: () => {
         notify.error("Please try again.");
