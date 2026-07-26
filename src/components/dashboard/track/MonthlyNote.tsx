@@ -89,7 +89,7 @@ const MonthlyNote = ({ monthID }: { monthID: string }) => {
   }, []);
 
   return (
-    <div className="relative overflow-hidden rounded-2xl border border-white/10 bg-black/20 w-full flex flex-col justify-between">
+    <div className="relative overflow-hidden h-125 rounded-2xl border border-white/10 bg-black/20 w-full flex flex-col justify-between">
 
       {/* Background Gradient Overlay */}
       <div className="absolute inset-0 bg-linear-to-br from-indigo-500/3 via-transparent to-transparent pointer-events-none" />
@@ -135,7 +135,7 @@ const MonthlyNote = ({ monthID }: { monthID: string }) => {
               setSaveStatus("saving");
             }}
             placeholder="Write your thoughts, goals, wins, lessons or motivation for this month..."
-            className="w-full h-70 text-[12px] leading-relaxed resize-none rounded-xl bg-white/5 border border-white/10 p-3 text-white placeholder:text-white/20 outline-none focus:border-indigo-500/40 focus:bg-white/8 transition-all duration-200 hide-scrollbar"
+            className="w-full h-94 text-[12px] leading-relaxed resize-none rounded-xl bg-white/5 border border-white/10 p-3 text-white placeholder:text-white/20 outline-none focus:border-indigo-500/40 focus:bg-white/8 transition-all duration-200 hide-scrollbar"
           />
 
           {/* Footer */}

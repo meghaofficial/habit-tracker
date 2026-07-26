@@ -28,7 +28,7 @@ const TargetsSection = ({
   ];
 
   return (
-    <div className="relative overflow-hidden rounded-2xl w-full border border-white/10 bg-black/20">
+    <div className="relative overflow-hidden h-125 rounded-2xl w-full border border-white/10 bg-black/20">
       <div className="absolute inset-0 bg-linear-to-br from-indigo-500/3 via-transparent to-transparent pointer-events-none" />
 
       {/* Header */}
@@ -233,13 +233,13 @@ const InlineTargetsList = ({
       </div>
 
       {/* Target list */}
-      <div className="flex flex-col gap-2 max-h-64 overflow-y-auto hide-scrollbar">
+      <div className="flex flex-col gap-2 max-h-70 overflow-y-auto hide-scrollbar">
         {isPending ? (
           Array.from({ length: 4 }).map((_, i) => (
             <div key={i} className="h-9 rounded-xl bg-white/5 animate-pulse" />
           ))
         ) : targets.length === 0 ? (
-          <div className="flex flex-col items-center py-6 gap-2">
+          <div className="flex flex-col items-center py-6 gap-2 justify-center h-70">
             <FiTarget size={24} className="text-gray-600" />
             <p className="text-[11px] text-gray-500">
               No targets yet. Add one above.
