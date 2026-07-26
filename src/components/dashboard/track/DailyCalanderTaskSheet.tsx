@@ -51,13 +51,19 @@ const DailyCalanderTaskSheet = ({
   const addTaskMutation = useMutation({
     mutationFn: addTask,
     onSuccess: (data) => {
-      const pr = data.progress
+      const pr = data.progress;
       setProgress((prev) => ({
-          ...prev,
-          overallProgress: pr.overallProgress,
-          dateLogProgress: prev.dateLogProgress.map((d, index) => ({ ...d, progress: pr.dateLogProgress[index].progress })),
-          taskProgress: [ ...prev.taskProgress, { id: data.task._id, count: 0, progress: "0" } ]
-        }));
+        ...prev,
+        overallProgress: pr.overallProgress,
+        dateLogProgress: prev.dateLogProgress.map((d, index) => ({
+          ...d,
+          progress: pr.dateLogProgress[index].progress,
+        })),
+        taskProgress: [
+          ...prev.taskProgress,
+          { id: data.task._id, count: 0, progress: "0" },
+        ],
+      }));
       queryClient.invalidateQueries({
         queryKey: ["tasks", dashboardData?._id],
       });
@@ -67,14 +73,17 @@ const DailyCalanderTaskSheet = ({
   const deleteTaskMutation = useMutation({
     mutationFn: removeTask,
     onSuccess: (data) => {
-      const pr = data.progress
-      console.log("or", pr)
+      const pr = data.progress;
+      console.log("or", pr);
       setProgress((prev) => ({
-          ...prev,
-          overallProgress: pr.overallProgress,
-          dateLogProgress: prev.dateLogProgress.map((d, index) => ({ ...d, progress: pr.dateLogProgress[index].progress })),
-          taskProgress: prev.taskProgress.filter(d => d?.id !== removeRowID)
-        }));
+        ...prev,
+        overallProgress: pr.overallProgress,
+        dateLogProgress: prev.dateLogProgress.map((d, index) => ({
+          ...d,
+          progress: pr.dateLogProgress[index].progress,
+        })),
+        taskProgress: prev.taskProgress.filter((d) => d?.id !== removeRowID),
+      }));
       queryClient.invalidateQueries({
         queryKey: ["tasks", dashboardData?._id],
       });
@@ -114,6 +123,7 @@ const DailyCalanderTaskSheet = ({
   };
 
   const handleAddRow = () => {
+    if (taskList?.length >= rowLimit) return;
     if (monthStatus === "scheduled") {
       alert(
         "Can not add task as the subscription for this month is not active",
@@ -494,20 +504,19 @@ const DailyCalanderTaskSheet = ({
                 ))}
 
               {/* Add Row button */}
-              {taskList?.length < rowLimit && (
-                <button
-                  onClick={addTaskMutation.isPending ? undefined : handleAddRow}
-                  disabled={addTaskMutation.isPending}
-                  className="w-full flex items-center justify-center gap-2 py-3 text-[11px] font-semibold text-indigo-400/70 hover:text-indigo-400 hover:bg-indigo-500/5 border-t border-white/5 transition-all duration-200 cursor-pointer disabled:opacity-50"
-                >
-                  {addTaskMutation.isPending ? (
-                    <span className="w-3.5 h-3.5 rounded-full border border-indigo-400 border-t-transparent animate-spin" />
-                  ) : (
-                    <FiPlus size={13} />
-                  )}
-                  {addTaskMutation.isPending ? "Adding…" : "Add Habit"}
-                </button>
-              )}
+              <button
+                onClick={addTaskMutation.isPending ? undefined : handleAddRow}
+                disabled={addTaskMutation.isPending || taskList?.length >= rowLimit} 
+                className={`w-full flex items-center justify-center gap-2 py-3 text-[11px] font-semibold ${taskList?.length < rowLimit && ' hover:text-indigo-400 hover:bg-indigo-500/5 border-t cursor-pointer'} text-indigo-400/70 border-white/5 transition-all duration-200 disabled:opacity-50`}
+                title={taskList?.length >= rowLimit ? "You cannot add more than 10 tasks" : ""}
+              >
+                {addTaskMutation.isPending ? (
+                  <span className="w-3.5 h-3.5 rounded-full border border-indigo-400 border-t-transparent animate-spin" />
+                ) : (
+                  <FiPlus size={13} />
+                )}
+                {addTaskMutation.isPending ? "Adding…" : "Add Habit"}
+              </button>
             </>
           )}
         </div>
@@ -542,15 +551,13 @@ const CheckboxCell = React.memo(
           ...prev,
           overallProgress: pr.overallProgress,
           dateLogProgress: prev.dateLogProgress.map((d) =>
-            d.fullDate === pr.dateLogProgress.fullDate
-              ? pr.dateLogProgress
-              : d,
+            d.fullDate === pr.dateLogProgress.fullDate ? pr.dateLogProgress : d,
           ),
-          taskProgress: prev.taskProgress.map((d) => 
-            d.id === pr.taskProgress.id ? pr.taskProgress : d
-          )
+          taskProgress: prev.taskProgress.map((d) =>
+            d.id === pr.taskProgress.id ? pr.taskProgress : d,
+          ),
         }));
-        setCurrCheckVal(prev => !prev);
+        setCurrCheckVal((prev) => !prev);
       },
       onError: () => {
         notify.error("Please try again.");

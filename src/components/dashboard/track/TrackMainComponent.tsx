@@ -83,10 +83,7 @@ const TrackMainComponent = ({
 
   useEffect(() => {
     if (!dateLogsData.data) return;
-
-    // Do whatever you want with the data
     setProgress(dateLogsData.data.progress);
-    // setDateLogs(dateLogsData.data.dateLogs);
   }, [dateLogsData.data]);
 
   const totalD = dashboardData?.totalDays || 0;
