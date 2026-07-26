@@ -112,6 +112,8 @@ export interface TaskI {
   _id: string;
   monthDashID: string;
   taskName: string;
+  count: number;
+  progress: string;
 }
 
 export interface DateLogI {

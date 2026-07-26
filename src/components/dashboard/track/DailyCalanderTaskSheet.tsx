@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect, useState } from "react";
+import React, { useEffect, useState } from "react";
 import { daysNums, weekLetters } from "../../../staticData";
 import { notify } from "../../../helper";
 import type { DashboardI, DateLogI, ProgressI, TaskI } from "../../../types";
@@ -19,9 +19,13 @@ import {
 const DailyCalanderTaskSheet = ({
   dashboardData,
   monthStatus,
+  progress,
+  setProgress,
 }: {
   dashboardData: DashboardI;
   monthStatus: string;
+  progress: ProgressI;
+  setProgress: React.Dispatch<React.SetStateAction<ProgressI>>;
 }) => {
   const totalD = dashboardData?.totalDays || 0;
   const firstDay = dashboardData?.firstDay || 0;
@@ -65,22 +69,6 @@ const DailyCalanderTaskSheet = ({
     },
   });
 
-  const toggleTaskMutation = useMutation({
-    mutationFn: toggleTask,
-    onSuccess: () => {
-      queryClient.invalidateQueries({
-        queryKey: ["date_logs", dashboardData?._id],
-      });
-    },
-    onError: () => {
-      notify.error("Please try again.");
-    },
-  });
-
-  const toggleID = toggleTaskMutation.isPending
-    ? toggleTaskMutation.variables?.taskID
-    : "";
-
   const resetDateLogsMutation = useMutation({
     mutationFn: resetDateLogs,
     onSuccess: () => {
@@ -121,15 +109,6 @@ const DailyCalanderTaskSheet = ({
     addTaskMutation.mutate(dashboardData!._id);
   };
 
-  const toggleCheckbox = (date: Date, taskID: string, marked: boolean) => {
-    toggleTaskMutation.mutate({
-      dashboardID: dashboardData!._id,
-      fullDate: date,
-      taskID,
-      marked,
-    });
-  };
-
   const handleReset = () => {
     const con = confirm("Are you sure you want to reset the dashboard?");
     if (!con) return;
@@ -144,15 +123,15 @@ const DailyCalanderTaskSheet = ({
         queryKey: ["tasks", dashboardData?._id],
       });
 
-      queryClient.invalidateQueries({
-        queryKey: ["date_logs", dashboardData?._id],
-      });
+      // queryClient.invalidateQueries({
+      //   queryKey: ["date_logs", dashboardData?._id],
+      // });
     };
 
     const onTaskMarked = () => {
-      queryClient.invalidateQueries({
-        queryKey: ["date_logs", dashboardData?._id],
-      });
+      // queryClient.invalidateQueries({
+      //   queryKey: ["date_logs", dashboardData?._id],
+      // });
     };
 
     const onTaskRemoved = () => {
@@ -160,9 +139,9 @@ const DailyCalanderTaskSheet = ({
         queryKey: ["tasks", dashboardData?._id],
       });
 
-      queryClient.invalidateQueries({
-        queryKey: ["date_logs", dashboardData?._id],
-      });
+      // queryClient.invalidateQueries({
+      //   queryKey: ["date_logs", dashboardData?._id],
+      // });
     };
 
     socket.on("task-marked", onTaskMarked);
@@ -177,7 +156,7 @@ const DailyCalanderTaskSheet = ({
   }, [dashboardData?._id, queryClient]);
 
   const dateLogs: DateLogI[] = dateLogsData?.data?.dateLogs;
-  const progress: ProgressI = dateLogsData?.data?.progress;
+  // const progress: ProgressI = dateLogsData?.data?.progress;
   const taskList: TaskI[] = taskListData?.data?.tasks;
 
   // Column widths
@@ -473,9 +452,10 @@ const DailyCalanderTaskSheet = ({
                             weekIndex * 7,
                             (weekIndex + 1) * 7,
                           )}
-                          onToggle={toggleCheckbox}
                           weekOffset={weekIndex * 7}
                           todayDate={todayDate}
+                          dashbID={dashboardData?._id}
+                          setProgress={setProgress}
                         />
                       </div>
                     ))}
@@ -488,9 +468,10 @@ const DailyCalanderTaskSheet = ({
                         <TaskRow
                           taskID={task._id}
                           logs={dateLogs?.slice(28)}
-                          onToggle={toggleCheckbox}
                           weekOffset={28}
                           todayDate={todayDate}
+                          dashbID={dashboardData?._id}
+                          setProgress={setProgress}
                         />
                       </div>
                     )}
@@ -523,36 +504,66 @@ const DailyCalanderTaskSheet = ({
 const CheckboxCell = React.memo(
   ({
     checked,
-    onToggle,
     fullDate,
     taskID,
-    logID,
     isToday,
+    dashbID,
+    setProgress,
   }: {
     checked: boolean;
-    onToggle: (
-      fullDate: Date,
-      taskID: string,
-      checked: boolean,
-      logID: string,
-    ) => void;
     fullDate: Date;
     taskID: string;
-    logID: string;
     isToday: boolean;
+    dashbID: string;
+    setProgress: React.Dispatch<React.SetStateAction<ProgressI>>;
   }) => {
-    const handleClick = useCallback(() => {
-      if (!isToday) return;
-      onToggle(fullDate, taskID, !checked, logID);
-    }, [onToggle, fullDate, taskID, checked, logID, isToday]);
+    const [currCheckVal, setCurrCheckVal] = useState(checked);
 
-    return (
+    const toggleTaskMutation = useMutation({
+      mutationFn: toggleTask,
+      onSuccess: (data) => {
+        const pr = data.progress;
+        setProgress((prev) => ({
+          ...prev,
+          overallProgress: pr.overallProgress,
+          dateLogProgress: prev.dateLogProgress.map((d) =>
+            d.fullDate === pr.dateLogProgress.fullDate
+              ? pr.dateLogProgress
+              : d,
+          ),
+          taskProgress: prev.taskProgress.map((d) => 
+            d.id === pr.taskProgress.id ? pr.taskProgress : d
+          )
+        }));
+        setCurrCheckVal((prev) => !prev);
+      },
+      onError: () => {
+        notify.error("Please try again.");
+      },
+    });
+
+    const toggleTaskID = toggleTaskMutation.isPending
+      ? toggleTaskMutation.variables?.taskID
+      : "";
+
+    const onToggle = (date: Date, taskID: string, marked: boolean) => {
+      toggleTaskMutation.mutate({
+        dashboardID: dashbID,
+        fullDate: date,
+        taskID,
+        marked,
+      });
+    };
+
+    return toggleTaskID === taskID ? (
+      <span className="w-2.5 h-2.5 rounded-full border border-emerald-400 border-t-transparent animate-spin" />
+    ) : (
       <span
-        onClick={handleClick}
+        onClick={() => onToggle(fullDate, taskID, !currCheckVal)}
         className={`h-4 w-4 rounded transition-all duration-200 ${
           isToday ? "cursor-pointer" : "cursor-default"
         } ${
-          checked
+          currCheckVal
             ? isToday
               ? "bg-emerald-400 shadow-[0_0_6px_rgba(74,222,128,0.4)]"
               : "bg-emerald-400/40"
@@ -569,25 +580,17 @@ const TaskRow = React.memo(
   ({
     taskID,
     logs,
-    onToggle,
     weekOffset,
     todayDate,
+    dashbID,
+    setProgress,
   }: {
     taskID: string;
-    logs: {
-      _id: string;
-      monthDashID: string;
-      fullDate: Date;
-      tasks: string[];
-    }[];
-    onToggle: (
-      fullDate: Date,
-      taskID: string,
-      checked: boolean,
-      logID: string,
-    ) => void;
+    logs: DateLogI[];
     weekOffset: number;
     todayDate: number;
+    dashbID: string;
+    setProgress: React.Dispatch<React.SetStateAction<ProgressI>>;
   }) =>
     logs.map((log, i) => {
       const dayNum = weekOffset + i + 1;
@@ -596,11 +599,11 @@ const TaskRow = React.memo(
         <CheckboxCell
           key={log._id}
           checked={log?.tasks?.includes(taskID)}
-          onToggle={onToggle}
           fullDate={log.fullDate}
           taskID={taskID}
-          logID={log._id}
           isToday={isToday}
+          dashbID={dashbID}
+          setProgress={setProgress}
         />
       );
     }),

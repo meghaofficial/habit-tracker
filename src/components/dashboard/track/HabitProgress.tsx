@@ -1,14 +1,17 @@
+import type { TaskProgressI } from "../../../types";
+
 const HabitProgress = ({
   progress,
   total,
   count,
   loading,
 }: {
-  progress: { id: string; count: number; progress: string | number }[];
+  progress: TaskProgressI[];
   total: number;
   count: number;
   loading: boolean;
 }) => {
+
   return (
     <div className="">
       <div className="flex flex-col items-center justify-center w-full p-3.5">

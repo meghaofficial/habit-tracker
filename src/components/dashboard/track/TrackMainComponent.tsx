@@ -9,6 +9,7 @@ import type {
   DateLogI,
   DateLogProgressI,
   MonthsI,
+  ProgressI,
   TaskI,
 } from "../../../types";
 import { useIsMobile } from "../../hooks/mobileHook";
@@ -20,6 +21,7 @@ import { useQuery } from "@tanstack/react-query";
 import { getDateLogs, getTasks } from "../../../api/dashboardApi";
 import TargetsSection from "./TargetsSection";
 import TodayTasks from "./mobile_view/TodayTasks";
+import { useEffect, useState } from "react";
 
 const TrackMainComponent = ({
   dashboardData,
@@ -50,20 +52,41 @@ const TrackMainComponent = ({
     queryFn: () => getTasks(dashboardData?._id),
     enabled: !!dashboardData?._id, // only when we want to trigger
   });
-  const progress = dateLogsData.data?.progress;
+  const [progress, setProgress] = useState<ProgressI>({
+    overallProgress: {
+      total: 0,
+      count: 0,
+      progress: 0
+    },
+    dateLogProgress: [],
+    taskProgress: []
+  });
   const taskList: TaskI[] = taskListData?.data?.tasks;
 
   const getTodayProgress = () => {
+    if (!progress) return {
+      count: 0,
+      progress: 0,
+    };
     const d = new Date();
-    const custom = d.toString().split("T")[0];
+    // const custom = d.toISOString().split("T")[0];
+    const custom = d.toLocaleDateString('en-CA', { timeZone: 'Asia/Kolkata' });
     const matched = progress?.dateLogProgress?.find(
       (p: DateLogProgressI) => p.fullDate.toString().split("T")[0] === custom,
     );
     return {
-      count: matched?.count,
-      progress: matched?.progress,
+      count: matched?.count || 0,
+      progress: matched?.progress || 0,
     };
   };
+
+  useEffect(() => {
+  if (!dateLogsData.data) return;
+
+  // Do whatever you want with the data
+  setProgress(dateLogsData.data.progress);
+  // setDateLogs(dateLogsData.data.dateLogs);
+}, [dateLogsData.data]);
 
   const totalD = dashboardData?.totalDays || 0;
   const hasWeek5 = totalD > 28;
@@ -225,6 +248,8 @@ const TrackMainComponent = ({
           <DailyCalanderTaskSheet
             dashboardData={dashboardData}
             monthStatus={activeMonth?.status}
+            progress={progress}
+            setProgress={setProgress}
           />
         </div>
         <div className="bg-black/20 border border-white/10 backdrop-blur-2xl light:border-lightBorder light:bg-lightCard w-[15%] rounded-2xl overflow-x-hidden relative top-47 h-full">
