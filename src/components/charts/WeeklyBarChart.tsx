@@ -25,12 +25,25 @@ export const WeeklyBarChart = ({
         show: false,
       },
     },
-    colors: ['#6366F1'],
+    colors: ['#4F46E5'], // base indigo-600
     plotOptions: {
       bar: {
-        borderRadius: 8,
+        borderRadius: 12,
         borderRadiusApplication: 'end',
-        columnWidth: '70%',
+        columnWidth: '55%',
+      },
+    },
+    fill: {
+      type: 'gradient',
+      gradient: {
+        shade: 'dark',
+        type: 'vertical',
+        shadeIntensity: 0.3,
+        gradientToColors: ['#818CF8'], // Indigo-400 (top glow)
+        inverseColors: false,
+        opacityFrom: 0.85,
+        opacityTo: 0.20,
+        stops: [0, 100],
       },
     },
     dataLabels: {
@@ -40,51 +53,53 @@ export const WeeklyBarChart = ({
       categories: data?.weekDays,
       labels: {
         style: {
-          colors: theme === "dark" ? "#fff" : '#000000',
-          fontSize: '12px',
+          colors: theme === "dark" ? "#9CA3AF" : '#4B5563',
+          fontSize: '11px',
+          fontFamily: 'inherit',
         },
       },
       title: {
         text: 'Days',
         style: {
-          color: theme === "dark" ? "#fff" : '#000000',
-          fontSize: '14px',
-          fontWeight: 500,
+          color: theme === "dark" ? "#6B7280" : '#9CA3AF',
+          fontSize: '12px',
+          fontWeight: 600,
           fontFamily: 'inherit',
         },
       },
       axisBorder: {
         show: true,
-        color: theme === "dark" ? "#fff" : '#000000',
+        color: theme === "dark" ? "rgba(255, 255, 255, 0.08)" : 'rgba(0, 0, 0, 0.08)',
         height: 1,
       },
       axisTicks: {
         show: false,
-        color: theme === "dark" ? "#fff" : '#000000',
+        color: theme === "dark" ? "rgba(255, 255, 255, 0.08)" : 'rgba(0, 0, 0, 0.08)',
       },
     },
     yaxis: {
       min: 0,
-      max: maxValue,
+      max: maxValue || 1,
       labels: {
         style: {
-          colors: theme === "dark" ? "#fff" : '#000000',
-          fontSize: '12px',
+          colors: theme === "dark" ? "#9CA3AF" : '#4B5563',
+          fontSize: '11px',
+          fontFamily: 'inherit',
         },
       },
       tickAmount: 3,
       title: {
         text: 'Tasks',
         style: {
-          color: theme === "dark" ? "#fff" : '#000000',
-          fontSize: '14px',
-          fontWeight: 500,
+          color: theme === "dark" ? "#6B7280" : '#9CA3AF',
+          fontSize: '12px',
+          fontWeight: 600,
           fontFamily: 'inherit',
         },
       },
       axisBorder: {
         show: true,
-        color: theme === "dark" ? "#fff" : '#000000',
+        color: theme === "dark" ? "rgba(255, 255, 255, 0.08)" : 'rgba(0, 0, 0, 0.08)',
       },
       axisTicks: {
         show: false,

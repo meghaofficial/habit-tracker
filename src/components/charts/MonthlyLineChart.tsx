@@ -13,7 +13,7 @@ export const MonthlyLineChart = ({ data, maxValue }: { data: { dates: number[], 
         show: false,
       },
       zoom: {
-        enabled: false, 
+        enabled: false,
       },
       scroller: {
         enabled: false,
@@ -94,11 +94,11 @@ export const MonthlyLineChart = ({ data, maxValue }: { data: { dates: number[], 
 
   return (
     <div className="w-full">
-      <Chart 
-        options={options} 
-        series={series} 
-        type="area" 
-        height={350} 
+      <Chart
+        options={options}
+        series={series}
+        type="area"
+        height={350}
       />
     </div>
   );

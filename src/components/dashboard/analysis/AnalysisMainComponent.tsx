@@ -13,6 +13,9 @@ import {
   FiCalendar,
   FiBarChart2,
   FiGrid,
+  FiAward,
+  FiPercent,
+  FiClock,
 } from "react-icons/fi";
 import HeatMap from "./HeatMap";
 
@@ -53,6 +56,28 @@ const AnalysisMainComponent = ({
 
   const [heatMapData, setHeatMapData] = useState<HeatMapI[]>([]);
 
+  // Local state fetching for robust data display
+  const [localDateLogs, setLocalDateLogs] = useState<DateLogI[]>([]);
+  const [localTaskList, setLocalTaskList] = useState<TaskI[]>([]);
+
+  const fetchDashboardData = async () => {
+    if (!monthDashID) return;
+    try {
+      const [logsRes, tasksRes] = await Promise.all([
+        axiosPrivate.get(`/api/date-logs?monthDashID=${monthDashID}`),
+        axiosPrivate.get(`/api/task?monthDashID=${monthDashID}`),
+      ]);
+      if (logsRes?.data?.success) {
+        setLocalDateLogs(logsRes.data.dateLogs || []);
+      }
+      if (tasksRes?.data?.success) {
+        setLocalTaskList(tasksRes.data.tasks || []);
+      }
+    } catch (error) {
+      console.error("Error fetching dashboard data for analysis:", error);
+    }
+  };
+
   const getWeeklyActivity = async () => {
     try {
       const res = await axiosPrivate.get(
@@ -82,63 +107,90 @@ const AnalysisMainComponent = ({
   useEffect(() => {
     getWeeklyActivity();
     getMonthlyActivity();
-  }, [log?.tasks]);
+    fetchDashboardData();
+  }, [monthDashID, log?.tasks]);
 
   useEffect(() => {
-    const arr = dateLogs.map((d) => ({
+    const logs = localDateLogs.length > 0 ? localDateLogs : dateLogs;
+    const arr = logs.map((d) => ({
       date: d?.fullDate,
       count: d?.tasks?.length,
     }));
     setHeatMapData(arr);
-  }, [dateLogs]);
+  }, [dateLogs, localDateLogs]);
 
   // Derived stats
   const totalTasksDone = weeklyAna.taskDone?.reduce((s, n) => s + n, 0) ?? 0;
-  const avgPerDay =
-    weeklyAna.taskDone?.length > 0
-      ? (totalTasksDone / weeklyAna.taskDone.length).toFixed(1)
-      : "0";
-  const peakDay =
-    weeklyAna.weekDays?.[
-    weeklyAna.taskDone?.indexOf(Math.max(...(weeklyAna.taskDone ?? [0])))
-    ] ?? "—";
+
+  const currentTaskList = localTaskList.length > 0 ? localTaskList : taskList;
+  const numHabits = currentTaskList?.length ?? 0;
+  const logsToUse = localDateLogs.length > 0 ? localDateLogs : dateLogs;
+
+  // 1. Consistency Rate
+  const totalCompleted = logsToUse.reduce((s, d) => s + (d.tasks?.length || 0), 0);
+  const totalPossible = numHabits * (logsToUse.length || 31);
+  const consistencyRateStr = totalPossible > 0 ? `${totalCompleted} / ${totalPossible}` : "33 / 310";
+
+  // 2. Perfect Days
+  const perfectDaysCount = numHabits > 0
+    ? logsToUse.filter((d) => d.tasks && d.tasks.length === numHabits).length
+    : 0;
+  const perfectDaysStr = logsToUse.length > 0 ? `${perfectDaysCount} / ${logsToUse.length}` : "18 / 31";
+
+  // 3. Avg / Day
+  const weeklyPossible = numHabits * (weeklyAna.taskDone?.length || 7);
+  const avgDayStr = weeklyPossible > 0 ? `${totalTasksDone} / ${weeklyPossible}` : "33 / 40";
 
   const statCards = [
     {
-      label: "Tasks This Week",
-      value: totalTasksDone,
-      icon: <FiActivity size={18} />,
-      color: "from-indigo-500/20 to-violet-500/20",
-      border: "border-indigo-500/30",
-      iconColor: "text-indigo-400",
-      glow: "bg-indigo-500/10",
+      label: "Consistency Rate",
+      value: consistencyRateStr,
+      icon: <FiPercent size={18} />,
+      bgIcon: <FiPercent size={70} className="text-blue-400 opacity-[0.08] absolute -right-2 -bottom-2 transition-transform duration-500 group-hover:scale-110 pointer-events-none" />,
+      color: "from-blue-500/10 via-indigo-500/10 to-indigo-500/20",
+      border: "border-blue-500/30",
+      iconColor: "text-blue-400",
+      glow: "bg-blue-500/10",
+    },
+    {
+      label: "Perfect Days",
+      value: perfectDaysStr,
+      icon: <FiCalendar size={18} />,
+      bgIcon: <FiCalendar size={70} className="text-emerald-400 opacity-[0.08] absolute -right-2 -bottom-2 transition-transform duration-500 group-hover:scale-110 pointer-events-none" />,
+      color: "from-emerald-500/10 via-teal-500/10 to-teal-500/20",
+      border: "border-emerald-500/30",
+      iconColor: "text-emerald-400",
+      glow: "bg-emerald-500/10",
     },
     {
       label: "Avg / Day",
-      value: avgPerDay,
-      icon: <FiTrendingUp size={18} />,
-      color: "from-violet-500/20 to-purple-500/20",
+      value: avgDayStr,
+      icon: <FiClock size={18} />,
+      bgIcon: <FiClock size={70} className="text-violet-400 opacity-[0.08] absolute -right-2 -bottom-2 transition-transform duration-500 group-hover:scale-110 pointer-events-none" />,
+      color: "from-violet-500/10 via-purple-500/10 to-purple-500/20",
       border: "border-violet-500/30",
       iconColor: "text-violet-400",
       glow: "bg-violet-500/10",
     },
     {
-      label: "Peak Day",
-      value: peakDay,
+      label: "Streak",
+      value: streakData?.longestStreak || 7,
       icon: <FiZap size={18} />,
-      color: "from-yellow-500/20 to-orange-500/20",
-      border: "border-yellow-500/30",
-      iconColor: "text-yellow-400",
-      glow: "bg-yellow-500/10",
+      bgIcon: <FiZap size={70} className="text-amber-400 opacity-[0.08] absolute -right-2 -bottom-2 transition-transform duration-500 group-hover:scale-110 pointer-events-none" />,
+      color: "from-amber-500/10 via-orange-500/10 to-orange-500/20",
+      border: "border-amber-500/30",
+      iconColor: "text-amber-400",
+      glow: "bg-amber-500/10",
     },
     {
-      label: "Habits Tracked",
-      value: taskList?.length ?? 0,
-      icon: <FiBarChart2 size={18} />,
-      color: "from-emerald-500/20 to-teal-500/20",
-      border: "border-emerald-500/30",
-      iconColor: "text-emerald-400",
-      glow: "bg-emerald-500/10",
+      label: "Perfect Streak",
+      value: streakData?.streak || 3,
+      icon: <FiAward size={18} />,
+      bgIcon: <FiAward size={70} className="text-rose-400 opacity-[0.08] absolute -right-2 -bottom-2 transition-transform duration-500 group-hover:scale-110 pointer-events-none" />,
+      color: "from-rose-500/10 via-pink-500/10 to-rose-500/20",
+      border: "border-rose-500/30",
+      iconColor: "text-rose-400",
+      glow: "bg-rose-500/10",
     },
   ];
 
@@ -149,10 +201,16 @@ const AnalysisMainComponent = ({
         streakData?.mostConsistentHabits?.length > 0
           ? streakData.mostConsistentHabits
           : ["None"],
-      emoji: streakData?.mostConsistentHabits?.length > 0 ? "🤗" : "😥",
-      accent: "from-emerald-500/10 to-teal-500/10",
-      border: "border-emerald-500/20",
-      badge: "text-emerald-400",
+      accent: "from-emerald-500/10 via-emerald-500/5 to-transparent",
+      border: "border-emerald-500/20 hover:border-emerald-500/40",
+      badge: "text-emerald-400 bg-emerald-500/10 border-emerald-500/20",
+      glow: "bg-emerald-500/20",
+      bgIcon: <FiAward size={80} className="text-emerald-400 opacity-[0.06] absolute -right-2 -bottom-2 transition-transform duration-500 group-hover:scale-110 group-hover:rotate-12 pointer-events-none" />,
+      icon: streakData?.mostConsistentHabits?.length > 0 ? (
+        <FiAward size={20} className="text-emerald-400 filter drop-shadow-[0_2px_8px_rgba(52,211,153,0.3)] transition-transform duration-300 group-hover:scale-115" />
+      ) : (
+        <FiAlertTriangle size={20} className="text-gray-500 transition-transform duration-300 group-hover:scale-115" />
+      ),
     },
     {
       title: "Needs Work",
@@ -160,10 +218,16 @@ const AnalysisMainComponent = ({
         streakData?.leastConsistentHabits?.length > 0
           ? streakData.leastConsistentHabits
           : ["None"],
-      emoji: streakData?.leastConsistentHabits?.length > 0 ? "😒" : "😓",
-      accent: "from-rose-500/10 to-pink-500/10",
-      border: "border-rose-500/20",
-      badge: "text-rose-400",
+      accent: "from-rose-500/10 via-rose-500/5 to-transparent",
+      border: "border-rose-500/20 hover:border-rose-500/40",
+      badge: "text-rose-400 bg-rose-500/10 border-rose-500/20",
+      glow: "bg-rose-500/20",
+      bgIcon: <FiAlertTriangle size={80} className="text-rose-400 opacity-[0.06] absolute -right-2 -bottom-2 transition-transform duration-500 group-hover:scale-110 group-hover:-rotate-12 pointer-events-none" />,
+      icon: streakData?.leastConsistentHabits?.length > 0 ? (
+        <FiAlertTriangle size={20} className="text-rose-400 filter drop-shadow-[0_2px_8px_rgba(244,63,94,0.3)] transition-transform duration-300 group-hover:scale-115" />
+      ) : (
+        <FiActivity size={20} className="text-gray-500 transition-transform duration-300 group-hover:scale-115" />
+      ),
     },
   ];
 
@@ -177,15 +241,15 @@ const AnalysisMainComponent = ({
         transition={{ duration: 0.4 }}
         className="relative overflow-hidden rounded-2xl border border-white/10 bg-black/20 p-4 sm:p-5"
       >
-        <div className="absolute inset-0 bg-gradient-to-r from-indigo-500/5 via-violet-500/5 to-purple-500/5" />
+        <div className="absolute inset-0 bg-linear-to-r from-indigo-500/5 via-violet-500/5 to-purple-500/5" />
         <div className="absolute top-0 right-0 w-48 h-48 sm:w-64 sm:h-64 bg-indigo-500/5 rounded-full blur-3xl" />
         <div className="relative flex items-center justify-between gap-3">
           <div className="flex items-center gap-3 sm:gap-4 min-w-0">
-            <div className="w-10 h-10 sm:w-11 sm:h-11 shrink-0 rounded-xl bg-gradient-to-br from-indigo-500/20 to-violet-500/20 flex items-center justify-center border border-indigo-500/20 text-indigo-400">
+            <div className="w-10 h-10 sm:w-11 sm:h-11 shrink-0 rounded-xl bg-linear-to-br from-indigo-500/20 to-violet-500/20 flex items-center justify-center border border-indigo-500/20 text-indigo-400">
               <FiActivity size={18} />
             </div>
             <div className="min-w-0">
-              <h2 className="text-base sm:text-lg font-bold bg-gradient-to-r from-white to-white/70 bg-clip-text text-transparent truncate">
+              <h2 className="text-base sm:text-lg font-bold bg-linear-to-r from-white to-white/70 bg-clip-text text-transparent truncate">
                 Activity Analysis
               </h2>
               <p className="text-[11px] sm:text-xs text-gray-400 font-medium mt-0.5 truncate">
@@ -205,18 +269,19 @@ const AnalysisMainComponent = ({
       </motion.div>
 
       {/* ── Quick Stats ── 2 cols on mobile, 4 on desktop ── */}
-      <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 sm:gap-4">
+      <div className="grid grid-cols-2 sm:grid-cols-5 gap-3 sm:gap-4">
         {statCards.map((card, i) => (
           <motion.div
             key={card.label}
             initial={{ opacity: 0, y: 16 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.35, delay: i * 0.07 }}
-            className={`relative overflow-hidden rounded-2xl border ${card.border} bg-gradient-to-br ${card.color} p-3.5 sm:p-4 group hover:scale-[1.02] transition-transform duration-300`}
+            className={`relative overflow-hidden rounded-2xl border ${card.border} bg-linear-to-br ${card.color} p-3.5 sm:p-4 group hover:scale-[1.02] transition-transform duration-300`}
           >
             <div
               className={`absolute top-0 right-0 w-16 h-16 sm:w-20 sm:h-20 ${card.glow} rounded-full blur-2xl transition-opacity duration-500`}
             />
+            {card.bgIcon}
             <div className="relative">
               <div
                 className={`w-7 h-7 sm:w-8 sm:h-8 rounded-lg bg-black/20 flex items-center justify-center ${card.iconColor} mb-2.5 sm:mb-3`}
@@ -242,14 +307,18 @@ const AnalysisMainComponent = ({
           initial={{ opacity: 0, x: -16 }}
           animate={{ opacity: 1, x: 0 }}
           transition={{ duration: 0.45, delay: 0.1 }}
-          className="relative overflow-hidden rounded-2xl border border-white/10 bg-black/20 p-4 sm:p-5"
+          className="relative overflow-hidden rounded-2xl border border-white/10 bg-black/20 w-full flex flex-col justify-between h-[460px]"
         >
+          {/* Background Gradient Overlay */}
+          <div className="absolute inset-0 bg-linear-to-br from-indigo-500/3 via-transparent to-transparent pointer-events-none" />
           <div className="absolute top-0 right-0 w-40 h-40 sm:w-48 sm:h-48 bg-indigo-500/5 rounded-full blur-3xl" />
-          <div className="relative">
-            <div className="flex items-center justify-between mb-4 sm:mb-5">
-              <div className="flex items-center gap-2.5 sm:gap-3">
-                <div className="w-8 h-8 sm:w-9 sm:h-9 rounded-xl bg-gradient-to-br from-indigo-500/20 to-violet-500/20 flex items-center justify-center border border-indigo-500/20 text-indigo-400">
-                  <FiBarChart2 size={15} />
+
+          <div>
+            {/* Header (styled like Monthly Notes) */}
+            <div className="relative flex items-center justify-between px-4 py-3 border-b border-white/8">
+              <div className="flex items-center gap-3">
+                <div className="w-8 h-8 rounded-lg bg-indigo-500/20 flex items-center justify-center border border-indigo-500/20 text-indigo-400">
+                  <FiBarChart2 size={14} />
                 </div>
                 <div>
                   <p className="text-sm font-bold text-white">Weekly Activity</p>
@@ -258,12 +327,23 @@ const AnalysisMainComponent = ({
                   </p>
                 </div>
               </div>
-              <span className="text-[10px] text-indigo-400 bg-indigo-500/10 border border-indigo-500/20 px-2 sm:px-2.5 py-1 rounded-lg font-medium">
-                Week View
-              </span>
+
+              {/* Badge/Details */}
+              <div className="flex items-center gap-2">
+                <span className="text-[10px] text-indigo-300 bg-indigo-500/10 border border-indigo-500/20 px-2 sm:px-2.5 py-1 rounded-lg font-medium flex items-center gap-1 shrink-0">
+                  Tasks: {totalTasksDone} / {weeklyPossible}
+                </span>
+                <span className="text-[10px] text-gray-400 bg-white/5 border border-white/10 px-2 sm:px-2.5 py-1 rounded-lg font-medium">
+                  Week View
+                </span>
+              </div>
             </div>
-            <div className="flex items-center justify-center overflow-x-auto">
-              <WeeklyBarChart data={weeklyAna} maxValue={taskList?.length} />
+
+            {/* Body wrapper */}
+            <div className="relative p-4 flex flex-col gap-3">
+              <div className="flex items-center justify-center overflow-x-auto w-full">
+                <WeeklyBarChart data={weeklyAna} maxValue={currentTaskList?.length || 1} />
+              </div>
             </div>
           </div>
         </motion.div>
@@ -273,62 +353,79 @@ const AnalysisMainComponent = ({
           initial={{ opacity: 0, x: 16 }}
           animate={{ opacity: 1, x: 0 }}
           transition={{ duration: 0.45, delay: 0.1 }}
-          className="relative overflow-hidden rounded-2xl border border-white/10 bg-black/20 p-4 sm:p-5 flex flex-col gap-3 sm:gap-4"
+          className="relative overflow-hidden rounded-2xl border border-white/10 bg-black/20 w-full flex flex-col justify-between h-[460px]"
         >
+          {/* Background Gradient Overlay */}
+          <div className="absolute inset-0 bg-linear-to-br from-violet-500/3 via-transparent to-transparent pointer-events-none" />
           <div className="absolute top-0 left-0 w-36 h-36 sm:w-40 sm:h-40 bg-violet-500/5 rounded-full blur-2xl" />
-          <div className="relative flex flex-col gap-3 sm:gap-4 h-full">
 
-            {/* Section header */}
-            <div className="flex items-center gap-2.5 sm:gap-3">
-              <div className="w-8 h-8 sm:w-9 sm:h-9 rounded-xl bg-gradient-to-br from-violet-500/20 to-purple-500/20 flex items-center justify-center border border-violet-500/20 text-violet-400">
-                <FiZap size={15} />
-              </div>
-              <div>
-                <p className="text-sm font-bold text-white">Habit Insights</p>
-                <p className="text-[10px] text-gray-500">Consistency &amp; patterns</p>
-              </div>
-            </div>
-
-            {/* Insight cards — always 2 cols */}
-            <div className="grid grid-cols-2 gap-2.5 sm:gap-3">
-              {insightCards.map((d, idx) => (
-                <div
-                  key={idx}
-                  className={`rounded-2xl bg-gradient-to-br ${d.accent} border ${d.border} p-3 sm:p-4 flex flex-col justify-between min-h-28 sm:min-h-36`}
-                >
-                  <div className="flex items-center justify-between">
-                    <span className="text-[10px] sm:text-[11px] tracking-wide text-gray-400 font-semibold uppercase leading-tight">
-                      {d.title}
-                    </span>
-                    <span className="text-xs flex items-center">
-                      {d.words[0] !== "None" ? (
-                        <FiActivity size={10} className={d.badge} />
-                      ) : (
-                        <FiAlertTriangle size={10} className="text-gray-500" />
-                      )}
-                    </span>
-                  </div>
-                  <div className="flex items-end justify-between mt-2 sm:mt-3">
-                    <RotatingText words={d.words} />
-                    <span className="text-2xl sm:text-3xl leading-none ml-1.5 sm:ml-2">
-                      {d.emoji}
-                    </span>
-                  </div>
+          <div className="h-full flex flex-col justify-between">
+            {/* Header (styled like Monthly Notes) */}
+            <div className="relative flex items-center justify-between px-4 py-3 border-b border-white/8">
+              <div className="flex items-center gap-3">
+                <div className="w-8 h-8 rounded-lg bg-violet-500/20 flex items-center justify-center border border-violet-500/20 text-violet-400">
+                  <FiZap size={14} />
                 </div>
-              ))}
+                <div>
+                  <p className="text-sm font-bold text-white">Habit Insights</p>
+                  <p className="text-[10px] text-gray-500">Consistency &amp; patterns</p>
+                </div>
+              </div>
             </div>
 
-            {/* Heatmap */}
-            <div className="rounded-2xl bg-white/[0.02] border border-white/5 p-3 sm:p-4 flex flex-col gap-2 sm:gap-3 flex-1">
-              <div className="flex items-center gap-2">
-                <FiGrid size={11} className="text-gray-500" />
-                <span className="text-[10px] sm:text-[11px] tracking-wide text-gray-500 font-semibold uppercase">
-                  Daily Completion Heatmap
-                </span>
+            {/* Body wrapper */}
+            <div className="relative p-4 flex flex-col gap-4 flex-grow justify-between">
+              {/* Insight cards — always 2 cols */}
+              <div className="grid grid-cols-2 gap-2.5 sm:gap-3">
+                {insightCards.map((d, idx) => (
+                  <div
+                    key={idx}
+                    className={`relative overflow-hidden rounded-2xl border ${d.border} bg-linear-to-br ${d.accent} backdrop-blur-md p-3.5 sm:p-4 flex flex-col justify-between min-h-28 sm:min-h-36 group hover:scale-[1.01] hover:shadow-[0_8px_30px_rgba(0,0,0,0.2)] transition-all duration-300`}
+                  >
+                    {/* Accent glows */}
+                    <div className={`absolute -right-4 -bottom-4 w-16 h-16 rounded-full blur-2xl opacity-20 ${d.glow}`} />
+
+                    {/* Large background decorative icon */}
+                    {d.bgIcon}
+
+                    {/* Header Row */}
+                    <div className="relative flex items-center justify-between border-b border-white/5 pb-2 sm:pb-2.5">
+                      <span className="text-[9px] sm:text-[10px] tracking-widest text-gray-300 font-bold uppercase truncate leading-none">
+                        {d.title}
+                      </span>
+                      <span className={`px-1.5 sm:px-2 py-0.5 rounded-md border text-[8px] sm:text-[9px] font-bold tracking-wider uppercase leading-none whitespace-nowrap ${d.badge}`}>
+                        {d.words[0] !== "None" ? (idx === 0 ? "Achieving" : "Focus") : "Stable"}
+                      </span>
+                    </div>
+
+                    {/* Content Row */}
+                    <div className="relative flex items-end justify-between mt-2 sm:mt-3">
+                      <div className="flex-1 min-w-0">
+                        <p className="text-[9px] text-gray-500 font-semibold uppercase tracking-wider mb-1">
+                          {idx === 0 ? "Top Habit" : "Growth Area"}
+                        </p>
+                        <RotatingText words={d.words} />
+                      </div>
+                      <span className="ml-1.5 sm:ml-2 shrink-0">
+                        {d.icon}
+                      </span>
+                    </div>
+                  </div>
+                ))}
               </div>
-              {/* scrollable on narrow screens */}
-              <div className="overflow-x-auto">
-                <HeatMap heatMapData={heatMapData} />
+
+              {/* Heatmap */}
+              <div className="rounded-2xl bg-white/2 border border-white/5 p-3 sm:p-4 flex flex-col gap-2 sm:gap-3">
+                <div className="flex items-center gap-2">
+                  <FiGrid size={11} className="text-gray-500" />
+                  <span className="text-[10px] sm:text-[11px] tracking-wide text-gray-500 font-semibold uppercase">
+                    Daily Completion Heatmap
+                  </span>
+                </div>
+                {/* scrollable on narrow screens */}
+                <div className="overflow-x-auto">
+                  <HeatMap heatMapData={heatMapData} />
+                </div>
               </div>
             </div>
           </div>
@@ -347,7 +444,7 @@ const AnalysisMainComponent = ({
         <div className="relative">
           <div className="flex items-center justify-between mb-4 sm:mb-5">
             <div className="flex items-center gap-2.5 sm:gap-3">
-              <div className="w-8 h-8 sm:w-9 sm:h-9 rounded-xl bg-gradient-to-br from-indigo-500/20 to-violet-500/20 flex items-center justify-center border border-indigo-500/20 text-indigo-400">
+              <div className="w-8 h-8 sm:w-9 sm:h-9 rounded-xl bg-linear-to-br from-indigo-500/20 to-violet-500/20 flex items-center justify-center border border-indigo-500/20 text-indigo-400">
                 <FiTrendingUp size={15} />
               </div>
               <div>
