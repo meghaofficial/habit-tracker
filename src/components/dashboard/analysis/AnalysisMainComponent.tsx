@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import { axiosPrivate } from "../../../api/axios";
 import { MonthlyLineChart } from "../../charts/MonthlyLineChart";
 import { WeeklyBarChart } from "../../charts/WeeklyBarChart";
+import { FilledPieChart } from "../../charts/FilledPieChart";
 import { motion, AnimatePresence } from "framer-motion";
 import { formatDateString } from "../../../helper";
 import type { DateLogI, TaskI, StreakI, HeatMapI } from "../../../types";
@@ -140,6 +141,16 @@ const AnalysisMainComponent = ({
   // 3. Avg / Day
   const weeklyPossible = numHabits * (weeklyAna.taskDone?.length || 7);
   const avgDayStr = weeklyPossible > 0 ? `${totalTasksDone} / ${weeklyPossible}` : "33 / 40";
+  const monthlyTasksDone = monthlyAna.tasks?.reduce((s, n) => s + n, 0) ?? 0;
+  const monthlyPossible = numHabits * (monthlyAna.tasks?.length || logsToUse.length || 31);
+  const monthlyTargetData = { done: 4, left: 3 };
+  const weeklyTargetData = [
+    { week: "Week 1", done: 5, left: 2 },
+    { week: "Week 2", done: 3, left: 4 },
+    { week: "Week 3", done: 6, left: 1 },
+    { week: "Week 4", done: 4, left: 3 },
+    { week: "Week 5", done: 2, left: 5 },
+  ];
 
   const statCards = [
     {
@@ -232,7 +243,7 @@ const AnalysisMainComponent = ({
   ];
 
   return (
-    <div className="flex flex-col gap-4 sm:gap-6 mt-4 mb-6 w-full text-white">
+    <div className="flex flex-col gap-4 w-full text-white mt-4">
 
       {/* ── Header Banner ── */}
       <motion.div
@@ -300,14 +311,14 @@ const AnalysisMainComponent = ({
       </div>
 
       {/* ── Charts Row ── stacks on mobile ── */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 sm:gap-6">
+      <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
 
         {/* Weekly Activity Chart */}
         <motion.div
           initial={{ opacity: 0, x: -16 }}
           animate={{ opacity: 1, x: 0 }}
           transition={{ duration: 0.45, delay: 0.1 }}
-          className="relative overflow-hidden rounded-2xl border border-white/10 bg-black/20 w-full flex flex-col justify-between h-[460px]"
+          className="relative overflow-hidden rounded-2xl border border-white/10 bg-black/20 w-full flex flex-col justify-between h-106.25"
         >
           {/* Background Gradient Overlay */}
           <div className="absolute inset-0 bg-linear-to-br from-indigo-500/3 via-transparent to-transparent pointer-events-none" />
@@ -329,14 +340,9 @@ const AnalysisMainComponent = ({
               </div>
 
               {/* Badge/Details */}
-              <div className="flex items-center gap-2">
-                <span className="text-[10px] text-indigo-300 bg-indigo-500/10 border border-indigo-500/20 px-2 sm:px-2.5 py-1 rounded-lg font-medium flex items-center gap-1 shrink-0">
-                  Tasks: {totalTasksDone} / {weeklyPossible}
-                </span>
-                <span className="text-[10px] text-gray-400 bg-white/5 border border-white/10 px-2 sm:px-2.5 py-1 rounded-lg font-medium">
-                  Week View
-                </span>
-              </div>
+              <span className="text-[10px] text-indigo-300 bg-indigo-500/10 border border-indigo-500/20 px-2 sm:px-2.5 py-1 rounded-lg font-medium flex items-center gap-1 shrink-0">
+                Tasks: {totalTasksDone} / {weeklyPossible}
+              </span>
             </div>
 
             {/* Body wrapper */}
@@ -353,7 +359,7 @@ const AnalysisMainComponent = ({
           initial={{ opacity: 0, x: 16 }}
           animate={{ opacity: 1, x: 0 }}
           transition={{ duration: 0.45, delay: 0.1 }}
-          className="relative overflow-hidden rounded-2xl border border-white/10 bg-black/20 w-full flex flex-col justify-between h-[460px]"
+          className="relative overflow-hidden rounded-2xl border border-white/10 bg-black/20 w-full flex flex-col justify-between h-106.25"
         >
           {/* Background Gradient Overlay */}
           <div className="absolute inset-0 bg-linear-to-br from-violet-500/3 via-transparent to-transparent pointer-events-none" />
@@ -363,7 +369,7 @@ const AnalysisMainComponent = ({
             {/* Header (styled like Monthly Notes) */}
             <div className="relative flex items-center justify-between px-4 py-3 border-b border-white/8">
               <div className="flex items-center gap-3">
-                <div className="w-8 h-8 rounded-lg bg-violet-500/20 flex items-center justify-center border border-violet-500/20 text-violet-400">
+                <div className="w-8 h-8 rounded-lg bg-indigo-500/20 flex items-center justify-center border border-indigo-500/20 text-indigo-400">
                   <FiZap size={14} />
                 </div>
                 <div>
@@ -374,7 +380,7 @@ const AnalysisMainComponent = ({
             </div>
 
             {/* Body wrapper */}
-            <div className="relative p-4 flex flex-col gap-4 flex-grow justify-between">
+            <div className="relative p-4 flex flex-col gap-4 grow justify-between">
               {/* Insight cards — always 2 cols */}
               <div className="grid grid-cols-2 gap-2.5 sm:gap-3">
                 {insightCards.map((d, idx) => (
@@ -419,7 +425,7 @@ const AnalysisMainComponent = ({
                 <div className="flex items-center gap-2">
                   <FiGrid size={11} className="text-gray-500" />
                   <span className="text-[10px] sm:text-[11px] tracking-wide text-gray-500 font-semibold uppercase">
-                    Daily Completion Heatmap
+                    Daily Completion
                   </span>
                 </div>
                 {/* scrollable on narrow screens */}
@@ -437,35 +443,130 @@ const AnalysisMainComponent = ({
         initial={{ opacity: 0, y: 16 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.45, delay: 0.2 }}
-        className="relative overflow-hidden rounded-2xl border border-white/10 bg-black/20 p-4 sm:p-5 mb-3"
+        className="relative overflow-hidden rounded-2xl border border-white/10 bg-black/20"
       >
         <div className="absolute bottom-0 left-0 w-48 h-28 sm:w-64 sm:h-32 bg-indigo-500/5 rounded-full blur-3xl" />
         <div className="absolute top-0 right-0 w-36 h-36 sm:w-48 sm:h-48 bg-violet-500/5 rounded-full blur-3xl" />
-        <div className="relative">
-          <div className="flex items-center justify-between mb-4 sm:mb-5">
-            <div className="flex items-center gap-2.5 sm:gap-3">
-              <div className="w-8 h-8 sm:w-9 sm:h-9 rounded-xl bg-linear-to-br from-indigo-500/20 to-violet-500/20 flex items-center justify-center border border-indigo-500/20 text-indigo-400">
+        <div>
+          {/* Header (styled like Weekly Activity) */}
+          <div className="relative flex items-center justify-between px-4 py-3 border-b border-white/8">
+            <div className="flex items-center gap-3">
+              <div className="w-8 h-8 rounded-lg bg-indigo-500/20 flex items-center justify-center border border-indigo-500/20 text-indigo-400">
                 <FiTrendingUp size={15} />
               </div>
               <div>
                 <p className="text-sm font-bold text-white">Monthly Activity</p>
-                <p className="text-[10px] text-gray-500 hidden sm:block">
-                  Daily tasks completed across this month
+                <p className="text-[10px] text-gray-500">
+                  This Month
                 </p>
               </div>
             </div>
-            <div className="flex items-center gap-1.5 sm:gap-2">
-              <div className="w-2 h-2 rounded-full bg-indigo-400" />
-              <span className="text-[10px] text-gray-400 whitespace-nowrap">
-                Tasks Completed
-              </span>
-            </div>
+
+            {/* Badge/Details */}
+            <span className="text-[10px] text-indigo-300 bg-indigo-500/10 border border-indigo-500/20 px-2 sm:px-2.5 py-1 rounded-lg font-medium flex items-center gap-1 shrink-0">
+              Tasks: {monthlyTasksDone} / {monthlyPossible}
+            </span>
           </div>
-          <div className="flex items-center justify-center overflow-x-auto pe-2 sm:pe-7">
-            <MonthlyLineChart data={monthlyAna} maxValue={taskList?.length} />
+
+          {/* Body wrapper */}
+          <div className="relative p-4 flex flex-col gap-3">
+            <div className="flex items-center justify-center overflow-x-auto w-full pe-2 sm:pe-7">
+              <MonthlyLineChart data={monthlyAna} maxValue={currentTaskList?.length || 1} />
+            </div>
           </div>
         </div>
       </motion.div>
+
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 mb-3">
+        {/* Monthly Targets */}
+        <motion.div
+          initial={{ opacity: 0, y: 16 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.45, delay: 0.25 }}
+          className="relative overflow-hidden rounded-2xl border border-white/10 bg-black/20"
+        >
+          <div className="absolute bottom-0 right-0 w-44 h-28 sm:w-56 sm:h-36 bg-emerald-500/5 rounded-full blur-3xl" />
+          <div className="absolute top-0 left-0 w-36 h-36 sm:w-44 sm:h-44 bg-indigo-500/5 rounded-full blur-3xl" />
+
+          <div>
+            <div className="relative flex items-center justify-between px-4 py-3 border-b border-white/8">
+              <div className="flex items-center gap-3">
+                <div className="w-8 h-8 rounded-lg bg-indigo-500/20 flex items-center justify-center border border-indigo-500/20 text-indigo-400">
+                  <FiAward size={14} />
+                </div>
+                <div>
+                  <p className="text-sm font-bold text-white">Monthly Targets</p>
+                  <p className="text-[10px] text-gray-500">This Month</p>
+                </div>
+              </div>
+
+              <div className="flex items-center gap-2">
+                <span className="text-[10px] text-emerald-300 bg-emerald-500/10 border border-emerald-500/20 px-2 sm:px-2.5 py-1 rounded-lg font-medium shrink-0">
+                  Done: {monthlyTargetData.done}
+                </span>
+                <span className="text-[10px] text-gray-400 bg-white/5 border border-white/10 px-2 sm:px-2.5 py-1 rounded-lg font-medium">
+                  Left: {monthlyTargetData.left}
+                </span>
+              </div>
+            </div>
+
+            <div className="relative p-4 flex items-center justify-center">
+              <div className="w-full max-w-xs mx-auto">
+                <FilledPieChart
+                  done={monthlyTargetData.done}
+                  left={monthlyTargetData.left}
+                  height={260}
+                />
+              </div>
+            </div>
+          </div>
+        </motion.div>
+
+        {/* Weekly Targets */}
+        <motion.div
+          initial={{ opacity: 0, y: 16 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.45, delay: 0.3 }}
+          className="relative overflow-hidden rounded-2xl border border-white/10 bg-black/20"
+        >
+          <div className="absolute bottom-0 left-0 w-48 h-28 sm:w-64 sm:h-32 bg-emerald-500/5 rounded-full blur-3xl" />
+          <div className="absolute top-0 right-0 w-36 h-36 sm:w-48 sm:h-48 bg-indigo-500/5 rounded-full blur-3xl" />
+
+          <div>
+            <div className="relative flex items-center justify-between px-4 py-3 border-b border-white/8">
+              <div className="flex items-center gap-3">
+                <div className="w-8 h-8 rounded-lg bg-indigo-500/20 flex items-center justify-center border border-indigo-500/20 text-indigo-400">
+                  <FiCalendar size={14} />
+                </div>
+                <div>
+                  <p className="text-sm font-bold text-white">Weekly Targets</p>
+                  <p className="text-[10px] text-gray-500">Five week breakdown</p>
+                </div>
+              </div>
+            </div>
+
+            <div className="relative p-4 grid grid-cols-2 min-[520px]:grid-cols-3 xl:grid-cols-5 gap-2.5">
+              {weeklyTargetData.map((target) => (
+                <div
+                  key={target.week}
+                  className="relative overflow-hidden rounded-2xl bg-white/5 border border-white/8 p-2.5"
+                >
+                  <div className="flex items-center justify-between mb-2">
+                    <p className="text-[10px] text-gray-300 uppercase tracking-widest font-bold">
+                      {target.week}
+                    </p>
+                  </div>
+                  <FilledPieChart
+                    done={target.done}
+                    left={target.left}
+                    height={112}
+                  />
+                </div>
+              ))}
+            </div>
+          </div>
+        </motion.div>
+      </div>
 
     </div>
   );
