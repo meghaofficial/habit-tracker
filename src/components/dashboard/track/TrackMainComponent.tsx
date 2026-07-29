@@ -17,7 +17,7 @@ import DonutGraph from "./DonutGraph";
 import { useSelector } from "react-redux";
 import type { RootState } from "../../../redux/store/store";
 import { useQuery } from "@tanstack/react-query";
-import { getDateLogs, getTasks } from "../../../api/dashboardApi";
+import { getDateLogs, getTasks } from "../../../api/dashboard.api";
 import TargetsSection from "./TargetsSection";
 import TodayTasks from "./mobile_view/TodayTasks";
 import { useEffect, useState } from "react";

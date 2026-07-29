@@ -3,7 +3,7 @@ import { formatTimestamp, notify } from "../../../helper";
 import { socket } from "../../../socket/socket";
 import { FiEdit3 } from "react-icons/fi";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { getMonthlyNote, updateMonthlyNote } from "../../../api/dashboardApi";
+import { getMonthlyNote, updateMonthlyNote } from "../../../api/dashboard.api";
 import Saving from "../../shared/Saving";
 
 const MonthlyNote = ({ monthID }: { monthID: string }) => {

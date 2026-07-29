@@ -202,3 +202,26 @@ export interface CalandarDataI {
   description: string;
   updatedAt?: string;
 }
+
+export interface WeekAnalysisI {
+  date: string;
+  week: string;
+  range: string;
+  weekDays: string[];
+  taskDone: number[];
+}
+
+export interface MonthAnalysisI {
+  dates: number[];
+  tasks: number[];
+}
+
+export interface TopLevelAnalysisI {
+  consistencyRate: string;
+  perfectDays: number;
+  totalDaysInMonth: number;
+  avgPerDay: number;
+  timeElapsed: number;
+  streak: number;
+  perfectStreak: number;
+}

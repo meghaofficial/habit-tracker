@@ -6,7 +6,7 @@ import Card from "../../../shared/Card";
 import { formatDateString2 } from "../../../../helper";
 import TodayAllTasks from "../../../charts/TodayAllTasks";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { addTask, getDateLogByDate } from "../../../../api/dashboardApi";
+import { addTask, getDateLogByDate } from "../../../../api/dashboard.api";
 
 const TodayTasks = ({
   taskList,

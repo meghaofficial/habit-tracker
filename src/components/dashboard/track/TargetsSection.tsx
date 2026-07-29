@@ -8,7 +8,7 @@ import {
   getTargets,
   markTarget,
   removeTarget,
-} from "../../../api/dashboardApi";
+} from "../../../api/dashboard.api";
 
 const TargetsSection = ({
   monthID,

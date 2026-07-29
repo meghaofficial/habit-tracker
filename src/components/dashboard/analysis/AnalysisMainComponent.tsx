@@ -5,7 +5,15 @@ import { WeeklyBarChart } from "../../charts/WeeklyBarChart";
 import { FilledPieChart } from "../../charts/FilledPieChart";
 import { motion, AnimatePresence } from "framer-motion";
 import { formatDateString } from "../../../helper";
-import type { DateLogI, TaskI, StreakI, HeatMapI } from "../../../types";
+import type {
+  DateLogI,
+  TaskI,
+  StreakI,
+  HeatMapI,
+  WeekAnalysisI,
+  MonthAnalysisI,
+  TopLevelAnalysisI,
+} from "../../../types";
 import {
   FiActivity,
   FiTrendingUp,
@@ -19,13 +27,16 @@ import {
   FiClock,
 } from "react-icons/fi";
 import HeatMap from "./HeatMap";
+import { useQuery } from "@tanstack/react-query";
+import { getDateLogs, getTasks } from "../../../api/dashboard.api";
+import { getMonthlyActivity, getTopLevelAnalysis, getWeeklyActivity } from "../../../api/analysis.api";
 
 const AnalysisMainComponent = ({
-  taskList,
+  // taskList,
   monthDashID,
   log,
   streakData,
-  dateLogs,
+  // dateLogs,
 }: {
   taskList: TaskI[];
   monthDashID: string;
@@ -33,83 +44,86 @@ const AnalysisMainComponent = ({
   streakData: StreakI;
   dateLogs: DateLogI[];
 }) => {
-  const [weeklyAna, setWeeklyAna] = useState<{
-    date: string;
-    week: string;
-    range: string;
-    weekDays: string[];
-    taskDone: number[];
-  }>({
-    date: "",
-    week: "",
-    range: "",
-    weekDays: [],
-    taskDone: [],
-  });
+  // const [weeklyAna, setWeeklyAna] = useState<WeekAnalysisI>({
+  //   date: "",
+  //   week: "",
+  //   range: "",
+  //   weekDays: [],
+  //   taskDone: [],
+  // });
 
-  const [monthlyAna, setMonthlyAna] = useState<{
-    dates: number[];
-    tasks: number[];
-  }>({
-    dates: [],
-    tasks: [],
-  });
+  // const [monthlyAna, setMonthlyAna] = useState<MonthAnalysisI>({
+  //   dates: [],
+  //   tasks: [],
+  // });
 
   const [heatMapData, setHeatMapData] = useState<HeatMapI[]>([]);
+
+  const dateLogsData = useQuery({
+    queryKey: ["date_logs", monthDashID],
+    queryFn: () => getDateLogs(monthDashID),
+    enabled: !!monthDashID,
+  });
+  const dateLogs: DateLogI[] = dateLogsData?.data?.dateLogs;
+
+  const taskListData = useQuery({
+    queryKey: ["tasks", monthDashID],
+    queryFn: () => getTasks(monthDashID),
+    enabled: !!monthDashID,
+  });
+  const taskList: TaskI[] = taskListData?.data?.tasks;
+
+  const weeklyActivityData = useQuery({
+    queryKey: ["weekly_activity", monthDashID],
+    queryFn: () => getWeeklyActivity(monthDashID!),
+    enabled: !!monthDashID,
+  });
+  const weeklyAna: WeekAnalysisI = weeklyActivityData.data?.data ?? [];
+
+  const monthlyActivityData = useQuery({
+    queryKey: ["monthly_activity", monthDashID],
+    queryFn: () => getMonthlyActivity(monthDashID!),
+    enabled: !!monthDashID,
+  });
+  const monthlyAna: MonthAnalysisI = monthlyActivityData.data?.data ?? [];
+
+  const topLevelAnalysisData = useQuery({
+    queryKey: ["top_level_analysis", monthDashID],
+    queryFn: () => getTopLevelAnalysis(monthDashID!),
+    enabled: !!monthDashID,
+  });
+  const topLevelData: TopLevelAnalysisI = topLevelAnalysisData.data?.data;
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
   // Local state fetching for robust data display
   const [localDateLogs, setLocalDateLogs] = useState<DateLogI[]>([]);
   const [localTaskList, setLocalTaskList] = useState<TaskI[]>([]);
-
-  const fetchDashboardData = async () => {
-    if (!monthDashID) return;
-    try {
-      const [logsRes, tasksRes] = await Promise.all([
-        axiosPrivate.get(`/api/date-logs?monthDashID=${monthDashID}`),
-        axiosPrivate.get(`/api/task?monthDashID=${monthDashID}`),
-      ]);
-      if (logsRes?.data?.success) {
-        setLocalDateLogs(logsRes.data.dateLogs || []);
-      }
-      if (tasksRes?.data?.success) {
-        setLocalTaskList(tasksRes.data.tasks || []);
-      }
-    } catch (error) {
-      console.error("Error fetching dashboard data for analysis:", error);
-    }
-  };
-
-  const getWeeklyActivity = async () => {
-    try {
-      const res = await axiosPrivate.get(
-        `/api/get-weekly-activity?monthDashID=${monthDashID}`,
-      );
-      if (res?.data?.success) {
-        setWeeklyAna(res?.data?.data);
-      }
-    } catch (error) {
-      console.error(error);
-    }
-  };
-
-  const getMonthlyActivity = async () => {
-    try {
-      const res = await axiosPrivate.get(
-        `/api/get-monthly-activity?monthDashID=${monthDashID}`,
-      );
-      if (res?.data?.success) {
-        setMonthlyAna(res?.data?.data);
-      }
-    } catch (error) {
-      console.error(error);
-    }
-  };
-
-  useEffect(() => {
-    getWeeklyActivity();
-    getMonthlyActivity();
-    fetchDashboardData();
-  }, [monthDashID, log?.tasks]);
 
   useEffect(() => {
     const logs = localDateLogs.length > 0 ? localDateLogs : dateLogs;
@@ -121,28 +135,18 @@ const AnalysisMainComponent = ({
   }, [dateLogs, localDateLogs]);
 
   // Derived stats
-  const totalTasksDone = weeklyAna.taskDone?.reduce((s, n) => s + n, 0) ?? 0;
+  const totalTasksDone = weeklyAna.taskDone?.reduce((s: any, n: any) => s + n, 0) ?? 0;
 
   const currentTaskList = localTaskList.length > 0 ? localTaskList : taskList;
   const numHabits = currentTaskList?.length ?? 0;
   const logsToUse = localDateLogs.length > 0 ? localDateLogs : dateLogs;
 
-  // 1. Consistency Rate
-  const totalCompleted = logsToUse.reduce((s, d) => s + (d.tasks?.length || 0), 0);
-  const totalPossible = numHabits * (logsToUse.length || 31);
-  const consistencyRateStr = totalPossible > 0 ? `${totalCompleted} / ${totalPossible}` : "33 / 310";
-
-  // 2. Perfect Days
-  const perfectDaysCount = numHabits > 0
-    ? logsToUse.filter((d) => d.tasks && d.tasks.length === numHabits).length
-    : 0;
-  const perfectDaysStr = logsToUse.length > 0 ? `${perfectDaysCount} / ${logsToUse.length}` : "18 / 31";
 
   // 3. Avg / Day
   const weeklyPossible = numHabits * (weeklyAna.taskDone?.length || 7);
-  const avgDayStr = weeklyPossible > 0 ? `${totalTasksDone} / ${weeklyPossible}` : "33 / 40";
-  const monthlyTasksDone = monthlyAna.tasks?.reduce((s, n) => s + n, 0) ?? 0;
-  const monthlyPossible = numHabits * (monthlyAna.tasks?.length || logsToUse.length || 31);
+  const monthlyTasksDone = monthlyAna.tasks?.reduce((s: any, n: any) => s + n, 0) ?? 0;
+  const monthlyPossible =
+    numHabits * (monthlyAna.tasks?.length || logsToUse.length || 31);
   const monthlyTargetData = { done: 4, left: 3 };
   const weeklyTargetData = [
     { week: "Week 1", done: 5, left: 2 },
@@ -155,9 +159,14 @@ const AnalysisMainComponent = ({
   const statCards = [
     {
       label: "Consistency Rate",
-      value: consistencyRateStr,
+      value: `${topLevelData?.consistencyRate}%`,
       icon: <FiPercent size={18} />,
-      bgIcon: <FiPercent size={70} className="text-blue-400 opacity-[0.08] absolute -right-2 -bottom-2 transition-transform duration-500 group-hover:scale-110 pointer-events-none" />,
+      bgIcon: (
+        <FiPercent
+          size={70}
+          className="text-blue-400 opacity-[0.08] absolute -right-2 -bottom-2 transition-transform duration-500 group-hover:scale-110 pointer-events-none"
+        />
+      ),
       color: "from-blue-500/10 via-indigo-500/10 to-indigo-500/20",
       border: "border-blue-500/30",
       iconColor: "text-blue-400",
@@ -165,9 +174,14 @@ const AnalysisMainComponent = ({
     },
     {
       label: "Perfect Days",
-      value: perfectDaysStr,
+      value: `${topLevelData?.perfectDays} / ${topLevelData?.totalDaysInMonth}`,
       icon: <FiCalendar size={18} />,
-      bgIcon: <FiCalendar size={70} className="text-emerald-400 opacity-[0.08] absolute -right-2 -bottom-2 transition-transform duration-500 group-hover:scale-110 pointer-events-none" />,
+      bgIcon: (
+        <FiCalendar
+          size={70}
+          className="text-emerald-400 opacity-[0.08] absolute -right-2 -bottom-2 transition-transform duration-500 group-hover:scale-110 pointer-events-none"
+        />
+      ),
       color: "from-emerald-500/10 via-teal-500/10 to-teal-500/20",
       border: "border-emerald-500/30",
       iconColor: "text-emerald-400",
@@ -175,9 +189,14 @@ const AnalysisMainComponent = ({
     },
     {
       label: "Avg / Day",
-      value: avgDayStr,
+      value: `${topLevelData?.avgPerDay} / ${topLevelData?.timeElapsed}`,
       icon: <FiClock size={18} />,
-      bgIcon: <FiClock size={70} className="text-violet-400 opacity-[0.08] absolute -right-2 -bottom-2 transition-transform duration-500 group-hover:scale-110 pointer-events-none" />,
+      bgIcon: (
+        <FiClock
+          size={70}
+          className="text-violet-400 opacity-[0.08] absolute -right-2 -bottom-2 transition-transform duration-500 group-hover:scale-110 pointer-events-none"
+        />
+      ),
       color: "from-violet-500/10 via-purple-500/10 to-purple-500/20",
       border: "border-violet-500/30",
       iconColor: "text-violet-400",
@@ -185,9 +204,14 @@ const AnalysisMainComponent = ({
     },
     {
       label: "Streak",
-      value: streakData?.longestStreak || 7,
+      value: topLevelData?.streak,
       icon: <FiZap size={18} />,
-      bgIcon: <FiZap size={70} className="text-amber-400 opacity-[0.08] absolute -right-2 -bottom-2 transition-transform duration-500 group-hover:scale-110 pointer-events-none" />,
+      bgIcon: (
+        <FiZap
+          size={70}
+          className="text-amber-400 opacity-[0.08] absolute -right-2 -bottom-2 transition-transform duration-500 group-hover:scale-110 pointer-events-none"
+        />
+      ),
       color: "from-amber-500/10 via-orange-500/10 to-orange-500/20",
       border: "border-amber-500/30",
       iconColor: "text-amber-400",
@@ -195,9 +219,14 @@ const AnalysisMainComponent = ({
     },
     {
       label: "Perfect Streak",
-      value: streakData?.streak || 3,
+      value: topLevelData?.perfectDays,
       icon: <FiAward size={18} />,
-      bgIcon: <FiAward size={70} className="text-rose-400 opacity-[0.08] absolute -right-2 -bottom-2 transition-transform duration-500 group-hover:scale-110 pointer-events-none" />,
+      bgIcon: (
+        <FiAward
+          size={70}
+          className="text-rose-400 opacity-[0.08] absolute -right-2 -bottom-2 transition-transform duration-500 group-hover:scale-110 pointer-events-none"
+        />
+      ),
       color: "from-rose-500/10 via-pink-500/10 to-rose-500/20",
       border: "border-rose-500/30",
       iconColor: "text-rose-400",
@@ -216,12 +245,24 @@ const AnalysisMainComponent = ({
       border: "border-emerald-500/20 hover:border-emerald-500/40",
       badge: "text-emerald-400 bg-emerald-500/10 border-emerald-500/20",
       glow: "bg-emerald-500/20",
-      bgIcon: <FiAward size={80} className="text-emerald-400 opacity-[0.06] absolute -right-2 -bottom-2 transition-transform duration-500 group-hover:scale-110 group-hover:rotate-12 pointer-events-none" />,
-      icon: streakData?.mostConsistentHabits?.length > 0 ? (
-        <FiAward size={20} className="text-emerald-400 filter drop-shadow-[0_2px_8px_rgba(52,211,153,0.3)] transition-transform duration-300 group-hover:scale-115" />
-      ) : (
-        <FiAlertTriangle size={20} className="text-gray-500 transition-transform duration-300 group-hover:scale-115" />
+      bgIcon: (
+        <FiAward
+          size={80}
+          className="text-emerald-400 opacity-[0.06] absolute -right-2 -bottom-2 transition-transform duration-500 group-hover:scale-110 group-hover:rotate-12 pointer-events-none"
+        />
       ),
+      icon:
+        streakData?.mostConsistentHabits?.length > 0 ? (
+          <FiAward
+            size={20}
+            className="text-emerald-400 filter drop-shadow-[0_2px_8px_rgba(52,211,153,0.3)] transition-transform duration-300 group-hover:scale-115"
+          />
+        ) : (
+          <FiAlertTriangle
+            size={20}
+            className="text-gray-500 transition-transform duration-300 group-hover:scale-115"
+          />
+        ),
     },
     {
       title: "Needs Work",
@@ -233,18 +274,29 @@ const AnalysisMainComponent = ({
       border: "border-rose-500/20 hover:border-rose-500/40",
       badge: "text-rose-400 bg-rose-500/10 border-rose-500/20",
       glow: "bg-rose-500/20",
-      bgIcon: <FiAlertTriangle size={80} className="text-rose-400 opacity-[0.06] absolute -right-2 -bottom-2 transition-transform duration-500 group-hover:scale-110 group-hover:-rotate-12 pointer-events-none" />,
-      icon: streakData?.leastConsistentHabits?.length > 0 ? (
-        <FiAlertTriangle size={20} className="text-rose-400 filter drop-shadow-[0_2px_8px_rgba(244,63,94,0.3)] transition-transform duration-300 group-hover:scale-115" />
-      ) : (
-        <FiActivity size={20} className="text-gray-500 transition-transform duration-300 group-hover:scale-115" />
+      bgIcon: (
+        <FiAlertTriangle
+          size={80}
+          className="text-rose-400 opacity-[0.06] absolute -right-2 -bottom-2 transition-transform duration-500 group-hover:scale-110 group-hover:-rotate-12 pointer-events-none"
+        />
       ),
+      icon:
+        streakData?.leastConsistentHabits?.length > 0 ? (
+          <FiAlertTriangle
+            size={20}
+            className="text-rose-400 filter drop-shadow-[0_2px_8px_rgba(244,63,94,0.3)] transition-transform duration-300 group-hover:scale-115"
+          />
+        ) : (
+          <FiActivity
+            size={20}
+            className="text-gray-500 transition-transform duration-300 group-hover:scale-115"
+          />
+        ),
     },
   ];
 
   return (
     <div className="flex flex-col gap-4 w-full text-white mt-4">
-
       {/* ── Header Banner ── */}
       <motion.div
         initial={{ opacity: 0, y: -12 }}
@@ -273,7 +325,7 @@ const AnalysisMainComponent = ({
           <div className="flex shrink-0 items-center gap-1.5 sm:gap-2 px-2.5 sm:px-3 py-1.5 rounded-xl bg-indigo-500/10 border border-indigo-500/20">
             <FiCalendar size={11} className="text-indigo-400" />
             <span className="text-[10px] sm:text-xs text-indigo-300 font-medium whitespace-nowrap">
-              {formatDateString(weeklyAna?.date) || "Today"}
+              {/* {formatDateString(weeklyAna?.date) || "Today"} */}
             </span>
           </div>
         </div>
@@ -312,7 +364,6 @@ const AnalysisMainComponent = ({
 
       {/* ── Charts Row ── stacks on mobile ── */}
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-
         {/* Weekly Activity Chart */}
         <motion.div
           initial={{ opacity: 0, x: -16 }}
@@ -332,7 +383,9 @@ const AnalysisMainComponent = ({
                   <FiBarChart2 size={14} />
                 </div>
                 <div>
-                  <p className="text-sm font-bold text-white">Weekly Activity</p>
+                  <p className="text-sm font-bold text-white">
+                    Weekly Activity
+                  </p>
                   <p className="text-[10px] text-gray-500">
                     {weeklyAna?.week || "This Week"}
                   </p>
@@ -348,7 +401,10 @@ const AnalysisMainComponent = ({
             {/* Body wrapper */}
             <div className="relative p-4 flex flex-col gap-3">
               <div className="flex items-center justify-center overflow-x-auto w-full">
-                <WeeklyBarChart data={weeklyAna} maxValue={currentTaskList?.length || 1} />
+                <WeeklyBarChart
+                  data={weeklyAna}
+                  maxValue={currentTaskList?.length || 1}
+                />
               </div>
             </div>
           </div>
@@ -374,7 +430,9 @@ const AnalysisMainComponent = ({
                 </div>
                 <div>
                   <p className="text-sm font-bold text-white">Habit Insights</p>
-                  <p className="text-[10px] text-gray-500">Consistency &amp; patterns</p>
+                  <p className="text-[10px] text-gray-500">
+                    Consistency &amp; patterns
+                  </p>
                 </div>
               </div>
             </div>
@@ -389,7 +447,9 @@ const AnalysisMainComponent = ({
                     className={`relative overflow-hidden rounded-2xl border ${d.border} bg-linear-to-br ${d.accent} backdrop-blur-md p-3.5 sm:p-4 flex flex-col justify-between min-h-28 sm:min-h-36 group hover:scale-[1.01] hover:shadow-[0_8px_30px_rgba(0,0,0,0.2)] transition-all duration-300`}
                   >
                     {/* Accent glows */}
-                    <div className={`absolute -right-4 -bottom-4 w-16 h-16 rounded-full blur-2xl opacity-20 ${d.glow}`} />
+                    <div
+                      className={`absolute -right-4 -bottom-4 w-16 h-16 rounded-full blur-2xl opacity-20 ${d.glow}`}
+                    />
 
                     {/* Large background decorative icon */}
                     {d.bgIcon}
@@ -399,8 +459,14 @@ const AnalysisMainComponent = ({
                       <span className="text-[9px] sm:text-[10px] tracking-widest text-gray-300 font-bold uppercase truncate leading-none">
                         {d.title}
                       </span>
-                      <span className={`px-1.5 sm:px-2 py-0.5 rounded-md border text-[8px] sm:text-[9px] font-bold tracking-wider uppercase leading-none whitespace-nowrap ${d.badge}`}>
-                        {d.words[0] !== "None" ? (idx === 0 ? "Achieving" : "Focus") : "Stable"}
+                      <span
+                        className={`px-1.5 sm:px-2 py-0.5 rounded-md border text-[8px] sm:text-[9px] font-bold tracking-wider uppercase leading-none whitespace-nowrap ${d.badge}`}
+                      >
+                        {d.words[0] !== "None"
+                          ? idx === 0
+                            ? "Achieving"
+                            : "Focus"
+                          : "Stable"}
                       </span>
                     </div>
 
@@ -412,9 +478,7 @@ const AnalysisMainComponent = ({
                         </p>
                         <RotatingText words={d.words} />
                       </div>
-                      <span className="ml-1.5 sm:ml-2 shrink-0">
-                        {d.icon}
-                      </span>
+                      <span className="ml-1.5 sm:ml-2 shrink-0">{d.icon}</span>
                     </div>
                   </div>
                 ))}
@@ -456,9 +520,7 @@ const AnalysisMainComponent = ({
               </div>
               <div>
                 <p className="text-sm font-bold text-white">Monthly Activity</p>
-                <p className="text-[10px] text-gray-500">
-                  This Month
-                </p>
+                <p className="text-[10px] text-gray-500">This Month</p>
               </div>
             </div>
 
@@ -471,7 +533,10 @@ const AnalysisMainComponent = ({
           {/* Body wrapper */}
           <div className="relative p-4 flex flex-col gap-3">
             <div className="flex items-center justify-center overflow-x-auto w-full pe-2 sm:pe-7">
-              <MonthlyLineChart data={monthlyAna} maxValue={currentTaskList?.length || 1} />
+              <MonthlyLineChart
+                data={monthlyAna}
+                maxValue={currentTaskList?.length || 1}
+              />
             </div>
           </div>
         </div>
@@ -495,7 +560,9 @@ const AnalysisMainComponent = ({
                   <FiAward size={14} />
                 </div>
                 <div>
-                  <p className="text-sm font-bold text-white">Monthly Targets</p>
+                  <p className="text-sm font-bold text-white">
+                    Monthly Targets
+                  </p>
                   <p className="text-[10px] text-gray-500">This Month</p>
                 </div>
               </div>
@@ -540,7 +607,9 @@ const AnalysisMainComponent = ({
                 </div>
                 <div>
                   <p className="text-sm font-bold text-white">Weekly Targets</p>
-                  <p className="text-[10px] text-gray-500">Five week breakdown</p>
+                  <p className="text-[10px] text-gray-500">
+                    Five week breakdown
+                  </p>
                 </div>
               </div>
             </div>
@@ -567,7 +636,6 @@ const AnalysisMainComponent = ({
           </div>
         </motion.div>
       </div>
-
     </div>
   );
 };

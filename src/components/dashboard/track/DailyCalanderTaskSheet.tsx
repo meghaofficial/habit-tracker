@@ -13,7 +13,7 @@ import {
   removeTask,
   resetDateLogs,
   toggleTask,
-} from "../../../api/dashboardApi";
+} from "../../../api/dashboard.api";
 
 // Main Component
 const DailyCalanderTaskSheet = ({
@@ -533,7 +533,6 @@ const DailyCalanderTaskSheet = ({
 
 const CheckboxCell = React.memo(
   ({
-    logID,
     checked,
     fullDate,
     taskID,
@@ -541,7 +540,6 @@ const CheckboxCell = React.memo(
     dashbID,
     setProgress,
   }: {
-    logID: string;
     checked: boolean;
     fullDate: Date;
     taskID: string;
@@ -641,7 +639,6 @@ const TaskRow = React.memo(
       return (
         <CheckboxCell
           key={log._id}
-          logID={log._id}
           checked={log?.tasks?.includes(taskID)}
           fullDate={log.fullDate}
           taskID={taskID}

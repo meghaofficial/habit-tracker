@@ -3,7 +3,7 @@ import { notify } from "../../../helper";
 import { socket } from "../../../socket/socket";
 import type { TaskI } from "../../../types";
 import { useMutation, useQuery } from "@tanstack/react-query";
-import { getTasks, updateTaskName } from "../../../api/dashboardApi";
+import { getTasks, updateTaskName } from "../../../api/dashboard.api";
 import Saving from "../../shared/Saving";
 
 const HabitSection = ({
