@@ -74,7 +74,6 @@ const DailyCalanderTaskSheet = ({
     mutationFn: removeTask,
     onSuccess: (data) => {
       const pr = data.progress;
-      console.log("or", pr);
       setProgress((prev) => ({
         ...prev,
         overallProgress: pr.overallProgress,
@@ -181,8 +180,9 @@ const DailyCalanderTaskSheet = ({
   }, [dashboardData?._id, queryClient]);
 
   const dateLogs: DateLogI[] = dateLogsData?.data?.dateLogs;
-  // const progress: ProgressI = dateLogsData?.data?.progress;
   const taskList: TaskI[] = taskListData?.data?.tasks;
+
+  // console.log("Datelogs", dateLogs[28].tasks)
 
   // Column widths
   const hasWeek5 = totalD > 28;
@@ -506,9 +506,15 @@ const DailyCalanderTaskSheet = ({
               {/* Add Row button */}
               <button
                 onClick={addTaskMutation.isPending ? undefined : handleAddRow}
-                disabled={addTaskMutation.isPending || taskList?.length >= rowLimit} 
-                className={`w-full flex items-center justify-center gap-2 py-3 text-[11px] font-semibold ${taskList?.length < rowLimit && ' hover:text-indigo-400 hover:bg-indigo-500/5 border-t cursor-pointer'} text-indigo-400/70 border-white/5 transition-all duration-200 disabled:opacity-50`}
-                title={taskList?.length >= rowLimit ? "You cannot add more than 10 tasks" : ""}
+                disabled={
+                  addTaskMutation.isPending || taskList?.length >= rowLimit
+                }
+                className={`w-full flex items-center justify-center gap-2 py-3 text-[11px] font-semibold ${taskList?.length < rowLimit && " hover:text-indigo-400 hover:bg-indigo-500/5 border-t cursor-pointer"} text-indigo-400/70 border-white/5 transition-all duration-200 disabled:opacity-50`}
+                title={
+                  taskList?.length >= rowLimit
+                    ? "You cannot add more than 10 tasks"
+                    : ""
+                }
               >
                 {addTaskMutation.isPending ? (
                   <span className="w-3.5 h-3.5 rounded-full border border-indigo-400 border-t-transparent animate-spin" />
@@ -527,6 +533,7 @@ const DailyCalanderTaskSheet = ({
 
 const CheckboxCell = React.memo(
   ({
+    logID,
     checked,
     fullDate,
     taskID,
@@ -534,6 +541,7 @@ const CheckboxCell = React.memo(
     dashbID,
     setProgress,
   }: {
+    logID: string;
     checked: boolean;
     fullDate: Date;
     taskID: string;
@@ -545,7 +553,7 @@ const CheckboxCell = React.memo(
 
     const toggleTaskMutation = useMutation({
       mutationFn: toggleTask,
-      onSuccess: (data) => {
+      onSuccess: (data, variables) => {
         const pr = data.progress;
         setProgress((prev) => ({
           ...prev,
@@ -557,7 +565,8 @@ const CheckboxCell = React.memo(
             d.id === pr.taskProgress.id ? pr.taskProgress : d,
           ),
         }));
-        setCurrCheckVal((prev) => !prev);
+
+        setCurrCheckVal(variables.marked);
       },
       onError: () => {
         notify.error("Please try again.");
@@ -569,6 +578,13 @@ const CheckboxCell = React.memo(
       : "";
 
     const onToggle = (date: Date, taskID: string, marked: boolean) => {
+      const today = new Date();
+      today.setUTCHours(0, 0, 0, 0);
+
+      const current = today.getTime();
+      const target = new Date(fullDate).getTime();
+
+      if (current !== target) return;
       toggleTaskMutation.mutate({
         dashboardID: dashbID,
         fullDate: date,
@@ -576,6 +592,10 @@ const CheckboxCell = React.memo(
         marked,
       });
     };
+
+    useEffect(() => {
+      setCurrCheckVal(checked);
+    }, [checked]);
 
     return toggleTaskID === taskID ? (
       <span className="w-2.5 h-2.5 rounded-full border border-emerald-400 border-t-transparent animate-spin" />
@@ -617,9 +637,11 @@ const TaskRow = React.memo(
     logs.map((log, i) => {
       const dayNum = weekOffset + i + 1;
       const isToday = dayNum === todayDate;
+
       return (
         <CheckboxCell
           key={log._id}
+          logID={log._id}
           checked={log?.tasks?.includes(taskID)}
           fullDate={log.fullDate}
           taskID={taskID}

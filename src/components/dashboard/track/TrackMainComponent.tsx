@@ -14,7 +14,6 @@ import type {
 } from "../../../types";
 import { useIsMobile } from "../../hooks/mobileHook";
 import DonutGraph from "./DonutGraph";
-import { type StreakI } from "../../../types";
 import { useSelector } from "react-redux";
 import type { RootState } from "../../../redux/store/store";
 import { useQuery } from "@tanstack/react-query";
@@ -31,13 +30,10 @@ const TrackMainComponent = ({
   setLog,
 }: {
   dashboardData: DashboardI;
-  taskList: TaskI[];
   setTaskList: React.Dispatch<React.SetStateAction<TaskI[]>>;
   activeMonth: MonthsI;
   log: DateLogI;
   setLog: React.Dispatch<React.SetStateAction<DateLogI>>;
-  streakData: StreakI;
-  dateLogs: DateLogI[];
 }) => {
   const isMobile = useIsMobile();
   const user = useSelector((state: RootState) => state.auth);
@@ -70,7 +66,6 @@ const TrackMainComponent = ({
         progress: 0,
       };
     const d = new Date();
-    // const custom = d.toISOString().split("T")[0];
     const custom = d.toLocaleDateString("en-CA", { timeZone: "Asia/Kolkata" });
     const matched = progress?.dateLogProgress?.find(
       (p: DateLogProgressI) => p.fullDate.toString().split("T")[0] === custom,

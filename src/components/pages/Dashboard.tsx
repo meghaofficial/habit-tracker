@@ -52,6 +52,8 @@ const Dashboard = () => {
     monthDashID: "",
     fullDate: new Date(),
     tasks: [],
+    count: 0,
+    progress: "0",
   });
   const [activeSubsLoading, setActiveSubsLoading] = useState(false);
   const [streakData, setStreakData] = useState<StreakI>({
@@ -381,13 +383,10 @@ const Dashboard = () => {
               {activeTab === "track" && (
                 <TrackMainComponent
                   dashboardData={dashboardData}
-                  taskList={taskList}
                   setTaskList={setTaskList}
                   activeMonth={activeMonth}
                   log={log}
                   setLog={setLog}
-                  streakData={streakData}
-                  dateLogs={dateLogs}
                 />
               )}
               {activeTab === "analysis" && (

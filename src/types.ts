@@ -121,6 +121,8 @@ export interface DateLogI {
   monthDashID: string;
   fullDate: Date;
   tasks: string[];
+  count: 0;
+  progress: string;
 }
 
 export interface MonthlyNoteI {
