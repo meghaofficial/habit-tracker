@@ -391,11 +391,8 @@ const Dashboard = () => {
               )}
               {activeTab === "analysis" && (
                 <AnalysisMainComponent
-                  taskList={taskList}
                   monthDashID={dashboardData?._id}
-                  log={log}
                   streakData={streakData}
-                  dateLogs={dateLogs}
                 />
               )}
               {activeTab === "calandar" && <Calendar />}

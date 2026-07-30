@@ -32,31 +32,12 @@ import { getDateLogs, getTasks } from "../../../api/dashboard.api";
 import { getMonthlyActivity, getTopLevelAnalysis, getWeeklyActivity } from "../../../api/analysis.api";
 
 const AnalysisMainComponent = ({
-  // taskList,
   monthDashID,
-  log,
   streakData,
-  // dateLogs,
 }: {
-  taskList: TaskI[];
   monthDashID: string;
-  log: DateLogI;
   streakData: StreakI;
-  dateLogs: DateLogI[];
 }) => {
-  // const [weeklyAna, setWeeklyAna] = useState<WeekAnalysisI>({
-  //   date: "",
-  //   week: "",
-  //   range: "",
-  //   weekDays: [],
-  //   taskDone: [],
-  // });
-
-  // const [monthlyAna, setMonthlyAna] = useState<MonthAnalysisI>({
-  //   dates: [],
-  //   tasks: [],
-  // });
-
   const [heatMapData, setHeatMapData] = useState<HeatMapI[]>([]);
 
   const dateLogsData = useQuery({
