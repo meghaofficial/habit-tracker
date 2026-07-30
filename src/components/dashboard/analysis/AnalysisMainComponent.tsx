@@ -1,5 +1,4 @@
 import { useEffect, useState } from "react";
-import { axiosPrivate } from "../../../api/axios";
 import { MonthlyLineChart } from "../../charts/MonthlyLineChart";
 import { WeeklyBarChart } from "../../charts/WeeklyBarChart";
 import { FilledPieChart } from "../../charts/FilledPieChart";

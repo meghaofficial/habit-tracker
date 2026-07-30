@@ -577,10 +577,9 @@ const CheckboxCell = React.memo(
 
     const onToggle = (date: Date, taskID: string, marked: boolean) => {
       const today = new Date();
-      today.setUTCHours(0, 0, 0, 0);
 
-      const current = today.getTime();
-      const target = new Date(fullDate).getTime();
+      const current = today.getDate();
+      const target = new Date(fullDate).getDate();
 
       if (current !== target) return;
       toggleTaskMutation.mutate({
