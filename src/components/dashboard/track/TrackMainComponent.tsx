@@ -123,7 +123,7 @@ const TrackMainComponent = ({
                   </span>
 
                   <span className="pb-0.5 text-sm text-gray-400">
-                    {monMap?.[new Date(activeMonth?.startDate).getMonth() + 1]}
+                    {monMap?.[new Date(new Date()).getMonth() + 1]}
                   </span>
                 </div>
               </div>

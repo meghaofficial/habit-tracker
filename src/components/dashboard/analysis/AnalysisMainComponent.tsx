@@ -3,7 +3,6 @@ import { MonthlyLineChart } from "../../charts/MonthlyLineChart";
 import { WeeklyBarChart } from "../../charts/WeeklyBarChart";
 import { FilledPieChart } from "../../charts/FilledPieChart";
 import { motion, AnimatePresence } from "framer-motion";
-import { formatDateString } from "../../../helper";
 import type {
   DateLogI,
   TaskI,
@@ -27,8 +26,13 @@ import {
 } from "react-icons/fi";
 import HeatMap from "./HeatMap";
 import { useQuery } from "@tanstack/react-query";
-import { getDateLogs, getTasks } from "../../../api/dashboard.api";
-import { getMonthlyActivity, getTopLevelAnalysis, getWeeklyActivity } from "../../../api/analysis.api";
+import { getDateLogs, getTargets, getTasks } from "../../../api/dashboard.api";
+import {
+  getMonthlyActivity,
+  getTopLevelAnalysis,
+  getWeeklyActivity,
+} from "../../../api/analysis.api";
+import { monMap } from "../../../staticData";
 
 const AnalysisMainComponent = ({
   monthDashID,
@@ -59,6 +63,8 @@ const AnalysisMainComponent = ({
     enabled: !!monthDashID,
   });
   const weeklyAna: WeekAnalysisI = weeklyActivityData.data?.data ?? [];
+  const numHabits = taskList?.length ?? 0;
+  const weeklyPossible = numHabits * (weeklyAna.taskDone?.length || 7);
 
   const monthlyActivityData = useQuery({
     queryKey: ["monthly_activity", monthDashID],
@@ -74,67 +80,134 @@ const AnalysisMainComponent = ({
   });
   const topLevelData: TopLevelAnalysisI = topLevelAnalysisData.data?.data;
 
+  const monthlyTargetsData = useQuery({
+    queryKey: ["targets", "monthly", monthDashID, 0],
+    queryFn: () =>
+      getTargets({
+        type: "monthly",
+        monthID: monthDashID,
+      }),
+    enabled: !!monthDashID,
+  });
+  const monthlyTargets = monthlyTargetsData?.data?.target?.targets ?? [];
+  const monthlyTargetsDone =
+    monthlyTargets?.filter((d: any) => d?.completed).length || 0;
 
+  // week 1
+  const week1Data = useQuery({
+    queryKey: ["targets", "weekly", monthDashID, 1],
+    queryFn: () =>
+      getTargets({
+        type: "weekly",
+        monthID: monthDashID,
+        week: 1,
+      }),
+    enabled: !!monthDashID,
+  });
+  const week1Targets = week1Data?.data?.target?.targets ?? [];
+  const week1TargetsDone =
+    week1Targets?.filter((d: any) => d?.completed).length || 0;
 
+  // week 2
+  const week2Data = useQuery({
+    queryKey: ["targets", "weekly", monthDashID, 2],
+    queryFn: () =>
+      getTargets({
+        type: "weekly",
+        monthID: monthDashID,
+        week: 2,
+      }),
+    enabled: !!monthDashID,
+  });
+  const week2Targets = week2Data?.data?.target?.targets ?? [];
+  const week2TargetsDone =
+    week2Targets?.filter((d: any) => d?.completed).length || 0;
 
+  // week 3
+  const week3Data = useQuery({
+    queryKey: ["targets", "weekly", monthDashID, 3],
+    queryFn: () =>
+      getTargets({
+        type: "weekly",
+        monthID: monthDashID,
+        week: 3,
+      }),
+    enabled: !!monthDashID,
+  });
+  const week3Targets = week3Data?.data?.target?.targets ?? [];
+  const week3TargetsDone =
+    week3Targets?.filter((d: any) => d?.completed).length || 0;
 
+  // week 4
+  const week4Data = useQuery({
+    queryKey: ["targets", "weekly", monthDashID, 4],
+    queryFn: () =>
+      getTargets({
+        type: "weekly",
+        monthID: monthDashID,
+        week: 4,
+      }),
+    enabled: !!monthDashID,
+  });
+  const week4Targets = week4Data?.data?.target?.targets ?? [];
+  const week4TargetsDone =
+    week4Targets?.filter((d: any) => d?.completed).length || 0;
 
+  // week 5
+  const week5Data = useQuery({
+    queryKey: ["targets", "weekly", monthDashID, 5],
+    queryFn: () =>
+      getTargets({
+        type: "weekly",
+        monthID: monthDashID,
+        week: 5,
+      }),
+    enabled: !!monthDashID,
+  });
+  const week5Targets = week5Data?.data?.target?.targets ?? [];
+  const week5TargetsDone =
+    week5Targets?.filter((d: any) => d?.completed).length || 0;
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-  // Local state fetching for robust data display
-  const [localDateLogs, setLocalDateLogs] = useState<DateLogI[]>([]);
-  const [localTaskList, setLocalTaskList] = useState<TaskI[]>([]);
+  const weeklyTargetData = [
+    {
+      week: "Week 1",
+      done: week1TargetsDone,
+      left: week1Targets.length - week1TargetsDone,
+      total: week1Targets.length,
+    },
+    {
+      week: "Week 2",
+      done: week2TargetsDone,
+      left: week2Targets.length - week2TargetsDone,
+      total: week2Targets.length,
+    },
+    {
+      week: "Week 3",
+      done: week3TargetsDone,
+      left: week3Targets.length - week3TargetsDone,
+      total: week3Targets.length,
+    },
+    {
+      week: "Week 4",
+      done: week4TargetsDone,
+      left: week4Targets.length - week4TargetsDone,
+      total: week4Targets.length,
+    },
+    {
+      week: "Week 5",
+      done: week5TargetsDone,
+      left: week5Targets.length - week5TargetsDone,
+      total: week5Targets.length,
+    },
+  ];
 
   useEffect(() => {
-    const logs = localDateLogs.length > 0 ? localDateLogs : dateLogs;
-    const arr = logs.map((d) => ({
+    const arr = dateLogs.map((d) => ({
       date: d?.fullDate,
       count: d?.tasks?.length,
     }));
     setHeatMapData(arr);
-  }, [dateLogs, localDateLogs]);
-
-  // Derived stats
-  const totalTasksDone = weeklyAna.taskDone?.reduce((s: any, n: any) => s + n, 0) ?? 0;
-
-  const currentTaskList = localTaskList.length > 0 ? localTaskList : taskList;
-  const numHabits = currentTaskList?.length ?? 0;
-  const logsToUse = localDateLogs.length > 0 ? localDateLogs : dateLogs;
-
-
-  // 3. Avg / Day
-  const weeklyPossible = numHabits * (weeklyAna.taskDone?.length || 7);
-  const monthlyTasksDone = monthlyAna.tasks?.reduce((s: any, n: any) => s + n, 0) ?? 0;
-  const monthlyPossible =
-    numHabits * (monthlyAna.tasks?.length || logsToUse.length || 31);
-  const monthlyTargetData = { done: 4, left: 3 };
-  const weeklyTargetData = [
-    { week: "Week 1", done: 5, left: 2 },
-    { week: "Week 2", done: 3, left: 4 },
-    { week: "Week 3", done: 6, left: 1 },
-    { week: "Week 4", done: 4, left: 3 },
-    { week: "Week 5", done: 2, left: 5 },
-  ];
+  }, [dateLogs, dateLogs]);
 
   const statCards = [
     {
@@ -296,9 +369,7 @@ const AnalysisMainComponent = ({
                 Activity Analysis
               </h2>
               <p className="text-[11px] sm:text-xs text-gray-400 font-medium mt-0.5 truncate">
-                {weeklyAna?.range
-                  ? `Showing data for ${weeklyAna.range}`
-                  : "Current month performance overview"}
+                A detailed breakdown of performance and strategic outcomes.
               </p>
             </div>
           </div>
@@ -306,6 +377,7 @@ const AnalysisMainComponent = ({
             <FiCalendar size={11} className="text-indigo-400" />
             <span className="text-[10px] sm:text-xs text-indigo-300 font-medium whitespace-nowrap">
               {/* {formatDateString(weeklyAna?.date) || "Today"} */}
+              {monMap[(new Date()).getMonth()+1]} {(new Date()).getDate()} {(new Date()).getFullYear()}
             </span>
           </div>
         </div>
@@ -334,9 +406,13 @@ const AnalysisMainComponent = ({
               <p className="text-[9px] sm:text-[10px] text-gray-400 uppercase tracking-widest font-bold leading-tight">
                 {card.label}
               </p>
+              {topLevelAnalysisData?.isPending ? (
+                <div className="bg-black/20 rounded-full animate-pulse h-8 w-1/2 mt-1"></div>
+              ) : (
               <p className="text-xl sm:text-2xl font-black text-white mt-1">
                 {card.value}
               </p>
+              )}
             </div>
           </motion.div>
         ))}
@@ -374,7 +450,7 @@ const AnalysisMainComponent = ({
 
               {/* Badge/Details */}
               <span className="text-[10px] text-indigo-300 bg-indigo-500/10 border border-indigo-500/20 px-2 sm:px-2.5 py-1 rounded-lg font-medium flex items-center gap-1 shrink-0">
-                Tasks: {totalTasksDone} / {weeklyPossible}
+                Tasks: {topLevelData?.avgPerDay} / {weeklyPossible}
               </span>
             </div>
 
@@ -383,7 +459,7 @@ const AnalysisMainComponent = ({
               <div className="flex items-center justify-center overflow-x-auto w-full">
                 <WeeklyBarChart
                   data={weeklyAna}
-                  maxValue={currentTaskList?.length || 1}
+                  maxValue={taskList?.length || 1}
                 />
               </div>
             </div>
@@ -506,7 +582,8 @@ const AnalysisMainComponent = ({
 
             {/* Badge/Details */}
             <span className="text-[10px] text-indigo-300 bg-indigo-500/10 border border-indigo-500/20 px-2 sm:px-2.5 py-1 rounded-lg font-medium flex items-center gap-1 shrink-0">
-              Tasks: {monthlyTasksDone} / {monthlyPossible}
+              Tasks: {topLevelData?.avgPerDay} /{" "}
+              {topLevelData?.totalDaysInMonth * taskList?.length}
             </span>
           </div>
 
@@ -515,14 +592,14 @@ const AnalysisMainComponent = ({
             <div className="flex items-center justify-center overflow-x-auto w-full pe-2 sm:pe-7">
               <MonthlyLineChart
                 data={monthlyAna}
-                maxValue={currentTaskList?.length || 1}
+                maxValue={taskList?.length || 1}
               />
             </div>
           </div>
         </div>
       </motion.div>
 
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 mb-3">
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 mb-4">
         {/* Monthly Targets */}
         <motion.div
           initial={{ opacity: 0, y: 16 }}
@@ -547,23 +624,29 @@ const AnalysisMainComponent = ({
                 </div>
               </div>
 
-              <div className="flex items-center gap-2">
+              {/* <div className="flex items-center gap-2">
                 <span className="text-[10px] text-emerald-300 bg-emerald-500/10 border border-emerald-500/20 px-2 sm:px-2.5 py-1 rounded-lg font-medium shrink-0">
                   Done: {monthlyTargetData.done}
                 </span>
                 <span className="text-[10px] text-gray-400 bg-white/5 border border-white/10 px-2 sm:px-2.5 py-1 rounded-lg font-medium">
                   Left: {monthlyTargetData.left}
                 </span>
-              </div>
+              </div> */}
             </div>
 
             <div className="relative p-4 flex items-center justify-center">
               <div className="w-full max-w-xs mx-auto">
-                <FilledPieChart
-                  done={monthlyTargetData.done}
-                  left={monthlyTargetData.left}
-                  height={260}
-                />
+                {monthlyTargets.length > 0 ? (
+                  <FilledPieChart
+                    done={monthlyTargetsDone}
+                    left={monthlyTargets.length - monthlyTargetsDone}
+                    height={260}
+                  />
+                ) : (
+                  <div className="flex items-center justify-center w-full h-75">
+                    <p className="text-gray-500 text-[12px]">No Data Found!</p>
+                  </div>
+                )}
               </div>
             </div>
           </div>
@@ -605,11 +688,19 @@ const AnalysisMainComponent = ({
                       {target.week}
                     </p>
                   </div>
-                  <FilledPieChart
-                    done={target.done}
-                    left={target.left}
-                    height={112}
-                  />
+                  {target.total > 0 ? (
+                    <FilledPieChart
+                      done={target.done}
+                      left={target.left}
+                      height={112}
+                    />
+                  ) : (
+                    <div className="flex items-center justify-center w-full h-28">
+                      <p className="text-gray-500 text-[12px]">
+                        No Data Found!
+                      </p>
+                    </div>
+                  )}
                 </div>
               ))}
             </div>
