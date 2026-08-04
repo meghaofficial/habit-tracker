@@ -14,13 +14,11 @@ const TodayAllTasks = ({
   log,
   setLog,
   monthDashID,
-  setTaskList,
 }: {
   taskList: { _id: string; taskName: string; monthDashID: string }[];
   log: DateLogI;
   setLog: React.Dispatch<React.SetStateAction<DateLogI>>;
   monthDashID: string;
-  setTaskList: React.Dispatch<React.SetStateAction<TaskI[]>>;
 }) => {
   const [removeRowID, setRemoveRowID] = useState<string | null>(null);
   const [addTaskLoading, setAddTaskLoading] = useState("");
@@ -59,7 +57,7 @@ const TodayAllTasks = ({
         `/api/task?taskID=${taskId}&monthDashID=${monthDashID}`,
       );
       if (res?.data?.success) {
-        setTaskList(res?.data?.tasks);
+        // setTaskList(res?.data?.tasks);
         // setProgress(res?.data?.progress);
       }
     } catch (error) {
@@ -84,7 +82,6 @@ const TodayAllTasks = ({
                 index={index}
                 taskId={task?._id}
                 taskName={task?.taskName}
-                setTaskList={setTaskList}
               />
 
               <div className="flex items-center gap-2">

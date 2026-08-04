@@ -6,7 +6,6 @@ import { motion, AnimatePresence } from "framer-motion";
 import type {
   DateLogI,
   TaskI,
-  StreakI,
   HeatMapI,
   WeekAnalysisI,
   MonthAnalysisI,
@@ -41,6 +40,13 @@ const AnalysisMainComponent = ({
 }) => {
   const [heatMapData, setHeatMapData] = useState<HeatMapI[]>([]);
 
+  const topLevelAnalysisData = useQuery({
+    queryKey: ["top_level_analysis", monthDashID],
+    queryFn: () => getTopLevelAnalysis(monthDashID!),
+    enabled: !!monthDashID,
+  });
+  const topLevelData: TopLevelAnalysisI = topLevelAnalysisData.data?.data;
+
   const dateLogsData = useQuery({
     queryKey: ["date_logs", monthDashID],
     queryFn: () => getDateLogs(monthDashID),
@@ -70,13 +76,6 @@ const AnalysisMainComponent = ({
     enabled: !!monthDashID,
   });
   const monthlyAna: MonthAnalysisI = monthlyActivityData.data?.data ?? [];
-
-  const topLevelAnalysisData = useQuery({
-    queryKey: ["top_level_analysis", monthDashID],
-    queryFn: () => getTopLevelAnalysis(monthDashID!),
-    enabled: !!monthDashID,
-  });
-  const topLevelData: TopLevelAnalysisI = topLevelAnalysisData.data?.data;
 
   const monthlyTargetsData = useQuery({
     queryKey: ["targets", "monthly", monthDashID, 0],

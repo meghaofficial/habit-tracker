@@ -182,13 +182,6 @@ export interface ProgressI {
   taskProgress: TaskProgressI[];
 }
 
-export interface StreakI {
-  streak: number;
-  longestStreak: number;
-  mostConsistentHabits: string[];
-  leastConsistentHabits: string[];
-}
-
 export interface HeatMapI {
   date: Date;
   count: number;

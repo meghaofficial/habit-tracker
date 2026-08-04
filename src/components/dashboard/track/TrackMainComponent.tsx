@@ -25,12 +25,10 @@ import { useEffect, useState } from "react";
 const TrackMainComponent = ({
   dashboardData,
   activeMonth,
-  setTaskList,
   log,
   setLog,
 }: {
   dashboardData: DashboardI;
-  setTaskList: React.Dispatch<React.SetStateAction<TaskI[]>>;
   activeMonth: MonthsI;
   log: DateLogI;
   setLog: React.Dispatch<React.SetStateAction<DateLogI>>;
@@ -232,7 +230,6 @@ const TrackMainComponent = ({
         {/* below sections */}
         <div className="bg-black/20 border border-white/10 w-[20%] light:bg-lightCard light:border-lightBorder rounded-2xl overflow-x-hidden relative top-47 h-full">
           <HabitSection
-            setTaskList={setTaskList}
             dashboardID={dashboardData?._id}
             loading={dateLogsData.isPending}
           />
@@ -325,7 +322,6 @@ const TrackMainComponent = ({
               setLog={setLog}
               monthDashID={dashboardData?._id}
               monthStatus={activeMonth?.status}
-              setTaskList={setTaskList}
             />
           </div>
         )}

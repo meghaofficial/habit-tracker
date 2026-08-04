@@ -1,17 +1,14 @@
 import { useEffect, useRef, useState } from "react";
 import { notify } from "../../../helper";
-import { socket } from "../../../socket/socket";
 import type { TaskI } from "../../../types";
 import { useMutation, useQuery } from "@tanstack/react-query";
 import { getTasks, updateTaskName } from "../../../api/dashboard.api";
 import Saving from "../../shared/Saving";
 
 const HabitSection = ({
-  setTaskList,
   loading,
   dashboardID,
 }: {
-  setTaskList: React.Dispatch<React.SetStateAction<TaskI[]>>;
   loading: boolean;
   dashboardID: string;
 }) => {
@@ -55,7 +52,6 @@ const HabitSection = ({
               index={index}
               taskId={task._id}
               taskName={task.taskName}
-              setTaskList={setTaskList}
             />
           </div>
         ))
@@ -69,12 +65,10 @@ export const InputData = ({
   index,
   taskId,
   taskName,
-  setTaskList,
 }: {
   index: number;
   taskId: string;
   taskName: string;
-  setTaskList: React.Dispatch<React.SetStateAction<TaskI[]>>;
 }) => {
   const [value, setValue] = useState<string>(taskName);
   const prevValueRef = useRef(taskName);
@@ -130,17 +124,17 @@ export const InputData = ({
   }, []);
 
   // WEBSOCKET SYNCING
-  useEffect(() => {
-    const onTaskUpdate = (data: any) => {
-      setTaskList((prev) =>
-        prev.map((task) => (task._id === data.task._id ? data.task : task)),
-      );
-    };
-    socket.on("update-task", onTaskUpdate);
-    return () => {
-      socket.off("update-task", onTaskUpdate);
-    };
-  }, []);
+  // useEffect(() => {
+  //   const onTaskUpdate = (data: any) => {
+  //     setTaskList((prev) =>
+  //       prev.map((task) => (task._id === data.task._id ? data.task : task)),
+  //     );
+  //   };
+  //   socket.on("update-task", onTaskUpdate);
+  //   return () => {
+  //     socket.off("update-task", onTaskUpdate);
+  //   };
+  // }, []);
 
   return (
     <div

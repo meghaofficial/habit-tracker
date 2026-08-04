@@ -11,8 +11,6 @@ import type {
   DateLogI,
   PlanI,
   SubscriptionI,
-  StreakI,
-  TaskI,
 } from "../../types";
 import { CustomButtonForm } from "../shared/CutomButton";
 import NavigationBar from "../shared/NavigationBar";
@@ -44,7 +42,6 @@ const Dashboard = () => {
     totalDays: 0,
     firstDay: 0,
   });
-  const [taskList, setTaskList] = useState<TaskI[]>([]);
   const [openPlan, setOpenPlan] = useState(false);
   const [activeMonth, setActiveMonth] = useState<SubscriptionI | any>({});
   const [log, setLog] = useState<DateLogI>({
@@ -56,12 +53,6 @@ const Dashboard = () => {
     progress: "0",
   });
   const [activeSubsLoading, setActiveSubsLoading] = useState(false);
-  const [streakData, setStreakData] = useState<StreakI>({
-    streak: 0,
-    longestStreak: 0,
-    mostConsistentHabits: [],
-    leastConsistentHabits: [],
-  });
   const [navMenu, setNavMenu] = useState(MASTER_MENU);
   const [fallback, setFallback] = useState(false);
   const isMobile = useIsMobile();
@@ -136,31 +127,9 @@ const Dashboard = () => {
     }
   };
 
-  const getStreak = async () => {
-    // setDashLoading(true);
-    try {
-      const res = await axiosPrivate.get(
-        `/api/get-streak?monthDashID=${dashboardData?._id}`,
-      );
-      if (res?.data?.success) {
-        setStreakData(res?.data?.data);
-      }
-    } catch (error) {
-      console.error(error);
-    } finally {
-      // setDashLoading(false);
-    }
-  };
-
   useEffect(() => {
     getActiveSubscription();
   }, []);
-
-  useEffect(() => {
-    if (dashboardData?._id) {
-      getStreak();
-    }
-  }, [dashboardData?._id]);
 
   useEffect(() => {
     if (isMobile) {
@@ -382,7 +351,6 @@ const Dashboard = () => {
               {activeTab === "track" && (
                 <TrackMainComponent
                   dashboardData={dashboardData}
-                  setTaskList={setTaskList}
                   activeMonth={activeMonth}
                   log={log}
                   setLog={setLog}

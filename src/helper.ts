@@ -1,5 +1,5 @@
 import { toast } from "react-toastify";
-import type { SubscriptionI } from "./types";
+import type { DateLogI, SubscriptionI } from "./types";
 
 export const notify = {
   success: (msg: string) => toast.success(msg),

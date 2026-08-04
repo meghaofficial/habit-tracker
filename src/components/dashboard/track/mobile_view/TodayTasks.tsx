@@ -14,14 +14,12 @@ const TodayTasks = ({
   setLog,
   monthDashID,
   monthStatus,
-  setTaskList,
 }: {
   taskList: TaskI[];
   log: DateLogI;
   setLog: React.Dispatch<React.SetStateAction<DateLogI>>;
   monthDashID: string;
   monthStatus: string;
-  setTaskList: React.Dispatch<React.SetStateAction<TaskI[]>>;
 }) => {
   const selectedDate = new Date();
   const [heading, setHeading] = useState("Todays Tasks");
@@ -103,7 +101,6 @@ const TodayTasks = ({
               log={log}
               setLog={setLog}
               monthDashID={monthDashID}
-              setTaskList={setTaskList}
             />
           )}
         </div>
