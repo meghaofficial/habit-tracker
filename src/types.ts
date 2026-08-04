@@ -224,4 +224,6 @@ export interface TopLevelAnalysisI {
   timeElapsed: number;
   streak: number;
   perfectStreak: number;
+  mostConsistentHabits: string[];
+  leastConsistentHabits: string[];
 }

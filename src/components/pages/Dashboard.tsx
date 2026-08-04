@@ -65,7 +65,6 @@ const Dashboard = () => {
   const [navMenu, setNavMenu] = useState(MASTER_MENU);
   const [fallback, setFallback] = useState(false);
   const isMobile = useIsMobile();
-  const [dateLogs, setDateLogs] = useState<DateLogI[]>([]);
 
   const handleSubscribe = async (planID: string, amount: number) => {
     setFreeTrialLoading(true);
@@ -392,7 +391,6 @@ const Dashboard = () => {
               {activeTab === "analysis" && (
                 <AnalysisMainComponent
                   monthDashID={dashboardData?._id}
-                  streakData={streakData}
                 />
               )}
               {activeTab === "calandar" && <Calendar />}

@@ -36,10 +36,8 @@ import { monMap } from "../../../staticData";
 
 const AnalysisMainComponent = ({
   monthDashID,
-  streakData,
 }: {
   monthDashID: string;
-  streakData: StreakI;
 }) => {
   const [heatMapData, setHeatMapData] = useState<HeatMapI[]>([]);
 
@@ -291,8 +289,8 @@ const AnalysisMainComponent = ({
     {
       title: "Most Consistent",
       words:
-        streakData?.mostConsistentHabits?.length > 0
-          ? streakData.mostConsistentHabits
+        topLevelData?.mostConsistentHabits?.length > 0
+          ? topLevelData.mostConsistentHabits
           : ["None"],
       accent: "from-emerald-500/10 via-emerald-500/5 to-transparent",
       border: "border-emerald-500/20 hover:border-emerald-500/40",
@@ -305,7 +303,7 @@ const AnalysisMainComponent = ({
         />
       ),
       icon:
-        streakData?.mostConsistentHabits?.length > 0 ? (
+        topLevelData?.mostConsistentHabits?.length > 0 ? (
           <FiAward
             size={20}
             className="text-emerald-400 filter drop-shadow-[0_2px_8px_rgba(52,211,153,0.3)] transition-transform duration-300 group-hover:scale-115"
@@ -320,8 +318,8 @@ const AnalysisMainComponent = ({
     {
       title: "Needs Work",
       words:
-        streakData?.leastConsistentHabits?.length > 0
-          ? streakData.leastConsistentHabits
+        topLevelData?.leastConsistentHabits?.length > 0
+          ? topLevelData.leastConsistentHabits
           : ["None"],
       accent: "from-rose-500/10 via-rose-500/5 to-transparent",
       border: "border-rose-500/20 hover:border-rose-500/40",
@@ -334,7 +332,7 @@ const AnalysisMainComponent = ({
         />
       ),
       icon:
-        streakData?.leastConsistentHabits?.length > 0 ? (
+        topLevelData?.leastConsistentHabits?.length > 0 ? (
           <FiAlertTriangle
             size={20}
             className="text-rose-400 filter drop-shadow-[0_2px_8px_rgba(244,63,94,0.3)] transition-transform duration-300 group-hover:scale-115"
@@ -376,7 +374,6 @@ const AnalysisMainComponent = ({
           <div className="flex shrink-0 items-center gap-1.5 sm:gap-2 px-2.5 sm:px-3 py-1.5 rounded-xl bg-indigo-500/10 border border-indigo-500/20">
             <FiCalendar size={11} className="text-indigo-400" />
             <span className="text-[10px] sm:text-xs text-indigo-300 font-medium whitespace-nowrap">
-              {/* {formatDateString(weeklyAna?.date) || "Today"} */}
               {monMap[(new Date()).getMonth()+1]} {(new Date()).getDate()} {(new Date()).getFullYear()}
             </span>
           </div>
