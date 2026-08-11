@@ -407,7 +407,7 @@ const DailyCalanderTaskSheet = ({
                       : "text-gray-500"
                   }`}
                 >
-                  {d}
+                  {d > 9 ? d : <span>{"\u00a0"}{d}{"\u00a0"}</span>}
                 </span>
               ))}
             </div>
