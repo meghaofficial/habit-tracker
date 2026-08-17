@@ -101,16 +101,19 @@ const Form = ({
 
   useEffect(() => {
     if (activeData) {
-      setFormData(activeData);
+      setFormData(prev => ({ ...prev, title: activeData?.title, description: activeData?.description }));
     }
-  }, []);
+  }, [activeData]);
+
+  console.log("formdata", formData);
+  console.log("activestatus", activeStatus)
 
   useEffect(() => {
     if (!activeData?.id) {
       setActiveStatus("default");
     }
     else {
-      setActiveStatus(activeData?.status)
+      setActiveStatus(activeData?.status);
     }
   }, [activeData?.id])
 
@@ -136,22 +139,18 @@ const Form = ({
         </p>
         <div className="flex flex-wrap gap-2.5">
           {Object.entries(statusColors).map(([key, value], index) => {
-            const currentStatus = activeData?.id
-              ? activeData?.status
-              : activeData;
-            const selected = currentStatus === key;
-
             return (
               <button
                 key={index}
                 onClick={() => {
-                  if (activeData?.id) {
-                    setActiveData((prev) =>
-                      prev ? { ...prev, status: key } : prev,
-                    );
-                  } else {
-                    setActiveStatus(key);
-                  }
+                  // if (activeData?.id) {
+                  //   setActiveData((prev) =>
+                  //     prev ? { ...prev, status: key } : prev,
+                  //   );
+                  // } else {
+                  //   setActiveStatus(key);
+                  // }
+                  setActiveStatus(key);
                   setFormData((prev) => ({ ...prev, status: key }));
                 }}
                 className={`flex items-center gap-2 px-2 py-1 rounded-xl text-[10px] transition-all duration-300 ${activeStatus === key ? "scale-105 shadow-lg ring-1 ring-white/20" : "hover:scale-105 hover:bg-white/5 opacity-70 hover:opacity-100"}`}
