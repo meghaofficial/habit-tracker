@@ -4,7 +4,7 @@ import { axiosPrivate } from "../../../../api/axios";
 import { formatTimestamp, notify } from "../../../../helper";
 import { statusColors, type CalandarDataI } from "../../../../types";
 import CircleLoader from "../../../loaders/CircleLoader";
-import { MdDelete, MdEdit, MdKeyboardArrowLeft } from "react-icons/md";
+import { MdDelete, MdEdit } from "react-icons/md";
 import type { RootState } from "../../../../redux/store/store";
 import { useSelector } from "react-redux";
 
@@ -13,6 +13,7 @@ type DetailsProps = {
   setActiveData: Dispatch<SetStateAction<CalandarDataI>>;
   setDataList: Dispatch<SetStateAction<CalandarDataI[]>>;
   setToggleUpdate: Dispatch<SetStateAction<boolean>>;
+  selectedDate: Date;
 };
 
 const Details = ({
@@ -20,6 +21,7 @@ const Details = ({
   setActiveData,
   setDataList,
   setToggleUpdate,
+  selectedDate,
 }: DetailsProps) => {
   const theme = useSelector((state: RootState) => state.theme).theme;
   const [deleteLoading, setDeleteLoading] = useState(false);
@@ -63,8 +65,8 @@ const Details = ({
       {/* Header */}
       <div className="border-b border-white/10 light:border-black/10 pb-4">
         <div className="flex items-center justify-between mb-2">
-          <span className="px-3 py-1 text-[10px] font-bold tracking-widest uppercase rounded-full bg-linear-to-r from-purple-500/20 to-pink-500/20 text-purple-400 border border-purple-500/20">
-            Note
+          <span className="playfair-display">
+            {formatTimestamp(selectedDate.toString()).split("|")[0]}
           </span>
           <div className="flex items-center gap-2">
             <button
@@ -83,13 +85,13 @@ const Details = ({
             </button>
           </div>
         </div>
-        <div className="flex items-center justify-between mt-4">
-          <h2 className="text-2xl font-bold mt-2 bg-linear-to-r from-white to-white/60 bg-clip-text text-transparent">
+        <div className="flex items-start justify-between mt-4">
+          <h2 className="text-[14px] font-bold mt-2 bg-linear-to-r from-white to-white/60 bg-clip-text text-transparent">
             {activeData.title}
           </h2>
           {activeData.status !== "default" && (
             <div
-              className="flex items-center gap-2 px-3 py-1.5 rounded-full shadow-lg"
+              className="flex items-center gap-2 px-3 py-1 rounded-full shadow-lg mt-2"
               style={{
                 background:
                   theme === "dark"
@@ -124,16 +126,18 @@ const Details = ({
       </div>
 
       {/* Body */}
-      <div className="space-y-6 py-6 grow">
-        <div className="group bg-white/2 rounded-2xl p-4 border border-white/5 transition-all hover:bg-white/4">
-          <p className="text-[11px] opacity-50 uppercase tracking-wider font-semibold mb-3 group-hover:opacity-80 transition-opacity">
-            What happened?
-          </p>
-          <p className="text-sm leading-relaxed opacity-90 whitespace-pre-wrap font-medium">
-            {activeData.description}
-          </p>
+      {activeData?.description && (
+        <div className="space-y-6 py-6 grow">
+          <div className="group bg-white/2 rounded-2xl p-4 border border-white/5 transition-all hover:bg-white/4">
+            <p className="text-[11px] opacity-50 uppercase tracking-wider font-semibold mb-3 group-hover:opacity-80 transition-opacity">
+              What happened?
+            </p>
+            <p className="text-[12px] leading-relaxed opacity-90 whitespace-pre-wrap">
+              {activeData.description}
+            </p>
+          </div>
         </div>
-      </div>
+      )}
 
       {/* Footer */}
       <div className="flex items-center justify-between pt-4 mt-auto border-t border-white/10 text-[11px] font-medium text-gray-400">

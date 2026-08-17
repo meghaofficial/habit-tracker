@@ -10,14 +10,6 @@ const CalandarMainComponent = () => {
   const month = currentViewDate.getMonth();
   const year = currentViewDate.getFullYear();
   const [selectedDate, setSelectedDate] = useState<Date>(new Date());
-  const [toggleUpdate, setToggleUpdate] = useState(false);
-
-  // I will send the date, year and month, it will going to tell me the list of notes.
-  const [formData, setFormData] = useState<CalandarDataI>({
-    status: "default",
-    title: "",
-    description: "",
-  });
   const [dataList, setDataList] = useState<CalandarDataI[]>([]);
   const [activeData, setActiveData] = useState<CalandarDataI>({
     id: "",
@@ -74,12 +66,10 @@ const CalandarMainComponent = () => {
       <RightCalandar
         setCurrentViewDate={setCurrentViewDate}
         setSelectedDate={setSelectedDate}
-        setFormData={setFormData}
         currentViewDate={currentViewDate}
         selectedDate={selectedDate}
         dataList={dataList}
         setActiveData={setActiveData}
-        setToggleUpdate={setToggleUpdate}
       />
     </div>
   );

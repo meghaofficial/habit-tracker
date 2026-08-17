@@ -1,4 +1,4 @@
-import type { Dispatch, SetStateAction } from "react";
+import { useState, type Dispatch, type SetStateAction } from "react";
 import CalandarChart from "./CalandarChart";
 import Header from "./Header";
 import type { CalandarDataI } from "../../../../types";
@@ -6,24 +6,27 @@ import type { CalandarDataI } from "../../../../types";
 type RightCalandarProps = {
   setCurrentViewDate: Dispatch<SetStateAction<Date>>;
   setSelectedDate: Dispatch<SetStateAction<Date>>;
-  setFormData: Dispatch<SetStateAction<CalandarDataI>>;
   currentViewDate: Date;
   selectedDate: Date;
   dataList: CalandarDataI[];
   setActiveData: Dispatch<SetStateAction<CalandarDataI>>;
-  setToggleUpdate: Dispatch<SetStateAction<boolean>>;
 };
 
 const RightCalandar = ({
   setCurrentViewDate,
   setSelectedDate,
-  setFormData,
   currentViewDate,
   selectedDate,
   dataList,
   setActiveData,
-  setToggleUpdate,
 }: RightCalandarProps) => {
+
+    const [formData, setFormData] = useState<CalandarDataI>({
+      status: "default",
+      title: "",
+      description: "",
+    });
+
   const handlePrevYear = () => {
     setCurrentViewDate(
       (prev) => new Date(prev.getFullYear() - 1, prev.getMonth(), 1),
@@ -88,7 +91,6 @@ const RightCalandar = ({
         setSelectedDate={setSelectedDate}
         setFormData={setFormData}
         setActiveData={setActiveData}
-        setToggleUpdate={setToggleUpdate}
       />
     </div>
   );

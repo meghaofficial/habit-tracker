@@ -61,16 +61,18 @@ export const CustomButtonForm = ({
 }: CustomButtonProps) => {
 
   const colorStyling: Record<string, string> = {
-    success: "bg-darkSuccess text-black hover:scale-[1.02]",
-    cancel: "bg-white/5 border border-white/10 hover:bg-white/10"
+    success: `${disabled ? "bg-darkSuccess/50" : "bg-darkSuccess hover:scale-[1.02]"} text-black`,
+    cancel: `${disabled ? "text-white/50" : "hover:bg-white/10 text-white"} bg-white/5 border border-white/10`
   }
+
+  console.log("disabled", disabled)
 
   return (
     <button
       onClick={onClick}
       disabled={disabled}
       title={title}
-      className={`w-full rounded-xl text-[${textSize}] py-2 font-semibold transition-all duration-300 ${colorStyling[type]} ${styling}`}
+      className={`${disabled ? "cursor-default" : "cursor-pointer"} w-full rounded-xl text-[${textSize}] py-2 font-semibold transition-all duration-300 ${colorStyling[type]} ${styling}`}
     >
       {children}
     </button>

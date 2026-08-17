@@ -32,6 +32,7 @@ const LeftDetails = ({
             setActiveData={setActiveData}
             setDataList={setDataList}
             setToggleUpdate={setToggleUpdate}
+            selectedDate={selectedDate}
           />
         ) : (
           <Form

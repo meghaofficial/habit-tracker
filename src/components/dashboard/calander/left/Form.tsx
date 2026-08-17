@@ -6,7 +6,7 @@ import type { RootState } from "../../../../redux/store/store";
 import { useSelector } from "react-redux";
 import CircleLoader from "../../../loaders/CircleLoader";
 import { axiosPrivate } from "../../../../api/axios";
-import CustomButton, { CustomButtonForm } from "../../../shared/CutomButton";
+import { CustomButtonForm } from "../../../shared/CutomButton";
 
 type FormProps = {
   activeData: CalandarDataI;
@@ -34,6 +34,7 @@ const Form = ({
   const [activeStatus, setActiveStatus] = useState("");
 
   const handleCreate = async () => {
+    if (!formData?.title || !formData?.status) return;
     setCreateLoading(true);
     try {
       const res = await axiosPrivate.post("/api/calandar", {
@@ -101,21 +102,21 @@ const Form = ({
 
   useEffect(() => {
     if (activeData) {
-      setFormData(prev => ({ ...prev, title: activeData?.title, description: activeData?.description }));
+      setFormData((prev) => ({
+        ...prev,
+        title: activeData?.title,
+        description: activeData?.description,
+      }));
     }
   }, [activeData]);
-
-  console.log("formdata", formData);
-  console.log("activestatus", activeStatus)
 
   useEffect(() => {
     if (!activeData?.id) {
       setActiveStatus("default");
-    }
-    else {
+    } else {
       setActiveStatus(activeData?.status);
     }
-  }, [activeData?.id])
+  }, [activeData?.id]);
 
   return (
     <motion.div
@@ -127,7 +128,7 @@ const Form = ({
         <span className="px-3 py-1 text-[10px] font-bold tracking-widest uppercase rounded-full bg-linear-to-r from-blue-500/20 to-cyan-500/20 text-cyan-400 border border-blue-500/20">
           {activeData?.id ? "Edit Task" : "New Task"}
         </span>
-        <span className="text-xs font-semibold px-3 py-1 bg-white/5 rounded-full border border-white/10">
+        <span className="playfair-display">
           {formatTimestamp(selectedDate.toString()).split("|")[0]}
         </span>
       </div>
@@ -155,11 +156,12 @@ const Form = ({
                 }}
                 className={`flex items-center gap-2 px-2 py-1 rounded-xl text-[10px] transition-all duration-300 ${activeStatus === key ? "scale-105 shadow-lg ring-1 ring-white/20" : "hover:scale-105 hover:bg-white/5 opacity-70 hover:opacity-100"}`}
                 style={{
-                  backgroundColor: activeStatus === key
-                    ? theme === "dark"
-                      ? value.dbg
-                      : value.bg
-                    : "transparent",
+                  backgroundColor:
+                    activeStatus === key
+                      ? theme === "dark"
+                        ? value.dbg
+                        : value.bg
+                      : "transparent",
                   border: `1px solid ${activeStatus === key ? (theme === "dark" ? value.ddot : value.dot) : theme === "dark" ? "rgba(255,255,255,.1)" : "rgba(0,0,0,.1)"}`,
                 }}
               >
@@ -225,17 +227,19 @@ const Form = ({
 
       {/* Action Buttons */}
       <div className="flex items-center gap-3 pt-2">
-        <CustomButtonForm
-          styling="cursor-pointer"
-          onClick={() => setToggleUpdate(false)}
-          type="cancel"
-        >
-          <span className="text-[12px]">Cancel</span>
-        </CustomButtonForm>
+        {activeData?.id && (
+          <CustomButtonForm
+            styling="cursor-pointer"
+            onClick={() => setToggleUpdate(false)}
+            type="cancel"
+          >
+            <span className="text-[12px]">Cancel</span>
+          </CustomButtonForm>
+        )}
         <CustomButtonForm
           styling="cursor-pointer"
           onClick={activeData?.id ? handleUpdate : handleCreate}
-          disabled={activeData?.id ? updateLoading : createLoading}
+          disabled={updateLoading || createLoading || !formData.title}
           type="success"
         >
           {createLoading || updateLoading ? (

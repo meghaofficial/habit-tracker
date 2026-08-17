@@ -5,6 +5,7 @@ import { statusColors, type CalandarDataI } from "../../../../types";
 import Card from "../../../shared/Card";
 import { motion } from "framer-motion";
 import type { Dispatch, SetStateAction } from "react";
+import { useState } from "react";
 
 type CalandarChartProps = {
   currentViewDate: Date;
@@ -13,7 +14,6 @@ type CalandarChartProps = {
   setSelectedDate: Dispatch<SetStateAction<Date>>;
   setFormData: Dispatch<SetStateAction<CalandarDataI>>;
   setActiveData: Dispatch<SetStateAction<CalandarDataI>>;
-  setToggleUpdate: Dispatch<SetStateAction<boolean>>;
 };
 
 const CalandarChart = ({
@@ -23,13 +23,13 @@ const CalandarChart = ({
   setSelectedDate,
   setFormData,
   setActiveData,
-  setToggleUpdate,
 }: CalandarChartProps) => {
   const theme = useSelector((state: RootState) => state.theme).theme;
   const month = currentViewDate.getMonth();
   const year = currentViewDate.getFullYear();
   const totalDays = new Date(year, month + 1, 0).getDate();
   const firstDay = new Date(year, month, 1).getDay();
+    const [toggleUpdate, setToggleUpdate] = useState(false);
 
   const realToday = new Date();
   const isLookingAtCurrentMonth =
@@ -136,25 +136,9 @@ const CalandarChart = ({
                           ? "text-white"
                           : "text-white/40 group-hover:text-white group-hover:bg-white/10"
                     } transition-colors`}
-                    // style={{
-                    //   background: isToday
-                    //     ? ""
-                    //     : exists
-                    //       ? `color-mix(in srgb, ${statusColors[exists.status]?.dbg} 50%, transparent)`
-                    //       : isSelected
-                    //         ? ""
-                    //         : "transparent",
-                    // }}
                   >
                     {dayNumber}
                   </div>
-
-                  {/* {exists?.status !== "default" && (
-                    <span className="text-[8px]">
-                      {exists?.status?.slice(0, 1).toUpperCase()}
-                      {exists?.status?.slice(1)}
-                    </span>
-                  )} */}
                 </div>
 
                 {/* Day Content */}
@@ -162,7 +146,7 @@ const CalandarChart = ({
                   {exists?.id ? (
                     <>
                       <div
-                        className="text-[11px] font-bold h-13 overflow-y-auto hide-scrollbar"
+                        className="text-[10px] font-semibold h-13 overflow-y-auto hide-scrollbar"
                         style={{
                           color:
                             theme === "dark"
