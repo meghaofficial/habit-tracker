@@ -14,6 +14,8 @@ type FormProps = {
   setToggleUpdate: Dispatch<SetStateAction<boolean>>;
   selectedDate: Date;
   setDataList: Dispatch<SetStateAction<CalandarDataI[]>>;
+  formData: CalandarDataI;
+  setFormData: Dispatch<SetStateAction<CalandarDataI>>;
 };
 
 const Form = ({
@@ -22,13 +24,10 @@ const Form = ({
   setToggleUpdate,
   selectedDate,
   setDataList,
+  formData,
+  setFormData
 }: FormProps) => {
   const theme = useSelector((state: RootState) => state.theme).theme;
-  const [formData, setFormData] = useState<CalandarDataI>({
-    status: "",
-    title: "",
-    description: "",
-  });
   const [createLoading, setCreateLoading] = useState(false);
   const [updateLoading, setUpdateLoading] = useState(false);
   const [activeStatus, setActiveStatus] = useState("");

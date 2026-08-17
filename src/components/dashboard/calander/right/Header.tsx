@@ -48,7 +48,7 @@ const Header = ({
             >
               <MdKeyboardArrowLeft size={18} />
             </button>
-            <span className="w-16 text-center text-purple-100">{monthStr}</span>
+            <span className="w-fit text-center text-purple-100">{monthStr}</span>
             <button
               className="p-1.5 rounded-lg hover:bg-white/10 transition-colors active:scale-95"
               onClick={handleNextMonth}

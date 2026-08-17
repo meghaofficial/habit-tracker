@@ -65,8 +65,6 @@ export const CustomButtonForm = ({
     cancel: `${disabled ? "text-white/50" : "hover:bg-white/10 text-white"} bg-white/5 border border-white/10`
   }
 
-  console.log("disabled", disabled)
-
   return (
     <button
       onClick={onClick}

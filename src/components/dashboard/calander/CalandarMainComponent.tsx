@@ -10,6 +10,11 @@ const CalandarMainComponent = () => {
   const month = currentViewDate.getMonth();
   const year = currentViewDate.getFullYear();
   const [selectedDate, setSelectedDate] = useState<Date>(new Date());
+  const [formData, setFormData] = useState<CalandarDataI>({
+    status: "default",
+    title: "",
+    description: "",
+  });
   const [dataList, setDataList] = useState<CalandarDataI[]>([]);
   const [activeData, setActiveData] = useState<CalandarDataI>({
     id: "",
@@ -62,10 +67,13 @@ const CalandarMainComponent = () => {
         setActiveData={setActiveData}
         setDataList={setDataList}
         selectedDate={selectedDate}
+        formData={formData}
+        setFormData={setFormData}
       />
       <RightCalandar
         setCurrentViewDate={setCurrentViewDate}
         setSelectedDate={setSelectedDate}
+        setFormData={setFormData}
         currentViewDate={currentViewDate}
         selectedDate={selectedDate}
         dataList={dataList}

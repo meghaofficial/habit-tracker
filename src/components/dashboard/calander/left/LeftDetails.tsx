@@ -9,6 +9,8 @@ type LeftDetailsProps = {
   setActiveData: Dispatch<SetStateAction<CalandarDataI>>;
   setDataList: Dispatch<SetStateAction<CalandarDataI[]>>;
   selectedDate: Date;
+  formData: CalandarDataI;
+  setFormData: Dispatch<SetStateAction<CalandarDataI>>;
 };
 
 const LeftDetails = ({
@@ -16,6 +18,8 @@ const LeftDetails = ({
   setActiveData,
   setDataList,
   selectedDate,
+  formData,
+  setFormData
 }: LeftDetailsProps) => {
   const [toggleUpdate, setToggleUpdate] = useState(false);
 
@@ -41,6 +45,8 @@ const LeftDetails = ({
             setToggleUpdate={setToggleUpdate}
             selectedDate={selectedDate}
             setDataList={setDataList}
+            formData={formData}
+            setFormData={setFormData}
           />
         )}
       </div>

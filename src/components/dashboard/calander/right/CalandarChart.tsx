@@ -29,7 +29,6 @@ const CalandarChart = ({
   const year = currentViewDate.getFullYear();
   const totalDays = new Date(year, month + 1, 0).getDate();
   const firstDay = new Date(year, month, 1).getDay();
-    const [toggleUpdate, setToggleUpdate] = useState(false);
 
   const realToday = new Date();
   const isLookingAtCurrentMonth =
@@ -84,7 +83,7 @@ const CalandarChart = ({
                   isSelected
                     ? ""
                     : "bg-white/3 hover:bg-white/6 hover:border-white/20"
-                }`}
+                } ${isToday && 'shadow-[0_0_35px_rgba(99,102,241,0.35)]'}`}
                 onClick={() => {
                   setSelectedDate(new Date(year, month, dayNumber));
                   setFormData({
@@ -94,7 +93,6 @@ const CalandarChart = ({
                   });
                   if (exists?.id) {
                     setActiveData(exists);
-                    setToggleUpdate(false);
                   } else {
                     setActiveData({
                       id: "",
@@ -104,7 +102,6 @@ const CalandarChart = ({
                       description: "",
                       updatedAt: "",
                     });
-                    setToggleUpdate(false);
                   }
                 }}
                 style={{
@@ -114,10 +111,10 @@ const CalandarChart = ({
                       exists && !isSelected ?
                         `color-mix(in srgb, ${statusColors[exists.status]?.dbg} 50%, transparent)` :
                         !exists && isSelected ? "#fff" :
-                          "#ffffff1a"
+                          isToday ? "#6366f1" : "#ffffff1a"
                   }`,
                   background: isToday
-                    ? "#00000033"
+                    ? "#6366f133"
                     : exists
                       ? `color-mix(in srgb, ${statusColors[exists.status]?.dbg} 50%, transparent)`
                       : isSelected

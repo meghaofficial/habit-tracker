@@ -1,4 +1,4 @@
-import { useState, type Dispatch, type SetStateAction } from "react";
+import type { Dispatch, SetStateAction } from "react";
 import CalandarChart from "./CalandarChart";
 import Header from "./Header";
 import type { CalandarDataI } from "../../../../types";
@@ -6,6 +6,7 @@ import type { CalandarDataI } from "../../../../types";
 type RightCalandarProps = {
   setCurrentViewDate: Dispatch<SetStateAction<Date>>;
   setSelectedDate: Dispatch<SetStateAction<Date>>;
+  setFormData: Dispatch<SetStateAction<CalandarDataI>>;
   currentViewDate: Date;
   selectedDate: Date;
   dataList: CalandarDataI[];
@@ -15,64 +16,48 @@ type RightCalandarProps = {
 const RightCalandar = ({
   setCurrentViewDate,
   setSelectedDate,
+  setFormData,
   currentViewDate,
   selectedDate,
   dataList,
   setActiveData,
 }: RightCalandarProps) => {
 
-    const [formData, setFormData] = useState<CalandarDataI>({
-      status: "default",
-      title: "",
-      description: "",
+  const handleChangeDate = (addYearVal: number, addMonthVal: number) => {
+    setCurrentViewDate((prev) => {
+      const updated = new Date(prev.getFullYear() + addYearVal, prev.getMonth() + addMonthVal, 1);
+      setSelectedDate(updated);
+      return updated;
     });
-
-  const handlePrevYear = () => {
-    setCurrentViewDate(
-      (prev) => new Date(prev.getFullYear() - 1, prev.getMonth(), 1),
-    );
-    setSelectedDate(new Date());
     setFormData({
       status: "default",
       title: "",
       description: "",
     });
+    setActiveData({
+      id: "",
+      date: null,
+      status: "",
+      title: "",
+      description: "",
+      updatedAt: "",
+    });
+  }
+
+  const handlePrevYear = () => {
+    handleChangeDate(-1, 0);
   };
 
   const handleNextYear = () => {
-    setCurrentViewDate(
-      (prev) => new Date(prev.getFullYear() + 1, prev.getMonth(), 1),
-    );
-    setSelectedDate(new Date());
-    setFormData({
-      status: "default",
-      title: "",
-      description: "",
-    });
+    handleChangeDate(1, 0);
   };
 
   const handlePrevMonth = () => {
-    setCurrentViewDate(
-      (prev) => new Date(prev.getFullYear(), prev.getMonth() - 1, 1),
-    );
-    setSelectedDate(new Date());
-    setFormData({
-      status: "default",
-      title: "",
-      description: "",
-    });
+    handleChangeDate(0, -1);
   };
 
   const handleNextMonth = () => {
-    setCurrentViewDate(
-      (prev) => new Date(prev.getFullYear(), prev.getMonth() + 1, 1),
-    );
-    setSelectedDate(new Date());
-    setFormData({
-      status: "default",
-      title: "",
-      description: "",
-    });
+    handleChangeDate(0, 1);
   };
 
   return (
