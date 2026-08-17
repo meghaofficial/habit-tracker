@@ -26,7 +26,7 @@ const Header = ({
     <Card heading="" cardWidth="w-full">
       <div className="flex flex-col sm:flex-row items-center justify-between gap-4 p-1">
         <div className="flex items-center gap-3">
-          <div className="w-10 h-10 rounded-xl bg-linear-to-br from-purple-500/20 to-blue-500/20 flex items-center justify-center border border-purple-500/20">
+          <div className="w-8 h-8 flex items-center justify-center rounded-lg bg-indigo-500/20 border border-indigo-500/20 text-indigo-400">
             <FaCalendarDays />
           </div>
           <div>

@@ -11,7 +11,6 @@ const CalandarMainComponent = () => {
   const year = currentViewDate.getFullYear();
   const [selectedDate, setSelectedDate] = useState<Date>(new Date());
   const [toggleUpdate, setToggleUpdate] = useState(false);
-  const [openForm, setOpenForm] = useState(false);
 
   // I will send the date, year and month, it will going to tell me the list of notes.
   const [formData, setFormData] = useState<CalandarDataI>({
