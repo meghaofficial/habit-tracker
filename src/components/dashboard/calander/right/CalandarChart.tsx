@@ -5,7 +5,6 @@ import { statusColors, type CalandarDataI } from "../../../../types";
 import Card from "../../../shared/Card";
 import { motion } from "framer-motion";
 import type { Dispatch, SetStateAction } from "react";
-import { useState } from "react";
 
 type CalandarChartProps = {
   currentViewDate: Date;
