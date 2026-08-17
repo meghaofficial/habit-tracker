@@ -1,11 +1,12 @@
 import { motion } from "framer-motion";
 import { formatTimestamp, notify } from "../../../../helper";
 import { statusColors, type CalandarDataI } from "../../../../types";
-import { useState, type Dispatch, type SetStateAction } from "react";
+import { useEffect, useState, type Dispatch, type SetStateAction } from "react";
 import type { RootState } from "../../../../redux/store/store";
 import { useSelector } from "react-redux";
 import CircleLoader from "../../../loaders/CircleLoader";
 import { axiosPrivate } from "../../../../api/axios";
+import CustomButton, { CustomButtonForm } from "../../../shared/CutomButton";
 
 type FormProps = {
   activeData: CalandarDataI;
@@ -24,13 +25,13 @@ const Form = ({
 }: FormProps) => {
   const theme = useSelector((state: RootState) => state.theme).theme;
   const [formData, setFormData] = useState<CalandarDataI>({
-    status: "default",
+    status: "",
     title: "",
     description: "",
   });
   const [createLoading, setCreateLoading] = useState(false);
   const [updateLoading, setUpdateLoading] = useState(false);
-  const [activeStatus, setActiveStatus] = useState("default");
+  const [activeStatus, setActiveStatus] = useState("");
 
   const handleCreate = async () => {
     setCreateLoading(true);
@@ -49,7 +50,7 @@ const Form = ({
         setDataList((prev) => [...prev, newTask]);
         setActiveData(newTask);
         setFormData({
-          status: "default",
+          status: "",
           title: "",
           description: "",
         });
@@ -98,11 +99,26 @@ const Form = ({
     }
   };
 
+  useEffect(() => {
+    if (activeData) {
+      setFormData(activeData);
+    }
+  }, []);
+
+  useEffect(() => {
+    if (!activeData?.id) {
+      setActiveStatus("default");
+    }
+    else {
+      setActiveStatus(activeData?.status)
+    }
+  }, [activeData?.id])
+
   return (
     <motion.div
       initial={{ opacity: 0, x: -10 }}
       animate={{ opacity: 1, x: 0 }}
-      className="flex flex-col space-y-6"
+      className="flex flex-col space-y-3"
     >
       <div className="flex items-center justify-between mb-2">
         <span className="px-3 py-1 text-[10px] font-bold tracking-widest uppercase rounded-full bg-linear-to-r from-blue-500/20 to-cyan-500/20 text-cyan-400 border border-blue-500/20">
@@ -114,7 +130,7 @@ const Form = ({
       </div>
 
       {/* Status Selection */}
-      <div className="space-y-3">
+      <div className="space-y-3 mt-3">
         <p className="text-[11px] font-bold opacity-60 tracking-wider uppercase">
           Select Status
         </p>
@@ -135,24 +151,21 @@ const Form = ({
                     );
                   } else {
                     setActiveStatus(key);
-                    setFormData((prev) => ({ ...prev, status: key }));
                   }
+                  setFormData((prev) => ({ ...prev, status: key }));
                 }}
-                className={`flex items-center gap-2 px-4 py-2 rounded-xl text-[12px] font-semibold transition-all duration-300 ${selected ? "scale-105 shadow-lg ring-1 ring-white/20" : "hover:scale-105 hover:bg-white/5 opacity-70 hover:opacity-100"}`}
+                className={`flex items-center gap-2 px-2 py-1 rounded-xl text-[10px] transition-all duration-300 ${activeStatus === key ? "scale-105 shadow-lg ring-1 ring-white/20" : "hover:scale-105 hover:bg-white/5 opacity-70 hover:opacity-100"}`}
                 style={{
-                  backgroundColor: selected
+                  backgroundColor: activeStatus === key
                     ? theme === "dark"
                       ? value.dbg
                       : value.bg
                     : "transparent",
-                  border: `1px solid ${selected ? (theme === "dark" ? value.ddot : value.dot) : theme === "dark" ? "rgba(255,255,255,.1)" : "rgba(0,0,0,.1)"}`,
-                  boxShadow: selected
-                    ? `0 4px 12px ${theme === "dark" ? value.ddot + "40" : value.dot + "30"}`
-                    : "none",
+                  border: `1px solid ${activeStatus === key ? (theme === "dark" ? value.ddot : value.dot) : theme === "dark" ? "rgba(255,255,255,.1)" : "rgba(0,0,0,.1)"}`,
                 }}
               >
                 <div
-                  className={`h-2.5 w-2.5 rounded-full ${selected ? "animate-pulse" : ""}`}
+                  className={`h-2.5 w-2.5 rounded-full ${activeStatus === key ? "animate-pulse" : ""}`}
                   style={{
                     backgroundColor: theme === "dark" ? value.ddot : value.dot,
                   }}
@@ -169,7 +182,7 @@ const Form = ({
         <label className="text-[11px] font-bold opacity-60 tracking-wider uppercase">
           Title
         </label>
-        <div className="relative group">
+        <div className="relative group mt-1.5">
           <input
             type="text"
             placeholder={
@@ -177,7 +190,7 @@ const Form = ({
                 ? activeData?.title
                 : "What do you want to accomplish?"
             }
-            className="w-full rounded-2xl bg-white/5 border border-white/10 px-4 py-3.5 text-sm outline-none transition-all duration-300 focus:bg-white/10 focus:border-purple-500/50 focus:ring-4 focus:ring-purple-500/10 placeholder:text-gray-500"
+            className="w-full rounded-xl bg-white/5 border border-white/10 px-3 py-2 text-[12px] outline-none transition-all duration-300 focus:bg-white/10 focus:border-purple-500/50 focus:ring-4 focus:ring-purple-500/10 placeholder:text-gray-500"
             value={formData.title}
             onChange={(e) =>
               setFormData((prev) => ({
@@ -200,7 +213,7 @@ const Form = ({
               ? activeData?.description
               : "Add some details about this task..."
           }
-          className="h-40 resize-none w-full rounded-2xl bg-white/5 border border-white/10 px-4 py-3.5 text-sm outline-none transition-all duration-300 focus:bg-white/10 focus:border-purple-500/50 focus:ring-4 focus:ring-purple-500/10 placeholder:text-gray-500"
+          className="mt-1.5 h-40 resize-none w-full rounded-xl bg-white/5 border border-white/10 px-3 py-2 text-[12px] outline-none transition-all duration-300 focus:bg-white/10 focus:border-purple-500/50 focus:ring-4 focus:ring-purple-500/10 placeholder:text-gray-500"
           value={formData.description}
           onChange={(e) =>
             setFormData((prev) => ({
@@ -213,31 +226,27 @@ const Form = ({
 
       {/* Action Buttons */}
       <div className="flex items-center gap-3 pt-2">
-        {activeData?.id && (
-          <button
-            disabled={createLoading}
-            className="flex-1 px-6 py-3.5 text-sm bg-white/5 hover:bg-white/10 border border-white/10 text-white rounded-2xl font-bold transition-all active:scale-95"
-            onClick={() => setToggleUpdate(false)}
-          >
-            Cancel
-          </button>
-        )}
-        <button
-          disabled={activeData?.id ? updateLoading : createLoading}
-          className="flex-2 px-6 py-3.5 text-sm bg-linear-to-r from-purple-600 to-indigo-600 hover:from-purple-500 hover:to-indigo-500 text-white rounded-2xl font-bold shadow-lg shadow-purple-500/25 transition-all active:scale-95 flex items-center justify-center gap-2 border border-purple-500/50"
+        <CustomButtonForm
+          styling="cursor-pointer"
+          onClick={() => setToggleUpdate(false)}
+          type="cancel"
+        >
+          <span className="text-[12px]">Cancel</span>
+        </CustomButtonForm>
+        <CustomButtonForm
+          styling="cursor-pointer"
           onClick={activeData?.id ? handleUpdate : handleCreate}
+          disabled={activeData?.id ? updateLoading : createLoading}
+          type="success"
         >
           {createLoading || updateLoading ? (
             <CircleLoader />
           ) : (
-            <>
-              <span>{activeData?.id ? "Save Changes" : "Create Task"}</span>
-              {!activeData?.id && (
-                <span className="text-lg leading-none">+</span>
-              )}
-            </>
+            <span className="text-[12px]">
+              {activeData?.id ? "Save Changes" : "Create"}
+            </span>
           )}
-        </button>
+        </CustomButtonForm>
       </div>
     </motion.div>
   );

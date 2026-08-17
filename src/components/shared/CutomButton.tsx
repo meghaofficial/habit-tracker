@@ -70,7 +70,7 @@ export const CustomButtonForm = ({
       onClick={onClick}
       disabled={disabled}
       title={title}
-      className={`w-full rounded-2xl text-[${textSize}] py-3 font-semibold transition-all duration-300 ${colorStyling[type]} ${styling}`}
+      className={`w-full rounded-xl text-[${textSize}] py-2 font-semibold transition-all duration-300 ${colorStyling[type]} ${styling}`}
     >
       {children}
     </button>
