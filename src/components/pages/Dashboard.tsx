@@ -6,18 +6,15 @@ import { axiosPrivate } from "../../api/axios";
 import CircleLoader from "../loaders/CircleLoader";
 import Popup from "../shared/Popup";
 import PageLoader from "../loaders/PageLoader";
-import type {
-  DashboardI,
-  DateLogI,
-  PlanI,
-  SubscriptionI,
-} from "../../types";
+import type { DashboardI, DateLogI, PlanI, SubscriptionI } from "../../types";
 import { CustomButtonForm } from "../shared/CutomButton";
 import NavigationBar from "../shared/NavigationBar";
 import { useIsMobile } from "../hooks/mobileHook";
-import Calendar from "../dashboard/calander/Calendar";
 import HistoryMainComponent from "../dashboard/history/HistoryMainComponent";
 import Fallback from "../shared/Fallback";
+import { LuSparkles } from "react-icons/lu";
+import AiCoachMainComponent from "../ai/AiCoachMainComponent";
+import CalandarMainComponent from "../dashboard/calander/CalandarMainComponent"
 
 const MASTER_MENU = [
   { key: "track", label: "Monthly Habit" },
@@ -345,6 +342,13 @@ const Dashboard = () => {
                       {tab.label}
                     </button>
                   ))}
+                  <button
+                    onClick={() => setActiveTab("aiCoach")}
+                    className={`rounded-xl w-full flex items-center gap-2 text-nowrap sm:px-5 px-3 py-2.5 text-sm font-medium transition-all duration-300 ${activeTab === "aiCoach" ? "bg-darkPrimary light:bg-lightPrimary text-white shadow-lg" : "text-gray-400 hover:text-white light:hover:text-black hover:bg-white/5"}`}
+                  >
+                    <span>Ai Coach</span>
+                    <LuSparkles />
+                  </button>
                 </div>
               </div>
 
@@ -357,12 +361,11 @@ const Dashboard = () => {
                 />
               )}
               {activeTab === "analysis" && (
-                <AnalysisMainComponent
-                  monthDashID={dashboardData?._id}
-                />
+                <AnalysisMainComponent monthDashID={dashboardData?._id} />
               )}
-              {activeTab === "calandar" && <Calendar />}
+              {activeTab === "calandar" && <CalandarMainComponent />}
               {activeTab === "history" && <HistoryMainComponent />}
+              {activeTab === "aiCoach" && <AiCoachMainComponent />}
             </>
           )}
         </div>

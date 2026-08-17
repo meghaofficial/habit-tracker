@@ -4,17 +4,19 @@ import { statusColors, type CalandarDataI } from "../../../types";
 import type { RootState } from "../../../redux/store/store";
 import { useSelector } from "react-redux";
 import Card from "../../shared/Card";
-import {
-  MdKeyboardArrowLeft,
-  MdKeyboardArrowRight,
-  MdDelete,
-  MdEdit,
-  MdKeyboardDoubleArrowLeft,
-} from "react-icons/md";
+import { MdKeyboardArrowLeft, MdKeyboardArrowRight } from "react-icons/md";
 import { formatTimestamp, notify } from "../../../helper";
 import { axiosPrivate } from "../../../api/axios";
 import CircleLoader from "../../loaders/CircleLoader";
 import { motion } from "framer-motion";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import {
+  createCalendarDateData,
+  getCalendarDateData,
+  updateCalendarDateData,
+  deleteCalendarDateData,
+} from "../../../api/calandar.api";
+import { MdDelete, MdEdit, MdKeyboardDoubleArrowLeft } from "react-icons/md";
 
 const Calendar = () => {
   const theme = useSelector((state: RootState) => state.theme).theme;
@@ -29,26 +31,23 @@ const Calendar = () => {
   const firstDay = new Date(year, month, 1).getDay();
   const [activeStatus, setActiveStatus] = useState("default");
   const [selectedDate, setSelectedDate] = useState<Date>(new Date());
-  const [createLoading, setCreateLoading] = useState(false);
   const [toggleUpdate, setToggleUpdate] = useState(false);
-  const [updateLoading, setUpdateLoading] = useState(false);
-  const [deleteLoading, setDeleteLoading] = useState(false);
+  const queryClient = useQueryClient();
   const [openForm, setOpenForm] = useState(false);
-
-  // I will send the date, year and month, it will going to tell me the list of notes.
-  const [formData, setFormData] = useState<CalandarDataI>({
-    status: "default",
-    title: "",
-    description: "",
-  });
-  const [dataResList, setDataResList] = useState<CalandarDataI[]>([]);
-  const [activeDataList, setActiveDataList] = useState<CalandarDataI>({
+  const [activeData, setActiveData] = useState<CalandarDataI>({
     id: "",
     date: null,
     status: "",
     title: "",
     description: "",
     updatedAt: "",
+  });
+
+  // I will send the date, year and month, it will going to tell me the list of notes.
+  const [formData, setFormData] = useState<CalandarDataI>({
+    status: "default",
+    title: "",
+    description: "",
   });
 
   const isLookingAtCurrentMonth =
@@ -105,134 +104,128 @@ const Calendar = () => {
     });
   };
 
-  const handleCreate = async () => {
-    setCreateLoading(true);
-    try {
-      const res = await axiosPrivate.post("/api/calandar", {
-        day: Number(selectedDate.getDate()),
-        month: selectedDate.getMonth(),
-        year: selectedDate.getFullYear(),
-        status: formData.status,
-        title: formData.title,
-        description: formData.description,
-      });
+  // Queries
+  const { data: calendarData, isPending: calendarLoading } = useQuery({
+    queryKey: ["calendar", month, year],
+    queryFn: () => getCalendarDateData({ month, year }),
+  });
 
-      if (res?.data?.success) {
-        const newTask = res.data.data;
-        setDataResList((prev) => [...prev, newTask]);
-        setActiveDataList(newTask);
+  // Mutations
+  const createCalendarMutation = useMutation({
+    mutationFn: createCalendarDateData,
+
+    onSuccess: (data) => {
+      if (data?.success) {
+        const newTask = data.data;
         setFormData({
           status: "default",
           title: "",
           description: "",
         });
-        return notify.success("Successfully Added");
+        notify.success("Successfully Added");
       }
-    } catch (error) {
-      console.error(error);
-      if ((error as any).response?.status === 409) {
-        notify.error((error as any).response.data.message);
+    },
+
+    onError: (error: any) => {
+      if (error?.response?.status === 409) {
+        notify.error(error.response.data.message);
       } else {
         notify.error("Something went wrong");
       }
-    } finally {
-      setCreateLoading(false);
-    }
-  };
-  const handleGetRes = async () => {
-    // setCreateLoading(true);
-    try {
-      const res = await axiosPrivate.get(
-        `/api/calandar?month=${month}&year=${year}`,
-      );
+    },
+  });
 
-      if (res?.data?.success) {
-        const data = res?.data?.data;
-        setDataResList(data);
-        const initialState = data.find((r: CalandarDataI) =>
-          r.date
-            ? new Date(r.date).getDate() === new Date()?.getDate()
-            : {
-                id: "",
-                date: null,
-                status: "",
-                title: "",
-                description: "",
-                updatedAt: "",
-              },
-        );
-        setActiveDataList(initialState);
-      }
-    } catch (error) {
-      console.error(error);
-    } finally {
-      // setCreateLoading(false);
-    }
-  };
-  const handleUpdate = async () => {
-    setUpdateLoading(true);
-    try {
-      const res = await axiosPrivate.patch("/api/calandar", {
-        id: activeDataList?.id,
-        status: formData.status,
-        title: formData.title,
-        description: formData.description,
-      });
+  const updateCalendarMutation = useMutation({
+    mutationFn: updateCalendarDateData,
 
-      if (res?.data?.success) {
-        const updatedTask = res.data.data;
-        setDataResList((prev) =>
-          prev.map((item) => (item.id === updatedTask.id ? updatedTask : item)),
+    onSuccess: (data) => {
+      if (data?.success) {
+        const updatedTask = data.data;
+        queryClient.setQueryData(
+          ["calendar", month, year],
+          (oldData: CalandarDataI[] = []) =>
+            oldData.map((item) =>
+              item.id === updatedTask.id ? updatedTask : item,
+            ),
         );
-        setActiveDataList(updatedTask);
         setToggleUpdate(false);
-        return notify.success("Successfully Updated");
+        notify.success("Successfully Updated");
       }
-    } catch (error) {
-      console.error(error);
-      if ((error as any).response?.status === 409) {
-        notify.error((error as any).response.data.message);
+    },
+
+    onError: (error: any) => {
+      if (error?.response?.status === 409) {
+        notify.error(error.response.data.message);
       } else {
         notify.error("Something went wrong");
       }
-    } finally {
-      setUpdateLoading(false);
-    }
-  };
+    },
+  });
 
-  const handleDelete = async () => {
-    if (!window.confirm("Are you sure you want to delete this task?")) return;
-    setDeleteLoading(true);
-    try {
-      const res = await axiosPrivate.delete("/api/calandar", {
-        data: { id: activeDataList?.id },
-      });
+  const deleteCalendarMutation = useMutation({
+    mutationFn: deleteCalendarDateData,
 
-      if (res?.data?.success) {
-        setDataResList((prev) =>
-          prev.filter((item) => item.id !== activeDataList.id),
+    onSuccess: (data) => {
+      if (data?.success) {
+        queryClient.setQueryData(
+          ["calendar", month, year],
+          (oldData: CalandarDataI[] = []) =>
+            oldData.filter((item) => item.id !== activeDataList?.id),
         );
-        setActiveDataList({
-          id: "",
-          date: null,
-          status: "",
-          title: "",
-          description: "",
-          updatedAt: "",
-        });
-        return notify.success("Successfully Deleted");
+        notify.success("Successfully Deleted");
       }
-    } catch (error) {
+    },
+
+    onError: (error: any) => {
       console.error(error);
       notify.error("Something went wrong");
-    } finally {
-      setDeleteLoading(false);
-    }
+    },
+  });
+
+  // Handler functions
+  const handleCreate = async () => {
+    createCalendarMutation.mutate({
+      day: Number(selectedDate.getDate()),
+      month: selectedDate.getMonth(),
+      year: selectedDate.getFullYear(),
+      status: formData.status,
+      title: formData.title,
+      description: formData.description,
+    });
   };
 
-  useEffect(() => {
-    handleGetRes();
-  }, []);
+  // Getting data
+  const dataResList = calendarData?.success ? calendarData.data : [];
+
+  const activeDataList = dataResList.find((r: CalandarDataI) =>
+    r.date ? new Date(r.date).getDate() === new Date().getDate() : false,
+  ) || {
+    id: "",
+    date: null,
+    status: "",
+    title: "",
+    description: "",
+    updatedAt: "",
+  };
+
+  const handleUpdate = () => {
+    if (!activeDataList?.id) return;
+
+    updateCalendarMutation.mutate({
+      id: activeDataList.id,
+      status: formData.status,
+      title: formData.title,
+      description: formData.description,
+    });
+  };
+
+  const handleDelete = () => {
+    if (!window.confirm("Are you sure you want to delete this task?")) {
+      return;
+    }
+    if (!activeDataList?.id) return;
+    deleteCalendarMutation.mutate(activeDataList.id);
+  };
 
   return (
     <div className="flex flex-col lg:flex-row items-start mt-4 mb-3 gap-4 w-full">
@@ -253,16 +246,20 @@ const Calendar = () => {
               <div className="border-b border-white/10 light:border-black/10 pb-4">
                 <div className="flex items-center justify-between mb-2">
                   <span className="px-3 py-1 text-[10px] font-bold tracking-widest uppercase rounded-full bg-linear-to-r from-purple-500/20 to-pink-500/20 text-purple-400 border border-purple-500/20">
-                    Note
+                    Task Details
                   </span>
                   <div className="flex items-center gap-2">
                     <button
                       className="flex items-center justify-center rounded-xl p-2 text-red-400 hover:text-red-300 transition-all hover:scale-105 active:scale-95 bg-red-500/10 hover:bg-red-500/20 border border-red-500/10"
                       onClick={handleDelete}
-                      disabled={deleteLoading}
+                      disabled={deleteCalendarMutation.isPending}
                       title="Delete Task"
                     >
-                      {deleteLoading ? <CircleLoader /> : <MdDelete />}
+                      {deleteCalendarMutation.isPending ? (
+                        <CircleLoader />
+                      ) : (
+                        <MdDelete />
+                      )}
                     </button>
                     <button
                       className="flex items-center gap-2 rounded-xl p-2 transition-all hover:scale-105 active:scale-105 bg-white/5 hover:bg-white/10 border border-white/10"
@@ -282,8 +279,50 @@ const Calendar = () => {
                   <h2 className="text-2xl font-bold mt-2 bg-linear-to-r from-white to-white/60 bg-clip-text text-transparent">
                     {activeDataList.title}
                   </h2>
-                  {activeDataList.status !== "default" && (
+                  {/* status */}
+                  <div
+                    className="flex items-center gap-2 px-3 py-1.5 rounded-full shadow-lg"
+                    style={{
+                      background:
+                        theme === "dark"
+                          ? statusColors[activeDataList.status]?.dbg
+                          : statusColors[activeDataList.status]?.bg,
+                      border: `1px solid ${theme === "dark" ? statusColors[activeDataList.status]?.ddot : statusColors[activeDataList.status]?.dot}40`,
+                    }}
+                  >
                     <div
+                      className="h-2 w-2 rounded-full shadow-sm animate-pulse"
+                      style={{
+                        background:
+                          theme === "dark"
+                            ? statusColors[activeDataList.status]?.ddot
+                            : statusColors[activeDataList.status]?.dot,
+                      }}
+                    />
+                    <span
+                      className="text-[11px] font-bold tracking-wide capitalize"
+                      style={{
+                        color:
+                          theme === "dark"
+                            ? statusColors[activeDataList.status]?.ddot
+                            : statusColors[activeDataList.status]?.dot,
+                      }}
+                    >
+                      {activeDataList.status}
+                    </span>
+                  </div>
+                </div>
+              </div>
+
+              {/* Body */}
+              <div className="space-y-6 py-6 grow">
+                {/* Status */}
+                <div className="group">
+                  <div className="flex items-center justify-between">
+                    <p className="text-[11px] opacity-50 uppercase tracking-wider font-semibold group-hover:opacity-80 transition-opacity">
+                      Status
+                    </p>
+                    {/* <div
                       className="flex items-center gap-2 px-3 py-1.5 rounded-full shadow-lg"
                       style={{
                         background:
@@ -313,16 +352,14 @@ const Calendar = () => {
                       >
                         {activeDataList.status}
                       </span>
-                    </div>
-                  )}
+                    </div> */}
+                  </div>
                 </div>
-              </div>
 
-              {/* Body */}
-              <div className="space-y-6 py-6 grow">
+                {/* Description */}
                 <div className="group bg-white/2 rounded-2xl p-4 border border-white/5 transition-all hover:bg-white/4">
                   <p className="text-[11px] opacity-50 uppercase tracking-wider font-semibold mb-3 group-hover:opacity-80 transition-opacity">
-                    What happened?
+                    Description
                   </p>
                   <p className="text-sm leading-relaxed opacity-90 whitespace-pre-wrap font-medium">
                     {activeDataList.description}
@@ -374,9 +411,9 @@ const Calendar = () => {
                         key={index}
                         onClick={() => {
                           if (activeDataList?.id) {
-                            setActiveDataList((prev) =>
-                              prev ? { ...prev, status: key } : prev,
-                            );
+                            // setActiveDataList((prev) =>
+                            //   prev ? { ...prev, status: key } : prev,
+                            // );
                           } else {
                             setActiveStatus(key);
                             setFormData((prev) => ({ ...prev, status: key }));
@@ -460,7 +497,7 @@ const Calendar = () => {
               <div className="flex items-center gap-3 pt-2">
                 {activeDataList?.id && (
                   <button
-                    disabled={createLoading}
+                    disabled={createCalendarMutation.isPending}
                     className="flex-1 px-6 py-3.5 text-sm bg-white/5 hover:bg-white/10 border border-white/10 text-white rounded-2xl font-bold transition-all active:scale-95"
                     onClick={() => setToggleUpdate(false)}
                   >
@@ -468,11 +505,16 @@ const Calendar = () => {
                   </button>
                 )}
                 <button
-                  disabled={activeDataList?.id ? updateLoading : createLoading}
+                  disabled={
+                    activeDataList?.id
+                      ? updateCalendarMutation.isPending
+                      : createCalendarMutation.isPending
+                  }
                   className="flex-2 px-6 py-3.5 text-sm bg-linear-to-r from-purple-600 to-indigo-600 hover:from-purple-500 hover:to-indigo-500 text-white rounded-2xl font-bold shadow-lg shadow-purple-500/25 transition-all active:scale-95 flex items-center justify-center gap-2 border border-purple-500/50"
                   onClick={activeDataList?.id ? handleUpdate : handleCreate}
                 >
-                  {createLoading || updateLoading ? (
+                  {createCalendarMutation.isPending ||
+                  updateCalendarMutation.isPending ? (
                     <CircleLoader />
                   ) : (
                     <>
@@ -492,7 +534,9 @@ const Calendar = () => {
       </Card>
 
       {/* Right */}
-      <div className="w-full lg:w-[72%] flex flex-col gap-4">
+      <div
+        className={`w-full ${openForm ? "lg:w-[72%]" : "w-full"} flex flex-col gap-4`}
+      >
         {/* Timeline Header */}
         <Card heading="" cardWidth="w-full">
           <div className="flex flex-col sm:flex-row items-center justify-between gap-4 p-1">
@@ -583,7 +627,7 @@ const Calendar = () => {
                   return (
                     <div
                       key={index}
-                      className="h-14 lg:h-28 rounded-2xl bg-white/[0.01] border border-white/[0.02]"
+                      className="h-14 lg:h-28 rounded-2xl bg-white/1 border border-white/2"
                     ></div>
                   );
                 }
@@ -592,12 +636,13 @@ const Calendar = () => {
                   <motion.div
                     key={index}
                     whileHover={{ y: -4, scale: 1.02 }}
-                    className={`group overflow-hidden relative h-14 lg:h-28 rounded-2xl cursor-pointer transition-all duration-300 flex flex-col ${
+                    className={`group overflow-hidden relative h-14 lg:h-30 rounded-2xl cursor-pointer transition-all duration-300 flex flex-col ${
                       isSelected
                         ? "bg-purple-500/10 border-2 border-purple-500 shadow-[0_0_20px_rgba(168,85,247,0.2)]"
-                        : "bg-white/[0.03] border border-white/10 hover:bg-white/[0.06] hover:border-white/20"
+                        : "bg-white/3 border border-white/10 hover:bg-white/6 hover:border-white/20"
                     }`}
                     onClick={() => {
+                      setOpenForm(true);
                       setSelectedDate(new Date(year, month, dayNumber));
                       setFormData({
                         status: "default",
@@ -605,25 +650,25 @@ const Calendar = () => {
                         description: "",
                       });
                       if (exists?.id) {
-                        setActiveDataList(exists);
+                        setActiveData(exists);
                         setToggleUpdate(false);
                       } else {
-                        setActiveDataList({
-                          id: "",
-                          date: null,
-                          status: "",
-                          title: "",
-                          description: "",
-                          updatedAt: "",
-                        });
+                        // setActiveDataList({
+                        //   id: "",
+                        //   date: null,
+                        //   status: "",
+                        //   title: "",
+                        //   description: "",
+                        //   updatedAt: "",
+                        // });
                         setToggleUpdate(false);
                       }
                     }}
                   >
                     {/* Day Header */}
-                    <div className="flex items-center justify-between px-3 py-2 bg-black/20 border-b border-white/5">
+                    <div className="flex items-center justify-between px-2 py-1.5 bg-black/20 border-b border-white/5">
                       <div
-                        className={`flex items-center justify-center w-7 h-7 rounded-full text-xs font-bold ${
+                        className={`flex items-center justify-center w-6 h-6 rounded-full text-xs font-bold ${
                           isToday
                             ? "bg-linear-to-br from-purple-500 to-indigo-600 text-white shadow-lg shadow-purple-500/30"
                             : isSelected
@@ -653,7 +698,7 @@ const Calendar = () => {
                       {exists?.id ? (
                         <>
                           <div
-                            className="text-[11px] font-bold truncate px-1.5 py-0.5 rounded border"
+                            className="text-[11px] font-bold truncate px-1.5 py-0.5 pb-2 flex items-start rounded border"
                             style={{
                               color:
                                 theme === "dark"
@@ -663,7 +708,9 @@ const Calendar = () => {
                               borderColor: `${theme === "dark" ? statusColors[exists.status]?.ddot : statusColors[exists.status]?.dot}30`,
                             }}
                           >
-                            {exists.title}
+                            {exists.title.length < 10
+                              ? `${exists.title}...`
+                              : exists.title}
                           </div>
                           <p className="text-[10px] sm:block hidden text-gray-400 line-clamp-2 px-1 mt-0.5 leading-tight group-hover:text-gray-300 transition-colors">
                             {exists.description}

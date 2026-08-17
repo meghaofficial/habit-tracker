@@ -220,3 +220,12 @@ export interface TopLevelAnalysisI {
   mostConsistentHabits: string[];
   leastConsistentHabits: string[];
 }
+
+export interface CalandarDateDataI {
+  day: number;
+  month: number;
+  year: number;
+  status: string;
+  title: string;
+  description: string;
+}
