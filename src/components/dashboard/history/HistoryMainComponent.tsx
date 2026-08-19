@@ -52,8 +52,23 @@ const HistoryMainComponent = ({ monthDashID }: { monthDashID: string }) => {
     }
   }, [selectedMonthId, monthsData]);
 
-  return (
-    <div className="flex flex-col lg:flex-row items-start mt-4 mb-6 gap-6 w-full text-white">
+  return loading ? (
+    <div className="flex flex-col lg:flex-row items-start mt-4 mb-6 gap-4 w-full text-white">
+      <div className="w-full lg:w-[28%] flex flex-col gap-4">
+        <div className="h-70 animate-pulse bg-white/5 rounded-2xl"></div>
+        <div className="h-120 animate-pulse bg-white/5 rounded-2xl"></div>
+      </div>
+      <div className="w-full lg:w-[72%] flex flex-col gap-4">
+        <div className="h-25 animate-pulse bg-white/5 rounded-2xl"></div>
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <div className="h-65 animate-pulse bg-white/5 rounded-2xl"></div>
+          <div className="h-65 animate-pulse bg-white/5 rounded-2xl"></div>
+        </div>
+        <div className="h-70 animate-pulse bg-white/5 rounded-2xl"></div>
+      </div>
+    </div>
+  ) : (
+    <div className="flex flex-col lg:flex-row items-start mt-4 mb-6 gap-4 w-full text-white">
       {/* Left Sidebar: Month & Selector */}
       <div className="w-full lg:w-[28%] flex flex-col gap-4">
         <PastMonthsData
