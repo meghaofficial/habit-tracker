@@ -364,7 +364,7 @@ const Dashboard = () => {
                 <AnalysisMainComponent monthDashID={dashboardData?._id} />
               )}
               {activeTab === "calandar" && <CalandarMainComponent />}
-              {activeTab === "history" && <HistoryMainComponent />}
+              {activeTab === "history" && <HistoryMainComponent monthDashID={dashboardData?._id} />}
               {activeTab === "aiCoach" && <AiCoachMainComponent />}
             </>
           )}

@@ -104,8 +104,11 @@ export interface DashboardI {
   userID: string;
   month: number;
   year: number;
+  totalTasks: number;
   totalDays: number;
+  totalCount: number;
   firstDay: number;
+  progress?: string;
 }
 
 export interface TaskI {

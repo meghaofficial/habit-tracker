@@ -14,6 +14,11 @@ import {
   FiBarChart2,
 } from "react-icons/fi";
 import { axiosPrivate } from "../../../api/axios";
+import PastMonthsData from "./PastMonthsData";
+import PerformanceSummary from "./PerformanceSummary";
+import type { DashboardI } from "../../../types";
+import MonthlyTargets from "./MonthlyTargets";
+import MonthlyNote from "./MonthlyNote";
 
 interface PastHabit {
   id: string;
@@ -262,8 +267,60 @@ const mockHistoryData: PastMonthData[] = [
   },
 ];
 
-const HistoryMainComponent = () => {
-  const [selectedMonthId, setSelectedMonthId] = useState(mockHistoryData[0].id);
+const HistoryMainComponent = ({ monthDashID } : { monthDashID: string }) => {
+
+  const [monthsData, setMonthsData] = useState<DashboardI[]>([]); 
+  const [selectedMonthId, setSelectedMonthId] = useState<string>(monthDashID);
+  const [selectedMonth, setSelectedMonth] = useState<DashboardI>({
+      _id: "",
+  userID: "",
+  month: 0,
+  year: 0,
+  totalCount: 0,
+  totalTasks: 0,
+  totalDays: 0,
+  firstDay: 0,
+  progress: "0"
+  });
+
+  const [loading, setLoading] = useState(false);
+
+  const getPastMonthsData = async () => {
+    setLoading(true);
+    try {
+      const res = await axiosPrivate.get(`/api/past-months-data`);
+      if (res?.data?.success) {
+        setMonthsData(res?.data?.data);
+      }
+    } catch (error) {
+      console.error(error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    getPastMonthsData();
+  }, []);
+
+  useEffect(() => {
+    const activeData = monthsData.find(d => d._id === selectedMonthId);
+    if (activeData) {
+      setSelectedMonth(activeData);
+    }
+  }, [selectedMonthId]);
+
+
+
+
+
+
+
+
+
+
+
+
 
   const selectedData =
     mockHistoryData.find((data) => data.id === selectedMonthId) ||
@@ -295,14 +352,6 @@ const HistoryMainComponent = () => {
       });
     }
   }
-
-  // Radial progress constants
-  const radius = 60;
-  const stroke = 12;
-  const normalizedRadius = radius - stroke * 2;
-  const circumference = normalizedRadius * 2 * Math.PI;
-  const strokeDashoffset =
-    circumference - (selectedData.overallProgress / 100) * circumference;
 
   const getHistory = async () => {
     try {
@@ -346,197 +395,13 @@ const HistoryMainComponent = () => {
   return (
     <div className="flex flex-col lg:flex-row items-start mt-4 mb-6 gap-6 w-full text-white">
       {/* Left Sidebar: Month & Selector */}
-      <div className="w-full lg:w-[28%] flex flex-col gap-6">
-        {/* Selector Card */}
-        <Card heading="" cardWidth="w-full">
-          <div className="p-1">
-            <div className="flex items-center gap-3 mb-4">
-              <div className="w-10 h-10 rounded-xl bg-linear-to-br from-yellow-500/20 to-orange-500/20 flex items-center justify-center border border-yellow-500/20 text-yellow-400">
-                <FiArchive size={20} />
-              </div>
-              <div>
-                <h2 className="text-lg font-bold bg-linear-to-r from-white to-white/70 bg-clip-text text-transparent">
-                  History Archive
-                </h2>
-                <p className="text-xs text-gray-400 font-medium">
-                  Select a past month
-                </p>
-              </div>
-            </div>
-
-            <div className="space-y-3">
-              {mockHistoryData.map((data) => {
-                const isActive = data.id === selectedMonthId;
-                return (
-                  <button
-                    key={data.id}
-                    onClick={() => setSelectedMonthId(data.id)}
-                    className={`w-full flex items-center justify-between p-3.5 rounded-2xl transition-all duration-300 border ${
-                      isActive
-                        ? "bg-linear-to-r from-yellow-500/10 to-orange-500/10 border-yellow-500/50 shadow-md"
-                        : "bg-white/2 border-white/5 hover:bg-white/2 hover:border-white/10"
-                    }`}
-                  >
-                    <div className="flex items-center gap-3">
-                      <FiCalendar
-                        className={
-                          isActive ? "text-yellow-400" : "text-gray-500"
-                        }
-                      />
-                      <div className="text-left">
-                        <p
-                          className={`text-sm font-semibold ${isActive ? "text-white" : "text-gray-300"}`}
-                        >
-                          {data.monthName} {data.year}
-                        </p>
-                        <p className="text-[10px] text-gray-500 mt-0.5">
-                          {data.totalHabits} Habits Tracked
-                        </p>
-                      </div>
-                    </div>
-                    <span
-                      className={`text-xs font-bold px-2.5 py-1 rounded-lg border ${
-                        isActive
-                          ? "bg-yellow-500/20 text-yellow-300 border-yellow-500/30"
-                          : "bg-white/5 text-gray-400 border-white/5"
-                      }`}
-                    >
-                      {data.overallProgress}%
-                    </span>
-                  </button>
-                );
-              })}
-            </div>
-          </div>
-        </Card>
-
-        {/* Month Summary Statistics */}
-        <Card heading="" cardWidth="w-full">
-          <div className="p-1 flex flex-col gap-6">
-            <h3 className="text-xs font-bold text-gray-400 uppercase tracking-widest">
-              Performance Summary
-            </h3>
-
-            {/* Overall Radial Meter */}
-            <div className="flex flex-col items-center justify-center bg-white/[0.01] border border-white/5 rounded-2xl p-5 relative overflow-hidden group">
-              <div className="absolute top-0 right-0 w-24 h-24 bg-yellow-500/5 rounded-full blur-2xl group-hover:bg-yellow-500/10 transition-all duration-500" />
-
-              <svg
-                height={radius * 2}
-                width={radius * 2}
-                className="transform -rotate-90"
-              >
-                {/* Background Ring */}
-                <circle
-                  stroke="rgba(255, 255, 255, 0.05)"
-                  fill="transparent"
-                  strokeWidth={stroke}
-                  r={normalizedRadius}
-                  cx={radius}
-                  cy={radius}
-                />
-                {/* Active Ring */}
-                <motion.circle
-                  stroke="url(#yellowGradient)"
-                  fill="transparent"
-                  strokeWidth={stroke}
-                  strokeDasharray={circumference + " " + circumference}
-                  style={{ strokeDashoffset }}
-                  strokeLinecap="round"
-                  r={normalizedRadius}
-                  cx={radius}
-                  cy={radius}
-                  initial={{ strokeDashoffset: circumference }}
-                  animate={{ strokeDashoffset }}
-                  transition={{ duration: 1, ease: "easeOut" }}
-                />
-                <defs>
-                  <linearGradient
-                    id="yellowGradient"
-                    x1="0%"
-                    y1="0%"
-                    x2="100%"
-                    y2="100%"
-                  >
-                    <stop offset="0%" stopColor="#f59e0b" />
-                    <stop offset="100%" stopColor="#ea580c" />
-                  </linearGradient>
-                </defs>
-              </svg>
-
-              <div className="absolute text-center">
-                <span className="text-2xl font-black text-white">
-                  {selectedData.overallProgress}%
-                </span>
-                <p className="text-[9px] text-gray-500 font-bold uppercase tracking-widest mt-0.5">
-                  Score
-                </p>
-              </div>
-
-              <span className="mt-4 text-xs font-medium text-gray-300 text-center">
-                Overall completion rate for {selectedData.monthName}
-              </span>
-            </div>
-
-            {/* Quick Metrics grid */}
-            <div className="grid grid-cols-2 gap-3">
-              <div className="p-3 bg-white/[0.02] border border-white/5 rounded-xl text-center">
-                <FiCheck
-                  className="text-emerald-400 mx-auto mb-1.5"
-                  size={16}
-                />
-                <span className="text-sm font-bold block">
-                  {selectedData.completedTasksCount}
-                </span>
-                <span className="text-[10px] text-gray-500 uppercase font-semibold">
-                  Done
-                </span>
-              </div>
-              <div className="p-3 bg-white/[0.02] border border-white/5 rounded-xl text-center">
-                <FiX className="text-rose-400 mx-auto mb-1.5" size={16} />
-                <span className="text-sm font-bold block">
-                  {selectedData.missedTasksCount}
-                </span>
-                <span className="text-[10px] text-gray-500 uppercase font-semibold">
-                  Missed
-                </span>
-              </div>
-            </div>
-
-            {/* Week-wise Progress Bars */}
-            <div className="space-y-3.5">
-              <h4 className="text-[11px] font-bold text-gray-400 uppercase tracking-widest flex items-center gap-1.5">
-                <FiBarChart2 size={12} /> Week-wise Breakdown
-              </h4>
-              <div className="space-y-3">
-                {selectedData.weekWiseProgress.map((w, idx) => (
-                  <div key={idx} className="space-y-1.5">
-                    <div className="flex justify-between text-[11px]">
-                      <span className="text-gray-400 font-medium">
-                        {w.week}
-                      </span>
-                      <span className="text-yellow-400 font-semibold">
-                        {w.rate}%
-                      </span>
-                    </div>
-                    <div className="w-full h-2 bg-white/5 rounded-full overflow-hidden border border-white/5">
-                      <motion.div
-                        className="h-full bg-linear-to-r from-yellow-500 to-orange-500 rounded-full"
-                        initial={{ width: 0 }}
-                        animate={{ width: `${w.rate}%` }}
-                        transition={{ duration: 0.8, delay: idx * 0.1 }}
-                      />
-                    </div>
-                  </div>
-                ))}
-              </div>
-            </div>
-          </div>
-        </Card>
+      <div className="w-full lg:w-[28%] flex flex-col gap-4">
+        <PastMonthsData selectedMonthId={selectedMonthId} setSelectedMonthId={setSelectedMonthId} data={monthsData} />
+        <PerformanceSummary selectedMonth={selectedMonth} monthDashID={selectedMonthId} />
       </div>
 
       {/* Right Content Area: Month Details */}
-      <div className="w-full lg:w-[72%] flex flex-col gap-6">
+      <div className="w-full lg:w-[72%] flex flex-col gap-4">
         {/* Header Ribbon / Archived Notice */}
         <Card heading="" cardWidth="w-full">
           <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 p-1">
@@ -559,53 +424,11 @@ const HistoryMainComponent = () => {
         </Card>
 
         {/* Goals & Notes */}
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-          {/* Monthly Targets */}
-          <Card heading="" cardWidth="w-full">
-            <div className="p-1 flex flex-col gap-4">
-              <h3 className="text-xs font-bold text-gray-400 uppercase tracking-widest flex items-center gap-2">
-                <FiTarget className="text-yellow-400" /> Monthly Targets Set
-              </h3>
-              <ul className="space-y-3.5 mt-1">
-                {selectedData.monthlyTargets.map((target, index) => (
-                  <li
-                    key={index}
-                    className="flex items-start gap-3 bg-white/[0.01] border border-white/5 p-3 rounded-xl hover:bg-white/[0.03] transition-colors"
-                  >
-                    <span className="flex items-center justify-center w-5 h-5 rounded-full bg-yellow-500/10 text-yellow-500 text-xs font-bold border border-yellow-500/20 shrink-0">
-                      {index + 1}
-                    </span>
-                    <span className="text-sm font-medium text-gray-300 leading-tight">
-                      {target}
-                    </span>
-                  </li>
-                ))}
-              </ul>
-            </div>
-          </Card>
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <MonthlyTargets monthDashID={selectedMonthId} />
 
           {/* Monthly Notes */}
-          <Card heading="" cardWidth="w-full">
-            <div className="p-1 flex flex-col gap-4">
-              <h3 className="text-xs font-bold text-gray-400 uppercase tracking-widest flex items-center gap-2">
-                <FiFileText className="text-orange-400" /> Reflections & Notes
-              </h3>
-              <div className="bg-white/[0.02] border border-white/5 rounded-2xl p-4 min-h-[160px] flex flex-col justify-between">
-                <p className="text-sm text-gray-300 leading-relaxed italic">
-                  "{selectedData.monthlyNotes}"
-                </p>
-                <div className="flex justify-between items-center text-[10px] text-gray-500 mt-4 border-t border-white/5 pt-3">
-                  <span className="font-semibold flex items-center gap-1">
-                    <FiAward className="text-yellow-500" />
-                    Month Outcome
-                  </span>
-                  <span className="font-bold text-emerald-400 bg-emerald-500/10 border border-emerald-500/20 px-2 py-0.5 rounded">
-                    COMPLETED
-                  </span>
-                </div>
-              </div>
-            </div>
-          </Card>
+          <MonthlyNote monthDashID={selectedMonthId} />
         </div>
 
         {/* Daywise and Taskwise Progress Grid */}
