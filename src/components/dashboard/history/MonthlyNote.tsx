@@ -56,7 +56,7 @@ const MonthlyNote = ({ monthDashID }: { monthDashID: string }) => {
                     Last updated at
                   </span>
                   <span className="font-bold text-emerald-400 bg-emerald-500/10 border border-emerald-500/20 px-2 py-0.5 rounded">
-                    {formatTimestamp(lastUpdate)}
+                    {lastUpdate ? formatTimestamp(lastUpdate) : "Info Unavailable"}
                   </span>
                 </div>
               </div>
