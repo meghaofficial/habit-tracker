@@ -2,7 +2,7 @@ import { useQuery } from "@tanstack/react-query";
 import { getDateLogs, getTasks } from "../../../api/dashboard.api";
 import type { DateLogI, TaskI } from "../../../types";
 import Card from "../../shared/Card";
-import { FiCalendar, FiCheck, FiMinus, FiX } from "react-icons/fi";
+import { FiCalendar, FiCheck, FiMinus } from "react-icons/fi";
 
 const DailyHabitMatrix = ({
   monthDashID,
@@ -54,6 +54,9 @@ const DailyHabitMatrix = ({
 
         {/* Matrix Table */}
         <div className="overflow-x-auto border border-white/5 rounded-2xl bg-white/1">
+        {taskListData.isPending || dateLogsData.isPending ? (
+          <div className="h-60 overflow-y-hidden flex justify-center animate-pulse bg-white/5 rounded-2xl"></div>
+        ) : (
           <table className="w-full border-collapse">
             <thead>
               <tr className="border-b border-white/5 bg-black/20 text-gray-400">
@@ -130,6 +133,7 @@ const DailyHabitMatrix = ({
               ))}
             </tbody>
           </table>
+          )}
         </div>
       </div>
     </Card>

@@ -69,7 +69,6 @@ const HistoryMainComponent = ({ monthDashID }: { monthDashID: string }) => {
 
       {/* Right Content Area: Month Details */}
       <div className="w-full lg:w-[72%] flex flex-col gap-4">
-        {/* Header Ribbon / Archived Notice */}
         <Card heading="" cardWidth="w-full">
           <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 p-1">
             <div className="flex items-center gap-3">
