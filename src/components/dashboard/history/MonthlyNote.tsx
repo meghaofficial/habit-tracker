@@ -47,16 +47,20 @@ const MonthlyNote = ({ monthDashID }: { monthDashID: string }) => {
           <>
             {note ? (
               <div className="bg-white/2 border border-white/5 rounded-2xl p-4 h-50 flex flex-col justify-between">
-                <p className="text-sm text-gray-300 leading-relaxed italic">
-                  {note}
-                </p>
+                <div className="overflow-y-auto h-40">
+                  <p className="text-sm text-gray-300 leading-relaxed italic">
+                    {note}
+                  </p>
+                </div>
                 <div className="flex justify-between items-center text-[10px] text-gray-500 mt-4 border-t border-white/5 pt-3">
                   <span className="font-semibold flex items-center gap-1">
                     <FiAward className="text-yellow-500" />
                     Last updated at
                   </span>
                   <span className="font-bold text-emerald-400 bg-emerald-500/10 border border-emerald-500/20 px-2 py-0.5 rounded">
-                    {lastUpdate ? formatTimestamp(lastUpdate) : "Info Unavailable"}
+                    {lastUpdate
+                      ? formatTimestamp(lastUpdate)
+                      : "Info Unavailable"}
                   </span>
                 </div>
               </div>

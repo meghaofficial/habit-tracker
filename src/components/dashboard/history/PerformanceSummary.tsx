@@ -1,4 +1,4 @@
-import { FiBarChart2, FiCheck, FiX } from "react-icons/fi";
+import { FiBarChart2, FiCheck, FiX, FiMinus } from "react-icons/fi";
 import RadialProgress from "../../charts/RadialProgress";
 import Card from "../../shared/Card";
 import type { DashboardI, TargetI } from "../../../types";
@@ -53,10 +53,10 @@ const PerformanceSummary = ({
             </span>
           </div>
           <div className="p-3 bg-white/2 border border-white/5 rounded-xl text-center">
-            <FiX className="text-rose-400 mx-auto mb-1.5" size={16} />
+            <FiMinus className="text-gray-500 mx-auto mb-1.5" size={16} />
             <span className="text-sm font-bold block">{missed}</span>
             <span className="text-[10px] text-gray-500 uppercase font-semibold">
-              Missed
+              Skipped
             </span>
           </div>
         </div>
