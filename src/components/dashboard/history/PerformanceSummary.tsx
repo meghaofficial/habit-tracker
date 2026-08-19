@@ -3,9 +3,10 @@ import RadialProgress from "../../charts/RadialProgress";
 import Card from "../../shared/Card";
 import type { DashboardI, TargetI } from "../../../types";
 import { monMap } from "../../../staticData";
-import { motion } from "framer-motion";
+import { motion, AnimatePresence } from "framer-motion";
 import { axiosPrivate } from "../../../api/axios";
 import { useEffect, useState } from "react";
+import { FaChevronDown } from "react-icons/fa";
 
 const PerformanceSummary = ({
   selectedMonth,
@@ -86,6 +87,8 @@ const WeeklyTargets = ({
   const [loading, setLoading] = useState(false);
   const [totalTargets, setTotalTargets] = useState(0);
   const [finished, setFinished] = useState(0);
+  const [openWeek, setOpenWeek] = useState(-1);
+  const [targets, setTargets] = useState<TargetI[]>([]);
 
   const getWeeklyData = async () => {
     setLoading(true);
@@ -97,6 +100,7 @@ const WeeklyTargets = ({
       if (res?.data?.success) {
         if (res?.data?.target) {
           const targets = res?.data?.target?.targets;
+          setTargets(targets);
           setTotalTargets(targets.length);
           const fin = targets.filter((d: TargetI) => d?.completed);
           setFinished(fin.length);
@@ -119,19 +123,87 @@ const WeeklyTargets = ({
     totalTargets > 0 ? ((finished / totalTargets) * 100).toFixed(2) : 0;
 
   return (
+    loading ? 
+    <div className="h-8 overflow-y-hidden flex justify-center animate-pulse bg-white/5 rounded-lg"></div> :
     <div key={week} className="space-y-1.5">
-      <div className="flex justify-between text-[11px]">
-        <span className="text-gray-400 font-medium">Week {week + 1}</span>
+      {/* Week Header */}
+      <button
+        onClick={() => setOpenWeek(openWeek === week ? -1 : week)}
+        className="w-full flex items-center justify-between text-[11px] group"
+      >
+        <div className="flex items-center gap-2">
+          <span className="text-gray-400 font-medium">Week {week + 1}</span>
+          {totalTargets > 0 && (
+            <motion.div
+              animate={{
+                rotate: openWeek === week ? 180 : 0,
+              }}
+              transition={{ duration: 0.25 }}
+            >
+              <FaChevronDown className="w-3.5 h-3.5 text-gray-500 group-hover:text-yellow-400 transition-colors" />
+            </motion.div>
+          )}
+        </div>
+
         <span className="text-yellow-400 font-semibold">{rate}%</span>
-      </div>
+      </button>
+
+      {/* Progress Bar */}
       <div className="w-full h-2 bg-white/5 rounded-full overflow-hidden border border-white/5">
         <motion.div
           className="h-full bg-linear-to-r from-yellow-500 to-orange-500 rounded-full"
           initial={{ width: 0 }}
           animate={{ width: `${rate}%` }}
-          transition={{ duration: 0.8, delay: week * 0.1 }}
+          transition={{
+            duration: 0.8,
+            delay: week * 0.1,
+          }}
         />
       </div>
+
+      {/* Accordion Content */}
+      <AnimatePresence initial={false}>
+        {openWeek === week && (
+          <motion.div
+            initial={{ height: 0, opacity: 0 }}
+            animate={{ height: "auto", opacity: 1 }}
+            exit={{ height: 0, opacity: 0 }}
+            transition={{
+              duration: 0.3,
+              ease: "easeInOut",
+            }}
+            className="overflow-hidden"
+          >
+            <div className="pt-2 pl-2 space-y-1.5">
+              {targets?.map((t) => (
+                <motion.div
+                  key={t._id}
+                  initial={{ opacity: 0, x: -8 }}
+                  animate={{ opacity: 1, x: 0 }}
+                  transition={{ duration: 0.2 }}
+                  className="flex items-center gap-2 text-[11px] text-gray-400"
+                >
+                  <div
+                    className={`w-1.5 h-1.5 rounded-full ${
+                      t.completed ? "bg-green-400" : "bg-gray-600"
+                    }`}
+                  />
+
+                  <span
+                    className={
+                      t.completed
+                        ? "text-gray-500 line-through"
+                        : "text-gray-300"
+                    }
+                  >
+                    {t.value}
+                  </span>
+                </motion.div>
+              ))}
+            </div>
+          </motion.div>
+        )}
+      </AnimatePresence>
     </div>
   );
 };

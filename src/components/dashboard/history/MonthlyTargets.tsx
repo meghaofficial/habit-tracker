@@ -58,7 +58,7 @@ const MonthlyTargets = ({ monthDashID }: { monthDashID: string }) => {
                     key={index}
                     className={`flex items-start gap-3 border ${t.completed ? "border-green-600/50 bg-green-600/5 hover:bg-green-600/10" : "border-white/5 bg-white/1 hover:bg-white/3"}  p-3 rounded-xl transition-colors`}
                   >
-                    <span className="flex items-center justify-center w-5 h-5 rounded-full bg-yellow-500/10 text-yellow-500 text-xs font-bold border border-yellow-500/20 shrink-0">
+                    <span className={`flex items-center justify-center w-5 h-5 rounded-full ${t.completed ? 'bg-green-500/10 text-green-500 border-green-500/20' : 'bg-yellow-500/10 text-yellow-500 border-yellow-500/20'} text-xs font-bold border shrink-0`}>
                       {index + 1}
                     </span>
                     <span className="text-sm font-medium text-gray-300 leading-tight">

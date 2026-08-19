@@ -304,11 +304,11 @@ const HistoryMainComponent = ({ monthDashID } : { monthDashID: string }) => {
   }, []);
 
   useEffect(() => {
-    const activeData = monthsData.find(d => d._id === selectedMonthId);
-    if (activeData) {
-      setSelectedMonth(activeData);
-    }
-  }, [selectedMonthId]);
+    const foundMonth = monthsData.find(d => d._id === selectedMonthId);
+  if (foundMonth) {
+    setSelectedMonth(foundMonth);
+  }
+  }, [selectedMonthId, monthsData]);
 
 
 
@@ -426,8 +426,6 @@ const HistoryMainComponent = ({ monthDashID } : { monthDashID: string }) => {
         {/* Goals & Notes */}
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           <MonthlyTargets monthDashID={selectedMonthId} />
-
-          {/* Monthly Notes */}
           <MonthlyNote monthDashID={selectedMonthId} />
         </div>
 
