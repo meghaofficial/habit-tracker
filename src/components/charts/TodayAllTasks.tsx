@@ -4,10 +4,10 @@ import type {
   DateLogI,
   TaskI,
 } from "../../types";
-import { InputData } from "../dashboard/track/HabitSection";
 import { notify } from "../../helper";
 import { LuMinus } from "react-icons/lu";
 import CircleLoader from "../loaders/CircleLoader";
+import { InputData } from "../dashboard/track/InputData";
 
 const TodayAllTasks = ({
   taskList,

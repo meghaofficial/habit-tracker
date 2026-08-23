@@ -1,9 +1,7 @@
-import { useEffect, useRef, useState } from "react";
-import { notify } from "../../../helper";
 import type { TaskI } from "../../../types";
-import { useMutation, useQuery } from "@tanstack/react-query";
-import { getTasks, updateTaskName } from "../../../api/dashboard.api";
-import Saving from "../../shared/Saving";
+import { useQuery } from "@tanstack/react-query";
+import { getTasks } from "../../../api/dashboard.api";
+import { InputData } from "./InputData";
 
 const HabitSection = ({
   loading,
@@ -57,104 +55,6 @@ const HabitSection = ({
         ))
       )}
       <div className="h-10 flex items-center justify-between px-2"></div>
-    </div>
-  );
-};
-
-export const InputData = ({
-  index,
-  taskId,
-  taskName,
-}: {
-  index: number;
-  taskId: string;
-  taskName: string;
-}) => {
-  const [value, setValue] = useState<string>(taskName);
-  const prevValueRef = useRef(taskName);
-  const [saveStatus, setSaveStatus] = useState<"idle" | "saving" | "saved">(
-    "idle",
-  );
-  const timeoutRef = useRef(0);
-
-  const updateTaskMutation = useMutation({
-    mutationFn: updateTaskName,
-    onMutate: () => {
-      setSaveStatus("saving");
-      if (timeoutRef.current) {
-        clearTimeout(timeoutRef.current);
-      }
-    },
-    onSuccess: () => {
-      setSaveStatus("saved");
-      timeoutRef.current = setTimeout(() => {
-        setSaveStatus("idle");
-      }, 1000);
-    },
-    onError: () => {
-      notify.error("Please try again.");
-    },
-  });
-
-  useEffect(() => {
-    if (value === prevValueRef.current) return;
-    const timeout = setTimeout(() => {
-      updateTaskMutation.mutate({
-        taskId,
-        taskName: value,
-      });
-    }, 500);
-
-    prevValueRef.current = value;
-
-    return () => clearTimeout(timeout);
-  }, [value, taskId]);
-
-  useEffect(() => {
-    setValue(taskName);
-    prevValueRef.current = taskName;
-  }, [taskName]);
-
-  useEffect(() => {
-    return () => {
-      if (timeoutRef.current) {
-        clearTimeout(timeoutRef.current);
-      }
-    };
-  }, []);
-
-  // WEBSOCKET SYNCING
-  // useEffect(() => {
-  //   const onTaskUpdate = (data: any) => {
-  //     setTaskList((prev) =>
-  //       prev.map((task) => (task._id === data.task._id ? data.task : task)),
-  //     );
-  //   };
-  //   socket.on("update-task", onTaskUpdate);
-  //   return () => {
-  //     socket.off("update-task", onTaskUpdate);
-  //   };
-  // }, []);
-
-  return (
-    <div
-      className={`text-[12px] px-2 p-1 flex items-center gap-2 border-b border-darkBox/50 light:border-lightBorder`}
-    >
-      <span>{index + 1}.</span>
-
-      <input
-        type="text"
-        className="outline-none w-full py-1"
-        title={value}
-        value={value}
-        onChange={(e) => {
-          setValue(e.target.value);
-          setSaveStatus("saving");
-        }}
-        disabled={updateTaskMutation.isPending}
-      />
-
-      <Saving saveStatus={saveStatus} />
     </div>
   );
 };
