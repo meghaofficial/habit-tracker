@@ -1,9 +1,10 @@
-import { useEffect, useState, useRef } from "react";
+import { useEffect, useState } from "react";
 import { IoStatsChart } from "react-icons/io5";
-import { FaCalendarAlt, FaBell, FaPlay, FaPause, FaVolumeMute, FaVolumeUp } from "react-icons/fa";
+import { FaCalendarAlt, FaBell } from "react-icons/fa";
 import { GoGoal } from "react-icons/go";
 import PlanSection from "../home/PlanSection";
 import NavigationBar from "../shared/NavigationBar";
+import VideoDemoImages from "../home/VideoDemoImages";
 
 const features = [
   {
@@ -31,35 +32,6 @@ const features = [
 const HomePage = () => {
   const [dark, setDark] = useState(false);
   const [showNavbar, setShowNavbar] = useState(false);
-
-  const videoRef = useRef<HTMLVideoElement>(null);
-  const [isPlaying, setIsPlaying] = useState(true);
-  const [isMuted, setIsMuted] = useState(true);
-  const [isHovered, setIsHovered] = useState(false);
-
-  const togglePlay = () => {
-    if (!videoRef.current) return;
-    if (isPlaying) {
-      videoRef.current.pause();
-      setIsPlaying(false);
-    } else {
-      videoRef.current.play().then(() => {
-        setIsPlaying(true);
-      }).catch(err => {
-        console.error("Video play failed:", err);
-      });
-    }
-  };
-
-  const toggleMute = (e: React.MouseEvent) => {
-    e.stopPropagation();
-    if (!videoRef.current) return;
-    videoRef.current.muted = !videoRef.current.muted;
-    setIsMuted(videoRef.current.muted);
-  };
-
-  const handlePlayEvent = () => setIsPlaying(true);
-  const handlePauseEvent = () => setIsPlaying(false);
 
   useEffect(() => {
     const savedTheme = localStorage.getItem("theme");
@@ -146,79 +118,7 @@ const HomePage = () => {
           </section>
 
           {/* Video Demo Section */}
-          <section className="mt-15 mb-24 flex flex-col items-center animate__animated animate__fadeIn">
-
-            {/* Mock Browser Container */}
-            <div 
-              className="w-full max-w-5xl rounded-3xl border border-white/10 light:border-black/10 bg-black/40 light:bg-white overflow-hidden shadow-[0_30px_100px_rgba(99,102,241,0.15)] light:shadow-[0_30px_80px_rgba(0,0,0,0.08)] backdrop-blur-xl relative transition-all duration-500 hover:scale-[1.01] hover:border-white/20 light:hover:border-black/20 hover:shadow-[0_45px_120px_rgba(99,102,241,0.22)] light:hover:shadow-[0_40px_100px_rgba(0,0,0,0.12)] group"
-              onMouseEnter={() => setIsHovered(true)}
-              onMouseLeave={() => setIsHovered(false)}
-            >
-              {/* Browser Header Bar */}
-              {/* <div className="flex items-center justify-between px-5 py-3 border-b border-white/10 light:border-black/10 bg-white/5 light:bg-black/2">
-                <div className="flex items-center gap-2">
-                  <span className="w-3 h-3 rounded-full bg-[#FF5F56] transition-opacity duration-350 hover:opacity-85"></span>
-                  <span className="w-3 h-3 rounded-full bg-[#FFBD2E] transition-opacity duration-350 hover:opacity-85"></span>
-                  <span className="w-3 h-3 rounded-full bg-[#27C93F] transition-opacity duration-350 hover:opacity-85"></span>
-                </div>
-                <div className="bg-white/5 light:bg-black/5 border border-white/10 light:border-black/5 text-xs px-10 py-1.5 rounded-lg text-gray-400 light:text-gray-500 font-mono w-1/2 text-center truncate shadow-inner">
-                  habitify.app/dashboard
-                </div>
-                <div className="w-12"></div>
-              </div> */}
-
-              {/* Video Content with Overlay Controls */}
-              <div className="relative aspect-video w-full bg-black cursor-pointer" onClick={togglePlay}>
-                <video
-                  ref={videoRef}
-                  src="https://www.youtube.com/watch?v=F_jnqx14idY&t=1158s"
-                  className="w-full h-full object-cover"
-                  loop
-                  muted={isMuted}
-                  playsInline
-                  autoPlay
-                  onPlay={handlePlayEvent}
-                  onPause={handlePauseEvent}
-                />
-
-                {/* Big Center Play Overlay (when paused) */}
-                <div className={`absolute inset-0 bg-black/40 backdrop-blur-[1px] flex flex-col items-center justify-center transition-all duration-300 ${!isPlaying ? "opacity-100 pointer-events-auto" : "opacity-0 pointer-events-none"}`}>
-                  <div className="relative flex items-center justify-center w-20 h-20 rounded-full bg-white/10 border border-white/20 backdrop-blur-md shadow-[0_8px_32px_rgba(0,0,0,0.37)] text-white text-2xl transition-all duration-300 hover:scale-110 hover:bg-white/20 hover:border-white/30 group/btn">
-                    {/* Pulsing Outer Ring */}
-                    <span className="absolute inset-0 rounded-full bg-white/10 animate-ping opacity-75"></span>
-                    <FaPlay className="relative z-10 ml-1.5" />
-                  </div>
-                  <p className="mt-4 text-xs font-bold tracking-widest uppercase text-white/95 drop-shadow-[0_2px_4px_rgba(0,0,0,0.5)]">
-                    Click to Play Demo
-                  </p>
-                </div>
-
-                {/* Hover / Small Overlay Controls */}
-                <div className={`absolute inset-x-0 bottom-0 bg-gradient-to-t from-black/80 via-black/40 to-transparent p-6 flex justify-between items-center transition-all duration-300 z-10 ${isHovered || !isPlaying ? "opacity-100 translate-y-0" : "opacity-0 translate-y-2 pointer-events-none"}`}>
-                  {/* Left Side: Play/Pause and Quick Status */}
-                  <div className="flex items-center gap-3">
-                    <button 
-                      onClick={(e) => { e.stopPropagation(); togglePlay(); }}
-                      className="flex items-center justify-center w-10 h-10 rounded-xl bg-white/10 hover:bg-white/20 border border-white/10 text-white transition-all duration-200 cursor-pointer"
-                    >
-                      {isPlaying ? <FaPause className="text-sm" /> : <FaPlay className="text-sm ml-0.5" />}
-                    </button>
-                    <span className="text-white text-xs font-semibold select-none bg-white/5 border border-white/5 rounded-md px-2 py-1 uppercase tracking-wider">
-                      {isPlaying ? "Playing Demo" : "Paused"}
-                    </span>
-                  </div>
-
-                  {/* Right Side: Sound Controls */}
-                  <button 
-                    onClick={toggleMute}
-                    className="flex items-center justify-center w-10 h-10 rounded-xl bg-white/10 hover:bg-white/20 border border-white/10 text-white transition-all duration-200 cursor-pointer"
-                  >
-                    {isMuted ? <FaVolumeMute className="text-base" /> : <FaVolumeUp className="text-base" />}
-                  </button>
-                </div>
-              </div>
-            </div>
-          </section>
+          <VideoDemoImages />
 
           {/* Features */}
           <div className="text-center mt-30">
