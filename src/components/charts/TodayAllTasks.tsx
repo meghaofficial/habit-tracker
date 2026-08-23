@@ -2,7 +2,6 @@ import { useState } from "react";
 import { axiosPrivate } from "../../api/axios";
 import type {
   DateLogI,
-  TaskI,
 } from "../../types";
 import { notify } from "../../helper";
 import { LuMinus } from "react-icons/lu";
