@@ -1,22 +1,17 @@
 import { useEffect, useState } from "react";
 import AnalysisMainComponent from "../dashboard/analysis/AnalysisMainComponent";
 import TrackMainComponent from "../dashboard/track/TrackMainComponent";
-import { formattedText, notify } from "../../helper";
+import { notify } from "../../helper";
 import { axiosPrivate } from "../../api/axios";
-import CircleLoader from "../loaders/CircleLoader";
-import Popup from "../shared/Popup";
 import PageLoader from "../loaders/PageLoader";
 import type { DashboardI, DateLogI, PlanI, SubscriptionI } from "../../types";
-import { CustomButtonForm } from "../shared/CutomButton";
 import NavigationBar from "../shared/NavigationBar";
 import { useIsMobile } from "../hooks/mobileHook";
 import HistoryMainComponent from "../dashboard/history/HistoryMainComponent";
 import Fallback from "../shared/Fallback";
-import { LuSparkles } from "react-icons/lu";
 import AiCoachMainComponent from "../ai/AiCoachMainComponent";
 import CalandarMainComponent from "../dashboard/calander/CalandarMainComponent";
 import FreeSubsConfirm from "../dashboard/subscription/FreeSubsConfirm";
-import SubsPlanCard from "../dashboard/subscription/SubsPlanCard";
 import SubsPlans from "../dashboard/subscription/SubsPlans";
 
 const MASTER_MENU = [
@@ -164,7 +159,7 @@ const Dashboard = () => {
                     {openPopup ? (
                       <FreeSubsConfirm setOpenPopup={setOpenPopup} handleSubscribe={() => handleSubscribe(plansList?.[0]?._id, 0)} loading={freeTrialLoading} />
                     ) : (
-                      <SubsPlans showFree={showFree} plansList={plansList} setOpenPopup={setOpenPopup} setOpenPlan={setOpenPlan} setShowDashboard={setShowDashboard} getActiveSubscription={getActiveSubscription} handleSubscribe={handleSubscribe} />
+                      <SubsPlans showFree={showFree} plansList={plansList} setOpenPopup={setOpenPopup} handleSubscribe={handleSubscribe} />
                     )}
                   </div>
                 </>

@@ -6,17 +6,11 @@ const SubsPlans = ({
   showFree,
   plansList,
   setOpenPopup,
-  setOpenPlan,
-  setShowDashboard,
-  getActiveSubscription,
   handleSubscribe
 }: {
   showFree: boolean;
   plansList: PlanI[];
   setOpenPopup: Dispatch<SetStateAction<boolean>>;
-  setOpenPlan: Dispatch<SetStateAction<boolean>>;
-  setShowDashboard: Dispatch<SetStateAction<boolean>>;
-  getActiveSubscription: () => Promise<void>;
   handleSubscribe: (planID: string, amount: number) => Promise<void>;
 }) => {
   return (
@@ -35,9 +29,6 @@ const SubsPlans = ({
             plan={plan}
             len={plansList.length}
             setOpenPopup={setOpenPopup}
-            setOpenPlan={setOpenPlan}
-            setShowDashboard={setShowDashboard}
-            getActiveSubscription={getActiveSubscription}
             handleSubscribe={handleSubscribe}
           />
         ))}

@@ -1,51 +1,19 @@
-import { useState, type Dispatch, type SetStateAction } from "react";
-import { formattedText, notify } from "../../../helper";
+import { type Dispatch, type SetStateAction } from "react";
+import { formattedText } from "../../../helper";
 import type { PlanI } from "../../../types";
 import { CustomButtonForm } from "../../shared/CutomButton";
-import { axiosPrivate } from "../../../api/axios";
 
 const SubsPlanCard = ({
   plan,
   len,
   setOpenPopup,
-  setOpenPlan,
-  setShowDashboard,
-  getActiveSubscription,
   handleSubscribe
 }: {
   plan: PlanI;
   len: number;
   setOpenPopup: Dispatch<SetStateAction<boolean>>;
-  setOpenPlan: Dispatch<SetStateAction<boolean>>;
-  setShowDashboard: Dispatch<SetStateAction<boolean>>;
-  getActiveSubscription: () => Promise<void>;
   handleSubscribe: (planID: string, amount: number) => Promise<void>;
 }) => {
-
-  const [loading, setLoading] = useState(false);
-
-  // const handleSubscribe = async (planID: string, amount: number) => {
-  //   setLoading(true);
-  //   try {
-  //     const res = await axiosPrivate.post("/api/subscribe", { planID, amount });
-
-  //     if (res?.data?.success) {
-  //       notify.success(res?.data?.message);
-  //       if (amount === 0) {
-  //         setOpenPopup(false);
-  //       } else {
-  //         setOpenPlan(false);
-  //       }
-  //       setShowDashboard(true);
-  //       await getActiveSubscription();
-  //     }
-  //   } catch (error) {
-  //     console.error(error);
-  //     notify.error("Please try again.");
-  //   } finally {
-  //     setLoading(false);
-  //   }
-  // };
 
   return (
     <div
