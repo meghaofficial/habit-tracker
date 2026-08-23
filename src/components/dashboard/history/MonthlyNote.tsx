@@ -39,7 +39,7 @@ const MonthlyNote = ({ monthDashID }: { monthDashID: string }) => {
     <Card heading="" cardWidth="w-full">
       <div className="p-1 flex flex-col gap-4">
         <h3 className="text-xs font-bold text-gray-400 uppercase tracking-widest flex items-center gap-2">
-          <FiFileText className="text-orange-400" /> Reflections & Notes
+          <FiFileText className="text-yellow-400" /> Reflections & Notes
         </h3>
         {loading ? (
           <div className="h-50 overflow-y-hidden flex justify-center animate-pulse bg-white/5 rounded-2xl"></div>

@@ -9,6 +9,7 @@ import {
   markTarget,
   removeTarget,
 } from "../../../api/dashboard.api";
+import SectionIcon from "../../shared/SectionIcon";
 
 const TargetsSection = ({
   monthID,
@@ -34,9 +35,7 @@ const TargetsSection = ({
       {/* Header */}
       <div className="relative flex items-center justify-between px-4 py-3 border-b border-white/8">
         <div className="flex items-center gap-3">
-          <div className="w-8 h-8 rounded-lg bg-linear-to-br from-indigo-500/20 to-indigo-500/20 flex items-center justify-center border border-indigo-500/20 text-indigo-400">
-            <FiTarget size={14} />
-          </div>
+          <SectionIcon Icon={FiTarget} />
           <div>
             <p className="text-sm font-bold text-white">Targets</p>
             <p className="text-[10px] text-gray-500">

@@ -14,6 +14,7 @@ import {
   resetDateLogs,
   toggleTask,
 } from "../../../api/dashboard.api";
+import SectionIcon from "../../shared/SectionIcon";
 
 // Main Component
 const DailyCalanderTaskSheet = ({
@@ -182,8 +183,6 @@ const DailyCalanderTaskSheet = ({
   const dateLogs: DateLogI[] = dateLogsData?.data?.dateLogs;
   const taskList: TaskI[] = taskListData?.data?.tasks;
 
-  // console.log("Datelogs", dateLogs[28].tasks)
-
   // Column widths
   const hasWeek5 = totalD > 28;
   const colW = hasWeek5 ? "w-[22%]" : "w-[25%]";
@@ -297,9 +296,7 @@ const DailyCalanderTaskSheet = ({
         {/* Card Header */}
         <div className="relative flex items-center justify-between px-4 py-3 border-b border-white/8">
           <div className="flex items-center gap-3">
-            <div className="w-8 h-8 rounded-lg bg-linear-to-br from-indigo-500/20 to-violet-500/20 flex items-center justify-center border border-indigo-500/20 text-indigo-400">
-              <FiCalendar size={14} />
-            </div>
+            <SectionIcon Icon={FiCalendar} />
             <div>
               <p className="text-sm font-bold text-white">
                 Monthly Habit Tracker

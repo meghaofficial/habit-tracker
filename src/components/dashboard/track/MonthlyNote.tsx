@@ -5,6 +5,7 @@ import { FiEdit3 } from "react-icons/fi";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { getMonthlyNote, updateMonthlyNote } from "../../../api/dashboard.api";
 import Saving from "../../shared/Saving";
+import SectionIcon from "../../shared/SectionIcon";
 
 const MonthlyNote = ({ monthID }: { monthID: string }) => {
   const [monthlyNote, setMonthlyNote] = useState("");
@@ -98,9 +99,7 @@ const MonthlyNote = ({ monthID }: { monthID: string }) => {
         {/* Header */}
         <div className="relative flex items-center justify-between px-4 py-3 border-b border-white/8">
           <div className="flex items-center gap-3">
-            <div className="w-8 h-8 rounded-lg bg-indigo-500/20 flex items-center justify-center border border-indigo-500/20 text-indigo-400">
-              <FiEdit3 size={14} />
-            </div>
+            <SectionIcon Icon={FiEdit3} />
             <div>
               <p className="text-sm font-bold text-white">Monthly Notes</p>
               <p className="text-[10px] text-gray-500">

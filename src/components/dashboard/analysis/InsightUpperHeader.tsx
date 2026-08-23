@@ -1,6 +1,7 @@
 import { motion } from "framer-motion";
 import { FiActivity, FiCalendar } from "react-icons/fi";
 import { monMap } from "../../../staticData";
+import SectionIcon from "../../shared/SectionIcon";
 
 const InsightUpperHeader = () => {
   return (
@@ -14,9 +15,7 @@ const InsightUpperHeader = () => {
       <div className="absolute top-0 right-0 w-48 h-48 sm:w-64 sm:h-64 bg-indigo-500/5 rounded-full blur-3xl" />
       <div className="relative flex items-center justify-between gap-3">
         <div className="flex items-center gap-3 sm:gap-4 min-w-0">
-          <div className="w-10 h-10 sm:w-11 sm:h-11 shrink-0 rounded-xl bg-linear-to-br from-indigo-500/20 to-violet-500/20 flex items-center justify-center border border-indigo-500/20 text-indigo-400">
-            <FiActivity size={18} />
-          </div>
+          <SectionIcon h="40px" w="40px" size={18} Icon={FiActivity} />
           <div className="min-w-0">
             <h2 className="text-base sm:text-lg font-bold bg-linear-to-r from-white to-white/70 bg-clip-text text-transparent truncate">
               Activity Analysis

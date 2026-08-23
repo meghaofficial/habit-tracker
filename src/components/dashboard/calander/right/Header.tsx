@@ -2,6 +2,7 @@ import { MdKeyboardArrowLeft, MdKeyboardArrowRight } from "react-icons/md";
 import Card from "../../../shared/Card";
 import { monMap } from "../../../../staticData";
 import { FaCalendarDays } from "react-icons/fa6";
+import SectionIcon from "../../../shared/SectionIcon";
 
 type HeaderProps = {
   handlePrevMonth: () => void;
@@ -26,9 +27,7 @@ const Header = ({
     <Card heading="" cardWidth="w-full">
       <div className="flex flex-col sm:flex-row items-center justify-between gap-4 p-1">
         <div className="flex items-center gap-3">
-          <div className="w-8 h-8 flex items-center justify-center rounded-lg bg-indigo-500/20 border border-indigo-500/20 text-indigo-400">
-            <FaCalendarDays />
-          </div>
+          <SectionIcon h="40px" w="40px" size={18} Icon={FaCalendarDays} />
           <div>
             <h1 className="text-lg font-bold bg-linear-to-r from-white to-white/70 bg-clip-text text-transparent">
               Timeline
