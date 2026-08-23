@@ -1,6 +1,6 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, useRef } from "react";
 import { IoStatsChart } from "react-icons/io5";
-import { FaCalendarAlt, FaBell } from "react-icons/fa";
+import { FaCalendarAlt, FaBell, FaPlay, FaPause, FaVolumeMute, FaVolumeUp } from "react-icons/fa";
 import { GoGoal } from "react-icons/go";
 import PlanSection from "../home/PlanSection";
 import NavigationBar from "../shared/NavigationBar";
@@ -32,6 +32,35 @@ const HomePage = () => {
   const [dark, setDark] = useState(false);
   const [showNavbar, setShowNavbar] = useState(false);
 
+  const videoRef = useRef<HTMLVideoElement>(null);
+  const [isPlaying, setIsPlaying] = useState(true);
+  const [isMuted, setIsMuted] = useState(true);
+  const [isHovered, setIsHovered] = useState(false);
+
+  const togglePlay = () => {
+    if (!videoRef.current) return;
+    if (isPlaying) {
+      videoRef.current.pause();
+      setIsPlaying(false);
+    } else {
+      videoRef.current.play().then(() => {
+        setIsPlaying(true);
+      }).catch(err => {
+        console.error("Video play failed:", err);
+      });
+    }
+  };
+
+  const toggleMute = (e: React.MouseEvent) => {
+    e.stopPropagation();
+    if (!videoRef.current) return;
+    videoRef.current.muted = !videoRef.current.muted;
+    setIsMuted(videoRef.current.muted);
+  };
+
+  const handlePlayEvent = () => setIsPlaying(true);
+  const handlePauseEvent = () => setIsPlaying(false);
+
   useEffect(() => {
     const savedTheme = localStorage.getItem("theme");
     if (savedTheme === "dark") {
@@ -62,31 +91,31 @@ const HomePage = () => {
           <nav className="flex justify-between items-center py-5 sm:pt-10 pt-7">
             <NavigationBar />
           </nav>
-          <nav
-            className={`fixed left-1/2 top-2 z-30 flex w-[95%] max-w-300 -translate-x-1/2 items-center justify-between rounded-2xl border border-white/10 bg-black/30 px-5 py-4 shadow-[0_20px_60px_rgba(0,0,0,0.18)] backdrop-blur-2xl transition-all duration-500 ease-out ${showNavbar ? "translate-y-0 opacity-100" : "-translate-y-10 opacity-0 pointer-events-none"} light:bg-white/70 `}
+          {/* <nav
+            className={`fixed left-1/2 top-0 z-30 flex w-full -translate-x-1/2 items-center justify-between bg-[#121212] px-5 py-4 transition-all duration-500 ease-out ${showNavbar ? "translate-y-0 opacity-100" : "-translate-y-10 opacity-0 pointer-events-none"} light:bg-white/70 `}
           >
             <NavigationBar />
-          </nav>
+          </nav> */}
 
           {/* Hero */}
           <section className="flex sm:flex-row flex-col sm:items-center justify-between py-15">
-            <div className="sm:max-w-125">
-              <p className="italic text-violet-500 font-semibold uppercase">
+            <div className="w-full flex flex-col items-center">
+              <p className=" text-violet-500 font-semibold uppercase">
                 Build habits that actually stick.
               </p>
-              <div className="flex sm:flex-row flex-col sm:items-center gap-3">
+              <div className="flex sm:flex-row flex-col sm:items-center gap-3 playfair-display">
                 <p className="sm:text-[7em] text-[22vw] font-bold">Habit</p>
                 <p className="sm:text-[7em] text-[22vw] sm:mt-0 -mt-5 font-bold leading-none bg-linear-to-r from-[#5B5CF6] via-[#3B82F6] to-[#A855F7] bg-clip-text text-transparent drop-shadow-[0_2px_8px_rgba(59,130,246,0.15)]">
                   Tracker
                 </p>
               </div>
-              <p className="text-gray-500 sm:mt-0 mt-5">
+              <p className="text-gray-500 sm:mt-0 mt-5 text-center w-[60%]">
                 Track your daily habits, build lasting routines, and visualize
                 your progress with beautifully organized insights. Stay
                 motivated, maintain consistency effortlessly, and transform
                 small daily actions into meaningful long-term growth.
               </p>
-              <div className="mt-5 flex sm:flex-nowrap flex-wrap gap-10 google-sans">
+              <div className="mt-10 flex sm:flex-nowrap flex-wrap gap-10 google-sans">
                 {[
                   ["STREAKS", "Daily Consistency"],
                   ["TRACKING", "Smart Insights"],
@@ -113,69 +142,79 @@ const HomePage = () => {
               </div>
             </div>
 
-            <div className="relative overflow-hidden rounded-[28px] border border-white/10 bg-black/20 p-5 shadow-[0_20px_60px_rgba(0,0,0,0.18)] backdrop-blur-2xl light:bg-lightCard sm:mt-0 mt-10 sm:hidden lg:block">
-              {/* Glow */}
-              <div className="absolute -left-10 -top-10 h-40 w-40 rounded-full bg-darkSuccess/10 blur-3xl" />
+           
+          </section>
 
-              {/* Header */}
-              <div className="relative mb-5 flex items-center justify-between">
-                <div>
-                  <p className="text-[15px] font-semibold text-white/90 light:text-black">
-                    Activity
-                  </p>
+          {/* Video Demo Section */}
+          <section className="mt-15 mb-24 flex flex-col items-center animate__animated animate__fadeIn">
 
-                  <p className="mt-1 text-[12px] text-white/45 light:text-black/45">
-                    Your consistency this month
-                  </p>
-                </div>
-
+            {/* Mock Browser Container */}
+            <div 
+              className="w-full max-w-5xl rounded-3xl border border-white/10 light:border-black/10 bg-black/40 light:bg-white overflow-hidden shadow-[0_30px_100px_rgba(99,102,241,0.15)] light:shadow-[0_30px_80px_rgba(0,0,0,0.08)] backdrop-blur-xl relative transition-all duration-500 hover:scale-[1.01] hover:border-white/20 light:hover:border-black/20 hover:shadow-[0_45px_120px_rgba(99,102,241,0.22)] light:hover:shadow-[0_40px_100px_rgba(0,0,0,0.12)] group"
+              onMouseEnter={() => setIsHovered(true)}
+              onMouseLeave={() => setIsHovered(false)}
+            >
+              {/* Browser Header Bar */}
+              {/* <div className="flex items-center justify-between px-5 py-3 border-b border-white/10 light:border-black/10 bg-white/5 light:bg-black/2">
                 <div className="flex items-center gap-2">
-                  <div className="h-2.5 w-2.5 rounded-full bg-darkSuccess" />
-
-                  <span className="text-[12px] font-medium text-white/50 light:text-black/50">
-                    Active days
-                  </span>
+                  <span className="w-3 h-3 rounded-full bg-[#FF5F56] transition-opacity duration-350 hover:opacity-85"></span>
+                  <span className="w-3 h-3 rounded-full bg-[#FFBD2E] transition-opacity duration-350 hover:opacity-85"></span>
+                  <span className="w-3 h-3 rounded-full bg-[#27C93F] transition-opacity duration-350 hover:opacity-85"></span>
                 </div>
-              </div>
+                <div className="bg-white/5 light:bg-black/5 border border-white/10 light:border-black/5 text-xs px-10 py-1.5 rounded-lg text-gray-400 light:text-gray-500 font-mono w-1/2 text-center truncate shadow-inner">
+                  habitify.app/dashboard
+                </div>
+                <div className="w-12"></div>
+              </div> */}
 
-              {/* Grid */}
-              <div
-                className="relative grid gap-2"
-                style={{ gridTemplateColumns: "repeat(7, 1fr)" }}
-              >
-                {Array.from({ length: 35 }).map((_, i) => {
-                  const level = Math.floor(Math.random() * 5);
+              {/* Video Content with Overlay Controls */}
+              <div className="relative aspect-video w-full bg-black cursor-pointer" onClick={togglePlay}>
+                <video
+                  ref={videoRef}
+                  src="https://www.youtube.com/watch?v=F_jnqx14idY&t=1158s"
+                  className="w-full h-full object-cover"
+                  loop
+                  muted={isMuted}
+                  playsInline
+                  autoPlay
+                  onPlay={handlePlayEvent}
+                  onPause={handlePauseEvent}
+                />
 
-                  const colors = dark
-                    ? ["#1e293b", "#14532d", "#166534", "#16a34a", "#22c55e"]
-                    : ["#e2e8f0", "#dcfce7", "#86efac", "#4ade80", "#22c55e"];
+                {/* Big Center Play Overlay (when paused) */}
+                <div className={`absolute inset-0 bg-black/40 backdrop-blur-[1px] flex flex-col items-center justify-center transition-all duration-300 ${!isPlaying ? "opacity-100 pointer-events-auto" : "opacity-0 pointer-events-none"}`}>
+                  <div className="relative flex items-center justify-center w-20 h-20 rounded-full bg-white/10 border border-white/20 backdrop-blur-md shadow-[0_8px_32px_rgba(0,0,0,0.37)] text-white text-2xl transition-all duration-300 hover:scale-110 hover:bg-white/20 hover:border-white/30 group/btn">
+                    {/* Pulsing Outer Ring */}
+                    <span className="absolute inset-0 rounded-full bg-white/10 animate-ping opacity-75"></span>
+                    <FaPlay className="relative z-10 ml-1.5" />
+                  </div>
+                  <p className="mt-4 text-xs font-bold tracking-widest uppercase text-white/95 drop-shadow-[0_2px_4px_rgba(0,0,0,0.5)]">
+                    Click to Play Demo
+                  </p>
+                </div>
 
-                  return (
-                    <div
-                      key={i}
-                      className="h-7 w-7 rounded-[10px] transition-all duration-300 hover:scale-110 hover:rotate-3 shadow-[inset_0_1px_2px_rgba(255,255,255,0.15)]"
-                      style={{
-                        background: colors[level],
-                      }}
-                    />
-                  );
-                })}
-              </div>
+                {/* Hover / Small Overlay Controls */}
+                <div className={`absolute inset-x-0 bottom-0 bg-gradient-to-t from-black/80 via-black/40 to-transparent p-6 flex justify-between items-center transition-all duration-300 z-10 ${isHovered || !isPlaying ? "opacity-100 translate-y-0" : "opacity-0 translate-y-2 pointer-events-none"}`}>
+                  {/* Left Side: Play/Pause and Quick Status */}
+                  <div className="flex items-center gap-3">
+                    <button 
+                      onClick={(e) => { e.stopPropagation(); togglePlay(); }}
+                      className="flex items-center justify-center w-10 h-10 rounded-xl bg-white/10 hover:bg-white/20 border border-white/10 text-white transition-all duration-200 cursor-pointer"
+                    >
+                      {isPlaying ? <FaPause className="text-sm" /> : <FaPlay className="text-sm ml-0.5" />}
+                    </button>
+                    <span className="text-white text-xs font-semibold select-none bg-white/5 border border-white/5 rounded-md px-2 py-1 uppercase tracking-wider">
+                      {isPlaying ? "Playing Demo" : "Paused"}
+                    </span>
+                  </div>
 
-              {/* Footer */}
-              <div className="relative mt-5 flex items-center justify-between">
-                <p className="text-[12px] text-white/40 light:text-black/40">
-                  82% consistency
-                </p>
-
-                <div className="flex items-center gap-1">
-                  {[1, 2, 3, 4].map((i) => (
-                    <div
-                      key={i}
-                      className="h-2 w-2 rounded-full bg-darkSuccess"
-                      style={{ opacity: i / 4 }}
-                    />
-                  ))}
+                  {/* Right Side: Sound Controls */}
+                  <button 
+                    onClick={toggleMute}
+                    className="flex items-center justify-center w-10 h-10 rounded-xl bg-white/10 hover:bg-white/20 border border-white/10 text-white transition-all duration-200 cursor-pointer"
+                  >
+                    {isMuted ? <FaVolumeMute className="text-base" /> : <FaVolumeUp className="text-base" />}
+                  </button>
                 </div>
               </div>
             </div>

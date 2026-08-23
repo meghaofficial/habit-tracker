@@ -150,7 +150,7 @@ function App() {
       {/* <button
         onClick={() => setIsOpen(!isOpen)}
       >{`${isOpen ? 'Close' : 'Open'} the devtools panel`}</button> */}
-      <ReactQueryDevtools initialIsOpen={false} />
+      {/* <ReactQueryDevtools initialIsOpen={false} /> */}
     </QueryClientProvider>
   );
 }

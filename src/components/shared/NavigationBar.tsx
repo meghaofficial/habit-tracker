@@ -63,14 +63,14 @@ const NavigationBar = () => {
             </div>
           </CustomButton>
         )}
-        <CustomButton onClick={toggleTheme} type="transparent">
+        {/* <CustomButton onClick={toggleTheme} type="transparent">
           <div className="flex items-center gap-1">
             {theme.theme === "dark" ? <LuSunMoon /> : <LuSunMedium />}
             <span className="sm:block hidden">
               {theme.theme === "dark" ? "Dark Theme" : "Light Theme"}
             </span>
           </div>
-        </CustomButton>
+        </CustomButton> */}
         <CustomButton
           onClick={() => {
             if (!isLogin) navigate("/login");
