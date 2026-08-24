@@ -232,3 +232,11 @@ export interface CalandarDateDataI {
   title: string;
   description: string;
 }
+
+export interface SubsList {
+  _id: string;
+  planType: string;
+  startDate: Date;
+  endDate: Date;
+  status: string;
+}
