@@ -38,12 +38,6 @@ const HomePage = () => {
           <nav className="flex justify-between items-center py-5 sm:pt-10 pt-7">
             <NavigationBar />
           </nav>
-          {/* <nav
-            className={`fixed left-1/2 top-0 z-30 flex w-full -translate-x-1/2 items-center justify-between bg-[#121212] px-5 py-4 transition-all duration-500 ease-out ${showNavbar ? "translate-y-0 opacity-100" : "-translate-y-10 opacity-0 pointer-events-none"} light:bg-white/70 `}
-          >
-            <NavigationBar />
-          </nav> */}
-
           <HeroSection />
           <VideoDemoImages />
           <Features />
