@@ -119,8 +119,8 @@ const WeeklyTargets = ({
       className="relative overflow-hidden rounded-2xl bg-white/5 border border-white/8 p-2.5"
     >
       <div className="flex items-center justify-between mb-2">
-        <p className="text-[10px] text-gray-300 uppercase tracking-widest font-bold">
-          {week}
+        <p className="text-[8px] text-gray-300 uppercase tracking-widest font-bold">
+          Week {week}
         </p>
       </div>
       {weekTargets.length > 0 ? (
