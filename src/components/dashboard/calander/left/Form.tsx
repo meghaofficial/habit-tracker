@@ -25,7 +25,7 @@ const Form = ({
   selectedDate,
   setDataList,
   formData,
-  setFormData
+  setFormData,
 }: FormProps) => {
   const theme = useSelector((state: RootState) => state.theme).theme;
   const [createLoading, setCreateLoading] = useState(false);
@@ -121,99 +121,171 @@ const Form = ({
     <motion.div
       initial={{ opacity: 0, x: -10 }}
       animate={{ opacity: 1, x: 0 }}
-      className="flex flex-col space-y-3"
+      className="flex flex-col"
     >
-      <div className="flex items-center justify-between mb-2">
-        <span className="px-3 py-1 text-[10px] font-bold tracking-widest uppercase rounded-full bg-linear-to-r from-blue-500/20 to-cyan-500/20 text-cyan-400 border border-blue-500/20">
-          {activeData?.id ? "Edit Task" : "New Task"}
-        </span>
-        <span className="playfair-display">
-          {formatTimestamp(selectedDate.toString()).split("|")[0]}
-        </span>
+      {/* Header */}
+      <div className="flex items-start justify-between gap-4 pb-5">
+        <div>
+          <div className="flex items-center gap-2">
+            <span className="text-[10px] font-bold uppercase tracking-[0.2em] text-indigo-400">
+              {activeData?.id ? "Edit Task" : "New Task"}
+            </span>
+
+            <span className="h-1 w-1 rounded-full bg-white/20" />
+
+            <span className="text-[10px] text-gray-500">
+              {formatTimestamp(selectedDate.toString()).split("|")[0]}
+            </span>
+          </div>
+
+          <h3 className="mt-2 text-lg font-semibold tracking-tight text-white light:text-lightText">
+            {activeData?.id ? "Update your task" : "Create a new task"}
+          </h3>
+
+          <p className="mt-1 text-[11px] leading-5 text-gray-500">
+            {activeData?.id
+              ? "Make changes to keep your plan up to date."
+              : "Define something meaningful you want to accomplish."}
+          </p>
+        </div>
+
+        <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl border border-white/10 bg-white/4 text-indigo-400">
+          ✦
+        </div>
       </div>
 
-      {/* Status Selection */}
-      <div className="space-y-3 mt-3">
-        <p className="text-[11px] font-bold opacity-60 tracking-wider uppercase">
-          Select Status
-        </p>
-        <div className="flex flex-wrap gap-2.5">
+      <div className="h-px bg-white/[0.07]" />
+
+      {/* Status */}
+      <div className="mt-5">
+        <div className="mb-2.5 flex items-center justify-between">
+          <label className="text-[10px] font-bold uppercase tracking-[0.18em] text-gray-500">
+            Status
+          </label>
+
+          <span className="text-[10px] text-gray-600">Choose one</span>
+        </div>
+
+        <div className="flex flex-wrap gap-2">
           {Object.entries(statusColors).map(([key, value], index) => {
+            const isActive = activeStatus === key;
+
             return (
               <button
                 key={index}
+                type="button"
                 onClick={() => {
-                  // if (activeData?.id) {
-                  //   setActiveData((prev) =>
-                  //     prev ? { ...prev, status: key } : prev,
-                  //   );
-                  // } else {
-                  //   setActiveStatus(key);
-                  // }
                   setActiveStatus(key);
-                  setFormData((prev) => ({ ...prev, status: key }));
+                  setFormData((prev) => ({
+                    ...prev,
+                    status: key,
+                  }));
                 }}
-                className={`flex items-center gap-2 px-2 py-1 rounded-xl text-[10px] transition-all duration-300 ${activeStatus === key ? "scale-105 shadow-lg ring-1 ring-white/20" : "hover:scale-105 hover:bg-white/5 opacity-70 hover:opacity-100"}`}
+                className={`
+              flex items-center gap-2 rounded-xl border px-3 py-2
+              text-[10px] font-medium capitalize
+              transition-all duration-200
+              ${
+                isActive
+                  ? "shadow-[0_6px_20px_rgba(99,102,241,0.12)]"
+                  : "border-white/8 bg-white/2 text-gray-500 hover:border-white/15 hover:bg-white/5 hover:text-gray-300"
+              }
+            `}
                 style={{
-                  backgroundColor:
-                    activeStatus === key
-                      ? theme === "dark"
-                        ? value.dbg
-                        : value.bg
-                      : "transparent",
-                  border: `1px solid ${activeStatus === key ? (theme === "dark" ? value.ddot : value.dot) : theme === "dark" ? "rgba(255,255,255,.1)" : "rgba(0,0,0,.1)"}`,
+                  backgroundColor: isActive
+                    ? theme === "dark"
+                      ? value.dbg
+                      : value.bg
+                    : undefined,
+
+                  borderColor: isActive
+                    ? theme === "dark"
+                      ? value.ddot
+                      : value.dot
+                    : undefined,
+
+                  color: isActive
+                    ? theme === "dark"
+                      ? value.ddot
+                      : value.dot
+                    : undefined,
                 }}
               >
-                <div
-                  className={`h-2.5 w-2.5 rounded-full ${activeStatus === key ? "animate-pulse" : ""}`}
+                <span
+                  className="h-2 w-2 shrink-0 rounded-full"
                   style={{
                     backgroundColor: theme === "dark" ? value.ddot : value.dot,
                   }}
                 />
-                <span className="capitalize">{key}</span>
+
+                {key}
               </button>
             );
           })}
         </div>
       </div>
 
-      {/* Title Input */}
-      <div className="space-y-2">
-        <label className="text-[11px] font-bold opacity-60 tracking-wider uppercase">
-          Title
+      {/* Title */}
+      <div className="mt-6">
+        <label className="text-[10px] font-bold uppercase tracking-[0.18em] text-gray-500">
+          Task title
         </label>
-        <div className="relative group mt-1.5">
-          <input
-            type="text"
-            placeholder={
-              activeData?.id
-                ? activeData?.title
-                : "What do you want to accomplish?"
-            }
-            className="w-full rounded-xl bg-white/5 border border-white/10 px-3 py-2 text-[12px] outline-none transition-all duration-300 focus:bg-white/10 focus:border-purple-500/50 focus:ring-4 focus:ring-purple-500/10 placeholder:text-gray-500"
-            value={formData.title}
-            onChange={(e) =>
-              setFormData((prev) => ({
-                ...prev,
-                title: e.target.value,
-              }))
-            }
-          />
-        </div>
+
+        <input
+          type="text"
+          placeholder={
+            activeData?.id
+              ? activeData?.title
+              : "What do you want to accomplish?"
+          }
+          value={formData.title}
+          onChange={(e) =>
+            setFormData((prev) => ({
+              ...prev,
+              title: e.target.value,
+            }))
+          }
+          className="
+        mt-2
+        h-11
+        w-full
+        rounded-xl
+        border
+        border-white/10
+        bg-white/[0.035]
+        px-3.5
+        text-[12px]
+        text-white
+        outline-none
+        transition-all
+        duration-200
+        placeholder:text-gray-600
+        hover:border-white/15
+        focus:border-indigo-500/40
+        focus:bg-white/5
+        focus:ring-4
+        focus:ring-indigo-500/[0.07]
+        light:text-lightText
+      "
+        />
       </div>
 
-      {/* Description Input */}
-      <div className="space-y-2">
-        <label className="text-[11px] font-bold opacity-60 tracking-wider uppercase">
-          Description
-        </label>
+      {/* Description */}
+      <div className="mt-5">
+        <div className="flex items-center justify-between">
+          <label className="text-[10px] font-bold uppercase tracking-[0.18em] text-gray-500">
+            Description
+          </label>
+
+          <span className="text-[9px] text-gray-600">Optional</span>
+        </div>
+
         <textarea
           placeholder={
             activeData?.id
               ? activeData?.description
               : "Add some details about this task..."
           }
-          className="mt-1.5 h-40 resize-none w-full rounded-xl bg-white/5 border border-white/10 px-3 py-2 text-[12px] outline-none transition-all duration-300 focus:bg-white/10 focus:border-purple-500/50 focus:ring-4 focus:ring-purple-500/10 placeholder:text-gray-500"
           value={formData.description}
           onChange={(e) =>
             setFormData((prev) => ({
@@ -221,22 +293,48 @@ const Form = ({
               description: e.target.value,
             }))
           }
+          className="
+        mt-2
+        h-36
+        w-full
+        resize-none
+        rounded-xl
+        border
+        border-white/10
+        bg-white/[0.035]
+        px-3.5
+        py-3
+        text-[12px]
+        leading-6
+        text-white
+        outline-none
+        transition-all
+        duration-200
+        placeholder:text-gray-600
+        hover:border-white/15
+        focus:border-indigo-500/40
+        focus:bg-white/5
+        focus:ring-4
+        focus:ring-indigo-500/[0.07]
+        light:text-lightText
+      "
         />
       </div>
 
-      {/* Action Buttons */}
-      <div className="flex items-center gap-3 pt-2">
+      {/* Actions */}
+      <div className="mt-6 flex items-center gap-2.5 border-t border-white/[0.07] pt-5">
         {activeData?.id && (
           <CustomButtonForm
-            styling="cursor-pointer"
+            styling="h-10 flex-1 cursor-pointer"
             onClick={() => setToggleUpdate(false)}
             type="cancel"
           >
-            <span className="text-[12px]">Cancel</span>
+            <span className="text-[11px] font-semibold">Cancel</span>
           </CustomButtonForm>
         )}
+
         <CustomButtonForm
-          styling="cursor-pointer"
+          styling="h-10 flex-1 cursor-pointer"
           onClick={activeData?.id ? handleUpdate : handleCreate}
           disabled={updateLoading || createLoading || !formData.title}
           type="success"
@@ -244,8 +342,8 @@ const Form = ({
           {createLoading || updateLoading ? (
             <CircleLoader />
           ) : (
-            <span className="text-[12px]">
-              {activeData?.id ? "Save Changes" : "Create"}
+            <span className="text-[11px] font-semibold">
+              {activeData?.id ? "Save Changes" : "Create Task"}
             </span>
           )}
         </CustomButtonForm>
