@@ -1,5 +1,4 @@
 import CustomButton from "./CutomButton";
-import { LuSunMedium, LuSunMoon } from "react-icons/lu";
 import type { RootState } from "../../redux/store/store";
 import { useDispatch, useSelector } from "react-redux";
 import { IoMdLogIn, IoMdLogOut } from "react-icons/io";
@@ -9,28 +8,27 @@ import { notify } from "../../helper";
 import { useLocation, useNavigate } from "react-router-dom";
 import Logo from "./Logo";
 import { IoSettingsSharp } from "react-icons/io5";
-import { setTheme } from "../../redux/slices/themeSlice";
 
 const NavigationBar = () => {
   const dispatch = useDispatch();
   const navigate = useNavigate();
   const location = useLocation();
   const isLogin = useSelector((state: RootState) => state.auth.username !== "");
-  const theme = useSelector((state: RootState) => state.theme);
+  // const theme = useSelector((state: RootState) => state.theme);
 
-  const toggleTheme = () => {
-    const newTheme = theme.theme === "dark" ? "light" : "dark";
-    dispatch(setTheme({ theme: newTheme }));
-    const root = window.document.documentElement;
+  // const toggleTheme = () => {
+  //   const newTheme = theme.theme === "dark" ? "light" : "dark";
+  //   dispatch(setTheme({ theme: newTheme }));
+  //   const root = window.document.documentElement;
 
-    if (newTheme === "dark") {
-      root.classList.remove("light");
-      localStorage.setItem("theme", "dark");
-    } else {
-      root.classList.add("light");
-      localStorage.setItem("theme", "light");
-    }
-  };
+  //   if (newTheme === "dark") {
+  //     root.classList.remove("light");
+  //     localStorage.setItem("theme", "dark");
+  //   } else {
+  //     root.classList.add("light");
+  //     localStorage.setItem("theme", "light");
+  //   }
+  // };
 
   const handleLogout = async () => {
     try {
