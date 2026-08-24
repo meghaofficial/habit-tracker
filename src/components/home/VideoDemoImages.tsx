@@ -62,10 +62,11 @@ const VideoDemoImages = () => {
     return () => clearInterval(timer);
   }, [isPaused]);
 
+  const formattedText = (text: string) => text.toLowerCase();
+
   return (
     <section className="mt-20 mb-28 w-full px-4">
       <div className="mx-auto w-full max-w-6xl">
-
         {/* Section Heading */}
         <div className="mb-10 text-center">
           <p className="text-[11px] font-semibold uppercase tracking-[0.3em] text-indigo-400">
@@ -78,8 +79,8 @@ const VideoDemoImages = () => {
           </h2>
 
           <p className="mx-auto mt-4 max-w-2xl text-sm leading-6 text-gray-500">
-            Plan your goals, build consistency, understand your performance
-            and keep moving forward — all from one place.
+            Plan your goals, build consistency, understand your performance and
+            keep moving forward — all from one place.
           </p>
         </div>
 
@@ -96,18 +97,15 @@ const VideoDemoImages = () => {
             shadow-[0_30px_100px_rgba(99,102,241,0.14)]
           "
         >
-
           {/* Ambient background */}
           <div className="pointer-events-none absolute -left-32 -top-32 h-80 w-80 rounded-full bg-indigo-500/10 blur-[100px]" />
 
           <div className="pointer-events-none absolute -bottom-32 -right-32 h-80 w-80 rounded-full bg-purple-500/10 blur-[100px]" />
 
           {/* Content */}
-          <div className="relative grid min-h-[620px] grid-cols-1 lg:grid-cols-[0.8fr_1.2fr]">
-
+          <div className="relative grid min-h-155 grid-cols-1 lg:grid-cols-[0.8fr_1.2fr]">
             {/* LEFT SIDE */}
             <div className="flex flex-col justify-center p-8 sm:p-10 lg:p-14">
-
               {/* Step indicator */}
               <div className="mb-8 flex items-center gap-3">
                 <span className="text-xs font-mono text-indigo-400">
@@ -147,17 +145,12 @@ const VideoDemoImages = () => {
                   {/* Points */}
                   <div className="mt-7 space-y-3">
                     {activeSlide.points.map((point) => (
-                      <div
-                        key={point}
-                        className="flex items-center gap-3"
-                      >
+                      <div key={point} className="flex items-center gap-3">
                         <div className="flex h-5 w-5 items-center justify-center rounded-full bg-indigo-500/10 border border-indigo-500/20">
                           <FiCheck className="text-[10px] text-indigo-400" />
                         </div>
 
-                        <span className="text-xs text-gray-400">
-                          {point}
-                        </span>
+                        <span className="text-xs text-gray-400">{point}</span>
                       </div>
                     ))}
                   </div>
@@ -213,7 +206,6 @@ const VideoDemoImages = () => {
 
             {/* RIGHT SIDE — SCREENSHOT */}
             <div className="relative flex items-center justify-center overflow-hidden p-6 sm:p-10 lg:p-12">
-
               {/* Glow behind screenshot */}
               <div className="absolute h-[70%] w-[70%] rounded-full bg-indigo-500/10 blur-[100px]" />
 
@@ -243,14 +235,13 @@ const VideoDemoImages = () => {
                 >
                   {/* Browser frame */}
                   <div className="overflow-hidden rounded-2xl border border-white/10 bg-zinc-900 shadow-[0_25px_80px_rgba(0,0,0,0.5)]">
-
                     {/* Browser top */}
-                    <div className="flex h-9 items-center gap-1.5 border-b border-white/5 bg-white/[0.025] px-4">
+                    <div className="flex h-9 items-center gap-1.5 border-b border-white/5 bg-white/2.5 px-4">
                       <span className="h-2.5 w-2.5 rounded-full bg-red-400/60" />
                       <span className="h-2.5 w-2.5 rounded-full bg-yellow-400/60" />
                       <span className="h-2.5 w-2.5 rounded-full bg-green-400/60" />
 
-                      <div className="ml-4 h-4 flex-1 max-w-[280px] rounded-md bg-white/5" />
+                      <div className="ml-4 h-4 flex-1 max-w-70 rounded-md bg-white/5" />
                     </div>
 
                     {/* Screenshot */}
@@ -267,7 +258,7 @@ const VideoDemoImages = () => {
                       />
 
                       {/* Screenshot shine */}
-                      <div className="pointer-events-none absolute inset-0 bg-gradient-to-br from-white/[0.04] via-transparent to-indigo-500/[0.04]" />
+                      <div className="pointer-events-none absolute inset-0 bg-linear-to-br from-white/4 via-transparent to-indigo-500/4" />
                     </div>
                   </div>
 
@@ -303,17 +294,15 @@ const VideoDemoImages = () => {
                 duration-300
                 ${
                   index === activeIndex
-                    ? "border-indigo-400/30 bg-indigo-500/[0.06]"
-                    : "border-white/[0.06] bg-white/[0.015] hover:border-white/10 hover:bg-white/[0.03]"
+                    ? "border-indigo-400/30 bg-indigo-500/6"
+                    : "border-white/6 bg-white/1.5 hover:border-white/10 hover:bg-white/3"
                 }
               `}
             >
               <div className="flex items-center justify-between">
                 <span
                   className={`text-[10px] font-mono ${
-                    index === activeIndex
-                      ? "text-indigo-400"
-                      : "text-gray-600"
+                    index === activeIndex ? "text-indigo-400" : "text-gray-600"
                   }`}
                 >
                   0{index + 1}
@@ -331,9 +320,8 @@ const VideoDemoImages = () => {
                 />
               </div>
 
-              <p className="mt-3 text-xs font-semibold text-gray-300">
-                {slide.eyebrow
-                  .toLowerCase()
+              <p className="mt-3 text-xs font-semibold text-gray-300 capitalize">
+                {formattedText(slide.eyebrow)
                   .replace("your ", "")
                   .replace("04", "")}
               </p>
