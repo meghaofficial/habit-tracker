@@ -1,4 +1,9 @@
+import { useNavigate } from "react-router-dom";
+
 const HeroSection = () => {
+
+  const navigate = useNavigate();
+
   const highlights = [
     {
       label: "STREAKS",
@@ -52,14 +57,14 @@ const HeroSection = () => {
 
         {/* CTA */}
         <div className="mt-8 flex w-full flex-col items-center gap-3 sm:mt-10 sm:w-auto sm:flex-row">
-          <button className=" group flex h-12 w-full items-center justify-center gap-2 rounded-xl bg-linear-to-r from-[#6366F1] via-[#3B82F6] to-[#A855F7] px-7 text-[13px] font-bold text-white shadow-[0_15px_45px_rgba(99,102,241,0.25)] transition-all duration-300 hover:-translate-y-0.5 hover:shadow-[0_20px_55px_rgba(99,102,241,0.35)] sm:w-auto ">
+          <button className=" group flex h-12 w-full items-center justify-center gap-2 rounded-xl bg-linear-to-r from-[#6366F1] via-[#3B82F6] to-[#A855F7] px-7 text-[13px] font-bold text-white shadow-[0_15px_45px_rgba(99,102,241,0.25)] transition-all duration-300 hover:-translate-y-0.5 hover:shadow-[0_20px_55px_rgba(99,102,241,0.35)] sm:w-auto " onClick={() => navigate("/login")}>
             Get Started Free
             <span className="transition-transform duration-300 group-hover:translate-x-1">
               →
             </span>
           </button>
 
-          <button className=" flex h-12 w-full items-center justify-center rounded-xl border border-white/10 bg-white/3 px-7 text-[13px] font-semibold text-gray-300 transition-all duration-300 hover:border-white/20 hover:bg-white/6 sm:w-auto ">
+          <button className=" flex h-12 w-full items-center justify-center rounded-xl border border-white/10 bg-white/3 px-7 text-[13px] font-semibold text-gray-300 transition-all duration-300 hover:border-white/20 hover:bg-white/6 sm:w-auto " onClick={() => navigate("/login")}>
             Explore Habitify
           </button>
         </div>
