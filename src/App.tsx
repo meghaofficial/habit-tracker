@@ -16,7 +16,6 @@ import { socket } from "./socket/socket";
 import NoInternetConnection from "./components/shared/NoInternetConnection";
 import AuthForm from "./components/auth/AuthForm";
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
-import { ReactQueryDevtools } from '@tanstack/react-query-devtools'
 
 const queryClient = new QueryClient()
 
