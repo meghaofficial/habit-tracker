@@ -27,7 +27,7 @@ const Footer = () => {
               href="mailto:support@habitify.com"
               className="mt-3 block text-[12px] text-gray-400 transition-colors hover:text-white"
             >
-              support@habitify.com
+              support@habitify.in
             </a>
           </div>
 
@@ -39,14 +39,14 @@ const Footer = () => {
 
             <div className="mt-3 flex items-center gap-4">
               <a
-                href="#"
+                href="https://www.linkedin.com/in/megha-sharma-a560b5205/"
                 aria-label="Instagram"
                 className="text-gray-500 text-[12px] transition-colors hover:text-white"
               >
                 Instagram
               </a>
               <a
-                href="#"
+                href="https://www.instagram.com/my.openspace?igsi=MW4zdmQyOWZkNjZiag%3D%3D&utm_source=qr"
                 aria-label="LinkedIn"
                 className="text-gray-500 text-[12px] transition-colors hover:text-white"
               >
