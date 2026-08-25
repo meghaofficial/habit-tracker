@@ -81,7 +81,7 @@ const ActivePlan = ({
                 Active Plan
               </p>
 
-              <span className="flex items-center gap-1 rounded-md border border-emerald-400/10 bg-emerald-400/[0.05] px-1.5 py-0.5 text-[9px] font-semibold text-emerald-400">
+              <span className="flex items-center gap-1 rounded-md border border-emerald-400/10 bg-emerald-400/5 px-1.5 py-0.5 text-[9px] font-semibold text-emerald-400">
                 <span className="h-1 w-1 rounded-full bg-emerald-400" />
                 Active
               </span>
