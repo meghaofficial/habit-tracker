@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import AnalysisMainComponent from "../dashboard/analysis/AnalysisMainComponent";
 import TrackMainComponent from "../dashboard/track/TrackMainComponent";
-import { notify } from "../../helper";
+import { formattedText, notify } from "../../helper";
 import { axiosPrivate } from "../../api/axios";
 import PageLoader from "../loaders/PageLoader";
 import type { DashboardI, DateLogI, PlanI, SubscriptionI } from "../../types";
@@ -13,6 +13,7 @@ import AiCoachMainComponent from "../ai/AiCoachMainComponent";
 import CalandarMainComponent from "../dashboard/calander/CalandarMainComponent";
 import FreeSubsConfirm from "../dashboard/subscription/FreeSubsConfirm";
 import SubsPlans from "../dashboard/subscription/SubsPlans";
+import Popup from "../shared/Popup";
 
 const MASTER_MENU = [
   { key: "track", label: "Monthly Habit" },
@@ -113,7 +114,7 @@ const Dashboard = () => {
         const hasUsedFree = !res?.data?.hasUsedFree;
         setShowFree(!hasUsedFree);
         if (subscription) await getDashboard();
-        if (!subscription) await getPlans(hasUsedFree);
+        else await getPlans(hasUsedFree);
       }
     } catch (error) {
       if ((error as any).response.status === 500) {
@@ -166,7 +167,7 @@ const Dashboard = () => {
               )}
 
               {/* extent plan popup */}
-              {/* <Popup open={openPlan} setOpen={setOpenPlan}>
+              <Popup open={openPlan} setOpen={setOpenPlan}>
                 <p className="text-3xl my-3 font-semibold text-center">
                   Select your Plan
                 </p>
@@ -199,7 +200,7 @@ const Dashboard = () => {
                     </div>
                   ))}
                 </div>
-              </Popup> */}
+              </Popup>
               <nav className="flex justify-between items-center p-0 sm:mb-0 mb-7 sm:pt-5 pt-4 w-full">
                 <NavigationBar />
               </nav>

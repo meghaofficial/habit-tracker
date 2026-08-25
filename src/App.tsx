@@ -63,16 +63,16 @@ function App() {
     initAuth();
   }, [dispatch]);
 
-  useEffect(() => {
-    if (user?.id) {
-      socket.connect();
-      socket.emit("join-user", user.id);
-    }
+  // useEffect(() => {
+  //   if (user?.id) {
+  //     socket.connect();
+  //     socket.emit("join-user", user.id);
+  //   }
 
-    return () => {
-      socket.disconnect();
-    };
-  }, [user?.id]);
+  //   return () => {
+  //     socket.disconnect();
+  //   };
+  // }, [user?.id]);
 
   useEffect(() => {
     const handleOnline = () => setIsOnline(true);

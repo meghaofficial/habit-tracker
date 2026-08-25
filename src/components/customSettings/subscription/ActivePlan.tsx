@@ -1,9 +1,4 @@
-import {
-  useEffect,
-  useState,
-  type Dispatch,
-  type SetStateAction,
-} from "react";
+import { useEffect, useState, type Dispatch, type SetStateAction } from "react";
 import { FiCalendar, FiChevronUp, FiZap } from "react-icons/fi";
 import { formatMonthYearSimple } from "../../../helper";
 import { axiosPrivate } from "../../../api/axios";
@@ -63,54 +58,82 @@ const ActivePlan = ({
   }, []);
 
   return (
-    <div className="relative overflow-hidden rounded-2xl border border-emerald-500/20 bg-emerald-500/5 p-5">
-      {/* Decorative glow */}
-      <div className="absolute -top-8 -right-8 w-28 h-28 rounded-full bg-emerald-500/15 blur-2xl pointer-events-none" />
+    <div className="group relative overflow-hidden rounded-2xl border border-indigo-400/10 bg-indigo-500/[0.035] p-5 transition-all duration-300 hover:border-indigo-400/15">
+      {/* Soft Decorative Glow */}
+      <div className="pointer-events-none absolute -right-16 -top-16 h-40 w-40 rounded-full bg-indigo-500/8 blur-3xl" />
 
-      <div className="flex sm:flex-row flex-col sm:items-center gap-4 justify-between">
+      <div className="pointer-events-none absolute -bottom-20 left-1/3 h-32 w-32 rounded-full bg-indigo-500/4 blur-3xl" />
+
+      <div className="relative z-10 flex flex-col justify-between gap-5 sm:flex-row sm:items-center">
+        {/* Plan Information */}
         <div className="flex items-center gap-4">
-          <div className="w-11 h-11 rounded-xl bg-emerald-500/15 border border-emerald-500/20 flex items-center justify-center text-emerald-400 shrink-0">
-            <FiZap className="w-5 h-5" />
+          {/* Icon */}
+          <div className="relative flex h-11 w-11 shrink-0 items-center justify-center rounded-xl border border-indigo-400/15 bg-indigo-500/10 text-indigo-400">
+            <FiZap className="h-5 w-5" />
+
+            {/* Active dot */}
+            <span className="absolute -right-0.5 -top-0.5 h-2.5 w-2.5 rounded-full border-2 border-zinc-950 bg-emerald-400 light:border-white" />
           </div>
+
           <div>
-            <p className="text-xs font-semibold text-emerald-400 uppercase tracking-wider mb-0.5">
-              Active Plan
-            </p>
+            <div className="mb-1 flex items-center gap-2">
+              <p className="text-[10px] font-semibold uppercase tracking-[0.16em] text-indigo-400">
+                Active Plan
+              </p>
+
+              <span className="flex items-center gap-1 rounded-md border border-emerald-400/10 bg-emerald-400/[0.05] px-1.5 py-0.5 text-[9px] font-semibold text-emerald-400">
+                <span className="h-1 w-1 rounded-full bg-emerald-400" />
+                Active
+              </span>
+            </div>
+
             {activeSubsLoading ? (
-              <div className="flex gap-2 items-center animate-pulse mt-1">
-                <div className="h-4 w-24 rounded bg-emerald-500/20" />
-                <div className="h-4 w-4 rounded bg-emerald-500/20" />
-                <div className="h-4 w-24 rounded bg-emerald-500/20" />
+              <div className="mt-2 flex animate-pulse items-center gap-2">
+                <div className="h-4 w-20 rounded-lg bg-indigo-500/10" />
+                <div className="h-4 w-4 rounded bg-indigo-500/10" />
+                <div className="h-4 w-20 rounded-lg bg-indigo-500/10" />
               </div>
             ) : (
-              <p className="text-sm font-medium text-white light:text-black flex items-center gap-1.5">
-                <FiCalendar className="w-3.5 h-3.5 text-emerald-400" />
-                {formatMonthYearSimple(startDate)}
-                <span className="text-slate-400 mx-0.5">→</span>
-                {formatMonthYearSimple(endDate)}
-              </p>
+              <div className="flex items-center gap-2 text-sm font-medium text-zinc-200 light:text-black">
+                <FiCalendar className="h-3.5 w-3.5 text-indigo-400" />
+
+                <span>{formatMonthYearSimple(startDate)}</span>
+
+                <span className="text-zinc-700">→</span>
+
+                <span>{formatMonthYearSimple(endDate)}</span>
+              </div>
             )}
           </div>
         </div>
 
+        {/* =================================================
+        EXTEND BUTTON
+    ================================================== */}
         <button
-          className={`flex items-center gap-2 px-4 py-2.5 rounded-xl text-xs font-semibold transition-all duration-300 cursor-pointer border ${
-            showPlans
-              ? "bg-white/5 border-white/10 light:bg-black/5 light:border-black/10 text-slate-400 hover:text-white light:hover:text-black"
-              : "bg-emerald-500 border-emerald-400/50 text-black hover:bg-emerald-400 shadow-md shadow-emerald-500/25"
-          }`}
+          type="button"
           onClick={() => {
-            if (!showPlans) getPlans();
+            if (!showPlans) {
+              getPlans();
+            }
+
             setShowPlans((prev) => !prev);
           }}
+          className={`flex cursor-pointer items-center justify-center gap-2 rounded-xl border px-4 py-2.5 text-xs font-semibold transition-all duration-300 ${
+            showPlans
+              ? "border-white/8 bg-white/[0.035] text-zinc-500 hover:bg-white/6 hover:text-zinc-300 light:border-black/10 light:bg-black/3 light:text-slate-600"
+              : "border-indigo-400/20 bg-indigo-500/10 text-indigo-300 hover:border-indigo-400/30 hover:bg-indigo-500/15"
+          }`}
         >
           {showPlans ? (
             <>
-              <FiChevronUp className="w-3.5 h-3.5" /> Hide Plans
+              <FiChevronUp className="h-3.5 w-3.5" />
+              Hide Plans
             </>
           ) : (
             <>
-              <FiZap className="w-3.5 h-3.5" /> Extend Plan
+              <FiZap className="h-3.5 w-3.5" />
+              Extend Plan
             </>
           )}
         </button>

@@ -1,70 +1,166 @@
+import { motion } from "framer-motion";
 import { FiCalendar, FiClock } from "react-icons/fi";
 import type { SubsList } from "../../../types";
 import { formatMonthYearSimple } from "../../../helper";
 
-const SubscriptionList = ({ type, loading, list }: { type: string; loading: boolean; list: SubsList[] }) => {
+const SubscriptionList = ({
+  type,
+  loading,
+  list,
+}: {
+  type: string;
+  loading: boolean;
+  list: SubsList[];
+}) => {
   return (
     <div
-      className={`rounded-2xl border ${type === "expired" ? "border-red-500/15 bg-red-500/5" : "border-amber-500/15 bg-amber-500/5"} p-5`}
+      className={`relative overflow-hidden rounded-2xl border p-5 ${
+        type === "scheduled"
+          ? "border-indigo-400/10 bg-indigo-500/2.5"
+          : "border-white/6 bg-white/1.5"
+      }`}
     >
-      <div className="flex items-center gap-2.5 mb-4">
-        <div className={`w-8 h-8 rounded-lg ${type === "expired" ? "bg-red-500/15 border border-red-500/20 text-red-400" : "bg-amber-500/15 border border-amber-500/20 text-amber-400"} flex items-center justify-center shrink-0`}>
-          {type === "expired" ? (
-            <FiClock className="w-4 h-4" />
-          ) : (
-            <FiCalendar className="w-4 h-4" />
-          )}
+      {/* Decorative Glow */}
+      {type === "scheduled" && (
+        <div className="pointer-events-none absolute -right-12 -top-12 h-28 w-28 rounded-full bg-indigo-500/6 blur-3xl" />
+      )}
+
+      {/* Header */}
+      <div className="relative z-10 mb-4 flex items-center justify-between">
+        <div className="flex items-center gap-3">
+          <div
+            className={`flex h-9 w-9 shrink-0 items-center justify-center rounded-xl border ${
+              type === "scheduled"
+                ? "border-indigo-400/10 bg-indigo-500/8 text-indigo-400"
+                : "border-white/6 bg-white/3 text-zinc-600"
+            }`}
+          >
+            {type === "scheduled" ? (
+              <FiCalendar className="h-4 w-4" />
+            ) : (
+              <FiClock className="h-4 w-4" />
+            )}
+          </div>
+
+          <div>
+            <h3
+              className={`text-sm font-semibold ${
+                type === "scheduled" ? "text-indigo-300" : "text-zinc-400"
+              }`}
+            >
+              {type === "scheduled"
+                ? "Scheduled Subscriptions"
+                : "Expired Subscriptions"}
+            </h3>
+
+            {!loading && (
+              <p className="mt-0.5 text-[10px] text-zinc-600">
+                {list.length === 0
+                  ? type === "scheduled"
+                    ? "No upcoming subscriptions"
+                    : "No past subscriptions"
+                  : `${list.length} record${list.length > 1 ? "s" : ""}`}
+              </p>
+            )}
+          </div>
         </div>
-        <div>
-          <h3 className={`font-semibold ${type === "expired" ? "text-red-400" : "text-amber-400"} text-sm`}>
-            {type === "expired" ? "Expired" : "Scheduled"} Subscriptions
-          </h3>
-          {!loading && (
-            <p className="text-[11px] text-slate-500 mt-0.5">
-              {list.length === 0
-                ? "No past subscriptions"
-                : `${list.length} record${list.length > 1 ? "s" : ""}`}
-            </p>
-          )}
-        </div>
+
+        {/* Count */}
+        {!loading && list.length > 0 && (
+          <span
+            className={`rounded-lg border px-2 py-1 text-[10px] font-semibold ${
+              type === "scheduled"
+                ? "border-indigo-400/10 bg-indigo-500/6 text-indigo-400"
+                : "border-white/6 bg-white/3 text-zinc-600"
+            }`}
+          >
+            {list.length}
+          </span>
+        )}
       </div>
 
-      <div className="divide-y divide-red-500/10">
+      {/* List */}
+      <div className="relative z-10">
         {loading ? (
-          <>
+          <div className="divide-y divide-white/4 light:divide-black/5">
             <SkeletonRow />
             <SkeletonRow />
             <SkeletonRow />
-          </>
+          </div>
         ) : list.length > 0 ? (
-          list.map((exp, index) => (
-            <div
-              key={index}
-              className="flex items-center justify-between py-3 px-1"
-            >
-              <div className="flex items-center gap-2.5">
-                <div className={`w-7 h-7 rounded-full border ${type === "expired" ? "bg-red-500/10 border-red-500/20" : "bg-amber-500/10 border-amber-500/20"} flex items-center justify-center shrink-0`}>
-                  <FiCalendar className={`w-3.5 h-3.5 ${type === "expired" ? "text-red-400" : "text-amber-400"}`} />
+          <div className="divide-y divide-white/4 light:divide-black/5">
+            {list.map((sub, index) => (
+              <motion.div
+                key={sub?._id || index}
+                initial={{
+                  opacity: 0,
+                  y: 4,
+                }}
+                animate={{
+                  opacity: 1,
+                  y: 0,
+                }}
+                transition={{
+                  delay: index * 0.04,
+                }}
+                className="group flex items-center justify-between gap-3 px-1 py-3.5"
+              >
+                {/* Left */}
+                <div className="flex min-w-0 items-center gap-3">
+                  <div
+                    className={`flex h-8 w-8 shrink-0 items-center justify-center rounded-lg border ${
+                      type === "scheduled"
+                        ? "border-indigo-400/10 bg-indigo-500/6 text-indigo-400"
+                        : "border-white/5 bg-white/2.5 text-zinc-600"
+                    }`}
+                  >
+                    <FiCalendar className="h-3.5 w-3.5" />
+                  </div>
+
+                  <div className="min-w-0">
+                    <p className="truncate text-[12px] font-medium text-zinc-300 light:text-black">
+                      {formatMonthYearSimple(sub?.startDate)}
+
+                      <span className="mx-1.5 text-zinc-700">→</span>
+
+                      {formatMonthYearSimple(sub?.endDate)}
+                    </p>
+
+                    <p className="mt-0.5 text-[10px] capitalize text-zinc-600">
+                      {sub?.planType}
+                    </p>
+                  </div>
                 </div>
-                <div>
-                  <p className="text-[12px] font-medium text-white light:text-black">
-                    {formatMonthYearSimple(exp?.startDate)} →{" "}
-                    {formatMonthYearSimple(exp?.endDate)}
-                  </p>
-                  <p className="text-[11px] text-slate-500 capitalize mt-0.5">
-                    {exp?.planType}
-                  </p>
-                </div>
-              </div>
-              <span className={`text-[10px] font-semibold px-2 py-0.5 rounded-full border ${type === "expired" ? "bg-red-500/15 text-red-400 border-red-500/20" : "bg-amber-500/15 text-amber-400 border-amber-500/20"} `}>
-                Expired
-              </span>
-            </div>
-          ))
+
+                {/* Status */}
+                <span
+                  className={`shrink-0 rounded-lg border px-2 py-1 text-[9px] font-semibold uppercase tracking-wider ${
+                    type === "scheduled"
+                      ? "border-indigo-400/10 bg-indigo-500/5 text-indigo-400"
+                      : "border-zinc-800 bg-zinc-900 text-zinc-600"
+                  }`}
+                >
+                  {type === "scheduled" ? "Scheduled" : "Expired"}
+                </span>
+              </motion.div>
+            ))}
+          </div>
         ) : (
-          <div className="flex flex-col items-center justify-center h-28 gap-2 text-slate-500/50">
-            <FiClock className="w-6 h-6" />
-            <p className="text-xs">No expired subscriptions</p>
+          // Empty State
+          <div className="flex h-28 flex-col items-center justify-center gap-2 rounded-xl border border-dashed border-white/5 light:border-black/6">
+            <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-white/2.5">
+              {type === "scheduled" ? (
+                <FiCalendar className="h-4 w-4 text-zinc-700" />
+              ) : (
+                <FiClock className="h-4 w-4 text-zinc-700" />
+              )}
+            </div>
+
+            <p className="text-[11px] text-zinc-700">
+              {type === "scheduled"
+                ? "No scheduled subscriptions"
+                : "No expired subscriptions"}
+            </p>
           </div>
         )}
       </div>

@@ -1,6 +1,6 @@
 import { motion } from "framer-motion";
 import { useState } from "react";
-import { FiKey, FiMail } from "react-icons/fi";
+import { FiKey, FiMail, FiShield } from "react-icons/fi";
 import { axiosPrivate } from "../../../api/axios";
 import { useSelector } from "react-redux";
 import type { RootState } from "../../../redux/store/store";
@@ -35,78 +35,167 @@ const Security = () => {
   };
 
   return (
-    <div className="space-y-6">
-      <div className="border-b border-white/10 light:border-black/10 pb-4">
-        <h3 className="text-xl font-bold text-white light:text-black">
-          Security Credentials
-        </h3>
-        <p className="text-xs text-slate-400 mt-1">
-          Update your password to keep your account secure.
-        </p>
+    <div className="space-y-7">
+      {/* Header */}
+      <div className="flex items-start gap-3 border-b border-white/6 pb-5">
+        <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl border border-indigo-400/10 bg-indigo-500/10">
+          <FiShield className="h-4 w-4 text-indigo-400" />
+        </div>
+        <div>
+          <h3 className="text-lg font-semibold tracking-tight text-white light:text-black">
+            Security Credentials
+          </h3>
+          <p className="mt-1 text-xs text-zinc-500">
+            Update your password to keep your account secure.
+          </p>
+        </div>
       </div>
 
-      {/* Mode Selector Pill */}
-      <div className="flex p-1 bg-slate-950/40 light:bg-black/5 border border-white/10 light:border-black/10 rounded-xl max-w-sm">
-        <button
-          onClick={() => setChangeWOtp(false)}
-          className={`flex-1 flex items-center justify-center gap-2 py-2 text-xs font-semibold rounded-lg transition-all duration-300 relative cursor-pointer ${
-            !changeWOtp
-              ? "text-purple-500 light:text-purple-600 font-bold"
-              : "text-slate-400 hover:text-slate-200 light:hover:text-slate-600"
-          }`}
-        >
-          {!changeWOtp && (
-            <motion.div
-              layoutId="passwordModePill"
-              className="absolute inset-0 bg-white/10 light:bg-white border border-white/10 light:border-slate-200 shadow-sm rounded-lg"
-              transition={{ type: "spring", stiffness: 400, damping: 30 }}
-            />
-          )}
-          <FiKey className="relative z-10 w-3.5 h-3.5" />
-          <span className="relative z-10">Use Old Password</span>
-        </button>
-        <button
-          onClick={() => {
-            if (sendOTPLoading) return;
-            setChangeWOtp(true);
-            handleSendOtp();
-          }}
-          className={`flex-1 flex items-center justify-center gap-2 py-2 text-xs font-semibold rounded-lg transition-all duration-300 relative cursor-pointer ${
-            changeWOtp
-              ? "text-purple-500 light:text-purple-600 font-bold"
-              : "text-slate-400 hover:text-slate-200 light:hover:text-slate-600"
-          }`}
-        >
-          {changeWOtp && (
-            <motion.div
-              layoutId="passwordModePill"
-              className="absolute inset-0 bg-white/10 light:bg-white border border-white/10 light:border-slate-200 shadow-sm rounded-lg"
-              transition={{ type: "spring", stiffness: 400, damping: 30 }}
-            />
-          )}
-          <FiMail className="relative z-10 w-3.5 h-3.5" />
-          <span className="relative z-10">Use OTP Code</span>
-        </button>
+      <div className="max-w-md">
+        <div className="mb-3">
+          <p className="text-xs font-semibold uppercase tracking-[0.15em] text-zinc-500">
+            Verification Method
+          </p>
+          <p className="mt-1 text-[11px] text-zinc-600">
+            Choose how you'd like to verify your identity.
+          </p>
+        </div>
+
+        {/* Old Pwd & OTP Code nav buttons */}
+        <div className="relative flex max-w-md gap-1 rounded-2xl border border-white/6 bg-zinc-950/50 p-1.5 light:border-black/8 light:bg-black/3">
+          <button
+            type="button"
+            onClick={() => setChangeWOtp(false)}
+            className={`relative flex flex-1 cursor-pointer items-center justify-center gap-2 rounded-xl px-3 py-2.5 text-xs font-semibold transition-colors duration-300 ${
+              !changeWOtp
+                ? "text-indigo-300"
+                : "text-zinc-500 hover:text-zinc-300"
+            }`}
+          >
+            {!changeWOtp && (
+              <motion.div
+                layoutId="passwordModePill"
+                transition={{
+                  type: "spring",
+                  stiffness: 400,
+                  damping: 30,
+                }}
+                className="absolute inset-0 rounded-xl border border-indigo-400/10 bg-indigo-500/8 shadow-[0_0_20px_rgba(99,102,241,0.05)]"
+              />
+            )}
+            <FiKey className="relative z-10 h-3.5 w-3.5" />
+            <span className="relative z-10 whitespace-nowrap">
+              Old Password
+            </span>
+          </button>
+
+          <button
+            type="button"
+            disabled={sendOTPLoading}
+            onClick={() => {
+              if (sendOTPLoading) return;
+
+              setChangeWOtp(true);
+              handleSendOtp();
+            }}
+            className={`relative flex flex-1 cursor-pointer items-center justify-center gap-2 rounded-xl px-3 py-2.5 text-xs font-semibold transition-colors duration-300 disabled:cursor-not-allowed disabled:opacity-50 ${
+              changeWOtp
+                ? "text-indigo-300"
+                : "text-zinc-500 hover:text-zinc-300"
+            }`}
+          >
+            {changeWOtp && (
+              <motion.div
+                layoutId="passwordModePill"
+                transition={{
+                  type: "spring",
+                  stiffness: 400,
+                  damping: 30,
+                }}
+                className="absolute inset-0 rounded-xl border border-indigo-400/10 bg-indigo-500/8 shadow-[0_0_20px_rgba(99,102,241,0.05)]"
+              />
+            )}
+            <FiMail className="relative z-10 h-3.5 w-3.5" />
+            <span className="relative z-10 whitespace-nowrap">OTP Code</span>
+          </button>
+        </div>
       </div>
 
-      {/* Form fields depending on selected mode */}
-      <div className="max-w-md space-y-5">
+      {/* Form */}
+      <motion.div layout className="max-w-md">
         {!changeWOtp ? (
           <CWOldPassword />
-        ) : sendOTPLoading ? (
-          /* Loading OTP State */
-          <div className="flex flex-col items-center justify-center py-10 space-y-4">
-            <div className="w-10 h-10 border-4 border-purple-500/20 border-t-purple-500 rounded-full animate-spin" />
-            <p className="text-sm text-slate-400">
-              Sending OTP to {user.email}...
+        ) : 
+        sendOTPLoading ? (
+          <motion.div
+            key="sending-otp"
+            initial={{
+              opacity: 0,
+              y: 8,
+            }}
+            animate={{
+              opacity: 1,
+              y: 0,
+            }}
+            className="flex flex-col items-center justify-center rounded-2xl border border-white/6 bg-white/1.5 px-6 py-12 light:border-black/6 light:bg-black/1.5"
+          >
+            {/* Animated loader */}
+            <div className="relative flex h-12 w-12 items-center justify-center">
+              <div className="absolute inset-0 rounded-full border-2 border-indigo-500/10" />
+
+              <div className="absolute inset-0 animate-spin rounded-full border-2 border-transparent border-t-indigo-400" />
+
+              <FiMail className="h-4 w-4 text-indigo-400" />
+            </div>
+
+            <p className="mt-5 text-sm font-medium text-zinc-300">
+              Sending verification code
             </p>
-          </div>
-        ) : changePwdAfterVerify ? (
+
+            <p className="mt-1 text-center text-xs leading-5 text-zinc-600">
+              We're sending an OTP to
+              <br />
+              <span className="text-zinc-500">{user.email}</span>
+            </p>
+          </motion.div>
+        ) : 
+        changePwdAfterVerify ? 
+        (
           <PwdAfterOTPVerification setChangeWOtp={setChangeWOtp} />
-        ) : (
+        ) : 
+        (
           <VerifyOTP setChangePwdAfterVerify={setChangePwdAfterVerify} />
         )}
-      </div>
+      </motion.div>
+
+      {/* Security Info */}
+      <motion.div
+        initial={{
+          opacity: 0,
+        }}
+        animate={{
+          opacity: 1,
+        }}
+        transition={{
+          delay: 0.2,
+        }}
+        className="flex max-w-md items-start gap-3 rounded-xl border border-indigo-400/10 bg-indigo-500/3 px-4 py-3.5"
+      >
+        <div className="mt-0.5 flex h-7 w-7 shrink-0 items-center justify-center rounded-lg bg-indigo-500/10">
+          <FiShield className="h-3.5 w-3.5 text-indigo-400" />
+        </div>
+
+        <div>
+          <p className="text-xs font-medium text-indigo-300">
+            Keep your account secure
+          </p>
+
+          <p className="mt-1 text-[11px] leading-5 text-zinc-600">
+            Never share your password or verification code with anyone. We will
+            never ask for your OTP.
+          </p>
+        </div>
+      </motion.div>
     </div>
   );
 };
