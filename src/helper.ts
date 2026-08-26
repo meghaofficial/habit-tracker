@@ -1,5 +1,6 @@
 import { toast } from "react-toastify";
 import type { DateLogI, SubscriptionI } from "./types";
+import { shortMonthName } from "./staticData";
 
 export const notify = {
   success: (msg: string) => toast.success(msg),
@@ -57,9 +58,10 @@ export function formatDateString2(date: string | Date) {
 export function formatMonthYearSimple(isoString: Date | string) {
   const date = new Date(isoString);
   const day = date.getDate();
-  const month = date.toLocaleString("en-US", { month: "long" });
+  // const month = date.toLocaleString("en-US", { month: "long" });
+  const monNo = date.getMonth();
   const year = date.getFullYear();
-  return `${day}/${month}/${year}`;
+  return `${day} ${shortMonthName[monNo+1]} ${year}`;
 }
 
 // NEw new

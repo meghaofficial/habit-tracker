@@ -1,4 +1,9 @@
-import React, { useEffect, useState } from "react";
+import React, {
+  useEffect,
+  useState,
+  type Dispatch,
+  type SetStateAction,
+} from "react";
 import { FaRegEye, FaRegEyeSlash } from "react-icons/fa6";
 import { useDispatch } from "react-redux";
 import { setCreds } from "../../redux/slices/authSlice";
@@ -14,13 +19,18 @@ const AuthForm = () => {
     username: "",
     email: "",
     password: "",
+    otp: "",
+    newPwd: "",
   });
   const dispatch = useDispatch();
-  const [loginActive, setLoginActive] = useState(true);
   const [signupLoading, setSignupLoading] = useState(false);
   const [loginLoading, setLoginLoading] = useState(false);
-
-  const [openOTP, setOpenOTP] = useState(false);
+  const [activeInterface, setActiveInterface] = useState("login");
+  const [openOTP, setOpenOTP] = useState(false); // while signup
+  const [forgotSteps, setForgotSteps] = useState("0");
+  const [sendOTPLoading, setSendOTPLoading] = useState(false);
+  const [verifyOtpLoading, setVerifyOtpLoading] = useState(false);
+  const [changePwdLoading, setChangePwdLoading] = useState(false);
 
   const handleSignup = async () => {
     setSignupLoading(true);
@@ -49,7 +59,7 @@ const AuthForm = () => {
     try {
       const { email, password } = formData;
       if (!email || !password) return;
-      
+
       const res = await axiosPublic.post("/login", { email, password });
 
       if (res?.data?.success) {
@@ -60,6 +70,8 @@ const AuthForm = () => {
           username: "",
           email: "",
           password: "",
+          otp: "",
+          newPwd: "",
         });
         // setOpen(false);
       } else {
@@ -73,12 +85,91 @@ const AuthForm = () => {
       setLoginLoading(false);
     }
   };
+  const handleSendOtp = async () => {
+    setSendOTPLoading(true);
+    try {
+      const res = await axiosPublic.post("/forgot-password", {
+        email: formData.email,
+      });
+      if (res.data.success) {
+        setForgotSteps("2");
+        notify.success(res.data.message);
+      }
+    } catch (error) {
+      notify.error(
+        (error as any)?.response?.data?.message ||
+          "An unexpected error occurred",
+      );
+    } finally {
+      setSendOTPLoading(false);
+    }
+  };
+  const handleVerifyOtp = async () => {
+    setVerifyOtpLoading(true);
+    try {
+      const res = await axiosPublic.post("/verify-change-pwd-otp", {
+        email: formData.email,
+        enteredOTP: formData.otp,
+      });
+      if (res.data.success) {
+        setForgotSteps("3");
+        notify.success(res.data.message);
+      }
+    } catch (error) {
+      notify.error(
+        (error as any)?.response?.data?.message ||
+          "An unexpected error occurred",
+      );
+    } finally {
+      setVerifyOtpLoading(false);
+    }
+  };
+  const handleChangePassword = async () => {
+    setChangePwdLoading(true);
+    try {
+      const res = await axiosPublic.post("/reset-password", {
+        email: formData.email,
+        new_password: formData.newPwd,
+      });
+      if (res.data.success) {
+        setActiveInterface("login");
+        setForgotSteps("0");
+        notify.success(res.data.message);
+      }
+    } catch (error) {
+      notify.error(
+        (error as any)?.response?.data?.message ||
+          "An unexpected error occurred",
+      );
+    } finally {
+      setChangePwdLoading(false);
+    }
+  };
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    if (signupLoading || loginLoading) return;
-    if (loginActive) await handleLogin();
-    else await handleSignup();
+    if (
+      signupLoading ||
+      loginLoading ||
+      sendOTPLoading ||
+      verifyOtpLoading ||
+      changePwdLoading
+    )
+      return;
+    if (activeInterface === "login") await handleLogin();
+    else if (activeInterface === "signup") await handleSignup();
+    else if (activeInterface === "forgot") {
+      if (forgotSteps === "1") {
+        if (!formData.email) return;
+        else await handleSendOtp();
+      } else if (forgotSteps === "2") {
+        if (!formData.otp) return;
+        await handleVerifyOtp();
+      } else if (forgotSteps === "3") {
+        if (!formData.newPwd) return;
+        await handleChangePassword();
+      }
+    }
   };
 
   useEffect(() => {
@@ -86,13 +177,14 @@ const AuthForm = () => {
       username: "",
       email: "",
       password: "",
+      otp: "",
+      newPwd: "",
     });
-  }, [loginActive]);
+  }, [activeInterface]);
 
   return (
     <>
       <div className="min-h-screen pb-8 mt-30 flex items-center justify-center px-4 relative overflow-hidden">
-
         <div className="w-full max-w-5xl relative z-10">
           <div className="text-center mb-12">
             <p className="text-xs uppercase tracking-[0.35em] text-darkPrimary font-bold">
@@ -120,7 +212,7 @@ const AuthForm = () => {
                 email={formData.email}
                 setOpenOTP={setOpenOTP}
                 handleSignup={handleSignup}
-                setLoginActive={setLoginActive}
+                setActiveInterface={setActiveInterface}
               />
             ) : (
               <div className="relative">
@@ -137,10 +229,9 @@ const AuthForm = () => {
 
                 {/* Form */}
                 <form onSubmit={handleSubmit} className="mt-8 space-y-4">
-                  {!loginActive && (
+                  {activeInterface === "signup" && (
                     <div>
                       <label className="text-sm text-gray-400">Username</label>
-
                       <input
                         type="text"
                         placeholder="John Doe"
@@ -157,77 +248,183 @@ const AuthForm = () => {
                     </div>
                   )}
 
-                  <div>
-                    <label className="text-sm text-gray-400">
-                      Email Address
-                    </label>
+                  {(activeInterface === "login" ||
+                    activeInterface === "signup" ||
+                    (activeInterface === "forgot" && forgotSteps === "1")) && (
+                    <div>
+                      <label className="text-sm text-gray-400">
+                        Email Address
+                      </label>
 
-                    <input
-                      type="email"
-                      placeholder="john@example.com"
-                      className="mt-2 w-full rounded-2xl border border-white/10 bg-white/5 px-4 py-3 outline-none transition-all focus:border-darkPrimary focus:bg-white/10"
-                      value={formData.email}
-                      onChange={(e) =>
-                        setFormData((prev) => ({
-                          ...prev,
-                          email: e.target.value,
-                        }))
-                      }
-                    />
-                  </div>
-
-                  <div>
-                    <label className="text-sm text-gray-400">Password</label>
-
-                    <div className="relative">
                       <input
-                        type={showPassword ? "text" : "password"}
-                        placeholder="••••••••"
+                        type="email"
+                        placeholder="john@example.com"
                         className="mt-2 w-full rounded-2xl border border-white/10 bg-white/5 px-4 py-3 outline-none transition-all focus:border-darkPrimary focus:bg-white/10"
-                        value={formData.password}
+                        value={formData.email}
                         onChange={(e) =>
                           setFormData((prev) => ({
                             ...prev,
-                            password: e.target.value,
+                            email: e.target.value,
                           }))
                         }
                       />
-                      <span
-                        onClick={() => setShowPassword(!showPassword)}
-                        className="absolute right-3 top-5.5 cursor-pointer text-gray-500"
-                      >
-                        {showPassword ? (
-                          <FaRegEye size={18} />
-                        ) : (
-                          <FaRegEyeSlash size={18} />
-                        )}
-                      </span>
                     </div>
-                  </div>
+                  )}
+
+                  {activeInterface !== "forgot" &&
+                    forgotSteps !== "1" &&
+                    forgotSteps !== "2" && (
+                      <div>
+                        <label className="text-sm text-gray-400">
+                          Password
+                        </label>
+                        <div className="relative">
+                          <input
+                            type={showPassword ? "text" : "password"}
+                            placeholder="••••••••"
+                            className="mt-2 w-full rounded-2xl border border-white/10 bg-white/5 px-4 py-3 outline-none transition-all focus:border-darkPrimary focus:bg-white/10"
+                            value={formData.password}
+                            onChange={(e) =>
+                              setFormData((prev) => ({
+                                ...prev,
+                                password: e.target.value,
+                              }))
+                            }
+                          />
+                          <span
+                            onClick={() => setShowPassword(!showPassword)}
+                            className="absolute right-3 top-5.5 cursor-pointer text-gray-500"
+                          >
+                            {showPassword ? (
+                              <FaRegEye size={18} />
+                            ) : (
+                              <FaRegEyeSlash size={18} />
+                            )}
+                          </span>
+                        </div>
+                      </div>
+                    )}
+
+                  {activeInterface === "forgot" && forgotSteps === "2" && (
+                    <div>
+                      <label className="text-sm text-gray-400">Enter OTP</label>
+                      <input
+                        inputMode="numeric"
+                        autoComplete="one-time-code"
+                        maxLength={6}
+                        value={formData.otp}
+                        onChange={(e) => {
+                          const value = e.target.value.replace(/[^0-9]/g, "");
+                          setFormData((prev) => ({
+                            ...prev,
+                            otp: value,
+                          }));
+                        }}
+                        placeholder="000000"
+                        className="mt-2 w-full rounded-2xl border border-white/10 bg-white/5 px-4 py-3 outline-none transition-all focus:border-darkPrimary focus:bg-white/10 tracking-[0.45em]"
+                      />
+                    </div>
+                  )}
+
+                  {/* New Password */}
+                  {activeInterface === "forgot" && forgotSteps === "3" && (
+                    <div>
+                      <label className="text-sm text-gray-400">
+                        New Password
+                      </label>
+                      <div className="relative">
+                        <input
+                          type={showPassword ? "text" : "password"}
+                          placeholder="••••••••"
+                          className="mt-2 w-full rounded-2xl border border-white/10 bg-white/5 px-4 py-3 outline-none transition-all focus:border-darkPrimary focus:bg-white/10"
+                          value={formData.newPwd}
+                          onChange={(e) =>
+                            setFormData((prev) => ({
+                              ...prev,
+                              newPwd: e.target.value,
+                            }))
+                          }
+                        />
+                        <span
+                          onClick={() => setShowPassword(!showPassword)}
+                          className="absolute right-3 top-5.5 cursor-pointer text-gray-500"
+                        >
+                          {showPassword ? (
+                            <FaRegEye size={18} />
+                          ) : (
+                            <FaRegEyeSlash size={18} />
+                          )}
+                        </span>
+                      </div>
+                    </div>
+                  )}
 
                   <div className="flex justify-between items-center text-sm">
-                    <label className="flex items-center gap-2 text-gray-400 cursor-pointer">
-                      <input type="checkbox" />
-                      Remember me
-                    </label>
+                    {activeInterface !== "forgot" ? (
+                      <label className="flex items-center gap-2 text-gray-400 cursor-pointer">
+                        <input type="checkbox" />
+                        Remember me
+                      </label>
+                    ) : (
+                      <div></div>
+                    )}
 
-                    <button className="text-darkPrimary hover:underline">
-                      Forgot password?
-                    </button>
+                    {activeInterface === "forgot" ? (
+                      <button
+                        key="btn-cancel"
+                        type="button"
+                        className="text-darkPrimary hover:underline"
+                        onClick={(e) => {
+                          e.preventDefault();
+                          setActiveInterface("login");
+                          setForgotSteps("0");
+                        }}
+                      >
+                        Cancel
+                      </button>
+                    ) : (
+                      <button
+                        key="btn-forgot"
+                        type="button"
+                        className="text-darkPrimary hover:underline"
+                        onClick={(e) => {
+                          e.preventDefault();
+                          setActiveInterface("forgot");
+                          setForgotSteps("1");
+                        }}
+                      >
+                        Forgot password?
+                      </button>
+                    )}
                   </div>
 
                   {/* signup and login button */}
-                  {signupLoading || loginLoading ? (
+                  {signupLoading ||
+                  loginLoading ||
+                  sendOTPLoading ||
+                  verifyOtpLoading ||
+                  changePwdLoading ? (
                     <div className="w-full mt-2 rounded-2xl bg-darkPrimary py-3 font-semibold text-white transition-all hover:scale-[1.02] hover:shadow-[0_10px_30px_rgba(91,92,246,0.35)]">
                       <CircleLoader />
                     </div>
                   ) : (
-                    <input
+                    <button
+                      key={`submit-${activeInterface}-${forgotSteps}`}
                       type="submit"
-                      value={loginActive ? "Sign In" : "Sign Up"}
-                      disabled={signupLoading || loginLoading}
-                      className="w-full mt-2 rounded-2xl bg-darkPrimary py-3 font-semibold text-white transition-all hover:scale-[1.02] hover:shadow-[0_10px_30px_rgba(91,92,246,0.35)]"
-                    />
+                      className="w-full mt-2 rounded-2xl bg-darkPrimary py-3 font-semibold text-white transition-all hover:scale-[1.02] hover:shadow-[0_10px_30px_rgba(91,92,246,0.35)] cursor-pointer"
+                    >
+                      {activeInterface === "login" && "Sign In"}
+                      {activeInterface === "signup" && "Sign Up"}
+                      {activeInterface === "forgot" &&
+                        forgotSteps === "1" &&
+                        "Send OTP"}
+                      {activeInterface === "forgot" &&
+                        forgotSteps === "2" &&
+                        "Verify OTP"}
+                      {activeInterface === "forgot" &&
+                        forgotSteps === "3" &&
+                        "Reset Password"}
+                    </button>
                   )}
 
                   {/* Divider */}
@@ -245,14 +442,23 @@ const AuthForm = () => {
 
                 {/* Footer */}
                 <div className="mt-8 text-center text-sm text-gray-500">
-                  {loginActive
+                  {activeInterface === "login"
                     ? "Don't have an account?"
                     : "Already have an account?"}
                   <button
                     className="ml-1 text-darkPrimary font-medium hover:underline"
-                    onClick={() => setLoginActive((prev) => !prev)}
+                    onClick={() => {
+                      if (activeInterface === "forgot") {
+                        setActiveInterface("login");
+                        setForgotSteps("0");
+                      } else if (activeInterface === "login") {
+                        setActiveInterface("signup");
+                      } else {
+                        setActiveInterface("login");
+                      }
+                    }}
                   >
-                    {loginActive ? "Create One" : "Sign In"}
+                    {activeInterface === "login" ? "Create One" : "Sign In"}
                   </button>
                 </div>
               </div>
@@ -268,12 +474,12 @@ const OTPComponent = ({
   email,
   setOpenOTP,
   handleSignup,
-  setLoginActive,
+  setActiveInterface,
 }: {
   email: string;
   setOpenOTP: React.Dispatch<React.SetStateAction<boolean>>;
   handleSignup: () => {};
-  setLoginActive: React.Dispatch<React.SetStateAction<boolean>>;
+  setActiveInterface: Dispatch<SetStateAction<string>>;
 }) => {
   const [timeLeft, setTimeLeft] = useState(600);
   const [isTimeUp, setIsTimeUp] = useState(false);
@@ -319,7 +525,7 @@ const OTPComponent = ({
       });
       if (res?.data?.success) {
         setOpenOTP(false);
-        setLoginActive(true);
+        setActiveInterface("login");
       }
     } catch (error) {
       console.error(error);

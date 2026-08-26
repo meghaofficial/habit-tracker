@@ -1,4 +1,4 @@
-import type { HeatMapI } from "../../../types";
+import type { HeatMapI } from "../../../../types";
 
 const palette = [
   "rgba(255, 255, 255, 0.03)", // 0 completions: subtle frosted slate
@@ -25,7 +25,7 @@ const HeatMap = ({ heatMapData }: { heatMapData: HeatMapI[] }) => {
             key={index}
             className="h-7 w-7 rounded-md border border-white/5 transition-all duration-300 hover:scale-105 hover:border-indigo-500/40 hover:shadow-[0_0_8px_rgba(99,102,241,0.2)] cursor-help"
             style={{ backgroundColor: color }}
-            title={`${count} tasks completed`}
+            title={`${count} Tasks Completed on ${(new Date(d.date)).toDateString()}`}
           />
         );
       })}

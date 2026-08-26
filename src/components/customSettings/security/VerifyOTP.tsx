@@ -108,7 +108,6 @@ const VerifyOTP = ({
                 value={otp}
                 onChange={(e) => {
                   const value = e.target.value.replace(/[^0-9]/g, "");
-
                   setOtp(value);
                 }}
                 placeholder="000000"
