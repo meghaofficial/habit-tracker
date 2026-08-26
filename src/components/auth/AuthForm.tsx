@@ -484,6 +484,7 @@ const OTPComponent = ({
   const [timeLeft, setTimeLeft] = useState(600);
   const [isTimeUp, setIsTimeUp] = useState(false);
   const [otp, setOtp] = useState("");
+  const [verifyOtpLoading, setVerifyOtpLoading] = useState(false);
 
   useEffect(() => {
     if (timeLeft <= 0) {
@@ -517,7 +518,9 @@ const OTPComponent = ({
     }
   };
 
-  const handleVerifyOTP = async () => {
+  const handleVerifyOTP = async (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+    setVerifyOtpLoading(true);
     try {
       const res = await axiosPublic.post(`/verify-signup-otp`, {
         email,
@@ -526,9 +529,36 @@ const OTPComponent = ({
       if (res?.data?.success) {
         setOpenOTP(false);
         setActiveInterface("login");
+        notify.success(res.data.message);
+      } else {
+        alert("Test");
       }
     } catch (error) {
+      if (axios.isAxiosError(error)) {
+        if (error.response) {
+          const statusCode = error.response.status;
+          const serverMessage =
+            error.response.data?.message || "Verification failed";
+
+          if (statusCode === 400) {
+            notify.error(serverMessage);
+          } else {
+            alert(`Server Error (${statusCode}): ${serverMessage}`);
+          }
+        } else if (error.request) {
+          alert("Network error: No response received from server.");
+        } else {
+          alert(`Request configuration error: ${error.message}`);
+        }
+      } else {
+        // 2. Fallback for non-Axios synchronous runtime errors
+        const nativeError = error as Error;
+        alert(`An unexpected error occurred: ${nativeError.message}`);
+      }
+
       console.error(error);
+    } finally {
+      setVerifyOtpLoading(false);
     }
   };
 
@@ -561,35 +591,43 @@ const OTPComponent = ({
         <p className="mt-1 font-medium">{email}</p>
       </div>
 
-      {/* OTP Inputs */}
-      <div className="flex justify-center gap-3 mt-8">
-        <input
-          inputMode="numeric"
-          maxLength={6}
-          className=" h-14 w-full rounded-2xl tracking-widest border border-white/10 bg-white/5 text-center text-xl font-bold outline-none transition-all focus:border-darkPrimary focus:bg-white/10"
-          value={otp}
-          onChange={(e) => {
-            const value = e.target.value.replace(/[^0-9]/g, "");
-            setOtp(value);
-          }}
-        />
-      </div>
-
-      {/* Timer */}
-      <div className="mt-6 flex justify-center">
-        <div className=" rounded-full border border-white/10 bg-white/5 px-4 py-2 text-sm ">
-          ⏳ Expires in{" "}
-          <span className="font-semibold">{formatTime(timeLeft)}</span>
+      <form onSubmit={handleVerifyOTP}>
+        {/* OTP Inputs */}
+        <div className="flex justify-center gap-3 mt-8">
+          <input
+            inputMode="numeric"
+            maxLength={6}
+            className=" h-14 w-full rounded-2xl tracking-widest border border-white/10 bg-white/5 text-center text-xl font-bold outline-none transition-all focus:border-darkPrimary focus:bg-white/10"
+            value={otp}
+            onChange={(e) => {
+              const value = e.target.value.replace(/[^0-9]/g, "");
+              setOtp(value);
+            }}
+          />
         </div>
-      </div>
 
-      {/* Verify Button */}
-      <button
-        className="w-full mt-8 rounded-2xl bg-darkPrimary py-3 font-semibold text-white transition-all hover:scale-[1.02]"
-        onClick={handleVerifyOTP}
-      >
-        Verify Account
-      </button>
+        {/* Timer */}
+        <div className="mt-6 flex justify-center">
+          <div className=" rounded-full border border-white/10 bg-white/5 px-4 py-2 text-sm ">
+            ⏳ Expires in{" "}
+            <span className="font-semibold">{formatTime(timeLeft)}</span>
+          </div>
+        </div>
+
+        {verifyOtpLoading ? (
+          <div className="w-full mt-8 rounded-2xl bg-darkPrimary py-3 font-semibold text-white transition-all hover:scale-[1.02] hover:shadow-[0_10px_30px_rgba(91,92,246,0.35)]">
+            <CircleLoader />
+          </div>
+        ) : (
+          <button
+            key="verify"
+            type="submit"
+            className="w-full mt-8 rounded-2xl bg-darkPrimary py-3 font-semibold text-white transition-all hover:scale-[1.02] hover:shadow-[0_10px_30px_rgba(91,92,246,0.35)] cursor-pointer"
+          >
+            Verify Account
+          </button>
+        )}
+      </form>
 
       {/* Resend */}
       <div className="mt-5 text-center">
