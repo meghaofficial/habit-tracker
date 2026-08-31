@@ -27,7 +27,6 @@ const Dashboard = () => {
   const [openPopup, setOpenPopup] = useState(false);
   const [freeTrialLoading, setFreeTrialLoading] = useState(false);
   const [plansList, setPlansList] = useState<PlanI[]>([]);
-  const [showDashboard, setShowDashboard] = useState(false);
   const [dashLoading, setDashLoading] = useState(false);
   const [showFree, setShowFree] = useState(false);
   const [dashboardData, setDashboardData] = useState<DashboardI>({
@@ -67,7 +66,6 @@ const Dashboard = () => {
         } else {
           setOpenPlan(false);
         }
-        setShowDashboard(true);
         await getActiveSubscription();
       }
     } catch (error) {
@@ -96,7 +94,6 @@ const Dashboard = () => {
       const res = await axiosPrivate.get("/api/dashboard");
       if (res?.data?.success) {
         setDashboardData(res?.data?.monthData);
-        setShowDashboard(true);
       }
     } catch (error) {
     } finally {
@@ -143,7 +140,7 @@ const Dashboard = () => {
         <Fallback />
       ) : (
         <div
-          className={`sm:px-6 px-5 sm:pt-4 pt-3 overflow-x-hidden ${!showDashboard && "h-screen overflow-y-hidden"}`}
+          className="sm:px-6 px-5 sm:pt-4 pt-3 overflow-x-hidden"
         >
           {dashLoading || activeSubsLoading ? (
             <div className="flex items-center justify-center h-screen">
@@ -151,7 +148,7 @@ const Dashboard = () => {
             </div>
           ) : (
             <>
-              {!showDashboard && (
+              {!activeMonth && (
                 <>
                   <div className="z-9999 backdrop-blur absolute -top-5 left-0 w-full h-full mt-5 rounded-2xl overflow-x-hidden flex items-center flex-col">
                     <nav className="flex justify-between items-center py-5 sm:pt-5 pt-4 w-full px-5">

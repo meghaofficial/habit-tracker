@@ -4,7 +4,6 @@ import PageNotFound from "./components/shared/PageNotFound";
 import { useDispatch, useSelector } from "react-redux";
 import { useEffect, useState } from "react";
 import type { RootState } from "./redux/store/store";
-import Demo from "./components/pages/Demo";
 import Dashboard from "./components/pages/Dashboard";
 import HomePage from "./components/pages/HomePage";
 import { refreshAccessToken } from "./api/axios";
@@ -12,7 +11,6 @@ import { removeCreds, setCreds } from "./redux/slices/authSlice";
 import PageLoader from "./components/loaders/PageLoader";
 import { ToastContainer } from "react-toastify";
 import Settings from "./components/pages/Settings";
-import { socket } from "./socket/socket";
 import NoInternetConnection from "./components/shared/NoInternetConnection";
 import AuthForm from "./components/auth/AuthForm";
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
@@ -124,7 +122,6 @@ function App() {
                     path="/"
                     element={isLogin ? <Dashboard /> : <HomePage />}
                   />
-                  <Route path="/demo" element={<Demo />} />
                   <Route
                     path="/settings"
                     element={
@@ -141,15 +138,9 @@ function App() {
                 </Routes>
               </div>
             )}
-
-            {/* <FloatingActionButtonComp /> */}
           </div>
         </>
       )}
-      {/* <button
-        onClick={() => setIsOpen(!isOpen)}
-      >{`${isOpen ? 'Close' : 'Open'} the devtools panel`}</button> */}
-      {/* <ReactQueryDevtools initialIsOpen={false} /> */}
     </QueryClientProvider>
   );
 }

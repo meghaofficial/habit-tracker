@@ -1,9 +1,11 @@
 import PlanSection from "../home/PlanSection";
 import NavigationBar from "../shared/NavigationBar";
 import VideoDemoImages from "../home/VideoDemoImages";
-import Features from "../home/Features"; 
+import Features from "../home/Features";
 import Footer from "../home/Footer";
 import HeroSection from "../home/HeroSection";
+import { useSelector } from "react-redux";
+import type { RootState } from "../../redux/store/store";
 
 const HomePage = () => {
   // const [dark, setDark] = useState(false);
@@ -28,6 +30,10 @@ const HomePage = () => {
   //   return () => window.removeEventListener("scroll", handleScroll);
   // }, []);
 
+  const isLogin = useSelector(
+    (state: RootState) => state.auth.accessToken !== "",
+  );
+
   return (
     <>
       <div className="min-h-screen sm:px-0 px-4">
@@ -41,7 +47,7 @@ const HomePage = () => {
           <HeroSection />
           <VideoDemoImages />
           <Features />
-          <PlanSection />
+          {isLogin && <PlanSection />}
           <Footer />
         </div>
       </div>
