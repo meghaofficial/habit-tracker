@@ -23,13 +23,13 @@ export default function CustomButton({
 }: CustomButtonProps) {
   
   const baseStyles =
-    `relative overflow-hidden ${rounded} px-3 py-1.5 text-[18px] font-semibold transition-all duration-300 hover:scale-[1.02] active:scale-[0.98] shadow`;
+    `relative overflow-hidden ${rounded} ${!disabled && "transition-all duration-300 hover:scale-[1.02] active:scale-[0.98] shadow"} px-3 py-1.5 text-[18px] font-semibold`;
 
     // shadow-[0_4px_20px_rgba(91,92,246,0.45)]
   const variants: Record<string, string> = {
     default:
       "text-white bg-linear-to-r from-[#5B5CF6] via-[#4F8CFF] to-[#9B5CFF]",
-    white: "bg-white text-black",
+    white: `${disabled ? "bg-white/60 text-black/90" : "bg-white text-black"}`,
     transparent:
       "text-violet-500 bg-linear-to-r from-[#5B5CF6]/20 via-[#4F8CFF]/20 to-[#9B5CFF]/20",
   };
@@ -40,6 +40,9 @@ export default function CustomButton({
       className={`${baseStyles} ${variants[type]} ${styling}`}
       disabled={disabled}
       title={title}
+      style={{
+        cursor: disabled ? "default" : "pointer"
+      }}
     >
       <div
         className="relative z-10 pb-px"

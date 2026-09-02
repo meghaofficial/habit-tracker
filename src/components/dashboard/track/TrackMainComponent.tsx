@@ -232,6 +232,8 @@ const TrackMainComponent = ({
           <HabitSection
             dashboardID={dashboardData?._id}
             loading={dateLogsData.isPending}
+            month={dashboardData.month}
+            year={dashboardData.year}
           />
         </div>
         <div className="w-[65%] rounded-2xl">

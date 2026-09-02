@@ -217,11 +217,18 @@ const DailyCalanderTaskSheet = ({
                     ?.map((d, dayIndex) => {
                       const dayNum = weekIndex * 7 + dayIndex + 1;
                       const isToday = dayNum === todayDate;
+
+                      const prg = Number.isNaN(Number(d?.progress))
+                        ? "0"
+                        : d?.progress === "100.00"
+                          ? "100"
+                          : d?.progress;
+
                       return (
                         <div
                           key={dayIndex}
                           className="flex flex-col items-center gap-0.5"
-                          title={`Day ${dayNum}: ${d?.progress}%`}
+                          title={`Day ${dayNum}: ${prg}%`}
                         >
                           <div
                             className={`w-2.5 h-14 flex items-end rounded-t-[3px] ${isToday ? "bg-indigo-500/20 border border-indigo-500/30" : "bg-white/5 border border-white/10"}`}
@@ -234,12 +241,7 @@ const DailyCalanderTaskSheet = ({
                           <span
                             className={`text-[5.5px] font-bold ${isToday ? "text-indigo-400" : "text-gray-600"}`}
                           >
-                            {Number.isNaN(Number(d?.progress))
-                              ? "0"
-                              : d?.progress === "100.00"
-                                ? "100"
-                                : d?.progress}
-                            %
+                            {prg}%
                           </span>
                         </div>
                       );
@@ -404,7 +406,15 @@ const DailyCalanderTaskSheet = ({
                       : "text-gray-500"
                   }`}
                 >
-                  {d > 9 ? d : <span>{"\u00a0"}{d}{"\u00a0"}</span>}
+                  {d > 9 ? (
+                    d
+                  ) : (
+                    <span>
+                      {"\u00a0"}
+                      {d}
+                      {"\u00a0"}
+                    </span>
+                  )}
                 </span>
               ))}
             </div>

@@ -31,7 +31,7 @@ const PastMonthsData = ({
           </div>
         </div>
 
-        <div className="space-y-3">
+        <div className="space-y-3 max-h-60 overflow-y-auto hide-scrollbar">
           {data.map((d) => {
             const isActive = d._id === selectedMonthId;
             return (
@@ -52,7 +52,7 @@ const PastMonthsData = ({
                     <p
                       className={`text-sm font-semibold ${isActive ? "text-white" : "text-gray-300"}`}
                     >
-                      {monMap[d.month - 1]} {d.year}
+                      {monMap[d.month+1]} {d.year}
                     </p>
                     <p className="text-[10px] text-gray-500 mt-0.5">
                       {d.totalTasks} Habits Tracked
