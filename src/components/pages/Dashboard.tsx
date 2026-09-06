@@ -14,12 +14,14 @@ import CalandarMainComponent from "../dashboard/calander/CalandarMainComponent";
 import FreeSubsConfirm from "../dashboard/subscription/FreeSubsConfirm";
 import SubsPlans from "../dashboard/subscription/SubsPlans";
 import Popup from "../shared/Popup";
+import RoadmapMainComponent from "../dashboard/roadmap/RoadmapMainComponent";
 
 const MASTER_MENU = [
   { key: "track", label: "Monthly Habit" },
   { key: "analysis", label: "Analysis" },
   { key: "calandar", label: "Calandar" },
   { key: "history", label: "History" },
+  { key: "roadmap", label: "Roadmap" },
 ];
 
 const Dashboard = () => {
@@ -241,6 +243,7 @@ const Dashboard = () => {
               {activeTab === "history" && (
                 <HistoryMainComponent monthDashID={dashboardData?._id} />
               )}
+              {activeTab === "roadmap" && <RoadmapMainComponent />}
               {activeTab === "aiCoach" && <AiCoachMainComponent />}
             </>
           )}

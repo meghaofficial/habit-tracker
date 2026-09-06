@@ -240,3 +240,26 @@ export interface SubsList {
   endDate: Date;
   status: string;
 }
+
+export interface RoadmapNodeData {
+  title: string;
+  description?: string;
+  color: string;
+  parentId?: string | null;
+}
+
+export interface RoadmapNode {
+  id: string;
+  type: "roadmap";
+  position: {
+    x: number;
+    y: number;
+  };
+  data: RoadmapNodeData;
+}
+
+export interface RoadmapEdge {
+  id: string;
+  source: string;
+  target: string;
+}
