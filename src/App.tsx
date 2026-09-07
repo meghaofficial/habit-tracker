@@ -1,4 +1,4 @@
-import { Navigate, Route, Routes } from "react-router-dom";
+import { Navigate, Outlet, Route, Routes } from "react-router-dom";
 import "./App.css";
 import PageNotFound from "./components/shared/PageNotFound";
 import { useDispatch, useSelector } from "react-redux";
@@ -13,9 +13,9 @@ import { ToastContainer } from "react-toastify";
 import Settings from "./components/pages/Settings";
 import NoInternetConnection from "./components/shared/NoInternetConnection";
 import AuthForm from "./components/auth/AuthForm";
-import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
+import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 
-const queryClient = new QueryClient()
+const queryClient = new QueryClient();
 
 function App() {
   const dispatch = useDispatch();

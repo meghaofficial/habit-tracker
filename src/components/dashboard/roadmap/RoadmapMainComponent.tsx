@@ -1,8 +1,14 @@
 import { ReactFlow } from "@xyflow/react";
 import "@xyflow/react/dist/style.css";
 import { RoadmapNode } from "./RoadmapNode";
+import RoadmapsList from "./RoadmapsList";
+import { useState } from "react";
+import RoadmapPage from "./RoadmapPage";
 
 const RoadmapMainComponent = () => {
+
+    const [openRoadmap, setOpenRoadmap] = useState(false);
+
   const nodes = [
     {
       id: "1",
@@ -60,9 +66,10 @@ const RoadmapMainComponent = () => {
 
   return (
     <>
-      <div className="w-full h-[calc(100vh-80px)]">
+    {openRoadmap ? <RoadmapPage setOpenRoadmap={setOpenRoadmap} /> : <RoadmapsList setOpenRoadmap={setOpenRoadmap} />}
+      {/* <div className="w-full h-[calc(100vh-80px)]">
         <ReactFlow nodes={nodes} edges={edges} nodeTypes={nodeTypes} fitView />
-      </div>
+      </div> */}
     </>
   );
 };

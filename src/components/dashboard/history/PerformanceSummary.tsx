@@ -1,4 +1,4 @@
-import { FiBarChart2, FiCheck, FiX, FiMinus } from "react-icons/fi";
+import { FiBarChart2, FiCheck, FiMinus } from "react-icons/fi";
 import RadialProgress from "../../charts/RadialProgress";
 import Card from "../../shared/Card";
 import type { DashboardI, TargetI } from "../../../types";

@@ -263,3 +263,15 @@ export interface RoadmapEdge {
   source: string;
   target: string;
 }
+
+export interface RoadmapI {
+  _id: string;
+  title: string;
+  description: string;
+  image: string;
+  category: string;
+  status: "In Progress" | "Completed" | "Draft" | string;
+  totalNodes: number;
+  completedNodes: number;
+  updatedAt: string;
+}

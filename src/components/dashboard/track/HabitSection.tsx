@@ -69,7 +69,7 @@ const HabitSection = ({
 
         <button
           onClick={() => setOpenPopup(true)}
-          title="Reset dashboard"
+          title="Recover last month Habits"
           disabled={makeDisable}
           className={`w-7 h-7 flex items-center justify-center rounded-lg border transition-colors duration-200 absolute right-2 top-1/4
     ${
