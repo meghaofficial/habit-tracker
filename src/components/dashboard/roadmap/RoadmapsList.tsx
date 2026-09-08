@@ -2,25 +2,12 @@ import { useState, type Dispatch, type SetStateAction } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import {
   FiPlus,
-  FiCompass,
-  FiSearch,
-  FiCalendar,
-  FiCheckCircle,
   FiArrowRight,
   FiTrash2,
-  FiX,
-  FiImage,
-  FiLayers,
   FiGitBranch,
-  FiPercent,
-  FiGrid,
-  FiList,
   FiClock,
-  // FiSparkles,
 } from "react-icons/fi";
 import type { RoadmapI } from "../../../types";
-import SectionIcon from "../../shared/SectionIcon";
-import { FaCalendarDays } from "react-icons/fa6";
 
 // Default Preset Images for Roadmaps
 const PRESET_IMAGES = [
@@ -63,7 +50,7 @@ const INITIAL_ROADMAPS: RoadmapI[] = [
     description: "Master essential algorithms, dynamic programming, tree traversals, and graph patterns for top-tier technical interviews.",
     image: PRESET_IMAGES[0].url,
     category: "Computer Science",
-    status: "In Progress",
+    status: "Completed",
     totalNodes: 16,
     completedNodes: 12,
     updatedAt: "Updated 2 days ago",
@@ -105,67 +92,6 @@ const INITIAL_ROADMAPS: RoadmapI[] = [
 
 const RoadmapsList = ({setOpenRoadmap}:{setOpenRoadmap: Dispatch<SetStateAction<boolean>>;}) => {
   const [roadmaps, setRoadmaps] = useState<RoadmapI[]>(INITIAL_ROADMAPS);
-  const [searchTerm, setSearchTerm] = useState("");
-  const [selectedCategory, setSelectedCategory] = useState("All");
-  const [viewMode, setViewMode] = useState<"grid" | "list">("grid");
-  const [isModalOpen, setIsModalOpen] = useState(false);
-
-  // New Roadmap Form State
-  const [newTitle, setNewTitle] = useState("");
-  const [newCategory, setNewCategory] = useState("Web Development");
-  const [newDescription, setNewDescription] = useState("");
-  const [newImage, setNewImage] = useState(PRESET_IMAGES[0].url);
-  const [customImageInput, setCustomImageInput] = useState("");
-
-  // Statistics calculation
-  const totalRoadmaps = roadmaps.length;
-  const totalCompletedNodes = roadmaps.reduce(
-    (acc, r) => acc + r.completedNodes,
-    0
-  );
-  const totalNodesCount = roadmaps.reduce((acc, r) => acc + r.totalNodes, 0);
-  const overallProgress =
-    totalNodesCount > 0
-      ? Math.round((totalCompletedNodes / totalNodesCount) * 100)
-      : 0;
-
-  // Filter roadmaps
-  const filteredRoadmaps = roadmaps.filter((rm) => {
-    const matchesSearch =
-      rm.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      rm.description.toLowerCase().includes(searchTerm.toLowerCase());
-    const matchesCategory =
-      selectedCategory === "All" || rm.category === selectedCategory;
-    return matchesSearch && matchesCategory;
-  });
-
-  const handleCreateRoadmap = (e: React.FormEvent) => {
-    e.preventDefault();
-    if (!newTitle.trim()) return;
-
-    const finalImage = customImageInput.trim() ? customImageInput : newImage;
-
-    const newRoadmapItem: RoadmapI = {
-      _id: `rm-${Date.now()}`,
-      title: newTitle.trim(),
-      description:
-        newDescription.trim() ||
-        "Custom roadmap learning path designed for structured progress.",
-      image: finalImage,
-      category: newCategory,
-      status: "In Progress",
-      totalNodes: 8,
-      completedNodes: 0,
-      updatedAt: "Created just now",
-    };
-
-    setRoadmaps([newRoadmapItem, ...roadmaps]);
-    // Reset Form
-    setNewTitle("");
-    setNewDescription("");
-    setCustomImageInput("");
-    setIsModalOpen(false);
-  };
 
   const handleDeleteRoadmap = (id: string, e: React.MouseEvent) => {
     e.stopPropagation();
@@ -176,18 +102,11 @@ const RoadmapsList = ({setOpenRoadmap}:{setOpenRoadmap: Dispatch<SetStateAction<
     <div className="flex flex-col gap-5 w-full text-white mb-4 mt-6">
 
       {/* 4. ROADMAPS GRID / CARDS DISPLAY */}
-      <div
-        className={
-          viewMode === "grid"
-            ? "grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5"
-            : "flex flex-col gap-4"
-        }
-      >
+      <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-5">
         {/* Quick "+ Create New Roadmap" Card */}
         <motion.div
           whileHover={{ scale: 1.02 }}
           whileTap={{ scale: 0.98 }}
-          // onClick={() => setIsModalOpen(true)}
           onClick={() => setOpenRoadmap(true)}
           className="relative rounded-2xl border-2 border-dashed border-white/15 hover:border-indigo-500/50 bg-black/10 hover:bg-indigo-500/5 p-6 flex flex-col items-center justify-center text-center cursor-pointer transition-all duration-300 min-h-70 group overflow-hidden"
         >
@@ -204,7 +123,7 @@ const RoadmapsList = ({setOpenRoadmap}:{setOpenRoadmap: Dispatch<SetStateAction<
 
         {/* Existing Roadmap Cards */}
         <AnimatePresence>
-          {filteredRoadmaps.map((rm, i) => {
+          {roadmaps.map((rm, i) => {
             const progressPct =
               rm.totalNodes > 0
                 ? Math.round((rm.completedNodes / rm.totalNodes) * 100)
@@ -224,7 +143,7 @@ const RoadmapsList = ({setOpenRoadmap}:{setOpenRoadmap: Dispatch<SetStateAction<
 
                 <div>
                   {/* IMAGE HEADER CONTAINER */}
-                  <div className="relative h-44 w-full overflow-hidden rounded-t-2xl bg-gray-900">
+                  <div className="relative h-36 w-full overflow-hidden rounded-t-2xl bg-gray-900">
                     <img
                       src={rm.image}
                       alt={rm.title}
@@ -235,9 +154,7 @@ const RoadmapsList = ({setOpenRoadmap}:{setOpenRoadmap: Dispatch<SetStateAction<
 
                     {/* Top Badges */}
                     <div className="absolute top-3 left-3 right-3 flex items-center justify-between gap-2 pointer-events-none">
-                      <span className="px-2.5 py-1 rounded-lg bg-black/60 backdrop-blur-md border border-white/15 text-[11px] font-semibold text-indigo-300 shadow-md">
-                        {rm.category}
-                      </span>
+                      <div></div>
                       <span
                         className={`px-2.5 py-1 rounded-lg text-[10px] font-bold backdrop-blur-md border shadow-md ${rm.status === "In Progress"
                             ? "bg-emerald-500/20 text-emerald-300 border-emerald-500/40"
@@ -266,9 +183,9 @@ const RoadmapsList = ({setOpenRoadmap}:{setOpenRoadmap: Dispatch<SetStateAction<
                       <h3 className="text-base font-bold text-white group-hover:text-indigo-300 transition-colors line-clamp-1">
                         {rm.title}
                       </h3>
-                      <p className="text-xs text-gray-400 line-clamp-2 mt-1 min-h-9 leading-relaxed">
+                      {/* <p className="text-xs text-gray-400 line-clamp-2 mt-1 min-h-9 leading-relaxed">
                         {rm.description}
-                      </p>
+                      </p> */}
                     </div>
 
                     {/* Node Progress Bar */}

@@ -241,6 +241,8 @@ export interface SubsList {
   status: string;
 }
 
+// Roadmap
+
 export interface RoadmapNodeData {
   title: string;
   description?: string;
@@ -274,4 +276,42 @@ export interface RoadmapI {
   totalNodes: number;
   completedNodes: number;
   updatedAt: string;
+}
+
+// Canvas
+
+export interface NodeI {
+  id: number;
+  text: string;
+  x: number;
+  y: number;
+}
+
+export type EdgeType = "child" | "linked";
+
+export interface EdgeI {
+  id: number;
+  source: number;
+  target: number;
+  type: EdgeType;
+}
+
+export interface DraggingI {
+  id: number;
+  offsetX: number;
+  offsetY: number;
+}
+
+export interface PanI {
+  startX: number;
+  startY: number;
+  initialPanX: number;
+  initialPanY: number;
+}
+
+export interface EdgeCoordinatesI {
+  startX: number;
+  startY: number;
+  endX: number;
+  endY: number;
 }
