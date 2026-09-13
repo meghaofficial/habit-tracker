@@ -141,9 +141,7 @@ const Dashboard = () => {
       {fallback ? (
         <Fallback />
       ) : (
-        <div
-          className="sm:px-6 px-5 sm:pt-4 pt-3 overflow-x-hidden"
-        >
+        <div className="sm:px-6 px-5 sm:pt-4 pt-3 overflow-x-hidden">
           {dashLoading || activeSubsLoading ? (
             <div className="flex items-center justify-center h-screen">
               <PageLoader />
@@ -152,14 +150,25 @@ const Dashboard = () => {
             <>
               {!activeMonth && (
                 <>
-                  <div className="z-9999 backdrop-blur absolute -top-5 left-0 w-full h-full mt-5 rounded-2xl overflow-x-hidden flex items-center flex-col">
+                  <div className="z-9999 backdrop-blur fixed inset-0 w-screen h-screen rounded-2xl overflow-x-hidden flex items-center flex-col">
                     <nav className="flex justify-between items-center py-5 sm:pt-5 pt-4 w-full px-5">
                       <NavigationBar />
                     </nav>
                     {openPopup ? (
-                      <FreeSubsConfirm setOpenPopup={setOpenPopup} handleSubscribe={() => handleSubscribe(plansList?.[0]?._id, 0)} loading={freeTrialLoading} />
+                      <FreeSubsConfirm
+                        setOpenPopup={setOpenPopup}
+                        handleSubscribe={() =>
+                          handleSubscribe(plansList?.[0]?._id, 0)
+                        }
+                        loading={freeTrialLoading}
+                      />
                     ) : (
-                      <SubsPlans showFree={showFree} plansList={plansList} setOpenPopup={setOpenPopup} handleSubscribe={handleSubscribe} />
+                      <SubsPlans
+                        showFree={showFree}
+                        plansList={plansList}
+                        setOpenPopup={setOpenPopup}
+                        handleSubscribe={handleSubscribe}
+                      />
                     )}
                   </div>
                 </>

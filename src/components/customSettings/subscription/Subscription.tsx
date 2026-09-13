@@ -13,6 +13,7 @@ const Subscription = () => {
   const [allSubsLoading, setAllSubsLoading] = useState(false);
   const [scheduledList, setScheduledList] = useState<SubsList[]>([]);
   const [expiredList, setExpiredList] = useState<SubsList[]>([]);
+  const [showFree, setShowFree] = useState(false);
 
   const getAllSubs = async () => {
     setAllSubsLoading(true);
@@ -37,8 +38,7 @@ const Subscription = () => {
   }, []);
 
   return (
-     <div className="space-y-7">
-      
+    <div className="space-y-7">
       {/* Header */}
       <div className="flex items-start gap-3 border-b border-white/6 pb-5 light:border-black/6">
         <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl border border-indigo-400/10 bg-indigo-500/10">
@@ -51,8 +51,7 @@ const Subscription = () => {
           </h3>
 
           <p className="mt-1 text-xs text-zinc-500">
-            Manage your membership, plans and subscription
-            history.
+            Manage your membership, plans and subscription history.
           </p>
         </div>
       </div>
@@ -64,6 +63,7 @@ const Subscription = () => {
           setGetPlanLoading={setGetPlanLoading}
           setPlansList={setPlansList}
           setShowPlans={setShowPlans}
+          setShowFree={setShowFree}
         />
 
         <PlansGrid
@@ -71,6 +71,7 @@ const Subscription = () => {
           getPlanLoading={getPlanLoading}
           plansList={plansList}
           setShowPlans={setShowPlans}
+          showFree={showFree}
         />
 
         {/* Subscription History */}

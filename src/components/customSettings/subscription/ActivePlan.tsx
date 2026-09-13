@@ -9,11 +9,13 @@ const ActivePlan = ({
   setGetPlanLoading,
   setPlansList,
   setShowPlans,
+  setShowFree,
 }: {
   showPlans: boolean;
   setGetPlanLoading: Dispatch<SetStateAction<boolean>>;
   setPlansList: Dispatch<SetStateAction<PlanI[]>>;
   setShowPlans: Dispatch<SetStateAction<boolean>>;
+  setShowFree: Dispatch<SetStateAction<boolean>>;
 }) => {
   const [activeSubsLoading, setActiveSubsLoading] = useState(false);
   const [startDate, setStartDate] = useState<Date>(new Date());
@@ -41,6 +43,8 @@ const ActivePlan = ({
         const subscription = res?.data?.subscription;
         setStartDate(subscription?.startDate);
         setEndDate(subscription?.endDate);
+        const hasUsedFree = res?.data?.hasUsedFree;
+        setShowFree(!hasUsedFree);
       }
     } catch (error) {
       if (
@@ -93,7 +97,7 @@ const ActivePlan = ({
                 <div className="h-4 w-4 rounded bg-indigo-500/10" />
                 <div className="h-4 w-20 rounded-lg bg-indigo-500/10" />
               </div>
-            ) : (
+            ) : startDate && startDate ? (
               <div className="flex items-center gap-2 text-sm font-medium text-zinc-200 light:text-black">
                 <FiCalendar className="h-3.5 w-3.5 text-indigo-400" />
 
@@ -103,6 +107,8 @@ const ActivePlan = ({
 
                 <span>{formatMonthYearSimple(endDate)}</span>
               </div>
+            ) : (
+              <div>Looks like you haven't used your free trial.</div>
             )}
           </div>
         </div>
