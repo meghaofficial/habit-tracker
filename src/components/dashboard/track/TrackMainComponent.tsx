@@ -333,6 +333,7 @@ const TrackMainComponent = ({
               <TargetsSection
                 monthID={dashboardData._id}
                 totalWeeks={hasWeek5 ? 5 : 4}
+                totalDaysInMonth={totalD}
               />
             </div>
             <div className="w-[40%]">

@@ -1,11 +1,6 @@
 import type { Dispatch, SetStateAction } from "react";
 import { motion } from "framer-motion";
-import {
-  FiArrowLeft,
-  FiBookOpen,
-  FiImage,
-  FiSettings,
-} from "react-icons/fi";
+import { FiArrowLeft } from "react-icons/fi";
 import RoadmapCanvas from "./RoadmapCanvas";
 import Thumbnail from "./Thumbnail";
 import RoadmapGuide from "./RoadmapGuide";
@@ -15,6 +10,15 @@ const RoadmapPage = ({
 }: {
   setOpenRoadmap: Dispatch<SetStateAction<boolean>>;
 }) => {
+  // const dummyMilestone = {
+  //   title: "Data Structures",
+  //   description: "Build a strong foundation in core data structures.",
+  //   completedChildren: 3,
+  //   totalChildren: 5,
+  //   isActive: true,
+  //   isExpanded: false,
+  // };
+
   return (
     <div className="w-full mb-4">
       {/* ================= HEADER ================= */}
@@ -49,26 +53,22 @@ const RoadmapPage = ({
 
         {/* Header actions */}
         <div className="flex shrink-0 items-center gap-2">
-          <motion.button
+          {/* <motion.button
             whileHover={{ y: -1 }}
             whileTap={{ scale: 0.97 }}
             className="flex h-9 items-center gap-2 rounded-lg border border-white/[0.07] bg-white/2.5 px-3 text-xs font-medium text-zinc-400 transition hover:border-indigo-400/15 hover:bg-indigo-500/5 hover:text-indigo-400 light:border-black/[0.07] light:text-slate-500"
           >
             <FiSettings className="h-3.5 w-3.5" />
             Settings
-          </motion.button>
-
-          {/* <motion.button
-            whileHover={{ y: -1 }}
-            whileTap={{ scale: 0.97 }}
-            className="flex h-9 items-center gap-2 rounded-lg border border-indigo-400/20 bg-indigo-500/10 px-3 text-xs font-medium text-indigo-400 transition hover:bg-indigo-500/15"
-          >
-            <FiBookOpen className="h-3.5 w-3.5" />
-            Roadmap Guide
           </motion.button> */}
           <RoadmapGuide />
         </div>
       </div>
+      {/* <Milestone
+        title={dummyMilestone.title}
+        completedChildren={dummyMilestone.completedChildren}
+        totalChildren={dummyMilestone.totalChildren}
+      /> */}
       <RoadmapCanvas />
     </div>
   );

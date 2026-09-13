@@ -1,5 +1,5 @@
 import { AnimatePresence, motion } from "framer-motion";
-import { useState } from "react";
+import { useEffect, useLayoutEffect, useRef, useState } from "react";
 import { FiCheck, FiPlus, FiTarget, FiX } from "react-icons/fi";
 import type { TargetI } from "../../../types";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
@@ -14,19 +14,49 @@ import SectionIcon from "../../shared/SectionIcon";
 const TargetsSection = ({
   monthID,
   totalWeeks,
+  totalDaysInMonth,
 }: {
   monthID: string;
   totalWeeks: number;
+  totalDaysInMonth: number;
 }) => {
+  const dateContainerRef = useRef<HTMLDivElement>(null);
+  const dateRefs = useRef<Record<number, HTMLButtonElement | null>>({});
   const [activeTab, setActiveTab] = useState<number>(0);
+  const [activeDate, setActiveDate] = useState(new Date().getDate());
 
   const tabs = [
     { key: 0, label: "Monthly" },
+    { key: -1, label: "Daily" },
     ...Array.from({ length: totalWeeks }, (_, i) => ({
       key: i + 1,
       label: `Week ${i + 1}`,
     })),
   ];
+
+  useEffect(() => {
+    const container = dateContainerRef.current;
+    const selectedDate = dateRefs.current[activeDate];
+
+    if (!container || !selectedDate) return;
+
+    container.scrollTo({
+      left: selectedDate.offsetLeft - 16,
+      behavior: "smooth",
+    });
+  }, [activeDate]);
+
+  useLayoutEffect(() => {
+    const container = dateContainerRef.current;
+    const selectedDate = dateRefs.current[activeDate];
+
+    if (!container || !selectedDate) return;
+
+    container.scrollTo({
+      left: selectedDate.offsetLeft - 16,
+      behavior: "instant",
+    });
+  }, [activeDate, activeTab]);
 
   return (
     <div className="relative overflow-hidden h-125 rounded-2xl w-full border border-white/10 bg-black/20">
@@ -63,22 +93,51 @@ const TargetsSection = ({
       </div>
 
       {/* Tab Content */}
-      <div className="relative p-4">
-        <AnimatePresence mode="wait">
-          <motion.div
-            key={activeTab}
-            initial={{ opacity: 0, y: 8 }}
-            animate={{ opacity: 1, y: 0 }}
-            exit={{ opacity: 0, y: -8 }}
-            transition={{ duration: 0.2 }}
+      <div className="relative">
+        {activeTab === -1 && (
+          <div
+            ref={dateContainerRef}
+            className="flex items-center gap-1.5 px-4 py-2.5 border-b border-white/5 overflow-x-auto hide-scrollbar"
           >
-            <InlineTargetsList
-              monthID={monthID}
-              type={activeTab === 0 ? "monthly" : "weekly"}
-              week={activeTab === 0 ? 0 : activeTab}
-            />
-          </motion.div>
-        </AnimatePresence>
+            {Array.from({ length: totalDaysInMonth }).map((_, index) => {
+              const date = index + 1;
+
+              return (
+                <button
+                  key={date}
+                  ref={(el) => {
+                    dateRefs.current[date] = el;
+                  }}
+                  onClick={() => setActiveDate(date)}
+                  className={`shrink-0 text-[11px] font-semibold px-3 py-1.5 rounded-xl transition-all duration-200 cursor-pointer ${
+                    activeDate === date
+                      ? "bg-indigo-500/20 text-indigo-300 border border-indigo-500/30"
+                      : "text-gray-500 hover:text-gray-300 hover:bg-white/5 border border-transparent"
+                  }`}
+                >
+                  {date}
+                </button>
+              );
+            })}
+          </div>
+        )}
+        <div className="p-4">
+          <AnimatePresence mode="wait">
+            <motion.div
+              key={activeTab}
+              initial={{ opacity: 0, y: 8 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: -8 }}
+              transition={{ duration: 0.2 }}
+            >
+              <InlineTargetsList
+                monthID={monthID}
+                type={activeTab === 0 ? "monthly" : "weekly"}
+                week={activeTab === 0 ? 0 : activeTab}
+              />
+            </motion.div>
+          </AnimatePresence>
+        </div>
       </div>
     </div>
   );

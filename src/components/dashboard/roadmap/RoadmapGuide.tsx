@@ -28,7 +28,7 @@ const RoadmapGuide = () => {
 <AnimatePresence>
   {showRoadmapGuide && (
     <motion.div
-      className="fixed inset-0 z-[100] flex items-center justify-center bg-black/70 p-4 backdrop-blur-sm"
+      className="fixed inset-0 z-100 flex items-center justify-center bg-black/70 p-4 backdrop-blur-sm"
       initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}
       exit={{ opacity: 0 }}
@@ -244,7 +244,7 @@ const RoadmapGuide = () => {
                 rounded-xl
                 border
                 border-indigo-400/10
-                bg-indigo-500/[0.06]
+                bg-indigo-500/6
                 p-5
               "
             >

@@ -283,6 +283,8 @@ export interface RoadmapI {
 export interface NodeI {
   id: number;
   text: string;
+  milestoneId?: string;
+  completed: boolean;
   x: number;
   y: number;
 }
@@ -314,4 +316,14 @@ export interface EdgeCoordinatesI {
   startY: number;
   endX: number;
   endY: number;
+}
+
+export interface RoadmapMilestone {
+  id: string;
+  title: string;
+  description?: string;
+
+  childNodeIds: string[];
+
+  progress: number;
 }

@@ -37,6 +37,9 @@ const Canvas = ({
   });
   const [panStart, setPanStart] = useState<PanI | null>(null);
 
+  console.log("nodes", nodes);
+  console.log("edges", edges)
+
   const createChildNode = (parent: NodeI) => {
     if (isPanningEnabled) {
       return;
@@ -49,6 +52,7 @@ const Canvas = ({
       text: "Child Node",
       x: parent.x + NODE_WIDTH + 100,
       y: parent.y,
+      completed: false,
     };
 
     const newEdge: EdgeI = {
@@ -81,6 +85,7 @@ const Canvas = ({
       text: "New Node",
       x: source.x,
       y: source.y + NODE_HEIGHT + 50,
+      completed: false,
     };
 
     const newEdge: EdgeI = {
@@ -122,6 +127,56 @@ const Canvas = ({
     return edges
       .filter((edge) => edge.type === "child" && edge.source === nodeId)
       .map((edge) => edge.target);
+  };
+
+  const toggleNodeCompletion = (nodeId: number) => {
+    if (isPanningEnabled) {
+      return;
+    }
+
+    setNodes((prevNodes) => {
+      // First toggle the clicked leaf node
+      const updatedNodes = prevNodes.map((node) =>
+        node.id === nodeId
+          ? {
+              ...node,
+              completed: !node.completed,
+            }
+          : node,
+      );
+
+      const nodeMap = new Map(updatedNodes.map((node) => [node.id, node]));
+
+      // Calculate completion recursively
+      const getCompletion = (
+        currentId: number,
+        visited = new Set<number>(),
+      ): boolean => {
+        if (visited.has(currentId)) {
+          return false;
+        }
+
+        visited.add(currentId);
+
+        const children = getChildren(currentId);
+
+        // Leaf node → use its own completion state
+        if (children.length === 0) {
+          return nodeMap.get(currentId)?.completed ?? false;
+        }
+
+        // Parent → completed only when ALL children are completed
+        return children.every((childId) =>
+          getCompletion(childId, new Set(visited)),
+        );
+      };
+
+      // Recalculate completion for every node
+      return updatedNodes.map((node) => ({
+        ...node,
+        completed: getCompletion(node.id),
+      }));
+    });
   };
 
   const getChildDescendants = (nodeId: number): number[] => {
@@ -550,9 +605,13 @@ const Canvas = ({
                 {/* ======================================= */}
 
                 <motion.div
-                  className=" group relative w-full h-full rounded-xl border border-neutral-700 bg-neutral-900 shadow-xl "
+                  className={`group relative w-full h-full rounded-xl border shadow-xl transition-colors ${
+                    node.completed
+                      ? "border-emerald-400/40 bg-emerald-500/15"
+                      : "border-neutral-700 bg-neutral-900"
+                  }`}
                   whileHover={{
-                    borderColor: "#737373",
+                    borderColor: node.completed ? "#34d399" : "#737373",
                   }}
                 >
                   {/* ===================================== */}
@@ -603,16 +662,46 @@ const Canvas = ({
                   )}
 
                   {/* ===================================== */}
-                  {/* TEXT                                    */}
+                  {/* TEXT + CHECKBOX                        */}
                   {/* ===================================== */}
 
-                  <textarea
-                    value={node.text}
-                    disabled={isPanningEnabled}
-                    onChange={(e) => updateText(node.id, e.target.value)}
-                    className="w-full h-full text-[12px] resize-none outline-none bg-transparent text-white text-sm p-4 pt-10 pr-10 hide-scrollbar"
-                    placeholder="Write something"
-                  />
+                  <div className="flex h-full w-full items-start gap-2 p-4 pt-10 pr-4">
+                    {/* Checkbox ONLY for leaf nodes */}
+                    {!hasChildren && (
+                      <button
+                        type="button"
+                        disabled={isPanningEnabled}
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          toggleNodeCompletion(node.id);
+                        }}
+                        className={`mt-0.5 flex h-4 w-4 shrink-0 items-center justify-center rounded border transition-colors ${
+                          node.completed
+                            ? "border-emerald-400 bg-emerald-500 text-white"
+                            : "border-neutral-600 bg-neutral-800 hover:border-emerald-400"
+                        }`}
+                        aria-label={
+                          node.completed
+                            ? "Mark task as incomplete"
+                            : "Mark task as complete"
+                        }
+                      >
+                        {node.completed && (
+                          <span className="text-[10px] font-bold">✓</span>
+                        )}
+                      </button>
+                    )}
+
+                    <textarea
+                      value={node.text}
+                      disabled={isPanningEnabled}
+                      onChange={(e) => updateText(node.id, e.target.value)}
+                      className={`h-full min-w-0 flex-1 resize-none bg-transparent text-[12px] outline-none hide-scrollbar ${
+                        node.completed ? "text-emerald-100" : "text-white"
+                      }`}
+                      placeholder="Write something"
+                    />
+                  </div>
 
                   {/* Right */}
                   <motion.button

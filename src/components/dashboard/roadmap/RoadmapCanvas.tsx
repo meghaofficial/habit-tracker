@@ -33,6 +33,7 @@ const RoadmapCanvas = () => {
                     text: "Start Here",
                     x: 80,
                     y: 80,
+                    completed: false
                   },
                 ])
               }
