@@ -57,11 +57,10 @@ export function formatDateString2(date: string | Date) {
 
 export function formatMonthYearSimple(isoString: Date | string) {
   const date = new Date(isoString);
-  const day = date.getDate();
-  // const month = date.toLocaleString("en-US", { month: "long" });
-  const monNo = date.getMonth();
-  const year = date.getFullYear();
-  return `${day} ${shortMonthName[monNo+1]} ${year}`;
+  const day = date.getUTCDate();
+  const monNo = date.getUTCMonth();
+  const year = date.getUTCFullYear();
+  return `${day} ${shortMonthName[monNo + 1]} ${year}`;
 }
 
 // NEw new

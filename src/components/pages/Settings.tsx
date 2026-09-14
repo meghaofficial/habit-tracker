@@ -114,7 +114,6 @@ const Settings = () => {
         </div> */}
 
         <div className="flex w-full flex-col gap-5 md:w-72">
-          
           {/* Header */}
           <div className="flex items-center gap-3 px-1">
             <motion.button

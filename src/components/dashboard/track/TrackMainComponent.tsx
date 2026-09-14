@@ -35,6 +35,7 @@ const TrackMainComponent = ({
 }) => {
   const isMobile = useIsMobile();
   const user = useSelector((state: RootState) => state.auth);
+  const now = new Date();
 
   const dateLogsData = useQuery({
     queryKey: ["date_logs", dashboardData?._id],
@@ -117,11 +118,11 @@ const TrackMainComponent = ({
 
                 <div className="mt-1 flex items-end gap-1">
                   <span className="text-4xl font-bold leading-none playfair-display">
-                    {new Date().getDate()}
+                    {now.getDate()}
                   </span>
 
                   <span className="pb-0.5 text-sm text-gray-400">
-                    {monMap?.[new Date(new Date()).getMonth() + 1]}
+                    {monMap?.[now.getMonth() + 1]}
                   </span>
                 </div>
               </div>

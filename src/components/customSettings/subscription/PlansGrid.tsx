@@ -29,7 +29,6 @@ const PlansGrid = ({
     if (!amount) {
       res = confirm("Are you sure you want to unlock the free trial ?");
     }
-    if (!res) return;
     setFreeTrialLoading(planID);
     try {
       const res = await axiosPrivate.post("/api/subscribe", { planID, amount });
