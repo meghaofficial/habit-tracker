@@ -1,9 +1,9 @@
 import { useEffect, useRef, useState } from "react";
 import { useMutation } from "@tanstack/react-query";
 
-import { notify } from "../../../helper";
-import { updateTaskName } from "../../../api/dashboard.api";
-import Saving from "../../shared/Saving";
+import { notify } from "../../../../helper";
+import { updateTaskName } from "../../../../api/dashboard.api";
+import Saving from "../../../shared/Saving";
 
 export const InputData = ({
   index,
@@ -22,9 +22,9 @@ export const InputData = ({
   // Latest value typed by the user
   const latestValueRef = useRef(taskName);
 
-  const [saveStatus, setSaveStatus] = useState<
-    "idle" | "saving" | "saved"
-  >("idle");
+  const [saveStatus, setSaveStatus] = useState<"idle" | "saving" | "saved">(
+    "idle",
+  );
 
   const timeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 

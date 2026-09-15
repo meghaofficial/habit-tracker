@@ -1,16 +1,16 @@
-import type { TaskI } from "../../../types";
+import type { TaskI } from "../../../../types";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
-import { getTasks } from "../../../api/dashboard.api";
-import { InputData } from "./InputData";
-import { axiosPrivate } from "../../../api/axios";
+import { getTasks } from "../../../../api/dashboard.api";
+import { axiosPrivate } from "../../../../api/axios";
 import { useEffect, useState, type Dispatch, type SetStateAction } from "react";
 import { MdOutlineCalendarMonth } from "react-icons/md";
-import PopupBox from "../../shared/PopupBox";
+import PopupBox from "../../../shared/PopupBox";
 import { FiTrash2 } from "react-icons/fi";
 import { IoAdd } from "react-icons/io5";
-import CircleLoader from "../../loaders/CircleLoader";
+import CircleLoader from "../../../loaders/CircleLoader";
 import axios from "axios";
-import { notify } from "../../../helper";
+import { notify } from "../../../../helper";
+import { InputData } from "./InputData";
 
 const HabitSection = ({
   loading,
@@ -165,7 +165,9 @@ const AddTaskListPopupSection = ({
       if (res?.data?.success) {
         notify.success("Task has been added");
         setOpenPopup(false);
-        await queryClient.invalidateQueries({ queryKey: ["tasks", currMonthID] });
+        await queryClient.invalidateQueries({
+          queryKey: ["tasks", currMonthID],
+        });
       }
     } catch (error) {
       if (axios.isAxiosError(error)) {

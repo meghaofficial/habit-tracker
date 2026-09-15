@@ -1,6 +1,5 @@
 import DailyCalanderTaskSheet from "./DailyCalanderTaskSheet";
-import HabitSection from "./HabitSection";
-import HabitProgress from "./HabitProgress";
+import HabitSection from "./habit_section/HabitSection";
 import MonthlyNote from "./MonthlyNote";
 import { monMap } from "../../../staticData";
 import { formatMonthYearSimple } from "../../../helper";
@@ -21,6 +20,7 @@ import { getDateLogs, getTasks } from "../../../api/dashboard.api";
 import TargetsSection from "./TargetsSection";
 import TodayTasks from "./mobile_view/TodayTasks";
 import { useEffect, useState } from "react";
+import HabitProgress from "./habit_section/HabitProgress";
 
 const TrackMainComponent = ({
   dashboardData,

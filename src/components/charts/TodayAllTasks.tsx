@@ -1,12 +1,10 @@
 import { useState } from "react";
 import { axiosPrivate } from "../../api/axios";
-import type {
-  DateLogI,
-} from "../../types";
+import type { DateLogI } from "../../types";
 import { notify } from "../../helper";
 import { LuMinus } from "react-icons/lu";
 import CircleLoader from "../loaders/CircleLoader";
-import { InputData } from "../dashboard/track/InputData";
+import { InputData } from "../dashboard/track/habit_section/InputData";
 
 const TodayAllTasks = ({
   taskList,
