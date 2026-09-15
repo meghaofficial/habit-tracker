@@ -2,7 +2,6 @@ import { AnimatePresence, motion } from "framer-motion";
 import { useEffect, useLayoutEffect, useRef, useState } from "react";
 import { FiCheck, FiPlus, FiTarget, FiX } from "react-icons/fi";
 import type { TargetI } from "../../../types";
-import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import {
   addTarget,
   getTargets,
@@ -10,6 +9,14 @@ import {
   removeTarget,
 } from "../../../api/dashboard.api";
 import SectionIcon from "../../shared/SectionIcon";
+import { axiosPrivate } from "../../../api/axios";
+import { TargetProgressTab } from "./TargetProgressTab";
+
+type SummaryType = {
+  total: number;
+  completed: number;
+  remaining: number;
+};
 
 const TargetsSection = ({
   monthID,
@@ -24,14 +31,27 @@ const TargetsSection = ({
   const dateRefs = useRef<Record<number, HTMLButtonElement | null>>({});
   const [activeTab, setActiveTab] = useState<number>(0);
   const [activeDate, setActiveDate] = useState(new Date().getDate());
+  const [summary, setSummary] = useState<{
+    monthlySummary: SummaryType;
+    weeklySummary: (SummaryType & { week: number })[];
+    dailySummary: (SummaryType & { dateNo: number })[];
+  }>({
+    monthlySummary: {
+      total: 0,
+      completed: 0,
+      remaining: 0,
+    },
+    weeklySummary: [],
+    dailySummary: [],
+  });
 
   const tabs = [
     { key: 0, label: "Monthly" },
-    { key: -1, label: "Daily" },
     ...Array.from({ length: totalWeeks }, (_, i) => ({
       key: i + 1,
       label: `Week ${i + 1}`,
     })),
+    { key: -1, label: "Daily" },
   ];
 
   useEffect(() => {
@@ -58,6 +78,24 @@ const TargetsSection = ({
     });
   }, [activeDate, activeTab]);
 
+  const getSummary = async () => {
+    try {
+      const res = await axiosPrivate.get(
+        `/api/targets-summary?monthDashID=${monthID}`,
+      );
+      if (res?.data?.success) {
+        const { monthlySummary, weeklySummary, dailySummary } = res?.data;
+        setSummary({ monthlySummary, weeklySummary, dailySummary });
+      }
+    } catch (error) {
+      console.error(error);
+    }
+  };
+
+  useEffect(() => {
+    getSummary();
+  }, []);
+
   return (
     <div className="relative overflow-hidden h-125 rounded-2xl w-full border border-white/10 bg-black/20">
       <div className="absolute inset-0 bg-linear-to-br from-indigo-500/3 via-transparent to-transparent pointer-events-none" />
@@ -76,7 +114,7 @@ const TargetsSection = ({
       </div>
 
       {/* Tab Bar */}
-      <div className="flex items-center gap-1.5 px-4 py-2.5 border-b border-white/5 overflow-x-auto hide-scrollbar">
+      {/* <div className="flex items-center gap-1.5 px-4 py-2.5 border-b border-white/5 overflow-x-auto hide-scrollbar">
         {tabs.map((tab) => (
           <button
             key={tab.key}
@@ -90,11 +128,32 @@ const TargetsSection = ({
             {tab.label}
           </button>
         ))}
+      </div> */}
+      <div className="flex items-center gap-2 px-4 py-2.5 border-b border-white/5 overflow-x-auto hide-scrollbar">
+        {tabs.map((tab) => {
+          const isMonthly = tab.key === 0;
+
+          const summ = isMonthly
+            ? summary.monthlySummary
+            : summary.weeklySummary.find((item) => item.week === tab.key);
+
+          return (
+            <TargetProgressTab
+              key={tab.key}
+              label={tab.label}
+              total={summ?.total ?? 0}
+              completed={summ?.completed ?? 0}
+              active={activeTab === tab.key}
+              onClick={() => setActiveTab(tab.key)}
+              variant="week"
+            />
+          );
+        })}
       </div>
 
       {/* Tab Content */}
       <div className="relative">
-        {activeTab === -1 && (
+        {/* {activeTab === -1 && (
           <div
             ref={dateContainerRef}
             className="flex items-center gap-1.5 px-4 py-2.5 border-b border-white/5 overflow-x-auto hide-scrollbar"
@@ -120,6 +179,34 @@ const TargetsSection = ({
               );
             })}
           </div>
+        )} */}
+        {activeTab === -1 && (
+          <div
+            ref={dateContainerRef}
+            className="flex items-center gap-2 px-4 py-2.5 border-b border-white/5 overflow-x-auto hide-scrollbar"
+          >
+            {Array.from({ length: totalDaysInMonth }).map((_, index) => {
+              const date = index + 1;
+
+              const summ = summary.dailySummary.find(
+                (item) => item.dateNo === date,
+              );
+
+              return (
+                <TargetProgressTab
+                  key={date}
+                  label={String(date)}
+                  total={summ?.total ?? 0}
+                  completed={summ?.completed ?? 0}
+                  active={activeDate === date}
+                  onClick={() => setActiveDate(date)}
+                  buttonRef={(el) => {
+                    dateRefs.current[date] = el;
+                  }}
+                />
+              );
+            })}
+          </div>
         )}
         <div className="p-4">
           <AnimatePresence mode="wait">
@@ -132,8 +219,16 @@ const TargetsSection = ({
             >
               <InlineTargetsList
                 monthID={monthID}
-                type={activeTab === 0 ? "monthly" : "weekly"}
+                type={
+                  activeTab === -1
+                    ? "daily"
+                    : activeTab === 0
+                      ? "monthly"
+                      : "weekly"
+                }
                 week={activeTab === 0 ? 0 : activeTab}
+                dateNo={activeDate}
+                getSummary={getSummary}
               />
             </motion.div>
           </AnimatePresence>
@@ -147,108 +242,207 @@ const InlineTargetsList = ({
   monthID,
   type,
   week,
+  dateNo,
+  getSummary,
 }: {
   monthID: string;
   type: string;
   week: number;
+  dateNo: number;
+  getSummary: () => Promise<void>;
 }) => {
   const [input, setInput] = useState("");
-  const [markLoading, setMarkLoading] = useState("");
-  const queryClient = useQueryClient();
+  const [targets, setTargets] = useState<TargetI[]>([]);
 
-  const { data, isPending } = useQuery({
-    queryKey: ["targets", type, monthID, week],
-    queryFn: () =>
-      getTargets({
+  const [loadingVals, setLoadingVals] = useState({
+    getTargetsLoading: false,
+    addTargetLoading: false,
+    markTargetLoading: "",
+    removeTargetLoading: "",
+  });
+
+  const loadingValsSetup = (
+    key: keyof typeof loadingVals,
+    value: boolean | string,
+  ) => {
+    setLoadingVals((prev) => ({
+      ...prev,
+      [key]: value,
+    }));
+  };
+
+  // =========================
+  // GET TARGETS
+  // =========================
+
+  const handleGetTargets = async () => {
+    loadingValsSetup("getTargetsLoading", true);
+
+    try {
+      const res = await getTargets({
         type,
         monthID,
         week,
-      }),
-  });
-  const targets = data?.target?.targets ?? [];
+        dateNo,
+      });
 
-  const completedCount = targets.filter((t: TargetI) => t.completed).length;
+      setTargets(res?.target?.targets ?? []);
+    } catch (error) {
+      console.error("Error getting targets:", error);
+      setTargets([]);
+    } finally {
+      loadingValsSetup("getTargetsLoading", false);
+    }
+  };
+
+  useEffect(() => {
+    handleGetTargets();
+  }, [type, monthID, week, dateNo]);
+
+  // =========================
+  // PROGRESS
+  // =========================
+
+  const completedCount = targets.filter((target) => target.completed).length;
+
   const progress =
     targets.length > 0
       ? Math.round((completedCount / targets.length) * 100)
       : 0;
 
-  const addTargetMutation = useMutation({
-    mutationFn: addTarget,
-    onSuccess: (data) => {
-      queryClient.setQueryData(["targets", type, monthID, week], data);
-      setInput("");
-    },
-    onError: (error) => {
-      console.error(error);
-    },
-  });
+  // =========================
+  // ADD TARGET
+  // =========================
 
-  const handleAddTarget = () => {
-    if (!input.trim() || targets.length >= 10) return;
-    addTargetMutation.mutate({
-      type,
-      monthID,
-      week,
-      target: input.trim(),
-    });
+  const handleAddTarget = async () => {
+    const value = input.trim();
+
+    if (!value || targets.length >= 10) return;
+
+    loadingValsSetup("addTargetLoading", true);
+
+    try {
+      const res = await addTarget({
+        type,
+        monthID,
+        week,
+        target: value,
+        dateNo,
+      });
+
+      /*
+       * Assuming API returns:
+       * {
+       *   target: {
+       *     targets: [...]
+       *   }
+       * }
+       */
+
+      setTargets(res?.target?.targets ?? []);
+      await getSummary();
+
+      setInput("");
+    } catch (error) {
+      console.error("Error adding target:", error);
+    } finally {
+      loadingValsSetup("addTargetLoading", false);
+    }
   };
 
-  const removeTargetMutation = useMutation({
-    mutationFn: removeTarget,
-    onSuccess: (_, variables) => {
-      queryClient.setQueryData(
-        ["targets", type, monthID, week],
-        (old: any) => ({
-          ...old,
-          target: {
-            ...old.target,
-            targets: old.target.targets.filter(
-              (t: TargetI) => t._id !== variables.targetID,
-            ),
-          },
-        }),
-      );
-    },
-    onError: (error) => {
-      console.error(error);
-    },
-  });
+  // =========================
+  // MARK TARGET
+  // =========================
 
-  const removingId = removeTargetMutation.isPending
-    ? removeTargetMutation.variables?.targetID
-    : "";
+  const handleMarkTarget = async (targetID: string, completed: boolean) => {
+    loadingValsSetup("markTargetLoading", targetID);
 
-  const markTargetMutation = useMutation({
-    mutationFn: markTarget,
-    onMutate: ({ targetID }) => {
-      setMarkLoading(targetID);
-    },
-    onSuccess: (data) => {
-      queryClient.setQueryData(["targets", type, monthID, week], data);
-    },
-    onError: (error) => {
-      console.error(error);
-    },
-    onSettled: () => {
-      setMarkLoading("");
-    },
-  });
+    try {
+      const res = await markTarget({
+        type,
+        monthID,
+        week,
+        targetID,
+        mark: completed,
+        dateNo,
+      });
+
+      /*
+       * If API returns the complete updated target list,
+       * use it directly.
+       */
+      if (res?.target?.targets) {
+        setTargets(res.target.targets);
+      } else {
+        /*
+         * Otherwise update only the target locally.
+         */
+        setTargets((prev) =>
+          prev.map((target) =>
+            target._id === targetID
+              ? {
+                  ...target,
+                  completed,
+                }
+              : target,
+          ),
+        );
+      }
+      await getSummary();
+    } catch (error) {
+      console.error("Error marking target:", error);
+    } finally {
+      loadingValsSetup("markTargetLoading", "");
+    }
+  };
+
+  // =========================
+  // REMOVE TARGET
+  // =========================
+
+  const handleRemoveTarget = async (targetID: string) => {
+    loadingValsSetup("removeTargetLoading", targetID);
+
+    try {
+      await removeTarget({
+        type,
+        monthID,
+        week,
+        targetID,
+        dateNo,
+      });
+
+      /*
+       * Remove locally instead of making
+       * another GET request.
+       */
+      setTargets((prev) => prev.filter((target) => target._id !== targetID));
+      await getSummary();
+    } catch (error) {
+      console.error("Error removing target:", error);
+    } finally {
+      loadingValsSetup("removeTargetLoading", "");
+    }
+  };
 
   return (
     <div className="flex flex-col gap-3">
       {/* Progress bar */}
       {targets.length > 0 && (
         <div className="flex items-center gap-3">
-          <div className="flex-1 h-1.5 bg-white/5 rounded-full overflow-hidden">
+          <div className="h-1.5 flex-1 overflow-hidden rounded-full bg-white/5">
             <motion.div
-              className="h-full bg-linear-to-r from-indigo-500 to-purple-400 rounded-full"
+              className="h-full rounded-full bg-linear-to-r from-indigo-500 to-purple-400"
               initial={{ width: 0 }}
               animate={{ width: `${progress}%` }}
-              transition={{ duration: 0.5, ease: "easeOut" }}
+              transition={{
+                duration: 0.5,
+                ease: "easeOut",
+              }}
             />
           </div>
-          <span className="text-[10px] font-bold text-indigo-400 shrink-0">
+
+          <span className="shrink-0 text-[10px] font-bold text-indigo-400">
             {completedCount}/{targets.length} done
           </span>
         </div>
@@ -260,29 +454,35 @@ const InlineTargetsList = ({
           type="text"
           value={input}
           onChange={(e) => setInput(e.target.value)}
-          onKeyDown={(e) => e.key === "Enter" && handleAddTarget()}
-          disabled={targets.length >= 10}
+          onKeyDown={(e) => {
+            if (e.key === "Enter" && !loadingVals.addTargetLoading) {
+              handleAddTarget();
+            }
+          }}
+          disabled={targets.length >= 10 || loadingVals.addTargetLoading}
           placeholder={
             targets.length >= 10
               ? "Max 10 targets reached"
               : type === "monthly"
                 ? "Add a monthly target…"
-                : "Add a weekly target…"
+                : type === "weekly"
+                  ? "Add a weekly target…"
+                  : "Add a daily target…"
           }
-          className="flex-1 rounded-xl py-2 px-3 text-[12px] bg-white/5 border border-white/10 text-white placeholder:text-white/20 outline-none focus:border-indigo-500/40 focus:bg-white/8 transition-all duration-200"
+          className="flex-1 rounded-xl border border-white/10 bg-white/5 px-3 py-2 text-[12px] text-white outline-none transition-all duration-200 placeholder:text-white/20 focus:border-indigo-500/40 focus:bg-white/8 disabled:cursor-not-allowed disabled:opacity-50"
         />
+
         <button
-          onClick={() => {
-            if (!input.trim() || targets.length >= 10) return;
-            handleAddTarget();
-          }}
+          onClick={handleAddTarget}
           disabled={
-            addTargetMutation.isPending || !input.trim() || targets.length >= 10
+            loadingVals.addTargetLoading ||
+            !input.trim() ||
+            targets.length >= 10
           }
-          className="flex items-center gap-1.5 px-3 py-2 rounded-xl bg-indigo-500/20 border border-indigo-500/30 text-indigo-300 text-[11px] font-semibold hover:bg-indigo-500/30 transition-colors duration-200 disabled:opacity-40 cursor-pointer disabled:cursor-not-allowed"
+          className="flex cursor-pointer items-center gap-1.5 rounded-xl border border-indigo-500/30 bg-indigo-500/20 px-3 py-2 text-[11px] font-semibold text-indigo-300 transition-colors duration-200 hover:bg-indigo-500/30 disabled:cursor-not-allowed disabled:opacity-40"
         >
-          {addTargetMutation.isPending ? (
-            <span className="w-3.5 h-3.5 rounded-full border border-indigo-300 border-t-transparent animate-spin" />
+          {loadingVals.addTargetLoading ? (
+            <span className="h-3.5 w-3.5 animate-spin rounded-full border border-indigo-300 border-t-transparent" />
           ) : (
             <FiPlus size={13} />
           )}
@@ -291,53 +491,60 @@ const InlineTargetsList = ({
       </div>
 
       {/* Target list */}
-      <div className="flex flex-col gap-2 max-h-70 overflow-y-auto hide-scrollbar">
-        {isPending ? (
+      <div className="hide-scrollbar flex max-h-70 flex-col gap-2 overflow-y-auto">
+        {loadingVals.getTargetsLoading ? (
           Array.from({ length: 4 }).map((_, i) => (
-            <div key={i} className="h-9 rounded-xl bg-white/5 animate-pulse" />
+            <div key={i} className="h-9 animate-pulse rounded-xl bg-white/5" />
           ))
         ) : targets.length === 0 ? (
-          <div className="flex flex-col items-center py-6 gap-2 justify-center h-70">
+          <div className="flex h-70 flex-col items-center justify-center gap-2 py-6">
             <FiTarget size={24} className="text-gray-600" />
+
             <p className="text-[11px] text-gray-500">
               No targets yet. Add one above.
             </p>
           </div>
         ) : (
           <AnimatePresence>
-            {targets.map((target: TargetI) => (
+            {targets.map((target) => (
               <motion.div
                 key={target._id}
-                initial={{ opacity: 0, y: -6 }}
-                animate={{ opacity: 1, y: 0 }}
-                exit={{ opacity: 0, height: 0, marginBottom: 0 }}
-                transition={{ duration: 0.2 }}
-                className={`flex items-center gap-2.5 p-2.5 rounded-xl border transition-all duration-200 group ${
+                initial={{
+                  opacity: 0,
+                  y: -6,
+                }}
+                animate={{
+                  opacity: 1,
+                  y: 0,
+                }}
+                exit={{
+                  opacity: 0,
+                  height: 0,
+                  marginBottom: 0,
+                }}
+                transition={{
+                  duration: 0.2,
+                }}
+                className={`group flex items-center gap-2.5 rounded-xl border p-2.5 transition-all duration-200 ${
                   target.completed
-                    ? "bg-emerald-500/8 border-emerald-500/20"
-                    : "bg-white/2 border-white/8 hover:border-white/15"
+                    ? "border-emerald-500/20 bg-emerald-500/8"
+                    : "border-white/8 bg-white/2 hover:border-white/15"
                 }`}
               >
                 {/* Checkbox */}
                 <button
                   onClick={() =>
-                    markTargetMutation.mutate({
-                      type,
-                      monthID,
-                      week,
-                      targetID: target._id,
-                      mark: !target.completed,
-                    })
+                    handleMarkTarget(target._id, !target.completed)
                   }
-                  disabled={markLoading === target._id}
-                  className={`w-5 h-5 shrink-0 rounded-md border flex items-center justify-center transition-all duration-200 cursor-pointer ${
+                  disabled={loadingVals.markTargetLoading === target._id}
+                  className={`flex h-5 w-5 shrink-0 cursor-pointer items-center justify-center rounded-md border transition-all duration-200 disabled:cursor-not-allowed ${
                     target.completed
-                      ? "bg-emerald-500/30 border-emerald-500/50 text-emerald-400"
-                      : "bg-white/5 border-white/15 hover:border-indigo-500/40"
+                      ? "border-emerald-500/50 bg-emerald-500/30 text-emerald-400"
+                      : "border-white/15 bg-white/5 hover:border-indigo-500/40"
                   }`}
                 >
-                  {markLoading === target._id ? (
-                    <span className="w-2.5 h-2.5 rounded-full border border-emerald-400 border-t-transparent animate-spin" />
+                  {loadingVals.markTargetLoading === target._id ? (
+                    <span className="h-2.5 w-2.5 animate-spin rounded-full border border-emerald-400 border-t-transparent" />
                   ) : target.completed ? (
                     <FiCheck size={10} />
                   ) : null}
@@ -347,7 +554,7 @@ const InlineTargetsList = ({
                 <p
                   className={`flex-1 text-[12px] leading-tight ${
                     target.completed
-                      ? "line-through text-gray-500"
+                      ? "text-gray-500 line-through"
                       : "text-white/80"
                   }`}
                 >
@@ -356,19 +563,12 @@ const InlineTargetsList = ({
 
                 {/* Remove */}
                 <button
-                  onClick={() =>
-                    removeTargetMutation.mutate({
-                      type,
-                      monthID,
-                      week,
-                      targetID: target._id,
-                    })
-                  }
-                  disabled={removingId === target._id}
-                  className="opacity-0 group-hover:opacity-100 transition-opacity duration-200 w-5 h-5 flex items-center justify-center rounded-md bg-rose-500/10 border border-rose-500/20 text-rose-400 hover:bg-rose-500/20 cursor-pointer"
+                  onClick={() => handleRemoveTarget(target._id)}
+                  disabled={loadingVals.removeTargetLoading === target._id}
+                  className="flex h-5 w-5 cursor-pointer items-center justify-center rounded-md border border-rose-500/20 bg-rose-500/10 text-rose-400 opacity-0 transition-opacity duration-200 group-hover:opacity-100 disabled:cursor-not-allowed"
                 >
-                  {removingId === target._id ? (
-                    <span className="w-2 h-2 rounded-full border border-rose-400 border-t-transparent animate-spin" />
+                  {loadingVals.removeTargetLoading === target._id ? (
+                    <span className="h-2 w-2 animate-spin rounded-full border border-rose-400 border-t-transparent" />
                   ) : (
                     <FiX size={9} />
                   )}

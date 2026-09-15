@@ -93,21 +93,41 @@ export const getDateLogByDate = async (monthDashID: string) => {
   return res.data;
 };
 
+const targetUrlHelper = (
+  type: string,
+  monthID: string,
+  week?: number,
+  dateNo?: number,
+  targetID?: string,
+) => {
+  if (type === "daily") {
+    return targetID
+      ? `/api/daily-targets?monthDashID=${monthID}&dateNo=${dateNo}&targetID=${targetID}`
+      : `/api/daily-targets?monthDashID=${monthID}&dateNo=${dateNo}`;
+  } else if (type === "monthly") {
+    return targetID
+      ? `/api/monthly-targets?monthDashID=${monthID}&targetID=${targetID}`
+      : `/api/monthly-targets?monthDashID=${monthID}`;
+  } else {
+    return targetID
+      ? `/api/weekly-targets?monthDashID=${monthID}&week=${week}&targetID=${targetID}`
+      : `/api/weekly-targets?monthDashID=${monthID}&week=${week}`;
+  }
+};
 
 // Get targets
 export const getTargets = async ({
   type,
   monthID,
   week,
+  dateNo,
 }: {
   type: string;
   monthID: string;
   week?: number;
+  dateNo?: number;
 }) => {
-  const url =
-    type === "monthly"
-      ? `/api/monthly-targets?monthDashID=${monthID}`
-      : `/api/weekly-targets?monthDashID=${monthID}&week=${week}`;
+  const url = targetUrlHelper(type, monthID, week, dateNo);
 
   const res = await axiosPrivate.get(url);
 
@@ -120,18 +140,17 @@ export const addTarget = async ({
   monthID,
   week,
   target,
+  dateNo,
 }: {
   type: string;
   monthID: string;
   week?: number;
   target: string;
+  dateNo?: number;
 }) => {
-  const url =
-    type === "monthly"
-      ? `/api/add-monthly-target?monthDashID=${monthID}`
-      : `/api/add-weekly-target?monthDashID=${monthID}&week=${week}`;
+  const url = targetUrlHelper(type, monthID, week, dateNo);
 
-  const res = await axiosPrivate.patch(url, {
+  const res = await axiosPrivate.post(url, {
     target,
   });
 
@@ -145,17 +164,16 @@ export const markTarget = async ({
   week,
   targetID,
   mark,
+  dateNo,
 }: {
   type: string;
   monthID: string;
   week?: number;
   targetID: string;
   mark: boolean;
+  dateNo?: number;
 }) => {
-  const url =
-    type === "monthly"
-      ? `/api/mark-monthly-target?monthDashID=${monthID}&targetID=${targetID}`
-      : `/api/mark-weekly-target?monthDashID=${monthID}&week=${week}&targetID=${targetID}`;
+  const url = targetUrlHelper(type, monthID, week, dateNo, targetID);
 
   const res = await axiosPrivate.patch(url, { mark });
 
@@ -168,30 +186,30 @@ export const removeTarget = async ({
   monthID,
   week,
   targetID,
+  dateNo,
 }: {
   type: string;
   monthID: string;
   week?: number;
   targetID: string;
+  dateNo?: number;
 }) => {
-  const url =
-    type === "monthly"
-      ? `/api/remove-monthly-target?monthDashID=${monthID}&targetID=${targetID}`
-      : `/api/remove-weekly-target?monthDashID=${monthID}&week=${week}&targetID=${targetID}`;
+  // const url =
+  //   type === "monthly"
+  //     ? `/api/remove-monthly-target?monthDashID=${monthID}&targetID=${targetID}`
+  //     : `/api/remove-weekly-target?monthDashID=${monthID}&week=${week}&targetID=${targetID}`;
 
-  const res = await axiosPrivate.patch(url);
+  const url = targetUrlHelper(type, monthID, week, dateNo, targetID);
+
+  const res = await axiosPrivate.delete(url);
 
   return res.data;
 };
 
 // Get monthly note
-export const getMonthlyNote = async ({
-  monthID,
-}: {
-  monthID: string;
-}) => {
+export const getMonthlyNote = async ({ monthID }: { monthID: string }) => {
   const res = await axiosPrivate.get(
-    `/api/monthly-note?monthDashID=${monthID}`
+    `/api/monthly-note?monthDashID=${monthID}`,
   );
 
   return res.data;
@@ -209,7 +227,7 @@ export const updateMonthlyNote = async ({
     `/api/monthly-note?monthDashID=${monthID}`,
     {
       note,
-    }
+    },
   );
 
   return res.data;
