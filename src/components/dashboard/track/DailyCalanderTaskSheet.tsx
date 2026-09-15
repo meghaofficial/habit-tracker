@@ -9,7 +9,6 @@ import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import {
   addTask,
   getDateLogs,
-  getTasks,
   removeTask,
   resetDateLogs,
   toggleTask,
@@ -41,12 +40,6 @@ const DailyCalanderTaskSheet = ({
   const dateLogsData = useQuery({
     queryKey: ["date_logs", dashboardData?._id],
     queryFn: () => getDateLogs(dashboardData?._id),
-    enabled: !!dashboardData?._id,
-  });
-
-  const taskListData = useQuery({
-    queryKey: ["tasks", dashboardData?._id],
-    queryFn: () => getTasks(dashboardData?._id),
     enabled: !!dashboardData?._id,
   });
 
