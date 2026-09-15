@@ -114,21 +114,6 @@ const TargetsSection = ({
       </div>
 
       {/* Tab Bar */}
-      {/* <div className="flex items-center gap-1.5 px-4 py-2.5 border-b border-white/5 overflow-x-auto hide-scrollbar">
-        {tabs.map((tab) => (
-          <button
-            key={tab.key}
-            onClick={() => setActiveTab(tab.key)}
-            className={`shrink-0 text-[11px] font-semibold px-3 py-1.5 rounded-xl transition-all duration-200 cursor-pointer ${
-              activeTab === tab.key
-                ? "bg-indigo-500/20 text-indigo-300 border border-indigo-500/30"
-                : "text-gray-500 hover:text-gray-300 hover:bg-white/5 border border-transparent"
-            }`}
-          >
-            {tab.label}
-          </button>
-        ))}
-      </div> */}
       <div className="flex items-center gap-2 px-4 py-2.5 border-b border-white/5 overflow-x-auto hide-scrollbar">
         {tabs.map((tab) => {
           const isMonthly = tab.key === 0;
@@ -153,33 +138,6 @@ const TargetsSection = ({
 
       {/* Tab Content */}
       <div className="relative">
-        {/* {activeTab === -1 && (
-          <div
-            ref={dateContainerRef}
-            className="flex items-center gap-1.5 px-4 py-2.5 border-b border-white/5 overflow-x-auto hide-scrollbar"
-          >
-            {Array.from({ length: totalDaysInMonth }).map((_, index) => {
-              const date = index + 1;
-
-              return (
-                <button
-                  key={date}
-                  ref={(el) => {
-                    dateRefs.current[date] = el;
-                  }}
-                  onClick={() => setActiveDate(date)}
-                  className={`shrink-0 text-[11px] font-semibold px-3 py-1.5 rounded-xl transition-all duration-200 cursor-pointer ${
-                    activeDate === date
-                      ? "bg-indigo-500/20 text-indigo-300 border border-indigo-500/30"
-                      : "text-gray-500 hover:text-gray-300 hover:bg-white/5 border border-transparent"
-                  }`}
-                >
-                  {date}
-                </button>
-              );
-            })}
-          </div>
-        )} */}
         {activeTab === -1 && (
           <div
             ref={dateContainerRef}
