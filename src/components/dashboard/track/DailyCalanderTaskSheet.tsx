@@ -22,11 +22,13 @@ const DailyCalanderTaskSheet = ({
   monthStatus,
   progress,
   setProgress,
+  taskList,
 }: {
   dashboardData: DashboardI;
   monthStatus: string;
   progress: ProgressI;
   setProgress: React.Dispatch<React.SetStateAction<ProgressI>>;
+  taskList: TaskI[];
 }) => {
   const totalD = dashboardData?.totalDays || 0;
   const firstDay = dashboardData?.firstDay || 0;
@@ -181,7 +183,7 @@ const DailyCalanderTaskSheet = ({
   }, [dashboardData?._id, queryClient]);
 
   const dateLogs: DateLogI[] = dateLogsData?.data?.dateLogs;
-  const taskList: TaskI[] = taskListData?.data?.tasks;
+  // const taskList: TaskI[] = taskListData?.data?.tasks;
 
   // Column widths
   const hasWeek5 = totalD > 28;
@@ -452,63 +454,62 @@ const DailyCalanderTaskSheet = ({
             </div>
           ) : (
             <>
-              {taskList?.length > 0 &&
-                taskList.map((task) => (
-                  <div
-                    key={task._id}
-                    className="flex items-center w-full px-3 py-2 border-b border-white/5 group hover:bg-white/2 transition-colors duration-150 relative"
+              {taskList?.map((task) => (
+                <div
+                  key={task._id}
+                  className=" flex items-center w-full px-3 py-2 border-b border-white/5 group hover:bg-white/2 transition-colors duration-150 relative "
+                >
+                  {/* Delete button */}
+                  <button
+                    disabled={removeRowID === task._id}
+                    onClick={() => handleDeleteRow(task._id)}
+                    className=" absolute -right-0.5 opacity-0 group-hover:opacity-100 transition-opacity duration-200 w-5 h-5 flex items-center justify-center rounded-md bg-rose-500/20 border border-rose-500/30 text-rose-400 hover:bg-rose-500/30 cursor-pointer "
+                    title="Remove habit"
                   >
-                    {/* Delete button */}
-                    <button
-                      disabled={removeRowID === task._id}
-                      onClick={() => handleDeleteRow(task._id)}
-                      className="absolute -right-0.5 opacity-0 group-hover:opacity-100 transition-opacity duration-200 w-5 h-5 flex items-center justify-center rounded-md bg-rose-500/20 border border-rose-500/30 text-rose-400 hover:bg-rose-500/30 cursor-pointer"
-                      title="Remove habit"
-                    >
-                      {removeRowID === task._id ? (
-                        <span className="w-2.5 h-2.5 rounded-full border border-rose-400 border-t-transparent animate-spin" />
-                      ) : (
-                        <FiTrash2 size={9} />
-                      )}
-                    </button>
-
-                    {/* Weeks 1–4 */}
-                    {Array.from({ length: 4 }).map((_, weekIndex) => (
-                      <div
-                        key={weekIndex}
-                        className={`flex items-center justify-evenly py-px ${colW}`}
-                      >
-                        <TaskRow
-                          taskID={task._id}
-                          logs={dateLogs?.slice(
-                            weekIndex * 7,
-                            (weekIndex + 1) * 7,
-                          )}
-                          weekOffset={weekIndex * 7}
-                          todayDate={todayDate}
-                          dashbID={dashboardData?._id}
-                          setProgress={setProgress}
-                        />
-                      </div>
-                    ))}
-
-                    {/* Week 5 */}
-                    {hasWeek5 && (
-                      <div
-                        className={`flex items-center justify-evenly py-px ${colW5}`}
-                      >
-                        <TaskRow
-                          taskID={task._id}
-                          logs={dateLogs?.slice(28)}
-                          weekOffset={28}
-                          todayDate={todayDate}
-                          dashbID={dashboardData?._id}
-                          setProgress={setProgress}
-                        />
-                      </div>
+                    {removeRowID === task._id ? (
+                      <span className="w-2.5 h-2.5 rounded-full border border-rose-400 border-t-transparent animate-spin" />
+                    ) : (
+                      <FiTrash2 size={9} />
                     )}
-                  </div>
-                ))}
+                  </button>
+
+                  {/* Weeks 1–4 */}
+                  {Array.from({ length: 4 }).map((_, weekIndex) => (
+                    <div
+                      key={weekIndex}
+                      className={`flex items-center justify-evenly py-px ${colW}`}
+                    >
+                      <TaskRow
+                        taskID={task._id}
+                        logs={dateLogs?.slice(
+                          weekIndex * 7,
+                          (weekIndex + 1) * 7,
+                        )}
+                        weekOffset={weekIndex * 7}
+                        todayDate={todayDate}
+                        dashbID={dashboardData?._id}
+                        setProgress={setProgress}
+                      />
+                    </div>
+                  ))}
+
+                  {/* Week 5 */}
+                  {hasWeek5 && (
+                    <div
+                      className={`flex items-center justify-evenly py-px ${colW5}`}
+                    >
+                      <TaskRow
+                        taskID={task._id}
+                        logs={dateLogs?.slice(28)}
+                        weekOffset={28}
+                        todayDate={todayDate}
+                        dashbID={dashboardData?._id}
+                        setProgress={setProgress}
+                      />
+                    </div>
+                  )}
+                </div>
+              ))}
 
               {/* Add Row button */}
               <button

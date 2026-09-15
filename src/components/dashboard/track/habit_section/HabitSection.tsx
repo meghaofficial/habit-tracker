@@ -1,40 +1,35 @@
 import type { TaskI } from "../../../../types";
-import { useQuery, useQueryClient } from "@tanstack/react-query";
-import { getTasks } from "../../../../api/dashboard.api";
+import { useQueryClient } from "@tanstack/react-query";
 import { axiosPrivate } from "../../../../api/axios";
 import { useEffect, useState, type Dispatch, type SetStateAction } from "react";
 import { MdOutlineCalendarMonth } from "react-icons/md";
 import PopupBox from "../../../shared/PopupBox";
-import { FiTrash2 } from "react-icons/fi";
+import { FiMenu, FiTrash2 } from "react-icons/fi";
 import { IoAdd } from "react-icons/io5";
 import CircleLoader from "../../../loaders/CircleLoader";
 import axios from "axios";
 import { notify } from "../../../../helper";
 import { InputData } from "./InputData";
+import { Reorder } from "framer-motion";
 
 const HabitSection = ({
   loading,
   dashboardID,
   month,
   year,
+  taskList,
+  setTaskList,
 }: {
   loading: boolean;
   dashboardID: string;
   month: number;
   year: number;
+  taskList: TaskI[];
+  setTaskList: Dispatch<SetStateAction<TaskI[]>>;
 }) => {
   const [makeDisable, setMakeDisable] = useState(false);
   const [disableLoading, setDisableLoading] = useState(false);
   const [openPopup, setOpenPopup] = useState(false);
-
-  const taskListData = useQuery({
-    queryKey: ["tasks", dashboardID],
-    queryFn: () => getTasks(dashboardID),
-    enabled: !!dashboardID,
-  });
-
-  const taskList: TaskI[] = taskListData?.data?.tasks;
-  const [prevTotalTasks, setPrevTotalTasks] = useState(0);
   const [prevDashID, setPrevDashID] = useState("");
 
   const lastMonth = async () => {
@@ -44,7 +39,7 @@ const HabitSection = ({
         `/api/last-month?month=${month}&year=${year}`,
       );
       setMakeDisable(!res?.data?.success);
-      setPrevTotalTasks(res?.data?.totalTasks);
+      // setPrevTotalTasks(res?.data?.totalTasks);
       setPrevDashID(res?.data?.monthDashID);
     } catch (error) {
       console.error(error);
@@ -78,7 +73,11 @@ const HabitSection = ({
         : "bg-yellow-500/10 border-yellow-500/20 text-yellow-400 hover:bg-yellow-500/20 cursor-pointer"
     }`}
         >
-          <MdOutlineCalendarMonth size={12} />
+          {disableLoading ? (
+            <CircleLoader className="h-3 w-3" />
+          ) : (
+            <MdOutlineCalendarMonth size={12} />
+          )}
         </button>
       </div>
 
@@ -99,15 +98,47 @@ const HabitSection = ({
           ))}
         </div>
       ) : (
-        taskList?.map((task, index) => (
-          <div key={task._id}>
-            <InputData
-              index={index}
-              taskId={task._id}
-              taskName={task.taskName}
-            />
-          </div>
-        ))
+        <Reorder.Group
+          axis="y"
+          values={taskList}
+          onReorder={setTaskList}
+          className="w-full"
+        >
+          {taskList.map((task, index) => (
+            <Reorder.Item
+              key={task._id}
+              value={task}
+              className="relative"
+              whileDrag={{
+                scale: 1.02,
+                zIndex: 20,
+              }}
+            >
+              <div className="relative">
+                <InputData
+                  index={index}
+                  taskId={task._id}
+                  taskName={task.taskName}
+                />
+
+                <div
+                  className="
+                absolute
+                right-2
+                top-1/2
+                -translate-y-1/2
+                cursor-grab
+                text-white/30
+                hover:text-indigo-400
+                active:cursor-grabbing
+              "
+                >
+                  <FiMenu size={13} />
+                </div>
+              </div>
+            </Reorder.Item>
+          ))}
+        </Reorder.Group>
       )}
       <div className="h-10 flex items-center justify-between px-2"></div>
       {openPopup && (

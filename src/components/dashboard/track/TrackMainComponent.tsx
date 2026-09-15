@@ -58,6 +58,12 @@ const TrackMainComponent = ({
   });
   const taskList: TaskI[] = taskListData?.data?.tasks;
 
+  const [orderedTaskList, setOrderedTaskList] = useState(taskList ?? []);
+
+  useEffect(() => {
+    setOrderedTaskList(taskList ?? []);
+  }, [taskList]);
+
   const getTodayProgress = () => {
     if (!progress)
       return {
@@ -235,6 +241,8 @@ const TrackMainComponent = ({
             loading={dateLogsData.isPending}
             month={dashboardData.month}
             year={dashboardData.year}
+            taskList={orderedTaskList}
+            setTaskList={setOrderedTaskList}
           />
         </div>
         <div className="w-[65%] rounded-2xl">
@@ -243,6 +251,7 @@ const TrackMainComponent = ({
             monthStatus={activeMonth?.status}
             progress={progress}
             setProgress={setProgress}
+            taskList={orderedTaskList}
           />
         </div>
         <div className="bg-black/20 border border-white/10 backdrop-blur-2xl light:border-lightBorder light:bg-lightCard w-[15%] rounded-2xl overflow-x-hidden relative top-47 h-full">
@@ -251,6 +260,7 @@ const TrackMainComponent = ({
             total={dashboardData?.totalDays}
             count={progress?.overallProgress.count}
             loading={dateLogsData.isPending}
+            taskList={orderedTaskList}
           />
         </div>
       </div>

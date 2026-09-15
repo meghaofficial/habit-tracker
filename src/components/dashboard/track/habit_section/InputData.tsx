@@ -127,11 +127,42 @@ export const InputData = ({
     };
   }, []);
 
-  // --------------------------------------------------
-  // UI
-  // --------------------------------------------------
-
   return (
+    // <div
+    //   className="
+    //     text-[12px]
+    //     px-2
+    //     p-1
+    //     flex
+    //     items-center
+    //     gap-2
+    //     border-b
+    //     border-darkBox/50
+    //     light:border-lightBorder
+    //   "
+    // >
+    //   <span>{index + 1}.</span>
+
+    //   <input
+    //     type="text"
+    //     className="outline-none w-full py-1"
+    //     title={value}
+    //     value={value}
+    //     onChange={(e) => {
+    //       const newValue = e.target.value;
+
+    //       setValue(newValue);
+
+    //       // Always keep track of what the user currently typed
+    //       latestValueRef.current = newValue;
+
+    //       setSaveStatus("saving");
+    //     }}
+    //   />
+
+    //   <Saving saveStatus={saveStatus} />
+    // </div>
+
     <div
       className="
         text-[12px]
@@ -140,9 +171,6 @@ export const InputData = ({
         flex
         items-center
         gap-2
-        border-b
-        border-darkBox/50
-        light:border-lightBorder
       "
     >
       <span>{index + 1}.</span>
@@ -156,10 +184,7 @@ export const InputData = ({
           const newValue = e.target.value;
 
           setValue(newValue);
-
-          // Always keep track of what the user currently typed
           latestValueRef.current = newValue;
-
           setSaveStatus("saving");
         }}
       />
