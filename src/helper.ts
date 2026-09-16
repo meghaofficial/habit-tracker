@@ -1,5 +1,5 @@
 import { toast } from "react-toastify";
-import type { DateLogI, SubscriptionI } from "./types";
+import type { SubscriptionI } from "./types";
 import { shortMonthName } from "./staticData";
 
 export const notify = {

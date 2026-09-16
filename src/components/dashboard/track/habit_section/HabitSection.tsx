@@ -1,7 +1,13 @@
 import type { TaskI } from "../../../../types";
 import { useQueryClient } from "@tanstack/react-query";
 import { axiosPrivate } from "../../../../api/axios";
-import { useEffect, useState, type Dispatch, type SetStateAction } from "react";
+import {
+  useEffect,
+  useRef,
+  useState,
+  type Dispatch,
+  type SetStateAction,
+} from "react";
 import { MdOutlineCalendarMonth } from "react-icons/md";
 import PopupBox from "../../../shared/PopupBox";
 import { FiMenu, FiTrash2 } from "react-icons/fi";
@@ -31,6 +37,7 @@ const HabitSection = ({
   const [disableLoading, setDisableLoading] = useState(false);
   const [openPopup, setOpenPopup] = useState(false);
   const [prevDashID, setPrevDashID] = useState("");
+  const draggedTaskIdRef = useRef<string | null>(null);
 
   const lastMonth = async () => {
     setDisableLoading(true);
@@ -52,6 +59,46 @@ const HabitSection = ({
     lastMonth();
   }, []);
 
+  const handleDragStart = (taskId: string) => {
+    draggedTaskIdRef.current = taskId;
+  };
+
+  const handleReorder = async (
+    currId: string,
+    prevId: string,
+    nextId: string,
+  ) => {
+    setDisableLoading(true);
+    try {
+      await axiosPrivate.patch(`/api/reorder-task?monthDashID=${dashboardID}`, {
+        currId,
+        prevId,
+        nextId,
+      });
+    } catch (error) {
+      console.error(error);
+    } finally {
+      setDisableLoading(false);
+    }
+  };
+
+  const handleReorderEnd = async () => {
+    const movedTaskId = draggedTaskIdRef.current;
+
+    if (!movedTaskId) return;
+    const movedIndex = taskList.findIndex((task) => task._id === movedTaskId);
+
+    if (movedIndex === -1) return;
+
+    const prevId = movedIndex > 0 ? taskList[movedIndex - 1]._id : "";
+    const nextId =
+      movedIndex < taskList.length - 1 ? taskList[movedIndex + 1]._id : "";
+
+    await handleReorder(movedTaskId, prevId, nextId);
+
+    draggedTaskIdRef.current = null;
+  };
+
   return (
     <div>
       <div className="relative border-b border-black">
@@ -66,12 +113,7 @@ const HabitSection = ({
           onClick={() => setOpenPopup(true)}
           title="Recover last month Habits"
           disabled={makeDisable}
-          className={`w-7 h-7 flex items-center justify-center rounded-lg border transition-colors duration-200 absolute right-2 top-1/4
-    ${
-      makeDisable
-        ? "bg-yellow-500/5 border-yellow-500/10 text-yellow-400/40 cursor-not-allowed opacity-50"
-        : "bg-yellow-500/10 border-yellow-500/20 text-yellow-400 hover:bg-yellow-500/20 cursor-pointer"
-    }`}
+          className={`w-7 h-7 flex items-center justify-center rounded-lg border transition-colors duration-200 absolute right-2 top-1/4 ${makeDisable ? "bg-yellow-500/5 border-yellow-500/10 text-yellow-400/40 cursor-not-allowed opacity-50" : "bg-yellow-500/10 border-yellow-500/20 text-yellow-400 hover:bg-yellow-500/20 cursor-pointer"}`}
         >
           {disableLoading ? (
             <CircleLoader className="h-3 w-3" />
@@ -113,6 +155,8 @@ const HabitSection = ({
                 scale: 1.02,
                 zIndex: 20,
               }}
+              onDragStart={() => handleDragStart(task._id)}
+              onDragEnd={handleReorderEnd}
             >
               <div className="relative">
                 <InputData
@@ -121,18 +165,7 @@ const HabitSection = ({
                   taskName={task.taskName}
                 />
 
-                <div
-                  className="
-                absolute
-                right-2
-                top-1/2
-                -translate-y-1/2
-                cursor-grab
-                text-white/30
-                hover:text-indigo-400
-                active:cursor-grabbing
-              "
-                >
+                <div className=" absolute right-2 top-1/2 -translate-y-1/2 cursor-grab text-white/30 hover:text-indigo-400 active:cursor-grabbing ">
                   <FiMenu size={13} />
                 </div>
               </div>
