@@ -84,10 +84,6 @@ const HabitSection = ({
 
     if (movedIndex === -1) return;
 
-    const prevId = movedIndex > 0 ? taskList[movedIndex - 1]._id : "";
-    const nextId =
-      movedIndex < taskList.length - 1 ? taskList[movedIndex + 1]._id : "";
-
     await handleReorder(taskList);
 
     draggedTaskIdRef.current = null;
