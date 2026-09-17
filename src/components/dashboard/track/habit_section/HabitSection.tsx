@@ -63,17 +63,11 @@ const HabitSection = ({
     draggedTaskIdRef.current = taskId;
   };
 
-  const handleReorder = async (
-    currId: string,
-    prevId: string,
-    nextId: string,
-  ) => {
+  const handleReorder = async (orderedTaskIds: TaskI[]) => {
     setDisableLoading(true);
     try {
       await axiosPrivate.patch(`/api/reorder-task?monthDashID=${dashboardID}`, {
-        currId,
-        prevId,
-        nextId,
+        orderedTaskIds,
       });
     } catch (error) {
       console.error(error);
@@ -94,7 +88,7 @@ const HabitSection = ({
     const nextId =
       movedIndex < taskList.length - 1 ? taskList[movedIndex + 1]._id : "";
 
-    await handleReorder(movedTaskId, prevId, nextId);
+    await handleReorder(taskList);
 
     draggedTaskIdRef.current = null;
   };
