@@ -54,29 +54,23 @@ const TargetsSection = ({
     { key: -1, label: "Daily" },
   ];
 
-  useEffect(() => {
-    const container = dateContainerRef.current;
-    const selectedDate = dateRefs.current[activeDate];
-
-    if (!container || !selectedDate) return;
-
-    container.scrollTo({
-      left: selectedDate.offsetLeft - 16,
-      behavior: "smooth",
-    });
-  }, [activeDate]);
-
   useLayoutEffect(() => {
     const container = dateContainerRef.current;
     const selectedDate = dateRefs.current[activeDate];
 
     if (!container || !selectedDate) return;
 
+    const containerRect = container.getBoundingClientRect();
+    const selectedRect = selectedDate.getBoundingClientRect();
+
+    const scrollPosition =
+      container.scrollLeft + (selectedRect.left - containerRect.left) - 16;
+
     container.scrollTo({
-      left: selectedDate.offsetLeft - 16,
-      behavior: "instant",
+      left: scrollPosition,
+      behavior: "auto",
     });
-  }, [activeDate, activeTab]);
+  }, [activeTab]);
 
   const getSummary = async () => {
     try {
