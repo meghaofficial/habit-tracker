@@ -175,7 +175,7 @@ const Dashboard = () => {
               )}
 
               {/* extent plan popup */}
-              <Popup open={openPlan} setOpen={setOpenPlan}>
+              <Popup open={openPlan} setOpen={setOpenPlan} heading="Plan">
                 <p className="text-3xl my-3 font-semibold text-center">
                   Select your Plan
                 </p>

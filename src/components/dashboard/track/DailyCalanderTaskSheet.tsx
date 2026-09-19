@@ -14,6 +14,9 @@ import {
   toggleTask,
 } from "../../../api/dashboard.api";
 import SectionIcon from "../../shared/SectionIcon";
+import { TbLockSquareRounded } from "react-icons/tb";
+import Popup from "../../shared/Popup";
+import HabitDaySelector from "./HabitDaySelector";
 
 // Main Component
 const DailyCalanderTaskSheet = ({
@@ -35,6 +38,7 @@ const DailyCalanderTaskSheet = ({
   const rowLimit = 10;
   const todayDate = new Date().getDate();
   const queryClient = useQueryClient();
+  const [openLockDays, setOpenLockDays] = useState(false);
 
   // Getting data
   const dateLogsData = useQuery({
@@ -176,7 +180,6 @@ const DailyCalanderTaskSheet = ({
   }, [dashboardData?._id, queryClient]);
 
   const dateLogs: DateLogI[] = dateLogsData?.data?.dateLogs;
-  // const taskList: TaskI[] = taskListData?.data?.tasks;
 
   // Column widths
   const hasWeek5 = totalD > 28;
@@ -466,6 +469,20 @@ const DailyCalanderTaskSheet = ({
                     )}
                   </button>
 
+                  {/* Lock Button - Temperorily commented will look back to it in version 2 */}
+                  {/* <button
+                    disabled={removeRowID === task._id}
+                    onClick={() => setOpenLockDays(true)}
+                    className=" absolute -left-1 opacity-0 group-hover:opacity-100 transition-opacity duration-200 w-5 h-5 flex items-center justify-center rounded-md bg-gray-500/20 border border-gray-500/30 text-gray-400 hover:bg-gray-500/30 cursor-pointer "
+                    title="Lock some days for some tasks"
+                  >
+                    {removeRowID === task._id ? (
+                      <span className="w-2.5 h-2.5 rounded-full border border-gray-400 border-t-transparent animate-spin" />
+                    ) : (
+                      <TbLockSquareRounded size={9} />
+                    )}
+                  </button> */}
+
                   {/* Weeks 1–4 */}
                   {Array.from({ length: 4 }).map((_, weekIndex) => (
                     <div
@@ -528,6 +545,26 @@ const DailyCalanderTaskSheet = ({
           )}
         </div>
       </div>
+
+      {openLockDays && (
+        <Popup
+          open={openLockDays}
+          setOpen={setOpenLockDays}
+          subHeading="Block days you skip"
+          heading="Manage Habit Days"
+          maxW="max-w-sm"
+        >
+          <div className="p-5">
+            <HabitDaySelector
+              totalD={dashboardData?.totalDays ?? 30}
+              firstDay={2}
+              onChange={(disabledDays) => {
+                console.log(disabledDays);
+              }}
+            />
+          </div>
+        </Popup>
+      )}
     </div>
   );
 };
