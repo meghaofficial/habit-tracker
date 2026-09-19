@@ -18,9 +18,10 @@ import type { RootState } from "../../../redux/store/store";
 import { useQuery } from "@tanstack/react-query";
 import { getDateLogs, getTasks } from "../../../api/dashboard.api";
 import TargetsSection from "./TargetsSection";
-import TodayTasks from "./mobile_view/TodayTasks";
 import { useEffect, useState } from "react";
 import HabitProgress from "./habit_section/HabitProgress";
+import MobileDailyTaskSheet from "./mobile_view/MobileDailyTaskSheet";
+import MobileDashboardDetails from "./mobile_view/MobileDashboardDetails";
 
 const TrackMainComponent = ({
   dashboardData,
@@ -264,90 +265,44 @@ const TrackMainComponent = ({
           />
         </div>
       </div>
-      {isMobile && (
-        <div className="mt-3">
-          <div className="relative mt-2 w-full overflow-hidden rounded-2xl border border-white/10 bg-black/20 h-20 light:bg-lightCard light:border-lightBorder flex items-center gap-4 ps-4">
-            <div className="h-9 w-9 border border-white/10 light:border-black/10 bg-white/5 light:bg-black/5 rounded-full flex items-center justify-center uppercase">
-              {user.username.slice(0, 1)}
-            </div>
-            <div>
-              <p className="google-sans text-xl font-bold">{user.username}</p>
-              <p className="text-xs mt-1 text-gray-500">{user?.email}</p>
-            </div>
-          </div>
-          {/* overall & todays progress */}
-          <div className="flex items-center gap-2">
-            {/* todays progress */}
-            <div className="relative mt-2 w-1/2 overflow-hidden rounded-2xl border border-white/10 bg-black/20 h-20 light:bg-lightCard light:border-lightBorder flex">
-              <div className="">
-                <p className="text-[10px] text-nowrap absolute top-3 left-3 text-gray-500">
-                  Daily View
-                </p>
-                <p className="text-[20px] font-bold absolute bottom-3 left-3 tracking-widest">
-                  {getTodayProgress().count}/{taskList?.length}
-                </p>
-              </div>
-              <div className="absolute right-3 bottom-3">
-                <DonutGraph
-                  percentage={
-                    Number.isNaN(Number(getTodayProgress().progress))
-                      ? 0
-                      : Number(getTodayProgress().progress)
-                  }
-                  size={30}
-                  textSize={10}
-                />
-              </div>
-            </div>
-            {/* overall progress */}
-            <div className="relative mt-2 w-1/2 overflow-hidden rounded-2xl border border-white/10 bg-black/20 h-20 light:bg-lightCard light:border-lightBorder flex">
-              <div className="">
-                <p className="text-[10px] text-nowrap absolute top-3 left-3 text-gray-500">
-                  Monthly View
-                </p>
-                <p className="text-[20px] font-bold absolute bottom-3 left-3">
-                  {progress?.overallProgress?.count}/
-                  {progress?.overallProgress?.total}
-                </p>
-              </div>
-              <div className="absolute right-3 bottom-3">
-                <DonutGraph
-                  percentage={
-                    Number.isNaN(Number(progress?.overallProgress?.progress))
-                      ? 0
-                      : Number(progress?.overallProgress?.progress)
-                  }
-                  size={30}
-                  textSize={10}
-                />
-              </div>
-            </div>
-          </div>
-        </div>
-      )}
       {/* monthly targets */}
-      <div className="flex sm:flex-row flex-col gap-4 mt-4">
+      <div className="flex sm:flex-row flex-col gap-4 mt-2">
         {isMobile && (
-          <div className="bg-black/20 rounded-2xl sm:hidden">
-            <TodayTasks
-              taskList={taskList}
-              log={log}
-              setLog={setLog}
+          <div className="rounded-2xl sm:hidden">
+            <MobileDashboardDetails
+              username={user.username}
+              email={user.email}
+              currentDay={now.getDate()}
+              currentMonth={monMap?.[now.getMonth() + 1] ?? ""}
+              planLabel={
+                activeMonth?.status === "active" ? "Current Plan" : "Dashboard"
+              }
+              startDate={formatMonthYearSimple(activeMonth?.startDate)}
+              endDate={formatMonthYearSimple(activeMonth?.endDate)}
+              todayCompleted={getTodayProgress().count || 0}
+              todayTotal={taskList?.length || 0}
+              monthCompleted={progress?.overallProgress?.count || 0}
+              monthTotal={progress?.overallProgress?.total || 0}
+            />
+            <div className="mb-3"></div>
+            <MobileDailyTaskSheet
               monthDashID={dashboardData?._id}
-              monthStatus={activeMonth?.status}
+              taskList={taskList}
+              onToggle={() => {}}
+              // onDelete={() => {}}
             />
           </div>
         )}
         {dashboardData?._id && (
-          <div className="flex gap-4 w-full">
-            <div className="w-[60%]">
+          <div className="flex gap-4 w-full sm:flex-row flex-col">
+            <div className="sm:w-[60%]">
               <TargetsSection
                 monthID={dashboardData._id}
                 totalWeeks={hasWeek5 ? 5 : 4}
                 totalDaysInMonth={totalD}
               />
             </div>
-            <div className="w-[40%]">
+            <div className="sm:w-[40%]">
               <MonthlyNote monthID={dashboardData?._id} />
             </div>
           </div>
