@@ -216,7 +216,7 @@ const HabitDaySelector = ({
               className={`relative h-5 w-9 shrink-0 rounded-full border transition-all duration-200 ${
                 allDaysEnabled
                   ? "border-indigo-400/30 bg-indigo-500/60"
-                  : "border-white/10 bg-white/[0.06]"
+                  : "border-white/10 bg-white/6"
               }`}
             >
               <motion.span
@@ -274,10 +274,10 @@ const HabitDaySelector = ({
                     transition-all duration-200
                     ${
                       isDisabled
-                        ? "border-white/5 bg-white/[0.025] text-slate-600"
+                        ? "border-white/5 bg-white/2.5 text-slate-600"
                         : isToday
                           ? "border-indigo-400/40 bg-indigo-500/15 text-indigo-400"
-                          : "border-emerald-500/20 bg-emerald-500/[0.08] text-slate-300 hover:border-white/25 hover:bg-white/[0.08]"
+                          : "border-emerald-500/20 bg-emerald-500/8 text-slate-300 hover:border-white/25 hover:bg-white/8"
                     }
                   `}
                 >
@@ -290,11 +290,11 @@ const HabitDaySelector = ({
       </div>
 
       {/* Actions */}
-      <div className="mt-4 flex items-center justify-end gap-2 border-t border-white/[0.06] pt-3">
+      <div className="mt-4 flex items-center justify-end gap-2 border-t border-white/6 pt-3">
         <button
           type="button"
           onClick={onCancel}
-          className="rounded-lg border border-white/[0.06] bg-white/[0.025] px-3 py-1.5 text-[11px] font-medium text-slate-400 transition hover:bg-white/[0.05] hover:text-slate-300"
+          className="rounded-lg border border-white/6 bg-white/2.5 px-3 py-1.5 text-[11px] font-medium text-slate-400 transition hover:bg-white/5 hover:text-slate-300"
         >
           Cancel
         </button>

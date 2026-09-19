@@ -14,7 +14,6 @@ import {
   toggleTask,
 } from "../../../api/dashboard.api";
 import SectionIcon from "../../shared/SectionIcon";
-import { TbLockSquareRounded } from "react-icons/tb";
 import Popup from "../../shared/Popup";
 import HabitDaySelector from "./HabitDaySelector";
 
