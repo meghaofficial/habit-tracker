@@ -12,7 +12,6 @@ import type {
   TaskI,
 } from "../../../types";
 import { useIsMobile } from "../../hooks/mobileHook";
-import DonutGraph from "./DonutGraph";
 import { useSelector } from "react-redux";
 import type { RootState } from "../../../redux/store/store";
 import { useQuery } from "@tanstack/react-query";
@@ -286,9 +285,11 @@ const TrackMainComponent = ({
             />
             <div className="mb-3"></div>
             <MobileDailyTaskSheet
-              monthDashID={dashboardData?._id}
+              dashboardData={dashboardData}
               taskList={taskList}
               onToggle={() => {}}
+              monthStatus={activeMonth?.status}
+              setProgress={setProgress}
               // onDelete={() => {}}
             />
           </div>
