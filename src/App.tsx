@@ -1,4 +1,4 @@
-import { Navigate, Outlet, Route, Routes } from "react-router-dom";
+import { Navigate, Route, Routes } from "react-router-dom";
 import "./App.css";
 import PageNotFound from "./components/shared/PageNotFound";
 import { useDispatch, useSelector } from "react-redux";
@@ -14,6 +14,7 @@ import Settings from "./components/pages/Settings";
 import NoInternetConnection from "./components/shared/NoInternetConnection";
 import AuthForm from "./components/auth/AuthForm";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
+import Reviews from "./components/pages/Reviews";
 
 const queryClient = new QueryClient();
 
@@ -23,7 +24,7 @@ function App() {
     (state: RootState) => state.auth.accessToken !== "",
   );
   const [isAuthLoading, setIsAuthLoading] = useState(false);
-  const user = useSelector((state: RootState) => state.auth);
+  // const user = useSelector((state: RootState) => state.auth);
   const theme = useSelector((state: RootState) => state.theme);
   const [isOnline, setIsOnline] = useState(navigator.onLine);
 
@@ -122,6 +123,7 @@ function App() {
                     path="/"
                     element={isLogin ? <Dashboard /> : <HomePage />}
                   />
+                  <Route path="/reviews" element={<Reviews />} />
                   <Route
                     path="/settings"
                     element={

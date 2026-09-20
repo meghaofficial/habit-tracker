@@ -5,9 +5,10 @@ import { IoMdLogIn, IoMdLogOut } from "react-icons/io";
 import { axiosPrivate } from "../../api/axios";
 import { removeCreds } from "../../redux/slices/authSlice";
 import { notify } from "../../helper";
-import { useLocation, useNavigate } from "react-router-dom";
+import { Link, useLocation, useNavigate } from "react-router-dom";
 import Logo from "./Logo";
 import { IoSettingsSharp } from "react-icons/io5";
+import { FiStar } from "react-icons/fi";
 
 const NavigationBar = () => {
   const dispatch = useDispatch();
@@ -49,6 +50,19 @@ const NavigationBar = () => {
         <Logo />
       </div>
       <div className="flex items-center gap-4">
+        {/* <Link
+          to="/reviews"
+          className="flex items-center gap-2 rounded-lg px-3 py-2 text-sm text-gray-400 transition hover:bg-indigo-500/10 hover:text-indigo-400"
+        >
+          <FiStar className="h-4 w-4" />
+          <span>Reviews</span>
+        </Link> */}
+        <CustomButton onClick={() => navigate("/reviews")} type="transparent">
+          <div className="flex items-center gap-2">
+            <FiStar className="h-4 w-4" />
+            <span>Reviews</span>
+          </div>
+        </CustomButton>
         {isLogin && location.pathname !== "/settings" && (
           <CustomButton
             styling="cursor-pointer"
