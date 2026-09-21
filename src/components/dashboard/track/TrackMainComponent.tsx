@@ -1,4 +1,3 @@
-import DailyCalanderTaskSheet from "./DailyCalanderTaskSheet";
 import HabitSection from "./habit_section/HabitSection";
 import MonthlyNote from "./MonthlyNote";
 import { monMap } from "../../../staticData";
@@ -19,19 +18,15 @@ import { getDateLogs, getTasks } from "../../../api/dashboard.api";
 import TargetsSection from "./TargetsSection";
 import { useEffect, useState } from "react";
 import HabitProgress from "./habit_section/HabitProgress";
-import MobileDailyTaskSheet from "./mobile_view/MobileDailyTaskSheet";
 import MobileDashboardDetails from "./mobile_view/MobileDashboardDetails";
+import TaskSheet from "./TaskSheet";
 
 const TrackMainComponent = ({
   dashboardData,
   activeMonth,
-  log,
-  setLog,
 }: {
   dashboardData: DashboardI;
   activeMonth: MonthsI;
-  log: DateLogI;
-  setLog: React.Dispatch<React.SetStateAction<DateLogI>>;
 }) => {
   const isMobile = useIsMobile();
   const user = useSelector((state: RootState) => state.auth);
@@ -59,6 +54,8 @@ const TrackMainComponent = ({
   const taskList: TaskI[] = taskListData?.data?.tasks;
 
   const [orderedTaskList, setOrderedTaskList] = useState(taskList ?? []);
+
+  const dateLogs: DateLogI[] = dateLogsData?.data?.dateLogs;
 
   useEffect(() => {
     setOrderedTaskList(taskList ?? []);
@@ -246,12 +243,14 @@ const TrackMainComponent = ({
           />
         </div>
         <div className="w-[65%] rounded-2xl">
-          <DailyCalanderTaskSheet
+          <TaskSheet
             dashboardData={dashboardData}
             monthStatus={activeMonth?.status}
             progress={progress}
             setProgress={setProgress}
-            taskList={orderedTaskList}
+            taskList={taskList}
+            logsLoading={dateLogsData.isPending}
+            dateLogs={dateLogs}
           />
         </div>
         <div className="bg-black/20 border border-white/10 backdrop-blur-2xl light:border-lightBorder light:bg-lightCard w-[15%] rounded-2xl overflow-x-hidden relative top-47 h-full">
@@ -284,13 +283,14 @@ const TrackMainComponent = ({
               monthTotal={progress?.overallProgress?.total || 0}
             />
             <div className="mb-3"></div>
-            <MobileDailyTaskSheet
+            <TaskSheet
               dashboardData={dashboardData}
-              taskList={taskList}
-              onToggle={() => {}}
               monthStatus={activeMonth?.status}
+              progress={progress}
               setProgress={setProgress}
-              // onDelete={() => {}}
+              taskList={taskList}
+              logsLoading={dateLogsData.isPending}
+              dateLogs={dateLogs}
             />
           </div>
         )}

@@ -1,18 +1,9 @@
 import React, { useEffect, useState } from "react";
 import { daysNums, weekLetters } from "../../../staticData";
-import { notify } from "../../../helper";
-import type { DashboardI, DateLogI, ProgressI, TaskI } from "../../../types";
+import type { DateLogI, ProgressI, TaskI } from "../../../types";
 import { socket } from "../../../socket/socket";
 import { FiCalendar, FiPlus, FiTrash2 } from "react-icons/fi";
 import { RiResetLeftLine } from "react-icons/ri";
-import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import {
-  addTask,
-  getDateLogs,
-  removeTask,
-  resetDateLogs,
-  toggleTask,
-} from "../../../api/dashboard.api";
 import SectionIcon from "../../shared/SectionIcon";
 import Popup from "../../shared/Popup";
 import HabitDaySelector from "./HabitDaySelector";
@@ -20,164 +11,45 @@ import { TaskRow } from "./daily_task_section/TaskRow";
 
 // Main Component
 const DailyCalanderTaskSheet = ({
-  dashboardData,
-  monthStatus,
+  totalDays,
+  firstDay = 0,
+  monthDashID,
   progress,
   setProgress,
   taskList,
+  handleDeleteRow,
+  handleReset,
+  addTaskLoading,
+  handleAddRow,
+  removeRowID,
+  dateLogs,
+  logsLoading,
 }: {
-  dashboardData: DashboardI;
-  monthStatus: string;
   progress: ProgressI;
   setProgress: React.Dispatch<React.SetStateAction<ProgressI>>;
   taskList: TaskI[];
+  handleDeleteRow: (taskID: string) => void;
+  handleReset: () => void;
+  addTaskLoading: boolean;
+  handleAddRow: () => void;
+  removeRowID: string | null;
+  totalDays: number;
+  firstDay: number;
+  monthDashID: string;
+  dateLogs: DateLogI[];
+  logsLoading: boolean;
 }) => {
-  const totalD = dashboardData?.totalDays || 0;
-  const firstDay = dashboardData?.firstDay || 0;
-  const [removeRowID, setRemoveRowID] = useState<string | null>(null);
+  const totalD = totalDays || 0;
   const rowLimit = 10;
   const todayDate = new Date().getDate();
-  const queryClient = useQueryClient();
   const [openLockDays, setOpenLockDays] = useState(false);
 
   // Getting data
-  const dateLogsData = useQuery({
-    queryKey: ["date_logs", dashboardData?._id],
-    queryFn: () => getDateLogs(dashboardData?._id),
-    enabled: !!dashboardData?._id,
-  });
-
-  // React Query Mutations
-  const addTaskMutation = useMutation({
-    mutationFn: addTask,
-    onSuccess: (data) => {
-      const pr = data.progress;
-      setProgress((prev) => ({
-        ...prev,
-        overallProgress: pr.overallProgress,
-        dateLogProgress: prev.dateLogProgress.map((d, index) => ({
-          ...d,
-          progress: pr.dateLogProgress[index].progress,
-        })),
-        taskProgress: [
-          ...prev.taskProgress,
-          { id: data.task._id, count: 0, progress: "0" },
-        ],
-      }));
-      queryClient.invalidateQueries({
-        queryKey: ["tasks", dashboardData?._id],
-      });
-    },
-  });
-
-  const deleteTaskMutation = useMutation({
-    mutationFn: removeTask,
-    onSuccess: (data) => {
-      const pr = data.progress;
-      setProgress((prev) => ({
-        ...prev,
-        overallProgress: pr.overallProgress,
-        dateLogProgress: prev.dateLogProgress.map((d, index) => ({
-          ...d,
-          progress: pr.dateLogProgress[index].progress,
-        })),
-        taskProgress: prev.taskProgress.filter((d) => d?.id !== removeRowID),
-      }));
-      queryClient.invalidateQueries({
-        queryKey: ["tasks", dashboardData?._id],
-      });
-    },
-    onError: () => {
-      notify.error("Please try again.");
-    },
-  });
-
-  const resetDateLogsMutation = useMutation({
-    mutationFn: resetDateLogs,
-    onSuccess: () => {
-      queryClient.invalidateQueries({
-        queryKey: ["date_logs", dashboardData?._id],
-      });
-    },
-    onError: () => {
-      notify.error("Please try again.");
-    },
-  });
-
-  // Functions
-  const handleDeleteRow = (taskID: string) => {
-    setRemoveRowID(taskID);
-
-    deleteTaskMutation.mutate(
-      {
-        taskID,
-        dashboardID: dashboardData!._id,
-      },
-      {
-        onSettled: () => {
-          setRemoveRowID(null);
-        },
-      },
-    );
-  };
-
-  const handleAddRow = () => {
-    if (taskList?.length >= rowLimit) return;
-    if (monthStatus === "scheduled") {
-      alert(
-        "Can not add task as the subscription for this month is not active",
-      );
-      return;
-    }
-
-    addTaskMutation.mutate(dashboardData!._id);
-  };
-
-  const handleReset = () => {
-    const con = confirm("Are you sure you want to reset the dashboard?");
-    if (!con) return;
-
-    resetDateLogsMutation.mutate(dashboardData!._id);
-  };
-
-  // // WEBSOCKET SYNCING
-  // useEffect(() => {
-  //   const onTaskAdded = () => {
-  //     queryClient.invalidateQueries({
-  //       queryKey: ["tasks", dashboardData?._id],
-  //     });
-
-  //     // queryClient.invalidateQueries({
-  //     //   queryKey: ["date_logs", dashboardData?._id],
-  //     // });
-  //   };
-
-  //   const onTaskMarked = () => {
-  //     // queryClient.invalidateQueries({
-  //     //   queryKey: ["date_logs", dashboardData?._id],
-  //     // });
-  //   };
-
-  //   const onTaskRemoved = () => {
-  //     queryClient.invalidateQueries({
-  //       queryKey: ["tasks", dashboardData?._id],
-  //     });
-
-  //     // queryClient.invalidateQueries({
-  //     //   queryKey: ["date_logs", dashboardData?._id],
-  //     // });
-  //   };
-
-  //   // socket.on("task-marked", onTaskMarked);
-  //   // socket.on("add-task", onTaskAdded);
-  //   // socket.on("remove-task", onTaskRemoved);
-
-  //   // return () => {
-  //   //   socket.off("task-marked", onTaskMarked);
-  //   //   socket.off("add-task", onTaskAdded);
-  //   //   socket.off("remove-task", onTaskRemoved);
-  //   // };
-  // }, [dashboardData?._id, queryClient]);
+  // const dateLogsData = useQuery({
+  //   queryKey: ["date_logs", monthDashID],
+  //   queryFn: () => getDateLogs(monthDashID),
+  //   enabled: !!monthDashID,
+  // });
 
   useEffect(() => {
     const handleTaskAdded = () => {
@@ -191,7 +63,7 @@ const DailyCalanderTaskSheet = ({
     };
   }, []);
 
-  const dateLogs: DateLogI[] = dateLogsData?.data?.dateLogs;
+  // const dateLogs: DateLogI[] = dateLogsData?.data?.dateLogs;
 
   // Column widths
   const hasWeek5 = totalD > 28;
@@ -207,7 +79,7 @@ const DailyCalanderTaskSheet = ({
           Daily Completion
         </p>
         <div className="flex items-end w-full gap-0.5 overflow-x-auto hide-scrollbar pb-1">
-          {dateLogsData.isPending ? (
+          {logsLoading ? (
             Array.from({ length: 30 }).map((_, i) => (
               <div
                 key={i}
@@ -326,7 +198,7 @@ const DailyCalanderTaskSheet = ({
                 year: "numeric",
               })}
             </span>
-            {!dateLogsData.isPending && (
+            {!logsLoading && (
               <button
                 onClick={handleReset}
                 title="Reset dashboard"
@@ -451,7 +323,7 @@ const DailyCalanderTaskSheet = ({
 
         {/* Checkbox Rows */}
         <div className="relative">
-          {dateLogsData.isPending ? (
+          {logsLoading ? (
             <div className="p-3 flex flex-col gap-2.5">
               {Array.from({ length: 5 }).map((_, i) => (
                 <div
@@ -509,7 +381,7 @@ const DailyCalanderTaskSheet = ({
                         )}
                         weekOffset={weekIndex * 7}
                         todayDate={todayDate}
-                        dashbID={dashboardData?._id}
+                        dashbID={monthDashID}
                         setProgress={setProgress}
                       />
                     </div>
@@ -525,7 +397,7 @@ const DailyCalanderTaskSheet = ({
                         logs={dateLogs?.slice(28)}
                         weekOffset={28}
                         todayDate={todayDate}
-                        dashbID={dashboardData?._id}
+                        dashbID={monthDashID}
                         setProgress={setProgress}
                       />
                     </div>
@@ -535,10 +407,8 @@ const DailyCalanderTaskSheet = ({
 
               {/* Add Row button */}
               <button
-                onClick={addTaskMutation.isPending ? undefined : handleAddRow}
-                disabled={
-                  addTaskMutation.isPending || taskList?.length >= rowLimit
-                }
+                onClick={addTaskLoading ? undefined : handleAddRow}
+                disabled={addTaskLoading || taskList?.length >= rowLimit}
                 className={`w-full flex items-center justify-center gap-2 py-3 text-[11px] font-semibold ${taskList?.length < rowLimit && " hover:text-indigo-400 hover:bg-indigo-500/5 border-t cursor-pointer"} text-indigo-400/70 border-white/5 transition-all duration-200 disabled:opacity-50`}
                 title={
                   taskList?.length >= rowLimit
@@ -546,12 +416,12 @@ const DailyCalanderTaskSheet = ({
                     : ""
                 }
               >
-                {addTaskMutation.isPending ? (
+                {addTaskLoading ? (
                   <span className="w-3.5 h-3.5 rounded-full border border-indigo-400 border-t-transparent animate-spin" />
                 ) : (
                   <FiPlus size={13} />
                 )}
-                {addTaskMutation.isPending ? "Adding…" : "Add Habit"}
+                {addTaskLoading ? "Adding…" : "Add Habit"}
               </button>
             </>
           )}
@@ -568,7 +438,7 @@ const DailyCalanderTaskSheet = ({
         >
           <div className="p-5">
             <HabitDaySelector
-              totalD={dashboardData?.totalDays ?? 30}
+              totalD={totalDays ?? 30}
               firstDay={2}
               onChange={(disabledDays) => {
                 console.log(disabledDays);

@@ -4,7 +4,7 @@ import TrackMainComponent from "../dashboard/track/TrackMainComponent";
 import { formattedText, notify } from "../../helper";
 import { axiosPrivate } from "../../api/axios";
 import PageLoader from "../loaders/PageLoader";
-import type { DashboardI, DateLogI, PlanI, SubscriptionI } from "../../types";
+import type { DashboardI, PlanI, SubscriptionI } from "../../types";
 import NavigationBar from "../shared/NavigationBar";
 import { useIsMobile } from "../hooks/mobileHook";
 import HistoryMainComponent from "../dashboard/history/HistoryMainComponent";
@@ -43,14 +43,6 @@ const Dashboard = () => {
   });
   const [openPlan, setOpenPlan] = useState(false);
   const [activeMonth, setActiveMonth] = useState<SubscriptionI | any>({});
-  const [log, setLog] = useState<DateLogI>({
-    _id: "",
-    monthDashID: "",
-    fullDate: new Date(),
-    tasks: [],
-    count: 0,
-    progress: "0",
-  });
   const [activeSubsLoading, setActiveSubsLoading] = useState(false);
   const [navMenu, setNavMenu] = useState(MASTER_MENU);
   const [fallback, setFallback] = useState(false);
@@ -241,8 +233,6 @@ const Dashboard = () => {
                 <TrackMainComponent
                   dashboardData={dashboardData}
                   activeMonth={activeMonth}
-                  log={log}
-                  setLog={setLog}
                 />
               )}
               {activeTab === "analysis" && (
