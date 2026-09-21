@@ -68,8 +68,6 @@ function App() {
       socket.connect();
       // socket.emit("join-user", user.id);/
       socket.on("connect", () => {
-        console.log("socket id", socket.id);
-
         socket.emit("join-user", user.id);
       });
       // console.log("join-user", user.id);

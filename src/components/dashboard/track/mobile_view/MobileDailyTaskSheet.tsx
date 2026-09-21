@@ -31,7 +31,7 @@ const MobileDailyTaskSheet = ({
   const today = new Date();
 
   const sortedDateLogs = useMemo(() => {
-    return [...dateLogs].sort(
+    return [...dateLogs]?.sort(
       (a, b) => new Date(a.fullDate).getTime() - new Date(b.fullDate).getTime(),
     );
   }, [dateLogs]);
@@ -72,19 +72,6 @@ const MobileDailyTaskSheet = ({
   const getDateCompletedCount = (log: DateLogI) => {
     return taskList?.filter((task) => log.tasks.includes(task._id)).length;
   };
-
-  // useEffect(() => {
-  //   const handleTaskAdded = (data: any) => {
-  //     console.log("Task added event received", data);
-  //     console.log("sss", socket.id);
-  //   };
-
-  //   socket.on("add-task", handleTaskAdded);
-
-  //   return () => {
-  //     socket.off("add-task", handleTaskAdded);
-  //   };
-  // }, [socket]);
 
   if (logsLoading) {
     return (

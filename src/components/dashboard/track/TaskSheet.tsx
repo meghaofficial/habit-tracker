@@ -112,8 +112,10 @@ const TaskSheet = ({
       );
       return;
     }
-
-    addTaskMutation.mutate(dashboardData!._id);
+    addTaskMutation.mutate({
+      dashboardID: dashboardData!._id,
+      socketID: socket?.id || "",
+    });
   };
 
   const handleReset = () => {
@@ -125,8 +127,24 @@ const TaskSheet = ({
 
   useEffect(() => {
     const handleTaskAdded = (data: any) => {
-      console.log("Task added event received", data);
-      console.log("sss", socket.id);
+      // console.log("Task added event received", data);
+      // console.log("socketID", socket.id);
+      const pr = data.progress;
+      setProgress((prev) => ({
+        ...prev,
+        overallProgress: pr.overallProgress,
+        dateLogProgress: prev.dateLogProgress.map((d, index) => ({
+          ...d,
+          progress: pr.dateLogProgress[index].progress,
+        })),
+        taskProgress: [
+          ...prev.taskProgress,
+          { id: data.task._id, count: 0, progress: "0" },
+        ],
+      }));
+      queryClient.invalidateQueries({
+        queryKey: ["tasks", dashboardData?._id],
+      });
     };
 
     socket.on("add-task", handleTaskAdded);
@@ -142,7 +160,7 @@ const TaskSheet = ({
       taskList={taskList}
       setProgress={setProgress}
       handleDeleteRow={handleDeleteRow}
-      dateLogs={dateLogs}
+      dateLogs={dateLogs || []}
       logsLoading={logsLoading}
       handleAddRow={handleAddRow}
     />
@@ -159,7 +177,7 @@ const TaskSheet = ({
       addTaskLoading={addTaskMutation.isPending}
       handleAddRow={handleAddRow}
       removeRowID={removeRowID}
-      dateLogs={dateLogs}
+      dateLogs={dateLogs || []}
       logsLoading={logsLoading}
     />
   );
