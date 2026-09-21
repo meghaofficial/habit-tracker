@@ -1,6 +1,5 @@
 import { useEffect, useMemo, useRef, useState } from "react";
 import { motion } from "framer-motion";
-import { LuCheck } from "react-icons/lu";
 import { FiPlus, FiTrash2 } from "react-icons/fi";
 import type { DashboardI, DateLogI, ProgressI, TaskI } from "../../../../types";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
@@ -11,6 +10,10 @@ import {
   resetDateLogs,
 } from "../../../../api/dashboard.api";
 import { notify } from "../../../../helper";
+import { CheckboxCell } from "../daily_task_section/CheckboxCell";
+import { socket } from "../../../../socket/socket";
+import type { RootState } from "../../../../redux/store/store";
+import { useSelector } from "react-redux";
 
 interface Props {
   dashboardData: DashboardI;
@@ -34,6 +37,8 @@ const MobileDailyTaskSheet = ({
   const rowLimit = 10;
   const queryClient = useQueryClient();
   const [removeRowID, setRemoveRowID] = useState<string | null>(null);
+  const todayDate = new Date().getDate();
+  const [userSocketID, setUserSocketID] = useState("");
 
   const dateRefs = useRef<Record<string, HTMLDivElement | null>>({});
 
@@ -183,6 +188,39 @@ const MobileDailyTaskSheet = ({
     return taskList?.filter((task) => log.tasks.includes(task._id)).length;
   };
 
+  // useEffect(() => {
+  //   const handleTaskAdded = (data: any) => {
+  //     console.log("Task added event received", data);
+  //     console.log("sss", socket.id);
+  //   };
+
+  //   socket.on("add-task", handleTaskAdded);
+
+  //   return () => {
+  //     socket.off("add-task", handleTaskAdded);
+  //   };
+  // }, [socket]);
+
+  const user = useSelector((state: RootState) => state.auth);
+
+  useEffect(() => {
+    console.log("Component mounted");
+    console.log("Connected:", socket.connected);
+    console.log("Socket ID:", socket.id);
+
+    // const handleTaskAdded = (data: any) => {
+    //   console.log("Task added:", data);
+    //   console.log("Connected:", socket.connected);
+    //   console.log("Socket ID:", socket.id);
+    // };
+
+    // socket.on("add-task", handleTaskAdded);
+
+    // return () => {
+    //   socket.off("add-task", handleTaskAdded);
+    // };
+  }, [taskList]);
+
   if (dateLogsData.isLoading) {
     return (
       <div className="p-5 text-center text-xs text-gray-500">
@@ -264,7 +302,7 @@ const MobileDailyTaskSheet = ({
           {/* =========================
               Task Rows
           ========================= */}
-          {taskList.map((task) => {
+          {taskList?.map((task) => {
             const completedCount = getTaskCount(task._id);
 
             return (
@@ -315,7 +353,17 @@ const MobileDailyTaskSheet = ({
                       }`}
                       style={{ width: DATE_COLUMN_WIDTH }}
                     >
-                      {checked && (
+                      <CheckboxCell
+                        key={log._id}
+                        checked={checked}
+                        fullDate={log.fullDate}
+                        taskID={log?._id}
+                        isToday={currentIsToday}
+                        dashbID={dashboardData?._id}
+                        setProgress={setProgress}
+                      />
+
+                      {/* {checked && (
                         <motion.button
                           type="button"
                           whileTap={
@@ -344,7 +392,7 @@ const MobileDailyTaskSheet = ({
                           }
                           className="h-6 w-6 rounded-md border border-white/10 transition hover:border-indigo-400/50 hover:bg-indigo-500/10"
                         />
-                      )}
+                      )} */}
                     </div>
                   );
                 })}

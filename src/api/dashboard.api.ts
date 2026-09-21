@@ -15,9 +15,17 @@ export const getTasks = async (dashboardID: string) => {
 };
 
 export const addTask = async (dashboardID: string) => {
-  const res = await axiosPrivate.post(`/api/task?monthDashID=${dashboardID}`, {
-    taskName: "",
-  });
+  const res = await axiosPrivate.post(
+    `/api/task?monthDashID=${dashboardID}`,
+    {
+      taskName: "",
+    },
+    // {
+    //   headers: {
+    //     "x-socket-id": socketID,
+    //   },
+    // },
+  );
 
   return res.data;
 };

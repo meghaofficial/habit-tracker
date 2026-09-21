@@ -15,6 +15,7 @@ import NoInternetConnection from "./components/shared/NoInternetConnection";
 import AuthForm from "./components/auth/AuthForm";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import Reviews from "./components/pages/Reviews";
+import { socket } from "./socket/socket";
 
 const queryClient = new QueryClient();
 
@@ -24,7 +25,7 @@ function App() {
     (state: RootState) => state.auth.accessToken !== "",
   );
   const [isAuthLoading, setIsAuthLoading] = useState(false);
-  // const user = useSelector((state: RootState) => state.auth);
+  const user = useSelector((state: RootState) => state.auth);
   const theme = useSelector((state: RootState) => state.theme);
   const [isOnline, setIsOnline] = useState(navigator.onLine);
 
@@ -62,16 +63,22 @@ function App() {
     initAuth();
   }, [dispatch]);
 
-  // useEffect(() => {
-  //   if (user?.id) {
-  //     socket.connect();
-  //     socket.emit("join-user", user.id);
-  //   }
+  useEffect(() => {
+    if (user?.id) {
+      socket.connect();
+      // socket.emit("join-user", user.id);/
+      socket.on("connect", () => {
+        console.log("socket id", socket.id);
 
-  //   return () => {
-  //     socket.disconnect();
-  //   };
-  // }, [user?.id]);
+        socket.emit("join-user", user.id);
+      });
+      // console.log("join-user", user.id);
+    }
+
+    return () => {
+      socket.disconnect();
+    };
+  }, [user?.id]);
 
   useEffect(() => {
     const handleOnline = () => setIsOnline(true);
