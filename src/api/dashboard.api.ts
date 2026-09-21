@@ -40,12 +40,19 @@ export const addTask = async ({
 export const removeTask = async ({
   taskID,
   dashboardID,
+  socketID,
 }: {
   taskID: string;
   dashboardID: string;
+  socketID: string;
 }) => {
   const res = await axiosPrivate.delete(
     `/api/task?taskID=${taskID}&monthDashID=${dashboardID}`,
+    {
+      headers: {
+        "x-socket-id": socketID,
+      },
+    },
   );
 
   return res.data;

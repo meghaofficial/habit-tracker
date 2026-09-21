@@ -95,6 +95,7 @@ const TaskSheet = ({
       {
         taskID,
         dashboardID: dashboardData!._id,
+        socketID: socket?.id || "",
       },
       {
         onSettled: () => {
@@ -147,7 +148,24 @@ const TaskSheet = ({
       });
     };
 
+    const handleTaskRemoved = (data: any) => {
+      const pr = data.progress;
+      setProgress((prev) => ({
+        ...prev,
+        overallProgress: pr.overallProgress,
+        dateLogProgress: prev.dateLogProgress.map((d, index) => ({
+          ...d,
+          progress: pr.dateLogProgress[index].progress,
+        })),
+        taskProgress: prev.taskProgress.filter((d) => d?.id !== removeRowID),
+      }));
+      queryClient.invalidateQueries({
+        queryKey: ["tasks", dashboardData?._id],
+      });
+    };
+
     socket.on("add-task", handleTaskAdded);
+    socket.on("remove-task", handleTaskRemoved);
 
     return () => {
       socket.off("add-task", handleTaskAdded);
