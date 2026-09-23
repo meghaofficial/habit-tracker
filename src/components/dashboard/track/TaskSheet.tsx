@@ -169,6 +169,7 @@ const TaskSheet = ({
 
     return () => {
       socket.off("add-task", handleTaskAdded);
+      socket.off("remove-task", handleTaskRemoved);
     };
   }, [socket]);
 

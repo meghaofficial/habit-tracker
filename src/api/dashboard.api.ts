@@ -64,15 +64,22 @@ export const toggleTask = async ({
   fullDate,
   taskID,
   marked,
+  socketID,
 }: {
   dashboardID: string;
   fullDate: Date;
   taskID: string;
   marked: boolean;
+  socketID: string;
 }) => {
   const res = await axiosPrivate.patch(
     `/api/date-logs?monthDashID=${dashboardID}&fullDate=${fullDate}&taskID=${taskID}`,
     { marked },
+    {
+      headers: {
+        "x-socket-id": socketID,
+      },
+    },
   );
 
   return res.data;

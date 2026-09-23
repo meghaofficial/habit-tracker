@@ -3,6 +3,7 @@ import type { ProgressI } from "../../../../types";
 import { useMutation } from "@tanstack/react-query";
 import { toggleTask } from "../../../../api/dashboard.api";
 import { notify } from "../../../../helper";
+import { socket } from "../../../../socket/socket";
 
 export const CheckboxCell = React.memo(
   ({
@@ -60,12 +61,47 @@ export const CheckboxCell = React.memo(
         fullDate: date,
         taskID,
         marked,
+        socketID: socket?.id || "",
       });
     };
 
     useEffect(() => {
       setCurrCheckVal(checked);
     }, [checked]);
+
+    useEffect(() => {
+      const handleTaskMark = (data: any) => {
+        const pr = data;
+        console.log(data);
+        setProgress((prev) => ({
+          ...prev,
+          overallProgress: pr?.overallProgress,
+          dateLogProgress: prev?.dateLogProgress?.map((d) =>
+            d.fullDate === pr?.dateLogProgress?.fullDate
+              ? pr?.dateLogProgress
+              : d,
+          ),
+          taskProgress: prev?.taskProgress?.map((d) =>
+            d.id === pr?.taskProgress.id ? pr?.taskProgress : d,
+          ),
+        }));
+
+        // setCurrCheckVal(data?.marked);
+        if (
+          data?.taskProgress?.id === taskID &&
+          new Date(data?.dateLogProgress?.fullDate).toDateString() ===
+            new Date(fullDate).toDateString()
+        ) {
+          setCurrCheckVal(data?.marked);
+        }
+      };
+
+      socket.on("mark-task", handleTaskMark);
+
+      return () => {
+        socket.off("mark-task", handleTaskMark);
+      };
+    }, [socket]);
 
     return toggleTaskID === taskID ? (
       <span className="w-2.5 h-2.5 rounded-full border border-emerald-400 border-t-transparent animate-spin" />

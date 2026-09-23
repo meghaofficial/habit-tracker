@@ -189,7 +189,6 @@ const MobileDailyTaskSheet = ({
                     <FiTrash2 size={13} />
                   </motion.button>
                 </div>
-
                 {/* =========================
                     Date Cells
                 ========================= */}
@@ -206,10 +205,10 @@ const MobileDailyTaskSheet = ({
                       style={{ width: DATE_COLUMN_WIDTH }}
                     >
                       <CheckboxCell
-                        key={log._id}
+                        key={log?._id}
                         checked={checked}
                         fullDate={log.fullDate}
-                        taskID={log?._id}
+                        taskID={task?._id}
                         isToday={currentIsToday}
                         dashbID={dashboardData?._id}
                         setProgress={setProgress}

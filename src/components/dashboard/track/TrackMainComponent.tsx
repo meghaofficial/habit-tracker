@@ -257,7 +257,7 @@ const TrackMainComponent = ({
           <HabitProgress
             progress={progress?.taskProgress}
             total={dashboardData?.totalDays}
-            count={progress?.overallProgress.count}
+            count={progress?.overallProgress?.count}
             loading={dateLogsData.isPending}
             taskList={orderedTaskList}
           />
