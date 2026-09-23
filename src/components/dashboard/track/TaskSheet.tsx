@@ -172,7 +172,7 @@ const TaskSheet = ({
     };
 
     const handleTaskUpdate = () => {
-      console.log("Task updateddd");
+      console.log("Task updated");
 
       queryClient.invalidateQueries({
         queryKey: ["tasks", dashboardData?._id],

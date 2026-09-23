@@ -179,18 +179,28 @@ export const addTarget = async ({
   week,
   target,
   dateNo,
+  socketID,
 }: {
   type: string;
   monthID: string;
   week?: number;
   target: string;
   dateNo?: number;
+  socketID: string;
 }) => {
   const url = targetUrlHelper(type, monthID, week, dateNo);
 
-  const res = await axiosPrivate.post(url, {
-    target,
-  });
+  const res = await axiosPrivate.post(
+    url,
+    {
+      target,
+    },
+    {
+      headers: {
+        "x-socket-id": socketID,
+      },
+    },
+  );
 
   return res.data;
 };
@@ -203,6 +213,7 @@ export const markTarget = async ({
   targetID,
   mark,
   dateNo,
+  socketID,
 }: {
   type: string;
   monthID: string;
@@ -210,10 +221,19 @@ export const markTarget = async ({
   targetID: string;
   mark: boolean;
   dateNo?: number;
+  socketID: string;
 }) => {
   const url = targetUrlHelper(type, monthID, week, dateNo, targetID);
 
-  const res = await axiosPrivate.patch(url, { mark });
+  const res = await axiosPrivate.patch(
+    url,
+    { mark },
+    {
+      headers: {
+        "x-socket-id": socketID,
+      },
+    },
+  );
 
   return res.data;
 };
@@ -225,21 +245,22 @@ export const removeTarget = async ({
   week,
   targetID,
   dateNo,
+  socketID,
 }: {
   type: string;
   monthID: string;
   week?: number;
   targetID: string;
   dateNo?: number;
+  socketID: string;
 }) => {
-  // const url =
-  //   type === "monthly"
-  //     ? `/api/remove-monthly-target?monthDashID=${monthID}&targetID=${targetID}`
-  //     : `/api/remove-weekly-target?monthDashID=${monthID}&week=${week}&targetID=${targetID}`;
-
   const url = targetUrlHelper(type, monthID, week, dateNo, targetID);
 
-  const res = await axiosPrivate.delete(url);
+  const res = await axiosPrivate.delete(url, {
+    headers: {
+      "x-socket-id": socketID,
+    },
+  });
 
   return res.data;
 };

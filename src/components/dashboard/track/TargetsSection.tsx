@@ -11,6 +11,7 @@ import {
 import SectionIcon from "../../shared/SectionIcon";
 import { axiosPrivate } from "../../../api/axios";
 import { TargetProgressTab } from "./TargetProgressTab";
+import { socket } from "../../../socket/socket";
 
 type SummaryType = {
   total: number;
@@ -223,10 +224,6 @@ const InlineTargetsList = ({
     }));
   };
 
-  // =========================
-  // GET TARGETS
-  // =========================
-
   const handleGetTargets = async () => {
     loadingValsSetup("getTargetsLoading", true);
 
@@ -251,20 +248,12 @@ const InlineTargetsList = ({
     handleGetTargets();
   }, [type, monthID, week, dateNo]);
 
-  // =========================
-  // PROGRESS
-  // =========================
-
   const completedCount = targets.filter((target) => target.completed).length;
 
   const progress =
     targets.length > 0
       ? Math.round((completedCount / targets.length) * 100)
       : 0;
-
-  // =========================
-  // ADD TARGET
-  // =========================
 
   const handleAddTarget = async () => {
     const value = input.trim();
@@ -280,16 +269,8 @@ const InlineTargetsList = ({
         week,
         target: value,
         dateNo,
+        socketID: socket?.id || "",
       });
-
-      /*
-       * Assuming API returns:
-       * {
-       *   target: {
-       *     targets: [...]
-       *   }
-       * }
-       */
 
       setTargets(res?.target?.targets ?? []);
       await getSummary();
@@ -317,6 +298,7 @@ const InlineTargetsList = ({
         targetID,
         mark: completed,
         dateNo,
+        socketID: socket?.id || "",
       });
 
       /*
@@ -362,12 +344,8 @@ const InlineTargetsList = ({
         week,
         targetID,
         dateNo,
+        socketID: socket?.id || "",
       });
-
-      /*
-       * Remove locally instead of making
-       * another GET request.
-       */
       setTargets((prev) => prev.filter((target) => target._id !== targetID));
       await getSummary();
     } catch (error) {
@@ -376,6 +354,30 @@ const InlineTargetsList = ({
       loadingValsSetup("removeTargetLoading", "");
     }
   };
+
+  useEffect(() => {
+    const handleTargetAdded = (data: any) => {
+      setTargets(data?.targets ?? []);
+    };
+
+    const handleTargetRemoved = (data: any) => {
+      setTargets(data?.targets ?? []);
+    };
+
+    const handleTargetMark = (data: any) => {
+      setTargets(data?.targets ?? []);
+    };
+
+    socket.on(`add-${type}-target`, handleTargetAdded);
+    socket.on(`remove-${type}-target`, handleTargetRemoved);
+    socket.on(`mark-${type}-target`, handleTargetMark);
+
+    return () => {
+      socket.off(`add-${type}-target`, handleTargetAdded);
+      socket.off(`remove-${type}-target`, handleTargetRemoved);
+      socket.off(`mark-${type}-target`, handleTargetMark);
+    };
+  }, [type]);
 
   return (
     <div className="flex flex-col gap-3">
