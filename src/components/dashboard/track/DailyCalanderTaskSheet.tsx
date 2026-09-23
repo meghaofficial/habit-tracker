@@ -44,13 +44,6 @@ const DailyCalanderTaskSheet = ({
   const todayDate = new Date().getDate();
   const [openLockDays, setOpenLockDays] = useState(false);
 
-  // Getting data
-  // const dateLogsData = useQuery({
-  //   queryKey: ["date_logs", monthDashID],
-  //   queryFn: () => getDateLogs(monthDashID),
-  //   enabled: !!monthDashID,
-  // });
-
   useEffect(() => {
     const handleTaskAdded = () => {
       console.log("Task added event received");
@@ -62,8 +55,6 @@ const DailyCalanderTaskSheet = ({
       socket.off("add-task", handleTaskAdded);
     };
   }, []);
-
-  // const dateLogs: DateLogI[] = dateLogsData?.data?.dateLogs;
 
   // Column widths
   const hasWeek5 = totalD > 28;

@@ -3,6 +3,7 @@ import { motion } from "framer-motion";
 import { FiPlus, FiTrash2 } from "react-icons/fi";
 import type { DashboardI, DateLogI, ProgressI, TaskI } from "../../../../types";
 import { CheckboxCell } from "../daily_task_section/CheckboxCell";
+import CircleLoader from "../../../loaders/CircleLoader";
 
 const TASK_COLUMN_WIDTH = 144;
 const DATE_COLUMN_WIDTH = 64;
@@ -15,6 +16,8 @@ const MobileDailyTaskSheet = ({
   dateLogs,
   logsLoading,
   handleAddRow,
+  addTaskLoading,
+  deletingID,
 }: {
   dashboardData: DashboardI;
   taskList: TaskI[];
@@ -23,6 +26,8 @@ const MobileDailyTaskSheet = ({
   dateLogs: DateLogI[];
   logsLoading: boolean;
   handleAddRow: () => void;
+  addTaskLoading: boolean;
+  deletingID: string | null;
 }) => {
   const containerRef = useRef<HTMLDivElement>(null);
 
@@ -107,7 +112,11 @@ const MobileDailyTaskSheet = ({
                 title="Add habit"
                 className="flex h-7 w-7 items-center justify-center rounded-lg border border-indigo-400/20 bg-indigo-500/10 text-indigo-400 transition hover:border-indigo-400/40 hover:bg-indigo-500/20"
               >
-                <FiPlus size={15} />
+                {addTaskLoading ? (
+                  <CircleLoader className="h-3 w-3" />
+                ) : (
+                  <FiPlus size={15} />
+                )}
               </motion.button>
             </div>
 
@@ -186,7 +195,11 @@ const MobileDailyTaskSheet = ({
                     title={`Delete ${task.taskName}`}
                     className="flex h-6 w-6 shrink-0 items-center justify-center rounded-md text-gray-600 transition-all hover:bg-red-500/10 hover:text-red-400 group-hover:opacity-100"
                   >
-                    <FiTrash2 size={13} />
+                    {deletingID === task?._id ? (
+                      <CircleLoader className="h-3 w-3" />
+                    ) : (
+                      <FiTrash2 size={13} />
+                    )}
                   </motion.button>
                 </div>
                 {/* =========================

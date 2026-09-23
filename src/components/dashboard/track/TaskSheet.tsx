@@ -75,6 +75,11 @@ const TaskSheet = ({
     },
   });
 
+  // parent
+  const deletingID = deleteTaskMutation.isPending
+    ? (deleteTaskMutation.variables?.taskID ?? null)
+    : null;
+
   const resetDateLogsMutation = useMutation({
     mutationFn: resetDateLogs,
     onSuccess: () => {
@@ -89,6 +94,7 @@ const TaskSheet = ({
 
   // Functions
   const handleDeleteRow = (taskID: string) => {
+    if (deleteTaskMutation.isPending) return;
     setRemoveRowID(taskID);
 
     deleteTaskMutation.mutate(
@@ -107,6 +113,7 @@ const TaskSheet = ({
 
   const handleAddRow = () => {
     if (taskList?.length >= rowLimit) return;
+    if (addTaskMutation.isPending) return;
     if (monthStatus === "scheduled") {
       alert(
         "Can not add task as the subscription for this month is not active",
@@ -182,6 +189,8 @@ const TaskSheet = ({
       dateLogs={dateLogs || []}
       logsLoading={logsLoading}
       handleAddRow={handleAddRow}
+      addTaskLoading={addTaskMutation.isPending}
+      deletingID={deletingID}
     />
   ) : (
     <DailyCalanderTaskSheet
