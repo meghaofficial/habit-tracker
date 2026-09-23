@@ -99,12 +99,6 @@ export const InputData = ({
   // --------------------------------------------------
 
   useEffect(() => {
-    /*
-     * Don't blindly overwrite local changes.
-     *
-     * If parent gives us a different taskName while the
-     * user has unsaved changes, keep the user's value.
-     */
     if (latestValueRef.current !== serverValueRef.current) {
       return;
     }
@@ -115,10 +109,6 @@ export const InputData = ({
     setValue(taskName);
   }, [taskName]);
 
-  // --------------------------------------------------
-  // CLEANUP
-  // --------------------------------------------------
-
   useEffect(() => {
     return () => {
       if (timeoutRef.current) {
@@ -128,51 +118,7 @@ export const InputData = ({
   }, []);
 
   return (
-    // <div
-    //   className="
-    //     text-[12px]
-    //     px-2
-    //     p-1
-    //     flex
-    //     items-center
-    //     gap-2
-    //     border-b
-    //     border-darkBox/50
-    //     light:border-lightBorder
-    //   "
-    // >
-    //   <span>{index + 1}.</span>
-
-    //   <input
-    //     type="text"
-    //     className="outline-none w-full py-1"
-    //     title={value}
-    //     value={value}
-    //     onChange={(e) => {
-    //       const newValue = e.target.value;
-
-    //       setValue(newValue);
-
-    //       // Always keep track of what the user currently typed
-    //       latestValueRef.current = newValue;
-
-    //       setSaveStatus("saving");
-    //     }}
-    //   />
-
-    //   <Saving saveStatus={saveStatus} />
-    // </div>
-
-    <div
-      className="
-        text-[12px]
-        px-2
-        p-1
-        flex
-        items-center
-        gap-2
-      "
-    >
+    <div className=" text-[12px] px-2 p-1 flex items-center gap-2 ">
       <span>{index + 1}.</span>
 
       <input
