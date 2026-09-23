@@ -86,7 +86,6 @@ export const CheckboxCell = React.memo(
           ),
         }));
 
-        // setCurrCheckVal(data?.marked);
         if (
           data?.taskProgress?.id === taskID &&
           new Date(data?.dateLogProgress?.fullDate).toDateString() ===

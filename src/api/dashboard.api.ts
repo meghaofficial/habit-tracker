@@ -98,13 +98,23 @@ export const resetDateLogs = async (dashboardID: string) => {
 export const updateTaskName = async ({
   taskId,
   taskName,
+  socketID,
 }: {
   taskId: string;
   taskName: string;
+  socketID: string;
 }) => {
-  const res = await axiosPrivate.patch(`/api/task?taskID=${taskId}`, {
-    taskName,
-  });
+  const res = await axiosPrivate.patch(
+    `/api/task?taskID=${taskId}`,
+    {
+      taskName,
+    },
+    {
+      headers: {
+        "x-socket-id": socketID,
+      },
+    },
+  );
 
   return res.data;
 };

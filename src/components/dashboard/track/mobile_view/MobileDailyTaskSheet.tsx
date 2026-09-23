@@ -8,6 +8,7 @@ import Popup from "../../../shared/Popup";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { updateTaskName } from "../../../../api/dashboard.api";
 import { notify } from "../../../../helper";
+import { socket } from "../../../../socket/socket";
 
 const TASK_COLUMN_WIDTH = 144;
 const DATE_COLUMN_WIDTH = 64;
@@ -131,6 +132,7 @@ const MobileDailyTaskSheet = ({
     updateHabitMutation.mutate({
       taskId: activeHabit._id,
       taskName: value,
+      socketID: socket?.id || "",
     });
   };
 

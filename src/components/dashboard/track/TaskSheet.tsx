@@ -171,12 +171,22 @@ const TaskSheet = ({
       });
     };
 
+    const handleTaskUpdate = () => {
+      console.log("Task updateddd");
+
+      queryClient.invalidateQueries({
+        queryKey: ["tasks", dashboardData?._id],
+      });
+    };
+
     socket.on("add-task", handleTaskAdded);
     socket.on("remove-task", handleTaskRemoved);
+    socket.on("update-task", handleTaskUpdate);
 
     return () => {
       socket.off("add-task", handleTaskAdded);
       socket.off("remove-task", handleTaskRemoved);
+      socket.off("update-task", handleTaskUpdate);
     };
   }, [socket]);
 

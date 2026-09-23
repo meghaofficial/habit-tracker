@@ -4,6 +4,7 @@ import { useMutation } from "@tanstack/react-query";
 import { notify } from "../../../../helper";
 import { updateTaskName } from "../../../../api/dashboard.api";
 import Saving from "../../../shared/Saving";
+import { socket } from "../../../../socket/socket";
 
 export const InputData = ({
   index,
@@ -15,17 +16,11 @@ export const InputData = ({
   taskName: string;
 }) => {
   const [value, setValue] = useState<string>(taskName);
-
-  // Value confirmed by the server
   const serverValueRef = useRef(taskName);
-
-  // Latest value typed by the user
   const latestValueRef = useRef(taskName);
-
   const [saveStatus, setSaveStatus] = useState<"idle" | "saving" | "saved">(
     "idle",
   );
-
   const timeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   const updateTaskMutation = useMutation({
@@ -86,6 +81,7 @@ export const InputData = ({
       updateTaskMutation.mutate({
         taskId,
         taskName: valueToSave,
+        socketID: socket?.id || "",
       });
     }, 500);
 
