@@ -5,6 +5,7 @@ import type { MonthAnalysisI, TopLevelAnalysisI } from "../../../types";
 import { MonthlyLineChart } from "../../charts/MonthlyLineChart";
 import { useQuery } from "@tanstack/react-query";
 import { getMonthlyActivity } from "../../../api/analysis.api";
+import { monMap } from "../../../staticData";
 
 const MonthlyActivity = ({
   topLevelData,
@@ -21,6 +22,8 @@ const MonthlyActivity = ({
     enabled: !!monthDashID,
   });
   const monthlyAna: MonthAnalysisI = monthlyActivityData.data?.data ?? [];
+  const currDate = new Date();
+  const currMonth = monMap[currDate.getMonth() + 1];
 
   return (
     <motion.div
@@ -37,7 +40,7 @@ const MonthlyActivity = ({
           <CardHeader
             icon={FiTrendingUp}
             title="Monthly Activity"
-            subTitle="This Month"
+            subTitle={currMonth}
           />
 
           {/* Badge/Details */}
@@ -48,8 +51,8 @@ const MonthlyActivity = ({
         </div>
 
         {/* Body wrapper */}
-        <div className="relative p-4 flex flex-col gap-3">
-          <div className="flex items-center justify-center overflow-x-auto w-full pe-2 sm:pe-7">
+        <div className="relative sm:p-4 px-4 flex flex-col gap-3">
+          <div className="w-full overflow-x-auto pe-2 sm:pe-7">
             <MonthlyLineChart data={monthlyAna} maxValue={numHabits || 1} />
           </div>
         </div>

@@ -1,14 +1,19 @@
-import Chart from 'react-apexcharts';
-import { useSelector } from 'react-redux';
-import type { RootState } from '../../redux/store/store';
+import Chart from "react-apexcharts";
+import { useSelector } from "react-redux";
+import type { RootState } from "../../redux/store/store";
 
-export const MonthlyLineChart = ({ data, maxValue }: { data: { dates: number[], tasks: number[] }, maxValue: number }) => {
-
+export const MonthlyLineChart = ({
+  data,
+  maxValue,
+}: {
+  data: { dates: number[]; tasks: number[] };
+  maxValue: number;
+}) => {
   const theme = useSelector((state: RootState) => state.theme).theme;
 
   const options: any = {
     chart: {
-      type: 'area',
+      type: "area",
       toolbar: {
         show: false,
       },
@@ -20,15 +25,15 @@ export const MonthlyLineChart = ({ data, maxValue }: { data: { dates: number[], 
       },
       animations: {
         enabled: true,
-      }
+      },
     },
-    colors: ['#6366F1'],
+    colors: ["#6366F1"],
     stroke: {
       // curve: 'smooth', // Creates a smooth curved line
       width: 2, // Line thickness
     },
     fill: {
-      type: 'gradient',
+      type: "gradient",
       gradient: {
         shadeIntensity: 0.5,
         opacityFrom: 0.7,
@@ -43,20 +48,20 @@ export const MonthlyLineChart = ({ data, maxValue }: { data: { dates: number[], 
       categories: data?.dates,
       labels: {
         style: {
-          colors: theme === "dark" ? "#fff" : '#000000',
-          fontSize: '12px',
+          colors: theme === "dark" ? "#fff" : "#000000",
+          fontSize: "12px",
         },
       },
       title: {
-        text: 'Dates',
+        text: "Dates",
         style: {
-          color: theme === "dark" ? "#fff" : '#000000',
-          fontSize: '14px',
+          color: theme === "dark" ? "#fff" : "#000000",
+          fontSize: "14px",
           fontWeight: 500,
         },
       },
-      axisBorder: { show: true, color: theme === "dark" ? "#fff" : '#000000' },
-      axisTicks: { show: false, color: '#E5E7EB' },
+      axisBorder: { show: true, color: theme === "dark" ? "#fff" : "#000000" },
+      axisTicks: { show: false, color: "#E5E7EB" },
     },
     yaxis: {
       min: 0,
@@ -64,41 +69,42 @@ export const MonthlyLineChart = ({ data, maxValue }: { data: { dates: number[], 
       tickAmount: 3,
       labels: {
         style: {
-          colors: theme === "dark" ? "#fff" : '#000000',
-          fontSize: '12px',
+          colors: theme === "dark" ? "#fff" : "#000000",
+          fontSize: "12px",
         },
       },
       title: {
-        text: 'Tasks',
+        text: "Tasks",
         style: {
-          color: theme === "dark" ? "#fff" : '#000000',
-          fontSize: '14px',
+          color: theme === "dark" ? "#fff" : "#000000",
+          fontSize: "14px",
           fontWeight: 500,
         },
       },
-      axisBorder: { show: true, color: theme === "dark" ? "#fff" : '#000000' },
-      axisTicks: { show: false, color: '#E5E7EB' },
+      axisBorder: { show: true, color: theme === "dark" ? "#fff" : "#000000" },
+      axisTicks: { show: false, color: "#E5E7EB" },
     },
     grid: {
       show: false,
-      borderColor: '#F3F4F6',
+      borderColor: "#F3F4F6",
     },
   };
 
   const series = [
     {
-      name: 'Tasks Completed',
+      name: "Tasks Completed",
       data: data?.tasks,
     },
   ];
 
   return (
-    <div className="w-full">
+    <div className="w-full min-w-250">
       <Chart
         options={options}
         series={series}
         type="area"
         height={350}
+        width="100%"
       />
     </div>
   );

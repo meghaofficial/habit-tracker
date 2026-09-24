@@ -4,6 +4,7 @@ import { FiAward, FiCalendar } from "react-icons/fi";
 import CardHeader from "../../shared/CardHeader";
 import { useQuery } from "@tanstack/react-query";
 import { getTargets } from "../../../api/dashboard.api";
+import { monMap } from "../../../staticData";
 
 const Targets = ({ monthDashID }: { monthDashID: string }) => {
   const monthlyTargetsData = useQuery({
@@ -18,6 +19,8 @@ const Targets = ({ monthDashID }: { monthDashID: string }) => {
   const monthlyTargets = monthlyTargetsData?.data?.target?.targets ?? [];
   const monthlyTargetsDone =
     monthlyTargets?.filter((d: any) => d?.completed).length || 0;
+  const currDate = new Date();
+  const currMonth = monMap[currDate.getMonth() + 1];
 
   return (
     <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 mb-4">
@@ -36,7 +39,7 @@ const Targets = ({ monthDashID }: { monthDashID: string }) => {
             <CardHeader
               icon={FiAward}
               title="Monthly Targets"
-              subTitle="This Month"
+              subTitle={currMonth}
             />
           </div>
 

@@ -9,11 +9,10 @@ const TopLevelMatrics = ({
   topLevelData: TopLevelAnalysisI;
   loading: boolean;
 }) => {
-
   const statCards = statsCardInfo(topLevelData);
 
   return (
-    <div className="grid grid-cols-2 sm:grid-cols-5 gap-3 sm:gap-4">
+    <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 sm:gap-4">
       {statCards.map((card, i) => (
         <motion.div
           key={card.label}
@@ -111,21 +110,21 @@ function statsCardInfo(topLevelData: TopLevelAnalysisI) {
       iconColor: "text-amber-400",
       glow: "bg-amber-500/10",
     },
-    {
-      label: "Perfect Streak",
-      value: topLevelData?.perfectDays,
-      icon: <FiAward size={18} />,
-      bgIcon: (
-        <FiAward
-          size={70}
-          className="text-rose-400 opacity-[0.08] absolute -right-2 -bottom-2 transition-transform duration-500 group-hover:scale-110 pointer-events-none"
-        />
-      ),
-      color: "from-rose-500/10 via-pink-500/10 to-rose-500/20",
-      border: "border-rose-500/30",
-      iconColor: "text-rose-400",
-      glow: "bg-rose-500/10",
-    },
+    // {
+    //   label: "Perfect Streak",
+    //   value: topLevelData?.perfectDays,
+    //   icon: <FiAward size={18} />,
+    //   bgIcon: (
+    //     <FiAward
+    //       size={70}
+    //       className="text-rose-400 opacity-[0.08] absolute -right-2 -bottom-2 transition-transform duration-500 group-hover:scale-110 pointer-events-none"
+    //     />
+    //   ),
+    //   color: "from-rose-500/10 via-pink-500/10 to-rose-500/20",
+    //   border: "border-rose-500/30",
+    //   iconColor: "text-rose-400",
+    //   glow: "bg-rose-500/10",
+    // },
   ];
 }
 

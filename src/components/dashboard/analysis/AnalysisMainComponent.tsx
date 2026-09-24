@@ -71,14 +71,10 @@ const AnalysisMainComponent = ({ monthDashID }: { monthDashID: string }) => {
     <div className="flex flex-col gap-4 w-full text-white mt-4">
       <InsightUpperHeader />
 
-      <TopLevelMatrics
-        topLevelData={topLevelData}
-        loading={loading}
-      />
+      <TopLevelMatrics topLevelData={topLevelData} loading={loading} />
 
-      <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+      <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 items-center">
         <WeeklyActivity
-          topLevelData={topLevelData}
           numHabits={taskList?.length}
           monthDashID={monthDashID}
         />
