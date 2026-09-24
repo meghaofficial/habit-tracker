@@ -4,17 +4,13 @@ import { FiCalendar, FiCheckCircle } from "react-icons/fi";
 interface MobileDashboardDetailsProps {
   username: string;
   email: string;
-
   currentDay: number;
   currentMonth: string;
-
   planLabel: string;
   startDate: string;
   endDate: string;
-
   todayCompleted: number;
   todayTotal: number;
-
   monthCompleted: number;
   monthTotal: number;
 }
@@ -64,26 +60,23 @@ const MobileDashboardDetails = ({
         {/* Current Date */}
         <div className="flex shrink-0 items-center gap-2">
           <div className="text-right">
-            <p className="text-[8px] uppercase tracking-[0.18em] text-gray-500">
-              {planLabel}
-            </p>
-
-            <div className="mt-0.5 flex items-end justify-end gap-1">
-              <span className="playfair-display text-2xl font-bold leading-none">
+            <div className="flex items-end justify-end gap-1">
+              <span className="playfair-display text-3xl font-bold leading-none">
                 {currentDay}
               </span>
 
-              <span className="pb-0.5 text-[10px] text-gray-400">
-                {currentMonth}
-              </span>
+              <span className="text-[12px] text-gray-400">{currentMonth}</span>
             </div>
           </div>
-
-          <FiCalendar className="h-4 w-4 text-indigo-400" />
         </div>
       </div>
 
       {/* Plan Dates */}
+      {/* <div className="px-3 pt-3">
+        <p className="text-[8px] uppercase tracking-[0.18em] text-gray-500">
+          {planLabel}
+        </p>
+      </div> */}
       <div className="flex items-center justify-between px-4 py-2.5">
         <div>
           <p className="text-[8px] uppercase tracking-[0.18em] text-gray-500">

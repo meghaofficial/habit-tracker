@@ -15,6 +15,14 @@ import FreeSubsConfirm from "../dashboard/subscription/FreeSubsConfirm";
 import SubsPlans from "../dashboard/subscription/SubsPlans";
 import Popup from "../shared/Popup";
 import RoadmapMainComponent from "../dashboard/roadmap/RoadmapMainComponent";
+import {
+  LuCalendarDays,
+  LuChartNoAxesCombined,
+  LuHistory,
+  LuListChecks,
+  LuMap,
+} from "react-icons/lu";
+import { FiChevronDown } from "react-icons/fi";
 
 const MASTER_MENU = [
   { key: "track", label: "Monthly Habit" },
@@ -47,6 +55,17 @@ const Dashboard = () => {
   const [navMenu, setNavMenu] = useState(MASTER_MENU);
   const [fallback, setFallback] = useState(false);
   const isMobile = useIsMobile();
+  const menuIcons: Record<string, React.ReactNode> = {
+    track: <LuListChecks />,
+    analysis: <LuChartNoAxesCombined />,
+    calandar: <LuCalendarDays />,
+    history: <LuHistory />,
+    roadmap: <LuMap />,
+  };
+
+  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+
+  const activeMenu = navMenu.find((item) => item.key === activeTab);
 
   const handleSubscribe = async (planID: string, amount: number) => {
     setFreeTrialLoading(true);
@@ -163,6 +182,7 @@ const Dashboard = () => {
                       />
                     )}
                   </div>
+                  ss
                 </>
               )}
 
@@ -204,30 +224,90 @@ const Dashboard = () => {
               <nav className="flex justify-between items-center p-0 sm:mb-0 mb-7 sm:pt-5 pt-4 w-full">
                 <NavigationBar />
               </nav>
-              <div className="flex items-center justify-center w-full sm:mt-4">
-                <div className="flex items-center gap-2 rounded-2xl sm:w-fit w-full border border-white/10 bg-black/20 light:border-black/10 p-1 backdrop-blur-xl light:bg-lightCard overflow-x-auto">
-                  {navMenu.map((tab) => (
+              {isMobile ? (
+                <>
+                  <div className="relative w-full sm:hidden">
+                    {/* Selected page */}
                     <button
-                      key={tab.key}
-                      onClick={() => setActiveTab(tab.key)}
-                      className={`rounded-xl w-full text-nowrap sm:px-5 px-3 py-2.5 text-sm font-medium transition-all duration-300 ${
-                        activeTab === tab.key
-                          ? "bg-darkPrimary light:bg-lightPrimary text-white shadow-lg"
-                          : "text-gray-400 hover:text-white light:hover:text-black hover:bg-white/5"
-                      }`}
+                      type="button"
+                      onClick={() => setMobileMenuOpen((prev) => !prev)}
+                      className=" flex w-full items-center justify-between rounded-xl border border-white/10 bg-black/20 px-3.5 py-3 backdrop-blur-xl light:border-black/10 light:bg-lightCard "
                     >
-                      {tab.label}
+                      <div className="flex items-center gap-2.5">
+                        <span className="flex h-7 w-7 items-center justify-center rounded-lg bg-indigo-500/10 text-sm text-indigo-400">
+                          {menuIcons[activeTab]}
+                        </span>
+
+                        <span className="text-[13px] font-medium">
+                          {activeMenu?.label}
+                        </span>
+                      </div>
+
+                      <FiChevronDown
+                        className={`text-gray-400 transition-transform duration-200 ${
+                          mobileMenuOpen ? "rotate-180" : ""
+                        }`}
+                      />
                     </button>
-                  ))}
-                  {/* <button
+
+                    {/* Dropdown */}
+                    {mobileMenuOpen && (
+                      <div className=" absolute left-0 top-[calc(100%+6px)] z-50 w-full overflow-hidden rounded-xl border border-white/10 bg-black p-1.5 shadow-xl light:border-black/10 light:bg-lightCard ">
+                        {navMenu.map((tab) => {
+                          const isActive = activeTab === tab.key;
+
+                          return (
+                            <button
+                              key={tab.key}
+                              type="button"
+                              onClick={() => {
+                                setActiveTab(tab.key);
+                                setMobileMenuOpen(false);
+                              }}
+                              className={`flex w-full items-center gap-2.5 rounded-lg px-3 py-2.5 text-left text-[12px] transition ${isActive ? "bg-indigo-500/10 text-indigo-400" : "text-gray-400 hover:bg-white/5 hover:text-white light:hover:bg-black/5 light:hover:text-black"}`}
+                            >
+                              <span
+                                className={`text-[15px] ${
+                                  isActive ? "text-indigo-400" : "text-gray-500"
+                                }`}
+                              >
+                                {menuIcons[tab.key]}
+                              </span>
+
+                              <span className="font-medium">{tab.label}</span>
+                            </button>
+                          );
+                        })}
+                      </div>
+                    )}
+                  </div>
+                </>
+              ) : (
+                <div className="flex items-center justify-center w-full sm:mt-4">
+                  <div className="flex items-center gap-2 rounded-2xl sm:w-fit w-full border border-white/10 bg-black/20 light:border-black/10 p-1 backdrop-blur-xl light:bg-lightCard overflow-x-auto">
+                    {navMenu.map((tab) => (
+                      <button
+                        key={tab.key}
+                        onClick={() => setActiveTab(tab.key)}
+                        className={`rounded-xl w-full text-nowrap sm:px-5 px-3 py-2.5 text-sm font-medium transition-all duration-300 ${
+                          activeTab === tab.key
+                            ? "bg-darkPrimary light:bg-lightPrimary text-white shadow-lg"
+                            : "text-gray-400 hover:text-white light:hover:text-black hover:bg-white/5"
+                        }`}
+                      >
+                        {tab.label}
+                      </button>
+                    ))}
+                    {/* <button
                     onClick={() => setActiveTab("aiCoach")}
                     className={`rounded-xl w-full flex items-center gap-2 text-nowrap sm:px-5 px-3 py-2.5 text-sm font-medium transition-all duration-300 ${activeTab === "aiCoach" ? "bg-darkPrimary light:bg-lightPrimary text-white shadow-lg" : "text-gray-400 hover:text-white light:hover:text-black hover:bg-white/5"}`}
                   >
                     <span>Ai Coach</span>
                     <LuSparkles />
                   </button> */}
+                  </div>
                 </div>
-              </div>
+              )}
 
               {activeTab === "track" && (
                 <TrackMainComponent
