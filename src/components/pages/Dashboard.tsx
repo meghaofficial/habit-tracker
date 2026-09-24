@@ -23,6 +23,7 @@ import {
   LuMap,
 } from "react-icons/lu";
 import { FiChevronDown } from "react-icons/fi";
+import { motion } from "framer-motion";
 
 const MASTER_MENU = [
   { key: "track", label: "Monthly Habit" },
@@ -182,7 +183,6 @@ const Dashboard = () => {
                       />
                     )}
                   </div>
-                  ss
                 </>
               )}
 
@@ -283,30 +283,38 @@ const Dashboard = () => {
                   </div>
                 </>
               ) : (
-                <div className="flex items-center justify-center w-full sm:mt-4">
-                  <div className="flex items-center gap-2 rounded-2xl sm:w-fit w-full border border-white/10 bg-black/20 light:border-black/10 p-1 backdrop-blur-xl light:bg-lightCard overflow-x-auto">
-                    {navMenu.map((tab) => (
-                      <button
-                        key={tab.key}
-                        onClick={() => setActiveTab(tab.key)}
-                        className={`rounded-xl w-full text-nowrap sm:px-5 px-3 py-2.5 text-sm font-medium transition-all duration-300 ${
-                          activeTab === tab.key
-                            ? "bg-darkPrimary light:bg-lightPrimary text-white shadow-lg"
-                            : "text-gray-400 hover:text-white light:hover:text-black hover:bg-white/5"
-                        }`}
-                      >
-                        {tab.label}
-                      </button>
-                    ))}
-                    {/* <button
-                    onClick={() => setActiveTab("aiCoach")}
-                    className={`rounded-xl w-full flex items-center gap-2 text-nowrap sm:px-5 px-3 py-2.5 text-sm font-medium transition-all duration-300 ${activeTab === "aiCoach" ? "bg-darkPrimary light:bg-lightPrimary text-white shadow-lg" : "text-gray-400 hover:text-white light:hover:text-black hover:bg-white/5"}`}
-                  >
-                    <span>Ai Coach</span>
-                    <LuSparkles />
-                  </button> */}
+                <>
+                  <div className="flex w-full items-center justify-center sm:mt-4">
+                    <div className=" relative flex w-full sm:w-fit items-center gap-1 overflow-x-auto hide-scrollbar rounded-2xl border border-white/8 bg-black/20 p-1.5 shadow-[inset_0_1px_0_rgba(255,255,255,0.04)] backdrop-blur-xl ">
+                      {navMenu.map((tab) => {
+                        const isActive = activeTab === tab.key;
+
+                        return (
+                          <button
+                            key={tab.key}
+                            onClick={() => setActiveTab(tab.key)}
+                            className={` relative z-0 flex-1 sm:flex-none whitespace-nowrap rounded-xl px-3 sm:px-5 py-2.5 text-[13px] font-medium transition-colors duration-300 ${isActive ? "text-white" : "text-gray-500 dark:text-gray-400 hover:text-gray-200 light:hover:text-gray-700"} `}
+                          >
+                            {/* Sliding active background */}
+                            {isActive && (
+                              <motion.span
+                                layoutId="active-analysis-tab"
+                                transition={{
+                                  type: "spring",
+                                  stiffness: 450,
+                                  damping: 35,
+                                }}
+                                className=" absolute inset-0 -z-10 rounded-xl border border-indigo-400/20 bg-indigo-500 light:bg-indigo-500/10 shadow-[0_4px_18px_rgba(99,102,241,0.12)] "
+                              />
+                            )}
+
+                            <span className="relative">{tab.label}</span>
+                          </button>
+                        );
+                      })}
+                    </div>
                   </div>
-                </div>
+                </>
               )}
 
               {activeTab === "track" && (

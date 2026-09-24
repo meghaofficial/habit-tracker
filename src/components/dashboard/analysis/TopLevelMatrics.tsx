@@ -1,5 +1,5 @@
 import { motion } from "framer-motion";
-import { FiAward, FiCalendar, FiClock, FiPercent, FiZap } from "react-icons/fi";
+import { FiCalendar, FiClock, FiPercent, FiZap } from "react-icons/fi";
 import type { TopLevelAnalysisI } from "../../../types";
 
 const TopLevelMatrics = ({
