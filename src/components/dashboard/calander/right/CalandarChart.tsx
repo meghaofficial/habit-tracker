@@ -78,11 +78,11 @@ const CalandarChart = ({
               <motion.div
                 key={index}
                 whileHover={{ y: -4, scale: 1.02 }}
-                className={`group overflow-hidden relative h-14 lg:h-28 rounded-2xl cursor-pointer transition-all duration-300 flex flex-col ${
+                className={`group overflow-hidden relative h-14 lg:h-28 rounded-2xl cursor-pointer transition-all duration-50 flex flex-col ${
                   isSelected
                     ? ""
                     : "bg-white/3 hover:bg-white/6 hover:border-white/20"
-                } ${isToday && 'shadow-[0_0_35px_rgba(99,102,241,0.35)]'}`}
+                } ${isToday && "shadow-[0_0_35px_rgba(99,102,241,0.35)]"}`}
                 onClick={() => {
                   setSelectedDate(new Date(year, month, dayNumber));
                   setFormData({
@@ -105,12 +105,15 @@ const CalandarChart = ({
                 }}
                 style={{
                   border: `1.5px solid ${
-                    exists && isSelected ?
-                      statusColors[exists.status]?.ddot :
-                      exists && !isSelected ?
-                        `color-mix(in srgb, ${statusColors[exists.status]?.dbg} 50%, transparent)` :
-                        !exists && isSelected ? "#fff" :
-                          isToday ? "#6366f1" : "#ffffff1a"
+                    exists && isSelected
+                      ? statusColors[exists.status]?.ddot
+                      : exists && !isSelected
+                        ? `color-mix(in srgb, ${statusColors[exists.status]?.dbg} 50%, transparent)`
+                        : !exists && isSelected
+                          ? "#fff"
+                          : isToday
+                            ? "#6366f1"
+                            : "#ffffff1a"
                   }`,
                   background: isToday
                     ? "#6366f133"
@@ -154,7 +157,7 @@ const CalandarChart = ({
                       </div>
                     </>
                   ) : (
-                    <div className="w-full h-full flex flex-col items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-300">
+                    <div className="w-full h-full flex flex-col items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-50">
                       <div className="w-6 h-6 rounded-full bg-white/10 flex items-center justify-center text-white/50 text-lg">
                         +
                       </div>

@@ -197,6 +197,8 @@ export interface CalandarDataI {
   title: string;
   description: string;
   updatedAt?: string;
+  tag?: string;
+  color?: string;
 }
 
 export interface WeekAnalysisI {

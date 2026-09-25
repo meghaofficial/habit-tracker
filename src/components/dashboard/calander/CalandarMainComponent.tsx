@@ -14,6 +14,8 @@ const CalandarMainComponent = () => {
     status: "default",
     title: "",
     description: "",
+    tag: "",
+    color: "",
   });
   const [dataList, setDataList] = useState<CalandarDataI[]>([]);
   const [activeData, setActiveData] = useState<CalandarDataI>({

@@ -1,12 +1,13 @@
 import { motion } from "framer-motion";
 import { formatTimestamp, notify } from "../../../../helper";
-import { statusColors, type CalandarDataI } from "../../../../types";
+import { type CalandarDataI } from "../../../../types";
 import { useEffect, useState, type Dispatch, type SetStateAction } from "react";
 import type { RootState } from "../../../../redux/store/store";
 import { useSelector } from "react-redux";
 import CircleLoader from "../../../loaders/CircleLoader";
 import { axiosPrivate } from "../../../../api/axios";
 import { CustomButtonForm } from "../../../shared/CutomButton";
+import TagColorPicker from "./TagColorPicker";
 
 type FormProps = {
   activeData: CalandarDataI;
@@ -149,9 +150,9 @@ const Form = ({
           </p>
         </div>
 
-        <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl border border-white/10 bg-white/4 text-indigo-400">
+        {/* <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl border border-white/10 bg-white/4 text-indigo-400">
           ✦
-        </div>
+        </div> */}
       </div>
 
       <div className="h-px bg-white/[0.07]" />
@@ -160,13 +161,13 @@ const Form = ({
       <div className="mt-5">
         <div className="mb-2.5 flex items-center justify-between">
           <label className="text-[10px] font-bold uppercase tracking-[0.18em] text-gray-500">
-            Status
+            Tag
           </label>
 
           <span className="text-[10px] text-gray-600">Choose one</span>
         </div>
 
-        <div className="flex flex-wrap gap-2">
+        {/* <div className="flex flex-wrap gap-2">
           {Object.entries(statusColors).map(([key, value], index) => {
             const isActive = activeStatus === key;
 
@@ -222,7 +223,13 @@ const Form = ({
               </button>
             );
           })}
-        </div>
+        </div> */}
+
+        <TagColorPicker
+          tag={formData?.tag || ""}
+          selectedColor={formData?.color || ""}
+          setFormData={setFormData}
+        />
       </div>
 
       {/* Title */}
