@@ -166,27 +166,27 @@ const LeftDetails = ({
           <motion.div
             initial={{ opacity: 0, y: 10 }}
             animate={{ opacity: 1, y: 0 }}
-            className="flex h-full flex-col"
+            className="flex flex-col sm:h-full"
           >
             {/* Date and actions */}
             <div className="flex items-center justify-between gap-3">
-              <div className="inline-flex items-center gap-3 rounded-xl border border-indigo-400/15 bg-indigo-500/6 px-4 py-2.5">
-                <span className="text-3xl font-semibold leading-none tracking-tight text-indigo-300 light:text-indigo-600">
+              <div className="inline-flex items-center gap-2 rounded-xl border border-indigo-400/15 bg-indigo-500/6 px-3 py-2 sm:gap-3 sm:px-4 sm:py-2.5">
+                <span className="text-2xl font-semibold leading-none tracking-tight text-indigo-300 sm:text-3xl light:text-indigo-600">
                   {todayStrArr[0]}
                 </span>
 
-                <div className="flex flex-col gap-0.5 border-l border-indigo-400/20 pl-3">
-                  <span className="text-xs font-semibold text-white/80 light:text-black/75">
+                <div className="flex flex-col gap-0.5 border-l border-indigo-400/20 pl-2 sm:pl-3">
+                  <span className="text-[11px] font-semibold text-white/80 sm:text-xs light:text-black/75">
                     {todayStrArr[1]}
                   </span>
 
-                  <span className="text-[10px] font-medium tracking-wider text-white/40 light:text-black/45">
+                  <span className="text-[9px] font-medium tracking-wider text-white/40 sm:text-[10px] light:text-black/45">
                     {todayStrArr[2]}
                   </span>
                 </div>
               </div>
 
-              <div className="flex items-center gap-2">
+              <div className="flex shrink-0 items-center gap-2">
                 <button
                   type="button"
                   onClick={() => setToggleUpdate(true)}
@@ -212,16 +212,16 @@ const LeftDetails = ({
 
             {/* Event details */}
             <div
-              className="mt-5 overflow-hidden rounded-2xl border"
+              className="mt-3 overflow-hidden rounded-xl border sm:mt-5 sm:rounded-2xl"
               style={{
                 borderColor: `${activeData.color || "#6366F1"}30`,
                 backgroundColor: `${activeData.color || "#6366F1"}08`,
               }}
             >
-              <div className="p-4">
+              <div className="p-3 sm:p-4">
                 {activeData.tag && (
                   <span
-                    className="mb-3 inline-block max-w-full wrap-break-word rounded-md px-2 py-1 text-[10px] font-semibold"
+                    className="mb-2 inline-block max-w-full wrap-break-word rounded-md px-2 py-0.5 text-[9px] font-semibold sm:mb-3 sm:py-1 sm:text-[10px]"
                     style={{
                       color: activeData.color || "#6366F1",
                       backgroundColor: `${activeData.color || "#6366F1"}18`,
@@ -231,17 +231,17 @@ const LeftDetails = ({
                   </span>
                 )}
 
-                <h2 className="wrap-break-word text-[14px] font-semibold leading-relaxed text-white/90 light:text-black/85">
+                <h2 className="wrap-break-word text-[13px] font-semibold leading-relaxed text-white/90 sm:text-[14px] light:text-black/85">
                   {activeData.title}
                 </h2>
 
                 {activeData.description && (
-                  <div className="mt-4 border-t border-white/6 pt-4 light:border-black/6">
-                    <p className="mb-2 text-[9px] font-semibold uppercase tracking-[0.14em] text-white/35 light:text-black/40">
+                  <div className="mt-2.5 border-t border-white/6 pt-2.5 sm:mt-4 sm:pt-4 light:border-black/6">
+                    <p className="mb-1 text-[9px] font-semibold uppercase tracking-[0.14em] text-white/35 sm:mb-2 light:text-black/40">
                       Notes
                     </p>
 
-                    <p className="whitespace-pre-wrap wrap-break-word text-[12px] leading-6 text-white/60 light:text-black/65">
+                    <p className="whitespace-pre-wrap wrap-break-word text-[12px] leading-5 text-white/60 sm:leading-6 light:text-black/65">
                       {activeData.description}
                     </p>
                   </div>
@@ -251,8 +251,8 @@ const LeftDetails = ({
 
             {/* Last updated */}
             {activeData.updatedAt && (
-              <div className="mt-auto pt-5">
-                <div className="flex flex-wrap items-center justify-between gap-2 border-t border-white/6 pt-3 text-[10px] light:border-black/6">
+              <div className="pt-3 sm:mt-auto sm:pt-5">
+                <div className="flex flex-wrap items-center justify-between gap-x-3 gap-y-1 border-t border-white/6 pt-2 text-[9px] sm:gap-2 sm:pt-3 sm:text-[10px] light:border-black/6">
                   <span className="text-white/35 light:text-black/40">
                     Last updated
                   </span>
@@ -272,42 +272,40 @@ const LeftDetails = ({
             className="flex flex-col"
           >
             {/* Header */}
-            <div className="flex items-start justify-between gap-4 pb-5">
-              <div>
-                <div className="flex items-center gap-2">
-                  <span className="text-[10px] font-bold uppercase tracking-[0.2em] text-indigo-400">
-                    {activeData?.id ? "Edit Task" : "New Task"}
-                  </span>
+            <div className="pb-3 sm:pb-5">
+              <div className="flex flex-wrap items-center justify-between gap-2 sm:justify-start">
+                <span className="text-[9px] font-bold uppercase tracking-[0.15em] text-indigo-400 sm:text-[10px] sm:tracking-[0.2em]">
+                  {activeData?.id ? "Edit Task" : "New Task"}
+                </span>
 
-                  <span className="h-1 w-1 rounded-full bg-white/20" />
-
-                  <span className="text-[10px] text-gray-500">
-                    {formatTimestamp(selectedDate.toString()).split("|")[0]}
-                  </span>
-                </div>
-
-                <h3 className="mt-2 text-lg font-semibold tracking-tight text-white light:text-lightText">
-                  {activeData?.id ? "Update your task" : "Create a new task"}
-                </h3>
-
-                <p className="mt-1 text-[11px] leading-5 text-gray-500">
-                  {activeData?.id
-                    ? "Make changes to keep your plan up to date."
-                    : "Define something meaningful you want to accomplish."}
-                </p>
+                <span className="text-[9px] text-gray-500 sm:text-[10px]">
+                  {formatTimestamp(selectedDate.toString()).split("|")[0]}
+                </span>
               </div>
+
+              <h3 className="mt-1 text-sm font-semibold tracking-tight text-white sm:mt-2 sm:text-lg light:text-lightText">
+                {activeData?.id ? "Update your task" : "Create a new task"}
+              </h3>
+
+              <p className="mt-1 hidden text-[11px] leading-5 text-gray-500 sm:block">
+                {activeData?.id
+                  ? "Make changes to keep your plan up to date."
+                  : "Define something meaningful you want to accomplish."}
+              </p>
             </div>
 
-            <div className="h-px bg-white/[0.07]" />
+            <div className="h-px bg-white/[0.07] light:bg-black/[0.07]" />
 
-            {/* Status */}
-            <div className="mt-5">
-              <div className="mb-2.5 flex items-center justify-between">
-                <label className="text-[10px] font-bold uppercase tracking-[0.18em] text-gray-500">
+            {/* Tag */}
+            <div className="mt-3 sm:mt-5">
+              <div className="mb-1.5 flex items-center justify-between sm:mb-2.5">
+                <label className="text-[9px] font-bold uppercase tracking-[0.14em] text-gray-500 sm:text-[10px] sm:tracking-[0.18em]">
                   Tag
                 </label>
 
-                <span className="text-[10px] text-gray-600">Choose one</span>
+                <span className="hidden text-[10px] text-gray-600 sm:inline">
+                  Choose one
+                </span>
               </div>
 
               <TagColorPicker
@@ -319,27 +317,45 @@ const LeftDetails = ({
 
             {/* Title */}
             <div className="mt-3">
-              <label className="text-[10px] font-bold uppercase tracking-[0.18em] text-gray-500">
+              <label
+                htmlFor="calendar-title"
+                className="text-[9px] font-bold uppercase tracking-[0.14em] text-gray-500 sm:text-[10px] sm:tracking-[0.18em]"
+              >
                 Title
               </label>
 
               <input
+                id="calendar-title"
                 type="text"
                 placeholder={
                   activeData?.id
-                    ? activeData?.title
+                    ? activeData.title
                     : "What do you want to accomplish?"
                 }
                 value={formData.title}
                 onChange={(e) => handleChangeValue("title", e.target.value)}
-                className=" mt-2 h-11 w-full rounded-xl border border-white/10 bg-white/[0.035] px-3.5 text-[12px] text-white outline-none transition-all duration-200 placeholder:text-gray-600 hover:border-white/15 focus:border-indigo-500/40 focus:bg-white/5 focus:ring-4 focus:ring-indigo-500/[0.07] light:text-lightText "
+                className="
+                mt-1.5 h-10 w-full rounded-xl
+                border border-white/10 bg-white/[0.035]
+                px-3 text-[12px] text-white outline-none
+                transition-colors duration-200
+                placeholder:text-gray-600 hover:border-white/15
+                focus:border-indigo-500/40 focus:bg-white/5
+                focus:ring-4 focus:ring-indigo-500/[0.07]
+                sm:mt-2 sm:h-11 sm:px-3.5
+                light:border-black/10 light:bg-black/2
+                light:text-lightText
+              "
               />
             </div>
 
             {/* Description */}
-            <div className="mt-5">
+            <div className="mt-3 sm:mt-5">
               <div className="flex items-center justify-between">
-                <label className="text-[10px] font-bold uppercase tracking-[0.18em] text-gray-500">
+                <label
+                  htmlFor="calendar-description"
+                  className="text-[9px] font-bold uppercase tracking-[0.14em] text-gray-500 sm:text-[10px] sm:tracking-[0.18em]"
+                >
                   Description
                 </label>
 
@@ -347,21 +363,29 @@ const LeftDetails = ({
               </div>
 
               <textarea
-                placeholder={
-                  activeData?.id
-                    ? activeData?.description
-                    : "Add some details about this task..."
-                }
+                id="calendar-description"
+                placeholder={activeData?.description || "Add some details..."}
                 value={formData.description}
                 onChange={(e) =>
                   handleChangeValue("description", e.target.value)
                 }
-                className=" mt-2 h-36 w-full resize-none rounded-xl border border-white/10 bg-white/[0.035] px-3.5 py-3 text-[12px] leading-6 text-white outline-none transition-all duration-200 placeholder:text-gray-600 hover:border-white/15 focus:border-indigo-500/40 focus:bg-white/5 focus:ring-4 focus:ring-indigo-500/[0.07] light:text-lightText "
+                className="
+                mt-1.5 block h-24 w-full resize-none rounded-xl
+                border border-white/10 bg-white/[0.035]
+                px-3 py-2 text-[12px] leading-5 text-white
+                outline-none transition-colors duration-200
+                placeholder:text-gray-600 hover:border-white/15
+                focus:border-indigo-500/40 focus:bg-white/5
+                focus:ring-4 focus:ring-indigo-500/[0.07]
+                sm:mt-2 sm:h-36 sm:px-3.5 sm:py-3 sm:leading-6
+                light:border-black/10 light:bg-black/2
+                light:text-lightText
+              "
               />
             </div>
 
             {/* Actions */}
-            <div className="mt-6 flex items-center gap-2.5 border-t border-white/[0.07] pt-5">
+            <div className="mt-3 flex items-center gap-2.5 border-t border-white/[0.07] pt-3 sm:mt-6 sm:pt-5 light:border-black/[0.07]">
               {activeData?.id && (
                 <CustomButtonForm
                   styling="h-10 flex-1 cursor-pointer"
@@ -375,7 +399,9 @@ const LeftDetails = ({
               <CustomButtonForm
                 styling="h-10 flex-1 cursor-pointer"
                 onClick={activeData?.id ? handleUpdate : handleCreate}
-                disabled={updateLoading || createLoading || !formData.title}
+                disabled={
+                  updateLoading || createLoading || !formData.title?.trim()
+                }
                 type="success"
               >
                 {createLoading || updateLoading ? (
