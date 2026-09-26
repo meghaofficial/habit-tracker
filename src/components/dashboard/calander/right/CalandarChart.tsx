@@ -1,10 +1,8 @@
-import { useSelector } from "react-redux";
-import type { RootState } from "../../../../redux/store/store";
 import { week } from "../../../../staticData";
-import { statusColors, type CalandarDataI } from "../../../../types";
 import Card from "../../../shared/Card";
 import { motion } from "framer-motion";
 import type { Dispatch, SetStateAction } from "react";
+import type { CalandarDataI } from "../../../../types";
 
 type CalandarChartProps = {
   currentViewDate: Date;
@@ -23,7 +21,6 @@ const CalandarChart = ({
   setFormData,
   setActiveData,
 }: CalandarChartProps) => {
-  const theme = useSelector((state: RootState) => state.theme).theme;
   const month = currentViewDate.getMonth();
   const year = currentViewDate.getFullYear();
   const totalDays = new Date(year, month + 1, 0).getDate();
@@ -77,16 +74,13 @@ const CalandarChart = ({
             return (
               <motion.div
                 key={index}
-                whileHover={{ y: -4, scale: 1.02 }}
-                className={`group overflow-hidden relative h-14 lg:h-28 rounded-2xl cursor-pointer transition-all duration-50 flex flex-col ${
-                  isSelected
-                    ? ""
-                    : "bg-white/3 hover:bg-white/6 hover:border-white/20"
-                } ${isToday && "shadow-[0_0_35px_rgba(99,102,241,0.35)]"}`}
+                // whileHover={{ y: -4, scale: 1.02 }}
+                className={`group overflow-hidden relative h-14 lg:h-28 rounded-2xl cursor-pointer transition-all duration-50 flex flex-col`}
                 onClick={() => {
                   setSelectedDate(new Date(year, month, dayNumber));
                   setFormData({
-                    status: "default",
+                    color: "",
+                    tag: "",
                     title: "",
                     description: "",
                   });
@@ -96,7 +90,8 @@ const CalandarChart = ({
                     setActiveData({
                       id: "",
                       date: null,
-                      status: "",
+                      tag: "",
+                      color: "",
                       title: "",
                       description: "",
                       updatedAt: "",
@@ -104,37 +99,27 @@ const CalandarChart = ({
                   }
                 }}
                 style={{
-                  border: `1.5px solid ${
-                    exists && isSelected
-                      ? statusColors[exists.status]?.ddot
-                      : exists && !isSelected
-                        ? `color-mix(in srgb, ${statusColors[exists.status]?.dbg} 50%, transparent)`
-                        : !exists && isSelected
-                          ? "#fff"
-                          : isToday
-                            ? "#6366f1"
-                            : "#ffffff1a"
-                  }`,
-                  background: isToday
-                    ? "#6366f133"
-                    : exists
-                      ? `color-mix(in srgb, ${statusColors[exists.status]?.dbg} 50%, transparent)`
-                      : isSelected
-                        ? "#ffffff1a"
-                        : "#ffffff1a",
+                  border: `1.5px solid ${isSelected ? "#6366F1" : exists ? `${exists?.color}66` : "#ffffff1a"}`,
                 }}
               >
                 {/* Day Header */}
 
-                <div className="flex items-center justify-between px-2 py-2 bg-black/20 border-b border-white/5">
+                <div
+                  className="flex items-center justify-between px-2 py-2 bg-black/20 border-b border-white/5"
+                  style={{
+                    backgroundColor: `${exists?.color}0D`,
+                  }}
+                >
                   <div
                     className={`flex items-center justify-center w-6 h-6 rounded-full text-xs font-bold ${
-                      isToday
-                        ? "text-white"
-                        : isSelected
-                          ? "text-white"
-                          : "text-white/40 group-hover:text-white group-hover:bg-white/10"
+                      !isSelected &&
+                      "text-white/40 group-hover:text-white group-hover:bg-white/10"
                     } transition-colors`}
+                    style={{
+                      backgroundColor: isToday ? "#6366F1" : ``,
+                      color: isToday || isSelected ? "white" : "#FFFFFF66",
+                    }}
+                    title={exists?.tag}
                   >
                     {dayNumber}
                   </div>
@@ -144,15 +129,7 @@ const CalandarChart = ({
                 <div className="hidden lg:flex flex-1 p-2 flex-col gap-1 overflow-hidden relative">
                   {exists?.id ? (
                     <>
-                      <div
-                        className="text-[10px] font-semibold h-13 overflow-y-auto hide-scrollbar"
-                        style={{
-                          color:
-                            theme === "dark"
-                              ? statusColors[exists.status]?.ddot
-                              : statusColors[exists.status]?.dot,
-                        }}
-                      >
+                      <div className="text-[10px] font-semibold h-13 overflow-y-auto hide-scrollbar">
                         {exists.title}
                       </div>
                     </>

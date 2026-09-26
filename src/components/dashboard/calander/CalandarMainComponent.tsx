@@ -11,7 +11,6 @@ const CalandarMainComponent = () => {
   const year = currentViewDate.getFullYear();
   const [selectedDate, setSelectedDate] = useState<Date>(new Date());
   const [formData, setFormData] = useState<CalandarDataI>({
-    status: "default",
     title: "",
     description: "",
     tag: "",
@@ -21,10 +20,11 @@ const CalandarMainComponent = () => {
   const [activeData, setActiveData] = useState<CalandarDataI>({
     id: "",
     date: null,
-    status: "",
     title: "",
     description: "",
     updatedAt: "",
+    tag: "",
+    color: "",
   });
 
   const handleGetRes = async () => {

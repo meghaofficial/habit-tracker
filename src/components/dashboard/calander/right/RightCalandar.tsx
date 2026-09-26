@@ -22,27 +22,32 @@ const RightCalandar = ({
   dataList,
   setActiveData,
 }: RightCalandarProps) => {
-
   const handleChangeDate = (addYearVal: number, addMonthVal: number) => {
     setCurrentViewDate((prev) => {
-      const updated = new Date(prev.getFullYear() + addYearVal, prev.getMonth() + addMonthVal, 1);
+      const updated = new Date(
+        prev.getFullYear() + addYearVal,
+        prev.getMonth() + addMonthVal,
+        1,
+      );
       setSelectedDate(updated);
       return updated;
     });
     setFormData({
-      status: "default",
       title: "",
       description: "",
+      tag: "",
+      color: "",
     });
     setActiveData({
       id: "",
       date: null,
-      status: "",
+      tag: "",
+      color: "",
       title: "",
       description: "",
       updatedAt: "",
     });
-  }
+  };
 
   const handlePrevYear = () => {
     handleChangeDate(-1, 0);

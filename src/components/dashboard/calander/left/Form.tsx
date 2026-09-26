@@ -31,17 +31,17 @@ const Form = ({
   const theme = useSelector((state: RootState) => state.theme).theme;
   const [createLoading, setCreateLoading] = useState(false);
   const [updateLoading, setUpdateLoading] = useState(false);
-  const [activeStatus, setActiveStatus] = useState("");
 
   const handleCreate = async () => {
-    if (!formData?.title || !formData?.status) return;
+    if (!formData?.title || !formData?.color) return;
     setCreateLoading(true);
     try {
       const res = await axiosPrivate.post("/api/calandar", {
         day: Number(selectedDate.getDate()),
         month: selectedDate.getMonth(),
         year: selectedDate.getFullYear(),
-        status: formData.status,
+        tag: formData.tag,
+        color: formData.color,
         title: formData.title,
         description: formData.description,
       });
@@ -51,7 +51,8 @@ const Form = ({
         setDataList((prev) => [...prev, newTask]);
         setActiveData(newTask);
         setFormData({
-          status: "",
+          tag: "",
+          color: "",
           title: "",
           description: "",
         });
@@ -74,7 +75,8 @@ const Form = ({
     try {
       const res = await axiosPrivate.patch("/api/calandar", {
         id: activeData?.id,
-        status: formData.status,
+        tag: formData.tag,
+        color: formData.color,
         title: formData.title,
         description: formData.description,
       });
@@ -109,14 +111,6 @@ const Form = ({
       }));
     }
   }, [activeData]);
-
-  useEffect(() => {
-    if (!activeData?.id) {
-      setActiveStatus("default");
-    } else {
-      setActiveStatus(activeData?.status);
-    }
-  }, [activeData?.id]);
 
   return (
     <motion.div

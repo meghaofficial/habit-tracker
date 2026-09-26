@@ -193,12 +193,12 @@ export interface HeatMapI {
 export interface CalandarDataI {
   id?: string;
   date?: Date | null;
-  status: string;
   title: string;
   description: string;
   updatedAt?: string;
-  tag?: string;
-  color?: string;
+  tag: string;
+  color: string;
+  day?: number;
 }
 
 export interface WeekAnalysisI {
