@@ -7,32 +7,29 @@ import {
   type SetStateAction,
 } from "react";
 import { FiChevronDown, FiCheck } from "react-icons/fi";
-import type { CalandarDataI } from "../../../../types";
+import type { CalandarDataI } from "../../../types";
 
 const tagColors = [
-  { name: "Indigo", value: "#6366F1" },
-  { name: "Violet", value: "#8B5CF6" },
-  { name: "Purple", value: "#A855F7" },
-  { name: "Fuchsia", value: "#D946EF" },
-  { name: "Pink", value: "#EC4899" },
-
-  { name: "Rose", value: "#F43F5E" },
-  { name: "Red", value: "#EF4444" },
-  { name: "Orange", value: "#F97316" },
-  { name: "Amber", value: "#F59E0B" },
-  { name: "Yellow", value: "#EAB308" },
-
-  { name: "Lime", value: "#84CC16" },
-  { name: "Green", value: "#22C55E" },
-  { name: "Emerald", value: "#10B981" },
-  { name: "Teal", value: "#14B8A6" },
-  { name: "Cyan", value: "#06B6D4" },
-
-  { name: "Sky", value: "#0EA5E9" },
-  { name: "Blue", value: "#3B82F6" },
-  { name: "Slate", value: "#64748B" },
-  { name: "Stone", value: "#78716C" },
-  { name: "Zinc", value: "#71717A" },
+  { name: "Red", value: "#E05555" },
+  { name: "Ruby", value: "#C94F6D" },
+  { name: "Purple", value: "#A477D5" },
+  { name: "Lavender", value: "#B49AE3" },
+  { name: "Green", value: "#5EAD78" },
+  { name: "Sage", value: "#91B58B" },
+  { name: "Yellow", value: "#E5C454" },
+  { name: "Golden", value: "#D5AA46" },
+  { name: "Blue", value: "#6495DB" },
+  { name: "Sky", value: "#7DBBD5" },
+  { name: "Brown", value: "#A67B5B" },
+  { name: "Caramel", value: "#C39770" },
+  { name: "Gray", value: "#969BA5" },
+  { name: "Slate", value: "#78899E" },
+  { name: "Pink", value: "#DF8FB5" },
+  { name: "Rose", value: "#CF7592" },
+  { name: "Onion", value: "#B77C96" },
+  { name: "Deep Onion", value: "#986580" },
+  { name: "Orange", value: "#E59A59" },
+  { name: "Teal", value: "#59ADA5" },
 ];
 
 interface TagColorPickerProps {
@@ -76,31 +73,13 @@ const TagColorPicker = ({
   return (
     <div ref={containerRef} className="relative w-full">
       {/* SELECT BAR */}
-      <div
-        className="
-          flex h-11 w-full items-center gap-3
-          rounded-xl border border-white/10
-          bg-white/3
-          px-3
-          transition-all duration-200
-          focus-within:border-indigo-400/30
-          light:border-black/10
-          light:bg-black/2
-        "
-      >
+      <div className=" flex h-11 w-full items-center gap-3 rounded-xl border border-white/10 bg-white/3 px-3 transition-all duration-200 focus-within:border-indigo-400/30 light:border-black/10 light:bg-black/2 ">
         {/* COLOR */}
         <button
           type="button"
           onClick={() => setOpen((prev) => !prev)}
-          className="
-            flex h-6 w-6 shrink-0 items-center justify-center
-            rounded-lg
-            transition-transform
-            hover:scale-105
-          "
-          style={{
-            backgroundColor: `${selectedColor}20`,
-          }}
+          className=" flex h-6 w-6 shrink-0 items-center justify-center rounded-lg transition-transform hover:scale-105 "
+          style={{ backgroundColor: `${selectedColor}20` }}
         >
           <span
             className="h-3 w-3 rounded-full"
@@ -119,7 +98,7 @@ const TagColorPicker = ({
           className=" min-w-0 flex-1 bg-transparent text-[12px] font-medium text-gray-200 outline-none placeholder:text-gray-600 light:text-gray-700 "
         />
 
-        {/* DROPDOWN */}
+        {/* DROPDOWN ICON */}
         <button
           type="button"
           onClick={() => setOpen((prev) => !prev)}
@@ -181,37 +160,15 @@ const TagColorPicker = ({
                     title={color.name}
                     onClick={() => {
                       handleChangeValue("color", color.value);
-                      // setSelectedColor(color.value);
-
-                      // // update your form
-                      // setFormData((prev) => ({
-                      //   ...prev,
-                      //   status: tag,
-                      //   color: color.value,
-                      // }));
-
                       setOpen(false);
                     }}
-                    className="
-                      group relative flex
-                      aspect-square
-                      items-center justify-center
-                      rounded-lg
-                      transition-all duration-200
-                      hover:scale-110
-                    "
+                    className=" group relative flex aspect-square items-center justify-center rounded-lg transition-all duration-200 hover:scale-110 "
                     style={{
                       backgroundColor: `${color.value}18`,
                     }}
                   >
                     <span
-                      className="
-                        flex h-4 w-4
-                        items-center justify-center
-                        rounded-full
-                        transition-all
-                        group-hover:scale-110
-                      "
+                      className=" flex h-4 w-4 items-center justify-center rounded-full transition-all group-hover:scale-110 "
                       style={{
                         backgroundColor: color.value,
                         boxShadow: selected

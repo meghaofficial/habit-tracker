@@ -140,13 +140,13 @@ const Dashboard = () => {
     getActiveSubscription();
   }, []);
 
-  useEffect(() => {
-    if (isMobile) {
-      setNavMenu(MASTER_MENU.filter((item) => item.key !== "calandar"));
-    } else {
-      setNavMenu(MASTER_MENU);
-    }
-  }, [window.innerWidth]);
+  // useEffect(() => {
+  //   if (isMobile) {
+  //     setNavMenu(MASTER_MENU.filter((item) => item.key !== "calandar"));
+  //   } else {
+  //     setNavMenu(MASTER_MENU);
+  //   }
+  // }, [window.innerWidth]);
 
   return (
     <>

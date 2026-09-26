@@ -14,7 +14,6 @@ import Settings from "./components/pages/Settings";
 import NoInternetConnection from "./components/shared/NoInternetConnection";
 import AuthForm from "./components/auth/AuthForm";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import Reviews from "./components/pages/Reviews";
 import { socket } from "./socket/socket";
 
 const queryClient = new QueryClient();
@@ -128,7 +127,7 @@ function App() {
                     path="/"
                     element={isLogin ? <Dashboard /> : <HomePage />}
                   />
-                  <Route path="/reviews" element={<Reviews />} />
+                  {/* <Route path="/reviews" element={<Reviews />} /> */}
                   <Route
                     path="/settings"
                     element={

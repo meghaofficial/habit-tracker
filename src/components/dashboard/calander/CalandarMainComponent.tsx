@@ -1,12 +1,11 @@
 import { useEffect, useState } from "react";
 import { type CalandarDataI } from "../../../types";
 import { axiosPrivate } from "../../../api/axios";
-import LeftDetails from "./left/LeftDetails";
-import RightCalandar from "./right/RightCalandar";
+import LeftDetails from "./LeftDetails";
+import RightCalandar from "./RightCalandar";
 
 const CalandarMainComponent = () => {
   const [currentViewDate, setCurrentViewDate] = useState<Date>(new Date());
-
   const month = currentViewDate.getMonth();
   const year = currentViewDate.getFullYear();
   const [selectedDate, setSelectedDate] = useState<Date>(new Date());
@@ -15,7 +14,7 @@ const CalandarMainComponent = () => {
     description: "",
     tag: "",
     color: "",
-  });
+  }); // what we are writing
   const [dataList, setDataList] = useState<CalandarDataI[]>([]);
   const [activeData, setActiveData] = useState<CalandarDataI>({
     id: "",
@@ -25,10 +24,12 @@ const CalandarMainComponent = () => {
     updatedAt: "",
     tag: "",
     color: "",
-  });
+  }); // for api response & when user clicks
+  const [loading, setLoading] = useState(false);
+  const [toggleUpdate, setToggleUpdate] = useState(false);
 
   const handleGetRes = async () => {
-    // setCreateLoading(true);
+    setLoading(true);
     try {
       const res = await axiosPrivate.get(
         `/api/calandar?month=${month}&year=${year}`,
@@ -54,16 +55,17 @@ const CalandarMainComponent = () => {
     } catch (error) {
       console.error(error);
     } finally {
-      // setCreateLoading(false);
+      setLoading(false);
     }
   };
 
   useEffect(() => {
     handleGetRes();
-  }, []);
+    setToggleUpdate(false);
+  }, [currentViewDate]);
 
   return (
-    <div className="flex flex-col lg:flex-row items-start mt-4 mb-3 gap-4 w-full">
+    <div className="flex flex-col-reverse lg:flex-row items-start sm:mt-4 mt-3 mb-3 sm:gap-4 gap-3 w-full">
       <LeftDetails
         activeData={activeData}
         setActiveData={setActiveData}
@@ -71,6 +73,8 @@ const CalandarMainComponent = () => {
         selectedDate={selectedDate}
         formData={formData}
         setFormData={setFormData}
+        toggleUpdate={toggleUpdate}
+        setToggleUpdate={setToggleUpdate}
       />
       <RightCalandar
         setCurrentViewDate={setCurrentViewDate}
@@ -80,6 +84,8 @@ const CalandarMainComponent = () => {
         selectedDate={selectedDate}
         dataList={dataList}
         setActiveData={setActiveData}
+        loading={loading}
+        setToggleUpdate={setToggleUpdate}
       />
     </div>
   );
