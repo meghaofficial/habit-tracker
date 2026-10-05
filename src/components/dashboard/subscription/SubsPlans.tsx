@@ -6,12 +6,14 @@ const SubsPlans = ({
   showFree,
   plansList,
   setOpenPopup,
-  handleSubscribe
+  handleSubscribe,
+  loading,
 }: {
   showFree: boolean;
   plansList: PlanI[];
   setOpenPopup: Dispatch<SetStateAction<boolean>>;
   handleSubscribe: (planID: string, amount: number) => Promise<void>;
+  loading: boolean;
 }) => {
   return (
     <div className="relative mb-5">
@@ -30,6 +32,7 @@ const SubsPlans = ({
             len={plansList.length}
             setOpenPopup={setOpenPopup}
             handleSubscribe={handleSubscribe}
+            loading={loading}
           />
         ))}
       </div>

@@ -2,19 +2,21 @@ import { type Dispatch, type SetStateAction } from "react";
 import { formattedText } from "../../../helper";
 import type { PlanI } from "../../../types";
 import { CustomButtonForm } from "../../shared/CutomButton";
+import CircleLoader from "../../loaders/CircleLoader";
 
 const SubsPlanCard = ({
   plan,
   len,
   setOpenPopup,
-  handleSubscribe
+  handleSubscribe,
+  loading,
 }: {
   plan: PlanI;
   len: number;
   setOpenPopup: Dispatch<SetStateAction<boolean>>;
   handleSubscribe: (planID: string, amount: number) => Promise<void>;
+  loading: boolean;
 }) => {
-
   return (
     <div
       key={plan?._id}
@@ -129,20 +131,24 @@ const SubsPlanCard = ({
                 }
               }}
             >
-              <span className="flex items-center justify-center gap-2">
-                Activate Plan
-                <svg
-                  className="h-4 w-4 transition-transform duration-300 group-hover:translate-x-1"
-                  viewBox="0 0 20 20"
-                  fill="currentColor"
-                >
-                  <path
-                    fillRule="evenodd"
-                    d="M10.293 3.293a1 1 0 011.414 0l5 5a1 1 0 010 1.414l-5 5a1 1 0 01-1.414-1.414L13.586 10H4a1 1 0 110-2h9.586l-3.293-3.293a1 1 0 010-1.414z"
-                    clipRule="evenodd"
-                  />
-                </svg>
-              </span>
+              {!loading ? (
+                <CircleLoader />
+              ) : (
+                <span className="flex items-center justify-center gap-2">
+                  Activate Plan
+                  <svg
+                    className="h-4 w-4 transition-transform duration-300 group-hover:translate-x-1"
+                    viewBox="0 0 20 20"
+                    fill="currentColor"
+                  >
+                    <path
+                      fillRule="evenodd"
+                      d="M10.293 3.293a1 1 0 011.414 0l5 5a1 1 0 010 1.414l-5 5a1 1 0 01-1.414-1.414L13.586 10H4a1 1 0 110-2h9.586l-3.293-3.293a1 1 0 010-1.414z"
+                      clipRule="evenodd"
+                    />
+                  </svg>
+                </span>
+              )}
             </CustomButtonForm>
           </div>
         </div>

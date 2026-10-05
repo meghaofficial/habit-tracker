@@ -30,6 +30,8 @@ const DailyHabitMatrix = ({
   });
   const dateLogs: DateLogI[] = dateLogsData?.data?.dateLogs || [];
 
+  // console.log("dateLogs", dateLogs);
+
   return (
     <Card heading="" cardWidth="w-full">
       <div className="p-1 flex flex-col gap-5">
@@ -96,22 +98,11 @@ const DailyHabitMatrix = ({
                       </div>
                     </td>
 
-                    {/* Days */}
-                    {Array.from({ length: daysInMonth }).map((_, index) => {
+                    {dateLogs?.map((log, index) => {
                       const day = index + 1;
 
-                      const dateLog = dateLogs?.find((d) => {
-                        const date = new Date(d.fullDate);
-
-                        return (
-                          date.getDate() === day &&
-                          date.getMonth() === selectedMonth &&
-                          date.getFullYear() === selectedYear
-                        );
-                      });
-
                       const isCompleted =
-                        dateLog?.tasks?.includes(task._id) ?? false;
+                        log?.tasks?.includes(task?._id) ?? false;
 
                       return (
                         <td key={index} className="px-1.5 py-3 text-center">

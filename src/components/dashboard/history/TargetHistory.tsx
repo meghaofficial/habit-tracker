@@ -211,7 +211,7 @@ const TargetHistory = ({ monthDashID }: { monthDashID: string }) => {
               <p className="text-xs text-rose-300">{errors[activeTab]}</p>
             </div>
           ) : total === 0 ? (
-            <div className="flex h-50 flex-col items-center justify-center rounded-xl border border-dashed border-white/8 px-4 text-center">
+            <div className="flex h-60 flex-col items-center justify-center rounded-xl border border-dashed border-white/8 px-4 text-center">
               <div className="mb-3 flex h-10 w-10 items-center justify-center rounded-xl border border-white/5 bg-white/3">
                 <FiTarget size={18} className="text-gray-500" />
               </div>

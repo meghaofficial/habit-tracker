@@ -140,14 +140,6 @@ const Dashboard = () => {
     getActiveSubscription();
   }, []);
 
-  // useEffect(() => {
-  //   if (isMobile) {
-  //     setNavMenu(MASTER_MENU.filter((item) => item.key !== "calandar"));
-  //   } else {
-  //     setNavMenu(MASTER_MENU);
-  //   }
-  // }, [window.innerWidth]);
-
   return (
     <>
       {fallback ? (
@@ -180,6 +172,7 @@ const Dashboard = () => {
                         plansList={plansList}
                         setOpenPopup={setOpenPopup}
                         handleSubscribe={handleSubscribe}
+                        loading={freeTrialLoading}
                       />
                     )}
                   </div>
