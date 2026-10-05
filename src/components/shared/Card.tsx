@@ -8,7 +8,8 @@ interface CardProps {
   heading: string;
   subHeading?: string;
   specialCard?: boolean;
-  rightOfHeading?: ReactNode
+  rightOfHeading?: ReactNode;
+  padStyle?: string;
 }
 
 const Card = ({
@@ -19,11 +20,12 @@ const Card = ({
   heading,
   subHeading,
   specialCard = false,
-  rightOfHeading=null
+  rightOfHeading = null,
+  padStyle = "p-5",
 }: CardProps) => {
   return (
     <div
-      className={`relative overflow-x-hidden rounded-2xl h-fit google-sans border border-white/10 ${cardWidth} light:border-black/10 bg-black/20 light:bg-lightCard p-5 ${styling}`}
+      className={`relative overflow-x-hidden rounded-2xl h-fit google-sans border border-white/10 ${cardWidth} light:border-black/10 bg-black/20 light:bg-lightCard ${padStyle} ${styling}`}
     >
       <div className="relative z-10 flex items-start justify-between">
         <div className="flex items-center justify-between w-full">

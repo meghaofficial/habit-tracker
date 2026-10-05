@@ -8,6 +8,7 @@ import SectionIcon from "../../shared/SectionIcon";
 import Popup from "../../shared/Popup";
 import HabitDaySelector from "./HabitDaySelector";
 import { TaskRow } from "./daily_task_section/TaskRow";
+import EnableNotifications from "../../EnableNotifications";
 
 // Main Component
 const DailyCalanderTaskSheet = ({
@@ -63,6 +64,7 @@ const DailyCalanderTaskSheet = ({
 
   return (
     <div className="flex flex-col gap-4">
+      {/* <EnableNotifications /> */}
       {/* ── Daily Progress Bars (now above the sheet) ── */}
       <div className="relative overflow-hidden rounded-2xl border border-white/10 bg-black/20 p-3">
         <div className="absolute inset-0 bg-linear-to-r from-indigo-500/3 via-transparent to-transparent pointer-events-none" />
@@ -163,7 +165,6 @@ const DailyCalanderTaskSheet = ({
           )}
         </div>
       </div>
-
       {/* ── Calendar Sheet ── */}
       <div className="relative overflow-hidden rounded-2xl border border-white/10 bg-black/20">
         <div className="absolute inset-0 bg-linear-to-br from-indigo-500/3 via-transparent to-transparent pointer-events-none" />
@@ -418,7 +419,6 @@ const DailyCalanderTaskSheet = ({
           )}
         </div>
       </div>
-
       {openLockDays && (
         <Popup
           open={openLockDays}
