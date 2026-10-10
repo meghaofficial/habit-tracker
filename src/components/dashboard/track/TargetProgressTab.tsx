@@ -27,8 +27,6 @@ export const TargetProgressTab = ({
 
   const svgWidth = variant === "daily" ? 32 : variant === "week" ? 64 : 72;
 
-  console.log();
-
   return (
     <div className="relative shrink-0 group">
       {/* Tooltip */}

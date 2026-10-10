@@ -31,7 +31,8 @@ const TargetsSection = ({
   const dateContainerRef = useRef<HTMLDivElement>(null);
   const dateRefs = useRef<Record<number, HTMLButtonElement | null>>({});
   const [activeTab, setActiveTab] = useState<number>(0);
-  const [activeDate, setActiveDate] = useState(new Date().getDate());
+  const currDate = new Date();
+  const [activeDate, setActiveDate] = useState(currDate.getDate());
   const [summary, setSummary] = useState<{
     monthlySummary: SummaryType;
     weeklySummary: (SummaryType & { week: number })[];

@@ -97,8 +97,8 @@ const HistoryMainComponent = ({ monthDashID }: { monthDashID: string }) => {
                         />
                         <div>
                           <h1 className="text-lg font-bold bg-linear-to-r from-white to-white/70 bg-clip-text text-transparent">
-                            {monMap[selectedMonth.month]} {selectedMonth.year}{" "}
-                            Report
+                            {monMap[selectedMonth.month + 1]}{" "}
+                            {selectedMonth.year} Report
                           </h1>
                           <p className="text-xs text-gray-400 font-medium">
                             Historical review of your habits and milestones
