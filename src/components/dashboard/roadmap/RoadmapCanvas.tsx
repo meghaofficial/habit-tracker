@@ -33,7 +33,7 @@ const RoadmapCanvas = () => {
                     text: "Start Here",
                     x: 80,
                     y: 80,
-                    completed: false
+                    completed: false,
                   },
                 ])
               }
@@ -48,7 +48,10 @@ const RoadmapCanvas = () => {
         <div className="absolute right-4 top-4 z-10 rounded-lg border border-white/[0.07] bg-black/30 px-3 py-2 text-[10px] text-zinc-500 backdrop-blur-sm light:border-black/[0.07] light:bg-white/70">
           <span className="text-zinc-400">{nodes.length}</span> nodes
           <span className="mx-2 text-zinc-700">•</span>
-          <span className="text-zinc-400">{nodes.length <= 0 ? 0 : nodes.length - 1}</span> connections
+          <span className="text-zinc-400">
+            {nodes.length <= 0 ? 0 : nodes.length - 1}
+          </span>{" "}
+          connections
         </div>
 
         {/* Dotted canvas */}
@@ -62,6 +65,7 @@ const RoadmapCanvas = () => {
         />
 
         <Canvas nodes={nodes} setNodes={setNodes} />
+        {/* <Canvas /> */}
 
         {/* Empty state / nodes go here */}
         <div className="relative flex h-full items-center justify-center">

@@ -289,6 +289,8 @@ export interface NodeI {
   completed: boolean;
   x: number;
   y: number;
+  width?: number;
+  height?: number;
 }
 
 export type EdgeType = "child" | "linked";

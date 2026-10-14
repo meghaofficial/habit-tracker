@@ -1,776 +1,615 @@
-import { useState, type Dispatch, type SetStateAction } from "react";
-import { motion, AnimatePresence } from "framer-motion";
-
 import {
-  FiMove,
-  FiChevronDown,
-  FiChevronRight,
-  FiTrash2,
-} from "react-icons/fi";
-import { FaHandPaper } from "react-icons/fa";
-import type {
-  NodeI,
-  DraggingI,
-  EdgeI,
-  PanI,
-  EdgeType,
-  EdgeCoordinatesI,
-} from "../../../types";
+  useEffect,
+  useRef,
+  useState,
+  type Dispatch,
+  type SetStateAction,
+  type PointerEvent as ReactPointerEvent,
+} from "react";
+import { motion } from "framer-motion";
+import {
+  handleClasses,
+  handles,
+  type Direction,
+  type EdgeI,
+  type Handle,
+  type MoveSession,
+  type ResizeSession,
+} from "./canvasUtility";
+import { FiMove } from "react-icons/fi";
+import {
+  FaArrowDown,
+  FaArrowLeft,
+  FaArrowRight,
+  FaArrowUp,
+} from "react-icons/fa";
 
-const NODE_WIDTH = 140;
-const NODE_HEIGHT = 80;
+export interface NodeI {
+  id: number;
+  text: string;
+  x: number;
+  y: number;
+  completed: boolean;
+  width?: number;
+  height?: number;
+}
 
-const Canvas = ({
-  nodes,
-  setNodes,
-}: {
+interface CanvasProps {
   nodes: NodeI[];
   setNodes: Dispatch<SetStateAction<NodeI[]>>;
-}) => {
+}
+
+const INITIAL_WIDTH = 100;
+const INITIAL_HEIGHT = 30;
+const MAX_WIDTH = 150;
+const MIN_HEIGHT = 20;
+const MIN_WIDTH = 60;
+
+const Canvas = ({ nodes, setNodes }: CanvasProps) => {
+  const nextId = useRef(1);
+  const textareaRefs = useRef<Record<number, HTMLTextAreaElement | null>>({});
+  const measureRef = useRef<HTMLSpanElement | null>(null);
+  const [activeNodeId, setActiveNodeId] = useState<number | null>(null);
+  const resizeRef = useRef<ResizeSession | null>(null);
+  const moveRef = useRef<MoveSession | null>(null);
   const [edges, setEdges] = useState<EdgeI[]>([]);
-  const [collapsedNodes, setCollapsedNodes] = useState<Set<number>>(new Set());
-  const [dragging, setDragging] = useState<DraggingI | null>(null);
-  const [isPanningEnabled, setIsPanningEnabled] = useState(false);
-  const [pan, setPan] = useState({
-    x: 0,
-    y: 0,
-  });
-  const [panStart, setPanStart] = useState<PanI | null>(null);
 
-  console.log("nodes", nodes);
-  console.log("edges", edges)
+  // Create one default node.
+  useEffect(() => {
+    if (nodes.length === 0) {
+      const id = nextId.current++;
 
-  const createChildNode = (parent: NodeI) => {
-    if (isPanningEnabled) {
-      return;
+      setNodes([
+        {
+          id,
+          text: "",
+          x: 80,
+          y: 80,
+          width: INITIAL_WIDTH,
+          height: INITIAL_HEIGHT,
+          completed: false,
+        },
+      ]);
+    } else {
+      nextId.current = Math.max(
+        nextId.current,
+        ...nodes.map((node) => node.id + 1),
+      );
     }
+  }, [nodes.length, setNodes]);
 
-    const nodeId = Date.now();
+  const updateNodeText = (id: number, text: string) => {
+    const textarea = textareaRefs.current[id];
+    const measure = measureRef.current;
 
-    const newNode: NodeI = {
-      id: nodeId,
-      text: "Child Node",
-      x: parent.x + NODE_WIDTH + 100,
-      y: parent.y,
-      completed: false,
-    };
+    let width = INITIAL_WIDTH;
+    let height = MIN_HEIGHT;
 
-    const newEdge: EdgeI = {
-      id: nodeId + 1,
-      source: parent.id,
-      target: nodeId,
-      type: "child",
-    };
+    if (text.length > 0 && measure && textarea) {
+      const style = window.getComputedStyle(textarea);
 
-    setNodes((prev) => [...prev, newNode]);
-    setEdges((prev) => [...prev, newEdge]);
+      measure.style.font = style.font;
+      measure.style.letterSpacing = style.letterSpacing;
+      measure.textContent = text.replace(/\n/g, " ");
 
-    // Automatically expand parent
-    setCollapsedNodes((prev) => {
-      const next = new Set(prev);
-      next.delete(parent.id);
-      return next;
-    });
-  };
+      const measuredWidth = measure.getBoundingClientRect().width;
 
-  const createLinkedNode = (source: NodeI) => {
-    if (isPanningEnabled) {
-      return;
-    }
+      // Grow horizontally up to 150px.
+      width = Math.min(
+        MAX_WIDTH,
+        Math.max(INITIAL_WIDTH, Math.ceil(measuredWidth + 20)),
+      );
 
-    const nodeId = Date.now();
+      // Once the maximum width is reached, wrap text and grow vertically.
+      textarea.style.width = `${width}px`;
+      textarea.style.height = "auto";
 
-    const newNode: NodeI = {
-      id: nodeId,
-      text: "New Node",
-      x: source.x,
-      y: source.y + NODE_HEIGHT + 50,
-      completed: false,
-    };
-
-    const newEdge: EdgeI = {
-      id: nodeId + 1,
-      source: source.id,
-      target: nodeId,
-      type: "linked",
-    };
-
-    setNodes((prev) => [...prev, newNode]);
-    setEdges((prev) => [...prev, newEdge]);
-
-    // Automatically expand source
-    setCollapsedNodes((prev) => {
-      const next = new Set(prev);
-      next.delete(source.id);
-      return next;
-    });
-  };
-
-  const updateText = (id: number, text: string) => {
-    if (isPanningEnabled) {
-      return;
+      height = Math.max(MIN_HEIGHT, Math.ceil(textarea.scrollHeight));
     }
 
     setNodes((prev) =>
       prev.map((node) =>
-        node.id === id
-          ? {
-              ...node,
-              text,
-            }
-          : node,
+        node.id === id ? { ...node, text, width, height } : node,
       ),
     );
   };
 
-  const getChildren = (nodeId: number): number[] => {
-    return edges
-      .filter((edge) => edge.type === "child" && edge.source === nodeId)
-      .map((edge) => edge.target);
+  // Measure the height needed to display all text at a specific width.
+  const getRequiredHeight = (text: string, width: number, id: number) => {
+    const textarea = textareaRefs.current[id];
+
+    if (!textarea || !text) return MIN_HEIGHT;
+
+    const clone = textarea.cloneNode(true) as HTMLTextAreaElement;
+    const computed = window.getComputedStyle(textarea);
+
+    clone.value = text;
+    clone.style.position = "fixed";
+    clone.style.left = "-10000px";
+    clone.style.top = "0";
+    clone.style.visibility = "hidden";
+    clone.style.pointerEvents = "none";
+    clone.style.width = `${width}px`;
+    clone.style.height = "auto";
+    clone.style.minHeight = "0";
+    clone.style.maxHeight = "none";
+    clone.style.overflow = "hidden";
+    clone.style.boxSizing = "border-box";
+    clone.style.font = computed.font;
+    clone.style.letterSpacing = computed.letterSpacing;
+    clone.style.lineHeight = computed.lineHeight;
+    clone.style.padding = computed.padding;
+    clone.style.border = computed.border;
+    clone.style.whiteSpace = "pre-wrap";
+    clone.style.overflowWrap = "anywhere";
+
+    document.body.appendChild(clone);
+
+    const requiredHeight = Math.ceil(clone.scrollHeight);
+
+    clone.remove();
+
+    return Math.max(MIN_HEIGHT, requiredHeight);
   };
 
-  const toggleNodeCompletion = (nodeId: number) => {
-    if (isPanningEnabled) {
-      return;
-    }
-
-    setNodes((prevNodes) => {
-      // First toggle the clicked leaf node
-      const updatedNodes = prevNodes.map((node) =>
-        node.id === nodeId
-          ? {
-              ...node,
-              completed: !node.completed,
-            }
-          : node,
-      );
-
-      const nodeMap = new Map(updatedNodes.map((node) => [node.id, node]));
-
-      // Calculate completion recursively
-      const getCompletion = (
-        currentId: number,
-        visited = new Set<number>(),
-      ): boolean => {
-        if (visited.has(currentId)) {
-          return false;
-        }
-
-        visited.add(currentId);
-
-        const children = getChildren(currentId);
-
-        // Leaf node → use its own completion state
-        if (children.length === 0) {
-          return nodeMap.get(currentId)?.completed ?? false;
-        }
-
-        // Parent → completed only when ALL children are completed
-        return children.every((childId) =>
-          getCompletion(childId, new Set(visited)),
-        );
-      };
-
-      // Recalculate completion for every node
-      return updatedNodes.map((node) => ({
-        ...node,
-        completed: getCompletion(node.id),
-      }));
-    });
-  };
-
-  const getChildDescendants = (nodeId: number): number[] => {
-    const children = getChildren(nodeId);
-
-    let descendants = [...children];
-
-    children.forEach((childId) => {
-      descendants = [...descendants, ...getChildDescendants(childId)];
-    });
-
-    return descendants;
-  };
-
-  // const getAllDescendants = (nodeId: number): number[] => {
-  //   const descendants: number[] = [];
-  //   const visited = new Set<number>();
-
-  //   const traverse = (currentId: number) => {
-  //     edges.forEach((edge) => {
-  //       if (edge.source === currentId && !visited.has(edge.target)) {
-  //         visited.add(edge.target);
-  //         descendants.push(edge.target);
-
-  //         traverse(edge.target);
-  //       }
-  //     });
-  //   };
-
-  //   traverse(nodeId);
-
-  //   return descendants;
-  // };
-
-  const getDeleteDescendants = (nodeId: number): number[] => {
-    const result: number[] = [];
-    const visited = new Set<number>();
-
-    // Start ONLY with child nodes
-    const childNodes = getChildren(nodeId);
-
-    const traverse = (currentId: number) => {
-      edges.forEach((edge) => {
-        if (edge.source === currentId && !visited.has(edge.target)) {
-          visited.add(edge.target);
-          result.push(edge.target);
-
-          // Once we're inside the child branch,
-          // follow both child and linked edges.
-          traverse(edge.target);
-        }
-      });
-    };
-
-    childNodes.forEach((childId) => {
-      if (!visited.has(childId)) {
-        visited.add(childId);
-        result.push(childId);
-
-        traverse(childId);
-      }
-    });
-
-    return result;
-  };
-
-  const deleteNode = (nodeId: number) => {
-    if (isPanningEnabled) {
-      return;
-    }
-
-    const descendants = getDeleteDescendants(nodeId);
-    const nodesToDelete = new Set<number>([nodeId, ...descendants]);
-
-    // Remove nodes
-    setNodes((prev) => prev.filter((node) => !nodesToDelete.has(node.id)));
-
-    // Remove related edges
-    setEdges((prev) =>
-      prev.filter(
-        (edge) =>
-          !nodesToDelete.has(edge.source) && !nodesToDelete.has(edge.target),
-      ),
-    );
-
-    // Remove collapsed state
-    setCollapsedNodes((prev) => {
-      const next = new Set(prev);
-
-      nodesToDelete.forEach((id) => {
-        next.delete(id);
-      });
-
-      return next;
-    });
-  };
-
-  const toggleCollapse = (nodeId: number) => {
-    if (isPanningEnabled) {
-      return;
-    }
-
-    setCollapsedNodes((prev) => {
-      const next = new Set(prev);
-
-      if (next.has(nodeId)) {
-        // Expand this node
-        next.delete(nodeId);
-      } else {
-        // Collapse this node
-        next.add(nodeId);
-      }
-
-      return next;
-    });
-  };
-
-  const getBranchDescendants = (nodeId: number): number[] => {
-    const result: number[] = [];
-    const visited = new Set<number>();
-
-    const traverse = (currentId: number) => {
-      edges.forEach((edge) => {
-        if (edge.source === currentId && !visited.has(edge.target)) {
-          visited.add(edge.target);
-          result.push(edge.target);
-
-          traverse(edge.target);
-        }
-      });
-    };
-
-    traverse(nodeId);
-
-    return result;
-  };
-
-  const isNodeHidden = (nodeId: number): boolean => {
-    for (const collapsedId of collapsedNodes) {
-      const children = getChildren(collapsedId);
-
-      for (const childId of children) {
-        if (nodeId === childId) {
-          return true;
-        }
-
-        const descendants = getBranchDescendants(childId);
-
-        if (descendants.includes(nodeId)) {
-          return true;
-        }
-      }
-    }
-
-    return false;
-  };
-
-  const handleDragStart = (
-    e: React.PointerEvent<HTMLButtonElement>,
+  const startResize = (
+    event: ReactPointerEvent<HTMLDivElement>,
     node: NodeI,
+    handle: Handle,
   ) => {
-    if (isPanningEnabled) {
-      return;
-    }
+    event.preventDefault();
+    event.stopPropagation();
 
-    e.stopPropagation();
+    setActiveNodeId(node.id);
 
-    setDragging({
-      id: node.id,
-      offsetX: e.clientX - node.x,
-      offsetY: e.clientY - node.y,
-    });
+    const startWidth = node.width ?? INITIAL_WIDTH;
+    const startHeight = node.height ?? INITIAL_HEIGHT;
 
-    e.currentTarget.setPointerCapture(e.pointerId);
-  };
+    // Calculate text constraints once at the start, not on every move.
+    const minWidth = MIN_WIDTH;
+    const minHeight = getRequiredHeight(node.text, startWidth, node.id);
 
-  const handleCanvasPointerDown = (e: React.PointerEvent<HTMLDivElement>) => {
-    if (!isPanningEnabled) {
-      return;
-    }
-
-    if ((e.target as HTMLElement).closest("button")) {
-      return;
-    }
-
-    setPanStart({
-      startX: e.clientX,
-      startY: e.clientY,
-      initialPanX: pan.x,
-      initialPanY: pan.y,
-    });
-
-    e.currentTarget.setPointerCapture(e.pointerId);
-  };
-
-  const handlePointerMove = (e: React.PointerEvent<HTMLDivElement>) => {
-    if (isPanningEnabled && panStart) {
-      const deltaX = e.clientX - panStart.startX;
-
-      const deltaY = e.clientY - panStart.startY;
-
-      setPan({
-        x: panStart.initialPanX + deltaX,
-        y: panStart.initialPanY + deltaY,
-      });
-
-      return;
-    }
-
-    if (!isPanningEnabled && dragging) {
-      setNodes((prev) =>
-        prev.map((node) =>
-          node.id === dragging.id
-            ? {
-                ...node,
-                x: e.clientX - dragging.offsetX,
-                y: e.clientY - dragging.offsetY,
-              }
-            : node,
-        ),
-      );
-    }
-  };
-
-  const handlePointerUp = () => {
-    setDragging(null);
-    setPanStart(null);
-  };
-
-  const togglePanning = () => {
-    setIsPanningEnabled((prev) => !prev);
-    // Stop any active node drag
-    setDragging(null);
-    // Stop any active pan
-    setPanStart(null);
-  };
-
-  const getEdgeCoordinates = (
-    source: NodeI,
-    target: NodeI,
-    type: EdgeType,
-  ): EdgeCoordinatesI => {
-    if (type === "child") {
-      return {
-        startX: source.x + NODE_WIDTH,
-        startY: source.y + NODE_HEIGHT / 2,
-        endX: target.x,
-        endY: target.y + NODE_HEIGHT / 2,
-      };
-    }
-
-    return {
-      startX: source.x + NODE_WIDTH / 2,
-      startY: source.y + NODE_HEIGHT,
-      endX: target.x + NODE_WIDTH / 2,
-      endY: target.y,
+    resizeRef.current = {
+      pointerId: event.pointerId,
+      nodeId: node.id,
+      handle,
+      startX: event.clientX,
+      startY: event.clientY,
+      startWidth,
+      startHeight,
+      startLeft: node.x,
+      startTop: node.y,
+      minWidth,
+      minHeight,
     };
+
+    event.currentTarget.setPointerCapture(event.pointerId);
   };
 
-  const createPath = (coordinates: EdgeCoordinatesI, type: EdgeType) => {
-    const { startX, startY, endX, endY } = coordinates;
+  const resizeNode = (event: ReactPointerEvent<HTMLDivElement>) => {
+    const session = resizeRef.current;
 
-    if (type === "child") {
-      const controlOffset = Math.max(80, Math.abs(endX - startX) / 2);
+    if (!session || session.pointerId !== event.pointerId) return;
 
-      return `
-        M ${startX} ${startY}
+    event.preventDefault();
 
-        C
-        ${startX + controlOffset}
-        ${startY},
+    const {
+      nodeId,
+      handle,
+      startX,
+      startY,
+      startWidth,
+      startHeight,
+      startLeft,
+      startTop,
+      minWidth,
+      minHeight,
+    } = session;
 
-        ${endX - controlOffset}
-        ${endY},
+    const dx = event.clientX - startX;
+    const dy = event.clientY - startY;
 
-        ${endX}
-        ${endY}
-      `;
+    let width = startWidth;
+    let height = startHeight;
+    let x = startLeft;
+    let y = startTop;
+
+    if (handle.includes("e")) {
+      width = Math.max(minWidth, startWidth + dx);
     }
 
-    const verticalOffset = Math.max(60, Math.abs(endY - startY) / 2);
+    if (handle.includes("w")) {
+      width = Math.max(minWidth, startWidth - dx);
+      x = startLeft + startWidth - width;
+    }
 
-    return `
-      M ${startX} ${startY}
+    if (handle.includes("s")) {
+      height = Math.max(minHeight, startHeight + dy);
+    }
 
-      C
-      ${startX}
-      ${startY + verticalOffset},
+    if (handle.includes("n")) {
+      height = Math.max(minHeight, startHeight - dy);
+      y = startTop + startHeight - height;
+    }
 
-      ${endX}
-      ${endY - verticalOffset},
+    // Keep the opposite edge anchored for top/left handles.
+    if (handle.includes("n")) {
+      y = startTop + startHeight - height;
+    }
 
-      ${endX}
-      ${endY}
-    `;
+    if (handle.includes("w")) {
+      x = startLeft + startWidth - width;
+    }
+
+    setNodes((prev) =>
+      prev.map((node) =>
+        node.id === nodeId ? { ...node, x, y, width, height } : node,
+      ),
+    );
+  };
+
+  const endResize = (event: ReactPointerEvent<HTMLDivElement>) => {
+    if (resizeRef.current?.pointerId !== event.pointerId) return;
+
+    resizeRef.current = null;
+
+    if (event.currentTarget.hasPointerCapture(event.pointerId)) {
+      event.currentTarget.releasePointerCapture(event.pointerId);
+    }
+  };
+
+  const startMove = (event: ReactPointerEvent<HTMLDivElement>, node: NodeI) => {
+    event.preventDefault();
+    event.stopPropagation();
+
+    setActiveNodeId(node.id);
+
+    moveRef.current = {
+      pointerId: event.pointerId,
+      nodeId: node.id,
+      startX: event.clientX,
+      startY: event.clientY,
+      startLeft: node.x,
+      startTop: node.y,
+    };
+
+    event.currentTarget.setPointerCapture(event.pointerId);
+  };
+
+  const moveNode = (event: ReactPointerEvent<HTMLDivElement>) => {
+    const session = moveRef.current;
+
+    if (!session || session.pointerId !== event.pointerId) return;
+
+    event.preventDefault();
+
+    const dx = event.clientX - session.startX;
+    const dy = event.clientY - session.startY;
+
+    setNodes((prev) =>
+      prev.map((node) =>
+        node.id === session.nodeId
+          ? {
+              ...node,
+              x: session.startLeft + dx,
+              y: session.startTop + dy,
+            }
+          : node,
+      ),
+    );
+  };
+
+  const endMove = (event: ReactPointerEvent<HTMLDivElement>) => {
+    if (moveRef.current?.pointerId !== event.pointerId) return;
+
+    moveRef.current = null;
+
+    if (event.currentTarget.hasPointerCapture(event.pointerId)) {
+      event.currentTarget.releasePointerCapture(event.pointerId);
+    }
+  };
+
+  const addConnectedNode = (source: NodeI, direction: Direction) => {
+    const id = nextId.current++;
+    const width = INITIAL_WIDTH;
+    const height = INITIAL_HEIGHT;
+    const gap = 90;
+
+    let x = source.x;
+    let y = source.y;
+
+    switch (direction) {
+      case "top":
+        x = source.x;
+        y = source.y - height - gap;
+        break;
+
+      case "bottom":
+        x = source.x;
+        y = source.y + (source.height ?? INITIAL_HEIGHT) + gap;
+        break;
+
+      case "left":
+        x = source.x - width - gap;
+        y = source.y;
+        break;
+
+      case "right":
+        x = source.x + (source.width ?? INITIAL_WIDTH) + gap;
+        y = source.y;
+        break;
+    }
+
+    const newNode: NodeI = {
+      id,
+      text: "",
+      x,
+      y,
+      width,
+      height,
+      completed: false,
+    };
+
+    setNodes((prev) => [...prev, newNode]);
+
+    setEdges((prev) => [
+      ...prev,
+      {
+        id: `${source.id}-${id}`,
+        from: source.id,
+        to: id,
+        direction,
+      },
+    ]);
+
+    setActiveNodeId(id);
   };
 
   return (
     <div
-      className={` relative w-full h-screen overflow-hidden select-none ${isPanningEnabled ? "cursor-grab" : ""} ${panStart ? "cursor-grabbing" : ""} `}
-      onPointerDown={handleCanvasPointerDown}
-      onPointerMove={handlePointerMove}
-      onPointerUp={handlePointerUp}
-      onPointerLeave={handlePointerUp}
+      className="relative h-screen w-full overflow-auto rounded-xl border border-[#303341] bg-[#171821] text-gray-100"
+      onPointerDown={(event) => {
+        if (event.target === event.currentTarget) {
+          setActiveNodeId(null);
+        }
+      }}
+      style={{
+        backgroundImage:
+          "radial-gradient(circle, #383a49 1px, transparent 1px)",
+        backgroundSize: "22px 22px",
+      }}
     >
-      {/* ================================================= */}
-      {/* PAN TOGGLE                                        */}
-      {/* ================================================= */}
+      {/* Hidden text measurement element */}
+      <span
+        ref={measureRef}
+        className="pointer-events-none invisible absolute left-0 top-0 whitespace-pre text-xs"
+        aria-hidden="true"
+      />
 
-      <button
-        type="button"
-        onClick={(e) => {
-          e.stopPropagation();
-          togglePanning();
-        }}
-        className={` absolute top-4 ${nodes.length > 0 ? "left-16" : "left-44"} z-50 w-9 h-9 rounded-lg flex items-center justify-center border shadow-lg transition-colors ${isPanningEnabled ? `text-indigo-400 border-indigo-400/20 bg-indigo-500/10` : ` bg-neutral-900 text-neutral-400 border-neutral-700 hover:text-white `} `}
-        title={isPanningEnabled ? "Disable panning" : "Enable panning"}
-      >
-        <FaHandPaper size={15} />
-      </button>
+      <svg className="pointer-events-none absolute inset-0 h-full w-full overflow-visible">
+        <defs>
+          <marker
+            id="canvas-arrowhead"
+            markerWidth="8"
+            markerHeight="8"
+            refX="6"
+            refY="3"
+            orient="auto"
+            markerUnits="userSpaceOnUse"
+          >
+            <path d="M0,0 L6,3 L0,6 Z" fill="#818cf8" />
+          </marker>
+        </defs>
 
-      {/* ================================================= */}
-      {/* CANVAS CONTENT                                    */}
-      {/* ================================================= */}
+        {edges.map((edge) => {
+          const from = nodes.find((node) => node.id === edge.from);
+          const to = nodes.find((node) => node.id === edge.to);
 
-      <div
-        className="absolute inset-0"
-        style={{
-          transform: `translate(${pan.x}px, ${pan.y}px)`,
-        }}
-      >
-        {/* ================================================= */}
-        {/* EDGES                                             */}
-        {/* ================================================= */}
+          if (!from || !to) return null;
 
-        <svg className=" absolute left-0 top-0 w-full h-full pointer-events-none overflow-visible ">
-          <AnimatePresence>
-            {edges.map((edge) => {
-              const source = nodes.find((node) => node.id === edge.source);
-              const target = nodes.find((node) => node.id === edge.target);
+          const fw = from.width ?? INITIAL_WIDTH;
+          const fh = from.height ?? INITIAL_HEIGHT;
+          const tw = to.width ?? INITIAL_WIDTH;
+          const th = to.height ?? INITIAL_HEIGHT;
 
-              if (!source || !target) {
-                return null;
-              }
+          let sx = from.x + fw / 2;
+          let sy = from.y + fh / 2;
+          let ex = to.x + tw / 2;
+          let ey = to.y + th / 2;
 
-              if (isNodeHidden(source.id) || isNodeHidden(target.id)) {
-                return null;
-              }
+          let d = "";
 
-              const coordinates = getEdgeCoordinates(source, target, edge.type);
-              const path = createPath(coordinates, edge.type);
-              const isChildEdge = edge.type === "child";
+          if (edge.direction === "right") {
+            sx = from.x + fw;
+            sy = from.y + fh / 2;
+            ex = to.x;
+            ey = to.y + th / 2;
 
-              return (
-                <motion.path
-                  key={edge.id}
-                  d={path}
-                  fill="none"
-                  stroke="white"
-                  strokeWidth={isChildEdge ? 2 : 1.5}
-                  strokeOpacity={isChildEdge ? 0.65 : 0.3}
-                  initial={{
-                    pathLength: 0,
-                    opacity: 0,
-                  }}
-                  animate={{
-                    pathLength: 1,
-                    opacity: 1,
-                  }}
-                  exit={{
-                    opacity: 0,
-                  }}
-                  transition={{
-                    duration: 0.3,
-                  }}
-                />
-              );
-            })}
-          </AnimatePresence>
-        </svg>
+            const curve = Math.max(35, Math.abs(ex - sx) * 0.45);
+            d = `M ${sx} ${sy} C ${sx + curve} ${sy}, ${ex - curve} ${ey}, ${ex} ${ey}`;
+          } else if (edge.direction === "left") {
+            sx = from.x;
+            sy = from.y + fh / 2;
+            ex = to.x + tw;
+            ey = to.y + th / 2;
 
-        {/* ================================================= */}
-        {/* NODES                                             */}
-        {/* ================================================= */}
+            const curve = Math.max(35, Math.abs(sx - ex) * 0.45);
+            d = `M ${sx} ${sy} C ${sx - curve} ${sy}, ${ex + curve} ${ey}, ${ex} ${ey}`;
+          } else if (edge.direction === "bottom") {
+            sx = from.x + fw / 2;
+            sy = from.y + fh;
+            ex = to.x + tw / 2;
+            ey = to.y;
 
-        <AnimatePresence>
-          {nodes.map((node) => {
-            if (isNodeHidden(node.id)) {
-              return null;
-            }
+            const curve = Math.max(35, Math.abs(ey - sy) * 0.45);
+            d = `M ${sx} ${sy} C ${sx} ${sy + curve}, ${ex} ${ey - curve}, ${ex} ${ey}`;
+          } else {
+            sx = from.x + fw / 2;
+            sy = from.y;
+            ex = to.x + tw / 2;
+            ey = to.y + th;
 
-            const children = getChildren(node.id);
-            const hasChildren = children.length > 0;
-            const isCollapsed = collapsedNodes.has(node.id);
+            const curve = Math.max(35, Math.abs(sy - ey) * 0.45);
+            d = `M ${sx} ${sy} C ${sx} ${sy - curve}, ${ex} ${ey + curve}, ${ex} ${ey}`;
+          }
 
-            return (
-              <motion.div
-                key={node.id}
-                className="absolute"
+          return (
+            <motion.path
+              key={edge.id}
+              d={d}
+              fill="none"
+              stroke="#818cf8"
+              strokeWidth={2}
+              strokeLinecap="round"
+              markerEnd="url(#canvas-arrowhead)"
+              initial={{ pathLength: 0, opacity: 0 }}
+              animate={{ pathLength: 1, opacity: 1 }}
+              transition={{
+                pathLength: { duration: 0.45, ease: "easeInOut" },
+                opacity: { duration: 0.2 },
+              }}
+            />
+          );
+        })}
+      </svg>
+
+      {nodes.map((node) => {
+        const isActive = activeNodeId === node.id;
+        return (
+          <motion.div
+            key={node.id}
+            initial={{ opacity: 0, scale: 0.9 }}
+            animate={{ opacity: 1, scale: 1 }}
+            transition={{ type: "spring", stiffness: 350, damping: 25 }}
+            onPointerDown={() => setActiveNodeId(node.id)}
+            className="absolute"
+            style={{
+              left: node.x,
+              top: node.y,
+            }}
+          >
+            <motion.div
+              className="rounded-md border border-[#414352] bg-[#20222c] shadow-lg transition-colors focus-within:border-indigo-400"
+              style={{
+                width: node.width ?? INITIAL_WIDTH,
+                minHeight: node.height ?? INITIAL_HEIGHT,
+              }}
+            >
+              <textarea
+                ref={(element) => {
+                  textareaRefs.current[node.id] = element;
+                }}
+                value={node.text}
+                onChange={(event) =>
+                  updateNodeText(node.id, event.target.value)
+                }
+                placeholder=""
+                aria-label="Node text"
+                rows={1}
+                className="block resize-none overflow-hidden bg-transparent p-2 text-xs leading-5 text-gray-100 outline-none placeholder:text-gray-500"
                 style={{
-                  left: node.x,
-                  top: node.y,
-                  width: NODE_WIDTH,
-                  height: NODE_HEIGHT,
+                  width: node.width ?? INITIAL_WIDTH,
+                  minHeight: node.height ?? INITIAL_HEIGHT,
+                  boxSizing: "border-box",
+                  overflowWrap: "anywhere",
                 }}
-                initial={{
-                  opacity: 0,
-                  scale: 0.8,
-                }}
-                animate={{
-                  opacity: 1,
-                  scale: 1,
-                }}
-                exit={{
-                  opacity: 0,
-                  scale: 0.8,
-                }}
-                transition={{
-                  type: "spring",
-                  stiffness: 400,
-                  damping: 25,
-                }}
-              >
-                {/* ======================================= */}
-                {/* NODE                                     */}
-                {/* ======================================= */}
+              />
 
-                <motion.div
-                  className={`group relative w-full h-full rounded-xl border shadow-xl transition-colors ${
-                    node.completed
-                      ? "border-emerald-400/40 bg-emerald-500/15"
-                      : "border-neutral-700 bg-neutral-900"
-                  }`}
-                  whileHover={{
-                    borderColor: node.completed ? "#34d399" : "#737373",
-                  }}
+              {isActive &&
+                handles.map((handle) => (
+                  <div
+                    key={handle}
+                    role="presentation"
+                    onPointerDown={(event) => startResize(event, node, handle)}
+                    onPointerMove={resizeNode}
+                    onPointerUp={endResize}
+                    onPointerCancel={endResize}
+                    className={`absolute ${handleClasses[handle]} ${
+                      handle.length === 1
+                        ? "rounded-sm"
+                        : "border border-[#171821]"
+                    } bg-indigo-400 opacity-90 shadow-sm hover:opacity-100`}
+                    style={{ touchAction: "none" }}
+                  />
+                ))}
+
+              {isActive && (
+                <div
+                  onPointerDown={(event) => startMove(event, node)}
+                  onPointerMove={moveNode}
+                  onPointerUp={endMove}
+                  onPointerCancel={endMove}
+                  className="absolute -right-10 top-14 z-20 flex h-6 w-6 -translate-x-1/2 -translate-y-1/2 cursor-grab items-center justify-center rounded-full border border-[#414352] bg-[#292c39] text-gray-300 shadow-md transition-colors hover:bg-[#363949] hover:text-white active:cursor-grabbing"
+                  style={{ touchAction: "none" }}
+                  title="Move node"
                 >
-                  {/* ===================================== */}
-                  {/* DRAG HANDLE                            */}
-                  {/* TOP LEFT                               */}
-                  {/* ===================================== */}
+                  <FiMove size={10} />
+                </div>
+              )}
 
+              {isActive && (
+                <>
+                  {/* Top */}
                   <button
                     type="button"
-                    disabled={isPanningEnabled}
-                    onPointerDown={(e) => handleDragStart(e, node)}
-                    className=" absolute top-2 left-2 w-6 h-6 rounded-md flex items-center justify-center text-neutral-500 hover:text-white hover:bg-neutral-800 cursor-grab active:cursor-grabbing transition-colors z-10 "
-                    aria-label="Drag node"
+                    title="Add node above"
+                    onPointerDown={(event) => event.stopPropagation()}
+                    onClick={(event) => {
+                      event.stopPropagation();
+                      addConnectedNode(node, "top");
+                    }}
+                    className="absolute left-1/2 top-0 z-30 flex h-6 w-6 -translate-x-1/2 -translate-y-[calc(100%+12px)] items-center justify-center rounded-full border border-[#414352] bg-[#292c39] transition-colors"
                   >
-                    <FiMove size={15} />
+                    <FaArrowUp size={10} />
                   </button>
 
-                  {/* ===================================== */}
-                  {/* COLLAPSE / EXPAND                      */}
-                  {/* TOP RIGHT                              */}
-                  {/* ===================================== */}
+                  {/* Bottom */}
+                  <button
+                    type="button"
+                    title="Add node below"
+                    onPointerDown={(event) => event.stopPropagation()}
+                    onClick={(event) => {
+                      event.stopPropagation();
+                      addConnectedNode(node, "bottom");
+                    }}
+                    className="absolute bottom-0 left-1/2 z-30 flex h-6 w-6 -translate-x-1/2 translate-y-[calc(100%+12px)] items-center justify-center rounded-full border border-[#414352] bg-[#292c39] transition-colors"
+                  >
+                    <FaArrowDown size={10} />
+                  </button>
 
-                  {hasChildren && (
-                    <motion.button
-                      type="button"
-                      disabled={isPanningEnabled}
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        toggleCollapse(node.id);
-                      }}
-                      className=" absolute top-2 right-2 w-6 h-6 rounded-md flex items-center justify-center text-neutral-500 hover:text-white hover:bg-neutral-800 transition-colors z-10 "
-                      whileHover={{
-                        scale: 1.1,
-                      }}
-                      whileTap={{
-                        scale: 0.9,
-                      }}
-                      aria-label={
-                        isCollapsed ? "Expand children" : "Collapse children"
-                      }
-                    >
-                      {isCollapsed ? (
-                        <FiChevronRight size={16} />
-                      ) : (
-                        <FiChevronDown size={16} />
-                      )}
-                    </motion.button>
-                  )}
-
-                  {/* ===================================== */}
-                  {/* TEXT + CHECKBOX                        */}
-                  {/* ===================================== */}
-
-                  <div className="flex h-full w-full items-start gap-2 p-4 pt-10 pr-4">
-                    {/* Checkbox ONLY for leaf nodes */}
-                    {!hasChildren && (
-                      <button
-                        type="button"
-                        disabled={isPanningEnabled}
-                        onClick={(e) => {
-                          e.stopPropagation();
-                          toggleNodeCompletion(node.id);
-                        }}
-                        className={`mt-0.5 flex h-4 w-4 shrink-0 items-center justify-center rounded border transition-colors ${
-                          node.completed
-                            ? "border-emerald-400 bg-emerald-500 text-white"
-                            : "border-neutral-600 bg-neutral-800 hover:border-emerald-400"
-                        }`}
-                        aria-label={
-                          node.completed
-                            ? "Mark task as incomplete"
-                            : "Mark task as complete"
-                        }
-                      >
-                        {node.completed && (
-                          <span className="text-[10px] font-bold">✓</span>
-                        )}
-                      </button>
-                    )}
-
-                    <textarea
-                      value={node.text}
-                      disabled={isPanningEnabled}
-                      onChange={(e) => updateText(node.id, e.target.value)}
-                      className={`h-full min-w-0 flex-1 resize-none bg-transparent text-[12px] outline-none hide-scrollbar ${
-                        node.completed ? "text-emerald-100" : "text-white"
-                      }`}
-                      placeholder="Write something"
-                    />
-                  </div>
+                  {/* Left */}
+                  <button
+                    type="button"
+                    title="Add node to the left"
+                    onPointerDown={(event) => event.stopPropagation()}
+                    onClick={(event) => {
+                      event.stopPropagation();
+                      addConnectedNode(node, "left");
+                    }}
+                    className="absolute left-0 top-1/2 z-30 flex h-6 w-6 -translate-x-[calc(100%+12px)] -translate-y-1/2 items-center justify-center rounded-full border border-[#414352] bg-[#292c39] transition-colors"
+                  >
+                    <FaArrowLeft size={10} />
+                  </button>
 
                   {/* Right */}
-                  <motion.button
+                  <button
                     type="button"
-                    disabled={isPanningEnabled}
-                    className=" absolute right-0 top-1/2 translate-x-1/2 -translate-y-1/2 w-4 h-4 rounded-full bg-indigo-500 text-white flex items-center justify-center text-lg font-medium opacity-0 pointer-events-none group-hover:opacity-100 group-hover:pointer-events-auto shadow-lg z-20 "
-                    whileHover={{
-                      scale: 1.15,
+                    title="Add node to the right"
+                    onPointerDown={(event) => event.stopPropagation()}
+                    onClick={(event) => {
+                      event.stopPropagation();
+                      addConnectedNode(node, "right");
                     }}
-                    whileTap={{
-                      scale: 0.9,
-                    }}
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      createChildNode(node);
-                    }}
+                    className="absolute right-0 top-1/2 z-30 flex h-6 w-6 translate-x-[calc(100%+12px)] -translate-y-1/2 items-center justify-center rounded-full border border-[#414352] bg-[#292c39] transition-colors"
                   >
-                    +
-                  </motion.button>
-
-                  {/* Bottom */}
-                  <motion.button
-                    type="button"
-                    disabled={isPanningEnabled}
-                    className=" absolute bottom-0 left-1/2 translate-y-1/2 -translate-x-1/2 w-4 h-4 rounded-full bg-indigo-500 text-white flex items-center justify-center text-lg font-medium opacity-0 pointer-events-none group-hover:opacity-100 group-hover:pointer-events-auto shadow-lg z-20 "
-                    whileHover={{
-                      scale: 1.15,
-                    }}
-                    whileTap={{
-                      scale: 0.9,
-                    }}
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      createLinkedNode(node);
-                    }}
-                  >
-                    +
-                  </motion.button>
-
-                  {/* ===================================== */}
-                  {/* DELETE                                  */}
-                  {/* BOTTOM RIGHT                            */}
-                  {/* ===================================== */}
-
-                  <motion.button
-                    type="button"
-                    disabled={isPanningEnabled}
-                    className=" absolute bottom-2 right-2 w-6 h-6 rounded-md flex items-center justify-center text-neutral-500 hover:text-red-400 hover:bg-neutral-800 transition-colors opacity-0 pointer-events-none group-hover:opacity-100 group-hover:pointer-events-auto z-20 "
-                    whileHover={{
-                      scale: 1.1,
-                    }}
-                    whileTap={{
-                      scale: 0.9,
-                    }}
-                    onClick={(e) => {
-                      e.stopPropagation();
-
-                      deleteNode(node.id);
-                    }}
-                    aria-label="Delete node"
-                  >
-                    <FiTrash2 size={15} />
-                  </motion.button>
-                </motion.div>
-              </motion.div>
-            );
-          })}
-        </AnimatePresence>
-      </div>
+                    <FaArrowRight size={10} />
+                  </button>
+                </>
+              )}
+            </motion.div>
+          </motion.div>
+        );
+      })}
     </div>
   );
 };
