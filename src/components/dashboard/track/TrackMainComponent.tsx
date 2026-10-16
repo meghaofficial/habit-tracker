@@ -160,7 +160,7 @@ const TrackMainComponent = ({
                   {Math.round(
                     ((getTodayProgress().count || 0) /
                       (taskList?.length || 1)) *
-                      100,
+                    100,
                   )}
                   %
                 </span>
@@ -179,11 +179,10 @@ const TrackMainComponent = ({
                 <div
                   className="h-full rounded-full bg-violet-500"
                   style={{
-                    width: `${
-                      taskList?.length
+                    width: `${taskList?.length
                         ? (getTodayProgress().count / taskList.length) * 100
                         : 0
-                    }%`,
+                      }%`,
                   }}
                 />
               </div>
@@ -198,7 +197,7 @@ const TrackMainComponent = ({
                   {Math.round(
                     ((progress?.overallProgress?.count || 0) /
                       (progress?.overallProgress?.total || 1)) *
-                      100,
+                    100,
                   )}
                   %
                 </span>
@@ -217,13 +216,12 @@ const TrackMainComponent = ({
                 <div
                   className="h-full rounded-full bg-emerald-500"
                   style={{
-                    width: `${
-                      progress?.overallProgress?.total
+                    width: `${progress?.overallProgress?.total
                         ? (progress.overallProgress.count /
-                            progress.overallProgress.total) *
-                          100
+                          progress.overallProgress.total) *
+                        100
                         : 0
-                    }%`,
+                      }%`,
                   }}
                 />
               </div>
@@ -248,7 +246,7 @@ const TrackMainComponent = ({
             monthStatus={activeMonth?.status}
             progress={progress}
             setProgress={setProgress}
-            taskList={taskList}
+            taskList={orderedTaskList}
             logsLoading={dateLogsData.isPending}
             dateLogs={dateLogs}
           />

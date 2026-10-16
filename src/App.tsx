@@ -123,11 +123,28 @@ function App() {
               <div className="text-darkText light:text-lightText">
                 <ToastContainer position="top-right" autoClose={3000} />
                 <Routes>
-                  <Route
+                  {/* <Route
                     path="/"
                     element={isLogin ? <Dashboard /> : <HomePage />}
+                  /> */}
+                  <Route
+                    path="/"
+                    element={<Navigate to="/monthly-habit" replace />}
                   />
-                  {/* <Route path="/reviews" element={<Reviews />} /> */}
+                  {[
+                    "/monthly-habit",
+                    "/analysis",
+                    "/calendar",
+                    "/history",
+                    "/roadmap",
+                    "/roadmap/:name",
+                  ].map((path) => (
+                    <Route
+                      key={path}
+                      path={path}
+                      element={isLogin ? <Dashboard /> : <HomePage />}
+                    />
+                  ))}
                   <Route
                     path="/settings"
                     element={

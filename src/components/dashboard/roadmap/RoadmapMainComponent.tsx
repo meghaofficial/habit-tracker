@@ -1,24 +1,18 @@
-import RoadmapsList from "./RoadmapsList";
 import { useState } from "react";
-import RoadmapPage from "./RoadmapPage";
-import RoadmapsPage from "./RoadmapsPage";
-import { useNavigate } from "react-router-dom";
+import RoadmapList from "./RoadmapList";
+import RoadmapCreation from "./RoadmapCreation";
 
 const RoadmapMainComponent = () => {
-  const [openRoadmap, setOpenRoadmap] = useState(false);
-  const navigate = useNavigate();
+  const [currentView, setCurrentView] = useState<"list" | "create">("list");
 
   return (
-    <>
-      {/* {openRoadmap ? (
-        <RoadmapPage setOpenRoadmap={setOpenRoadmap} />
+    <div className="w-full">
+      {currentView === "create" ? (
+        <RoadmapCreation onBack={() => setCurrentView("list")} />
       ) : (
-        <RoadmapsList setOpenRoadmap={setOpenRoadmap} />
-      )} */}
-
-      {/* <RoadmapsPage /> */}
-      <RoadmapsList />
-    </>
+        <RoadmapList onAddNewRoadmap={() => setCurrentView("create")} />
+      )}
+    </div>
   );
 };
 
