@@ -14,8 +14,6 @@ import type { RoadmapData, RoadmapNode } from "./types";
 
 export type ViewRoadmapProps = {
   roadmap: RoadmapData;
-  breadcrumbs: { id: string; title: string }[];
-  onNavigateBreadcrumb: (index: number) => void;
   onOpenNestedRoadmap: (nodeId: string) => void;
   onToggleNodeComplete?: (nodeId: string) => void;
   onToggleTaskComplete?: (nodeId: string, taskId: string) => void;
@@ -23,8 +21,6 @@ export type ViewRoadmapProps = {
 
 export default function ViewRoadmap({
   roadmap,
-  breadcrumbs,
-  onNavigateBreadcrumb,
   onOpenNestedRoadmap,
   onToggleNodeComplete,
   onToggleTaskComplete,
@@ -87,14 +83,14 @@ export default function ViewRoadmap({
     return result;
   }, [roadmap.nodes]);
 
-  const fullDisplayTitle = breadcrumbs
-    .map((b) => b.title || "Untitled")
-    .join(" / ");
+  // const fullDisplayTitle = breadcrumbs
+  //   .map((b) => b.title || "Untitled")
+  //   .join(" / ");
 
   return (
-    <div className="flex h-full flex-col overflow-y-auto rounded-2xl border border-white/10 bg-[#121212] p-4 sm:p-6 shadow-sm">
+    <div>
       {/* Breadcrumb Bar */}
-      <div className="flex flex-wrap items-center gap-1.5 pb-3 text-xs text-gray-400 border-b border-white/[0.08]">
+      {/* <div className="flex flex-wrap items-center gap-1.5 pb-3 text-xs text-gray-400 border-b border-white/8">
         {breadcrumbs.map((crumb, idx) => {
           const isLast = idx === breadcrumbs.length - 1;
           return (
@@ -114,7 +110,7 @@ export default function ViewRoadmap({
             </React.Fragment>
           );
         })}
-      </div>
+      </div> */}
 
       {/* Header Preview Info */}
       <div className="mt-4 flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
@@ -145,7 +141,7 @@ export default function ViewRoadmap({
         </div>
 
         {/* Overall progress indicator */}
-        <div className="rounded-xl border border-white/[0.08] bg-[#171717] px-3.5 py-2.5 shrink-0 min-w-[160px]">
+        <div className="rounded-xl border border-white/8 bg-[#171717] px-3.5 py-2.5 shrink-0 min-w-[160px]40">
           <div className="flex items-center justify-between text-[11px]">
             <span className="text-gray-400 font-medium">Progress</span>
             <span className="font-bold text-emerald-400">
@@ -153,7 +149,7 @@ export default function ViewRoadmap({
             </span>
           </div>
 
-          <div className="mt-1.5 h-1.5 overflow-hidden rounded-full bg-white/[0.08]">
+          <div className="mt-1.5 h-1.5 overflow-hidden rounded-full bg-white/8">
             <div
               className="h-full rounded-full bg-emerald-400 transition-all duration-300"
               style={{ width: `${stats.percentage}%` }}
@@ -271,7 +267,7 @@ export default function ViewRoadmap({
                       return (
                         <article
                           key={node.id}
-                          className="group relative flex flex-col justify-between overflow-hidden rounded-xl border border-white/[0.12] bg-[#191919] p-3 transition duration-200 hover:border-white/25 hover:bg-[#1d1d1d] shadow-sm"
+                          className="group relative flex flex-col justify-between overflow-hidden rounded-xl border border-white/12 bg-[#191919] p-3 transition duration-200 hover:border-white/25 hover:bg-[#1d1d1d] shadow-sm"
                           style={{
                             borderLeftColor: node.color,
                             borderLeftWidth: "3px",
@@ -455,7 +451,7 @@ export default function ViewRoadmap({
                           </div>
 
                           {/* Card Bottom: Progress bar */}
-                          <div className="mt-4 pt-2 border-t border-white/[0.06]">
+                          <div className="mt-4 pt-2 border-t border-white/6">
                             <div className="flex items-center justify-between text-[10px] text-gray-400">
                               <span>
                                 {isNodeDone ? (
@@ -474,7 +470,7 @@ export default function ViewRoadmap({
                               </span>
                             </div>
 
-                            <div className="mt-1 h-[3px] overflow-hidden rounded-full bg-white/[0.08]">
+                            <div className="mt-1 h-0.75 overflow-hidden rounded-full bg-white/8">
                               <div
                                 className="h-full rounded-full transition-all duration-300"
                                 style={{
@@ -494,7 +490,7 @@ export default function ViewRoadmap({
                     <div className="my-3 flex items-center justify-between px-2">
                       {isEvenRow ? (
                         <>
-                          <div className="h-0.5 flex-1 bg-gradient-to-r from-transparent via-white/10 to-transparent" />
+                          <div className="h-0.5 flex-1 bg-linear-to-r from-transparent via-white/10 to-transparent" />
                           <div className="flex items-center gap-1.5 text-xs text-gray-400 bg-[#161616] px-3 py-1 rounded-full border border-white/10 shadow-sm">
                             <span>Turn Down &amp; Reverse (Right to Left)</span>
                             <CornerDownLeft
@@ -512,7 +508,7 @@ export default function ViewRoadmap({
                             />
                             <span>Turn Down (Left to Right)</span>
                           </div>
-                          <div className="h-0.5 flex-1 bg-gradient-to-r from-transparent via-white/10 to-transparent" />
+                          <div className="h-0.5 flex-1 bg-linear-to-r from-transparent via-white/10 to-transparent" />
                         </>
                       )}
                     </div>

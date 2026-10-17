@@ -2,108 +2,21 @@ import React, { useCallback, useEffect, useRef, useState } from "react";
 import { ArrowLeft, GripVertical, Save, Sparkles } from "lucide-react";
 import CreateRoadmap from "./CreateRoadmap";
 import ViewRoadmap from "./ViewRoadmap";
-import type { RoadmapData, RoadmapNode } from "./types";
+import type { RoadmapData } from "./types";
+import { initialRootRoadmap } from "./testData";
 
 export type RoadmapCreationProps = {
   onBack: () => void;
   onSaveRoadmap?: (roadmap: RoadmapData) => void;
 };
 
-// Initial default roadmap template with sample nodes to make testing immediately interactive
-const initialRootRoadmap: RoadmapData = {
-  id: "roadmap-" + Date.now(),
-  title: "Modern Full-Stack Engineering",
-  category: "Software Development",
-  icon: "🚀",
-  color: "#6366f1",
-  description:
-    "End-to-end pathway covering web architecture, APIs, distributed persistence, and cloud deployment.",
-  nodes: [
-    {
-      id: "node-1",
-      title: "Core Web Fundamentals",
-      type: "single",
-      icon: "🌱",
-      color: "#10b981",
-      description: "Master HTTP/HTTPS, browser rendering, DNS resolution, and security headers.",
-      completed: true,
-    },
-    {
-      id: "node-2",
-      title: "State Management & React Architecture",
-      type: "sequential",
-      icon: "⚛️",
-      color: "#38bdf8",
-      tasks: [
-        { id: "t1", title: "Step 1: Component Lifecycle & Hooks", completed: true },
-        { id: "t2", title: "Step 2: Global Stores (Redux / Zustand)", completed: true },
-        { id: "t3", title: "Step 3: Server State & TanStack Query", completed: false },
-        { id: "t4", title: "Step 4: Performance Profiling & Memoization", completed: false },
-      ],
-    },
-    {
-      id: "node-3",
-      title: "Backend Services & Microservices",
-      type: "nested",
-      icon: "🏛️",
-      color: "#8b5cf6",
-      nestedRoadmap: {
-        id: "sub-1",
-        title: "Distributed Microservices & APIs",
-        category: "Backend Architecture",
-        icon: "🏛️",
-        color: "#8b5cf6",
-        description: "Deep dive into gRPC, message queues, API gateways, and concurrency.",
-        nodes: [
-          {
-            id: "sub-node-1",
-            title: "REST & gRPC Contracts",
-            type: "single",
-            icon: "📜",
-            color: "#8b5cf6",
-            completed: true,
-          },
-          {
-            id: "sub-node-2",
-            title: "Event-Driven Queues (Kafka / RabbitMQ)",
-            type: "sequential",
-            icon: "⚡",
-            color: "#ec4899",
-            tasks: [
-              { id: "sub-t1", title: "Step 1: Producer / Consumer Patterns", completed: true },
-              { id: "sub-t2", title: "Step 2: Dead Letter Queues & Retries", completed: false },
-            ],
-          },
-        ],
-      },
-    },
-    {
-      id: "node-4",
-      title: "SQL & Distributed Database Tuning",
-      type: "sequential",
-      icon: "🗄️",
-      color: "#f59e0b",
-      tasks: [
-        { id: "t4-1", title: "Step 1: Indexing & B-Trees", completed: true },
-        { id: "t4-2", title: "Step 2: ACID Transactions & Locks", completed: false },
-        { id: "t4-3", title: "Step 3: Sharding & Read Replicas", completed: false },
-      ],
-    },
-    {
-      id: "node-5",
-      title: "Observability & Tracing",
-      type: "single",
-      icon: "📊",
-      color: "#ec4899",
-      description: "Prometheus, Grafana, OpenTelemetry, and structured logging in production.",
-      completed: false,
-    },
-  ],
-};
-
-export default function RoadmapCreation({ onBack, onSaveRoadmap }: RoadmapCreationProps) {
+export default function RoadmapCreation({
+  onBack,
+  onSaveRoadmap,
+}: RoadmapCreationProps) {
   // Master roadmap tree state
-  const [rootRoadmap, setRootRoadmap] = useState<RoadmapData>(initialRootRoadmap);
+  const [rootRoadmap, setRootRoadmap] =
+    useState<RoadmapData>(initialRootRoadmap);
 
   // Navigation path for nested roadmaps (array of node IDs)
   // e.g. [] -> root, ["node-3"] -> nested under node-3
@@ -147,7 +60,7 @@ export default function RoadmapCreation({ onBack, onSaveRoadmap }: RoadmapCreati
     // Recursively update nested roadmap in tree
     const updateRecursive = (
       current: RoadmapData,
-      pathIndex: number
+      pathIndex: number,
     ): RoadmapData => {
       const targetNodeId = navigationPath[pathIndex];
       const newNodes = current.nodes.map((node) => {
@@ -207,7 +120,7 @@ export default function RoadmapCreation({ onBack, onSaveRoadmap }: RoadmapCreati
     const updatedNodes = activeRoadmap.nodes.map((n) => {
       if (n.id === nodeId && n.tasks) {
         const updatedTasks = n.tasks.map((t) =>
-          t.id === taskId ? { ...t, completed: !t.completed } : t
+          t.id === taskId ? { ...t, completed: !t.completed } : t,
         );
         return { ...n, tasks: updatedTasks };
       }
@@ -296,7 +209,8 @@ export default function RoadmapCreation({ onBack, onSaveRoadmap }: RoadmapCreati
                 </span>
               </div>
               <p className="text-[11px] text-gray-400">
-                Configure your roadmap on the left panel &bull; Drag divider to resize &bull; View horizontal zigzag path on the right
+                Configure your roadmap on the left panel &bull; Drag divider to
+                resize &bull; View horizontal zigzag path on the right
               </p>
             </div>
           </div>
@@ -352,7 +266,9 @@ export default function RoadmapCreation({ onBack, onSaveRoadmap }: RoadmapCreati
             aria-valuemax={75}
             tabIndex={0}
             className={`group relative z-10 hidden lg:flex w-2.5 items-center justify-center cursor-col-resize transition-colors duration-150 select-none ${
-              isDragging ? "bg-indigo-500/40" : "bg-white/[0.04] hover:bg-indigo-500/20"
+              isDragging
+                ? "bg-indigo-500/40"
+                : "bg-white/[0.04] hover:bg-indigo-500/20"
             }`}
           >
             <div

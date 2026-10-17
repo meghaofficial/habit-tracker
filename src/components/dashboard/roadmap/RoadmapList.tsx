@@ -258,7 +258,11 @@ export default function RoadmapList({
                       <ChevronRight
                         size={13}
                         className="mt-0.5 shrink-0 text-gray-600 opacity-0 transition group-hover:translate-x-0.5 group-hover:opacity-100"
-                        onClick={() => navigate(`/roadmap/${roadmap.title}`)}
+                        onClick={() =>
+                          navigate(
+                            `/roadmap/${roadmap.title.toLocaleLowerCase()}`,
+                          )
+                        }
                       />
                     </div>
 

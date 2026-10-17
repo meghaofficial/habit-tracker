@@ -144,17 +144,18 @@ const Dashboard = () => {
   useEffect(() => {
     const path = location.pathname;
 
-    switch (path) {
-      case "/analysis":
+    switch (true) {
+      case path === "/analysis":
         setActiveTab("analysis");
         break;
-      case "/calendar":
+      case path === "/calendar":
         setActiveTab("calandar");
         break;
-      case "/history":
+      case path === "/history":
         setActiveTab("history");
         break;
-      case "/roadmap":
+      case path === "/roadmap":
+      case path.startsWith("/roadmap/"):
         setActiveTab("roadmap");
         break;
 

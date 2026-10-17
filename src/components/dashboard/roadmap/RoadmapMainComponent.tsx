@@ -1,16 +1,32 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import RoadmapList from "./RoadmapList";
 import RoadmapCreation from "./RoadmapCreation";
+import { useParams } from "react-router-dom";
+import ViewRoadmapStructure from "./ViewRoadmapStructure";
 
 const RoadmapMainComponent = () => {
-  const [currentView, setCurrentView] = useState<"list" | "create">("list");
+  const params = useParams();
+
+  const [currentView, setCurrentView] = useState<"list" | "create" | "view">(
+    "list",
+  );
+
+  useEffect(() => {
+    if (params.name) {
+      setCurrentView("view");
+    }
+  }, [params]);
 
   return (
     <div className="w-full">
-      {currentView === "create" ? (
-        <RoadmapCreation onBack={() => setCurrentView("list")} />
-      ) : (
+      {currentView === "list" && (
         <RoadmapList onAddNewRoadmap={() => setCurrentView("create")} />
+      )}
+      {currentView === "create" && (
+        <RoadmapCreation onBack={() => setCurrentView("list")} />
+      )}
+      {currentView === "view" && (
+        <ViewRoadmapStructure onBack={() => setCurrentView("list")} />
       )}
     </div>
   );
