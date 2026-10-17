@@ -1,27 +1,20 @@
 import {
   useEffect,
   useMemo,
+  useRef,
   useState,
   type Dispatch,
   type SetStateAction,
 } from "react";
-import {
-  Check,
-  ChevronRight,
-  Circle,
-  Plus,
-  Search,
-  X,
-  RotateCcw,
-} from "lucide-react";
-import { initialRoadmaps } from "./testData";
+import { Check, Plus, Search, X, RotateCcw } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import type { RoadmapData } from "./types";
 import { roadmapApi } from "../../../api/roadmap.api";
 import RoadmapItemCard from "./components/RoadmapItemCard";
+import { notify } from "../../../helper";
 
 export interface RoadmapItem {
-  id: string;
+  _id: string;
   userID?: string;
   title: string;
   description?: string;
@@ -43,11 +36,14 @@ export default function RoadmapList({
   setActiveRoadmap,
 }: RoadmapListProps) {
   const navigate = useNavigate();
-  const [roadmaps, setRoadmaps] = useState<RoadmapItem[]>();
+  const [roadmaps, setRoadmaps] = useState<RoadmapItem[]>([]);
   const [loading, setLoading] = useState(true);
   const [search, setSearch] = useState("");
   const [showCompletedOnly, setShowCompletedOnly] = useState(false);
   const [selectedCategory, setSelectedCategory] = useState<string>("all");
+  const [isDeleting, setIsDeleting] = useState(false);
+
+  const isFirstRender = useRef(true);
 
   // Extract categories for optional filter tabs
   const categories = useMemo(() => {
@@ -59,73 +55,29 @@ export default function RoadmapList({
     return ["all", ...Array.from(set)];
   }, [roadmaps]);
 
-  // Overall totals and statistics
-  const totals = useMemo(() => {
-    if (!roadmaps) return [];
-    let completedSteps = 0;
-    let totalSteps = 0;
-    let completedRoadmapsCount = 0;
-
-    roadmaps.forEach((item) => {
-      completedSteps += item.completed_nodes_count;
-      totalSteps += item.total_nodes_count;
-      if (item.completed_nodes_count === item.total_nodes_count) {
-        completedRoadmapsCount += 1;
-      }
-    });
-
-    const percentage =
-      totalSteps > 0 ? Math.round((completedSteps / totalSteps) * 100) : 0;
-
-    return {
-      completedSteps,
-      totalSteps,
-      completedRoadmapsCount,
-      totalRoadmaps: roadmaps.length,
-      percentage,
-    };
-  }, [roadmaps]);
-
   // Filtered roadmaps according to search query, completed filter, and category
-  const visibleRoadmaps = useMemo(() => {
-    if (!roadmaps) return [];
-    const query = search.trim().toLowerCase();
+  // const visibleRoadmaps = useMemo(() => {
+  //   if (!roadmaps) return [];
+  //   const query = search.trim().toLowerCase();
 
-    return roadmaps.filter((roadmap) => {
-      const matchesSearch =
-        !query ||
-        roadmap.title.toLowerCase().includes(query) ||
-        (roadmap?.description &&
-          roadmap.description.toLowerCase().includes(query)) ||
-        roadmap.category.toLowerCase().includes(query);
+  //   return roadmaps.filter((roadmap) => {
+  //     const matchesSearch =
+  //       !query ||
+  //       roadmap.title.toLowerCase().includes(query) ||
+  //       (roadmap?.description &&
+  //         roadmap.description.toLowerCase().includes(query)) ||
+  //       roadmap.category.toLowerCase().includes(query);
 
-      const isCompleted =
-        roadmap.completed_nodes_count === roadmap.total_nodes_count;
-      const matchesCompleted = !showCompletedOnly || isCompleted;
+  //     const isCompleted =
+  //       roadmap.completed_nodes_count === roadmap.total_nodes_count;
+  //     const matchesCompleted = !showCompletedOnly || isCompleted;
 
-      const matchesCategory =
-        selectedCategory === "all" || roadmap.category === selectedCategory;
+  //     const matchesCategory =
+  //       selectedCategory === "all" || roadmap.category === selectedCategory;
 
-      return matchesSearch && matchesCompleted && matchesCategory;
-    });
-  }, [roadmaps, search, showCompletedOnly, selectedCategory]);
-
-  // Quick increment/toggle helper for testing progress interactively
-  const updateProgress = (id: string, delta: number) => {
-    // setRoadmaps((prev) =>
-    //   prev.map((item) => {
-    //     if (item.id !== id) return item;
-    //     const nextCompleted = Math.max(
-    //       0,
-    //       Math.min(item.total_nodes_count, item.completed_nodes_count + delta),
-    //     );
-    //     return {
-    //       ...item,
-    //       completedProblems: nextCompleted,
-    //     };
-    //   }),
-    // );
-  };
+  //     return matchesSearch && matchesCompleted && matchesCategory;
+  //   });
+  // }, [roadmaps, search, showCompletedOnly, selectedCategory]);
 
   const resetFilters = () => {
     setSearch("");
@@ -133,21 +85,62 @@ export default function RoadmapList({
     setSelectedCategory("all");
   };
 
-  useEffect(() => {
-    const fetchRoadmaps = async () => {
-      try {
-        // Calling the clean API function with query parameters
-        const data = await roadmapApi.getList();
-        setRoadmaps(data?.data);
-      } catch (error) {
-        console.error("Failed to load roadmaps:", error);
-      } finally {
-        setLoading(false);
-      }
-    };
+  // const fetchRoadmaps = async () => {
+  //   try {
+  //     const data = await roadmapApi.getList();
+  //     setRoadmaps(data?.data);
+  //   } catch (error) {
+  //     console.error("Failed to load roadmaps:", error);
+  //   } finally {
+  //     setLoading(false);
+  //   }
+  // };
 
-    fetchRoadmaps();
-  }, []);
+  const fetchRoadmaps = async (searchValue = "") => {
+    try {
+      const data = await roadmapApi.getList({
+        search: searchValue.trim(),
+        page: 1,
+        // limit: 10,
+      });
+
+      setRoadmaps(data?.data ?? []);
+    } catch (error) {
+      console.error("Failed to load roadmaps:", error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const deleteRoadmap = async (id: string) => {
+    try {
+      setIsDeleting(true);
+      await roadmapApi.delete(id);
+      notify.success("Roadmap deleted successfully.");
+      await fetchRoadmaps();
+    } catch (error) {
+      console.error("Failed to delete roadmap:", error);
+      notify.error("Could not delete the roadmap. Please try again.");
+    } finally {
+      setIsDeleting(false);
+    }
+  };
+
+  useEffect(() => {
+    if (isFirstRender.current) {
+      isFirstRender.current = false;
+      fetchRoadmaps(search);
+      return;
+    }
+
+    setLoading(true);
+
+    const timeoutId = setTimeout(() => {
+      fetchRoadmaps(search);
+    }, 300);
+
+    return () => clearTimeout(timeoutId);
+  }, [search]);
 
   return (
     <div className="w-full text-white rounded-2xl my-4 border border-white/10 bg-black/20">
@@ -160,7 +153,7 @@ export default function RoadmapList({
                 Learning Roadmaps
               </h1>
               <span className="rounded-full border border-indigo-500/25 bg-indigo-500/10 px-2.5 py-0.5 text-[10px] font-medium text-indigo-400">
-                {visibleRoadmaps.length} available
+                {roadmaps.length} available
               </span>
             </div>
             <p className="mt-1 max-w-2xl text-[13px] leading-5 text-gray-400">
@@ -252,13 +245,28 @@ export default function RoadmapList({
         {/* Roadmap Cards Grid matching RoadmapsPage.tsx dimensions and look */}
         <div className="mt-6">
           <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-4">
-            {visibleRoadmaps.map((roadmap) => (
-              <RoadmapItemCard roadmap={roadmap} />
-            ))}
+            {loading ? (
+              Array.from({ length: 6 }).map((_, index) => (
+                <div
+                  className="w-full h-30 bg-white/5 rounded-xl animate-pulse"
+                  key={index}
+                ></div>
+              ))
+            ) : (
+              <>
+                {roadmaps.map((roadmap) => (
+                  <RoadmapItemCard
+                    roadmap={roadmap}
+                    deleteRoadmap={deleteRoadmap}
+                    isDeleting={isDeleting}
+                  />
+                ))}
+              </>
+            )}
           </div>
 
           {/* Empty state matching RoadmapsPage.tsx */}
-          {visibleRoadmaps.length === 0 && (
+          {roadmaps.length === 0 && (
             <div className="flex flex-col items-center rounded-xl border border-dashed border-white/10 px-5 py-16 text-center">
               <Search size={24} className="text-gray-500" />
               <h3 className="mt-3 text-sm font-semibold text-gray-200">

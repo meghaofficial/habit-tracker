@@ -17,19 +17,19 @@ export const roadmapApi = {
 
   // POST: Create a new item
   create: async (data: any) => {
-    const response = await axiosPrivate.post("/roadmaps", data);
+    const response = await axiosPrivate.post("/api/roadmaps", data);
     return response.data;
   },
 
   // PUT: Update an item
   update: async (data: any) => {
-    const response = await axiosPrivate.put("/roadmaps", data);
+    const response = await axiosPrivate.put("/api/roadmaps", data);
     return response.data;
   },
 
   // DELETE: Delete an item
   delete: async (id: string) => {
-    const response = await axiosPrivate.delete("/roadmaps", { data: { id } });
+    const response = await axiosPrivate.delete(`/api/roadmaps/${id}`);
     return response.data;
   },
 };
