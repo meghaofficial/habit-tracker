@@ -9,6 +9,8 @@ import {
   CornerDownRight,
   ChevronDown,
   ChevronUp,
+  ArrowRight,
+  ArrowLeft,
 } from "lucide-react";
 import type { RoadmapData, RoadmapNode } from "./types";
 
@@ -89,29 +91,6 @@ export default function ViewRoadmap({
 
   return (
     <div>
-      {/* Breadcrumb Bar */}
-      {/* <div className="flex flex-wrap items-center gap-1.5 pb-3 text-xs text-gray-400 border-b border-white/8">
-        {breadcrumbs.map((crumb, idx) => {
-          const isLast = idx === breadcrumbs.length - 1;
-          return (
-            <React.Fragment key={crumb.id + idx}>
-              <button
-                type="button"
-                onClick={() => onNavigateBreadcrumb(idx)}
-                className={`font-medium transition hover:text-white ${
-                  isLast
-                    ? "text-emerald-400 font-semibold"
-                    : "text-gray-400 hover:underline"
-                }`}
-              >
-                {crumb.title || "Untitled"}
-              </button>
-              {!isLast && <span className="text-gray-600 font-bold">/</span>}
-            </React.Fragment>
-          );
-        })}
-      </div> */}
-
       {/* Header Preview Info */}
       <div className="mt-4 flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
         <div className="flex items-start gap-3 min-w-0 flex-1">
@@ -191,7 +170,7 @@ export default function ViewRoadmap({
             </p>
           </div>
         ) : (
-          <div className="space-y-6 pb-6">
+          <div className="">
             {rows.map((rowNodes, rowIndex) => {
               const isEvenRow = rowIndex % 2 === 0;
               const isLastRow = rowIndex === rows.length - 1;
@@ -204,21 +183,9 @@ export default function ViewRoadmap({
 
               return (
                 <div key={"row-" + rowIndex} className="relative">
-                  {/* Row direction indicator */}
-                  <div className="mb-1.5 flex items-center justify-between text-[10px] text-gray-500 px-1">
-                    <span className="font-medium">
-                      Row {rowIndex + 1} (
-                      {isEvenRow ? "Left → Right" : "Right → Left"})
-                    </span>
-                    <span className="text-gray-600">
-                      Nodes {rowIndex * NODES_PER_ROW + 1} to{" "}
-                      {rowIndex * NODES_PER_ROW + rowNodes.length}
-                    </span>
-                  </div>
-
                   {/* Nodes in this row */}
                   <div
-                    className={`grid gap-3 ${
+                    className={`grid gap-x-2.5 ${
                       rowNodes.length === 1
                         ? "grid-cols-1 sm:grid-cols-3"
                         : rowNodes.length === 2
@@ -265,252 +232,264 @@ export default function ViewRoadmap({
                       const isExpanded = !!expandedNodeIds[node.id];
 
                       return (
-                        <article
-                          key={node.id}
-                          className="group relative flex flex-col justify-between overflow-hidden rounded-xl border border-white/12 bg-[#191919] p-3 transition duration-200 hover:border-white/25 hover:bg-[#1d1d1d] shadow-sm"
-                          style={{
-                            borderLeftColor: node.color,
-                            borderLeftWidth: "3px",
-                          }}
-                        >
-                          {/* Card Top: Node Number, Icon, Title, and Type Badge */}
-                          <div>
-                            <div className="flex items-start justify-between gap-2">
-                              <div className="flex items-center gap-2 min-w-0 flex-1">
-                                <span className="flex h-7 w-7 shrink-0 items-center justify-center rounded-lg bg-white/5 text-sm">
-                                  {node.icon}
-                                </span>
-                                <div className="min-w-0 flex-1">
-                                  <div className="flex items-center gap-1.5">
-                                    <span className="text-[10px] font-bold text-gray-500">
-                                      #{actualIndex + 1}
+                        <div className="flex gap-x-2.5 min-h-50">
+                          <article
+                            key={node.id}
+                            className="group relative w-full flex flex-col justify-between overflow-hidden rounded-xl border border-white/12 bg-[#191919] p-3 transition duration-200 hover:border-white/25 hover:bg-[#1d1d1d] shadow-sm"
+                            style={{
+                              borderLeftColor: node.color,
+                              borderLeftWidth: "3px",
+                            }}
+                          >
+                            {/* Card Top: Node Number, Icon, Title, and Type Badge */}
+                            <div>
+                              <div className="flex items-start justify-between gap-2">
+                                <div className="flex items-center gap-2 min-w-0 flex-1">
+                                  <span className="flex h-7 w-7 shrink-0 items-center justify-center rounded-lg bg-white/5 text-sm">
+                                    {node.icon}
+                                  </span>
+                                  <div className="min-w-0 flex-1">
+                                    <div className="flex items-center gap-1.5">
+                                      <span className="text-[10px] font-bold text-gray-500">
+                                        #{actualIndex + 1}
+                                      </span>
+                                      <h4 className="text-xs font-semibold text-gray-100 truncate">
+                                        {node.title}
+                                      </h4>
+                                    </div>
+
+                                    {/* Type tag */}
+                                    <div className="mt-0.5 flex items-center gap-1.5">
+                                      {node.type === "single" && (
+                                        <span className="text-[9px] text-blue-400 font-medium">
+                                          Single Milestone
+                                        </span>
+                                      )}
+                                      {node.type === "sequential" && (
+                                        <span className="text-[9px] text-amber-400 font-medium">
+                                          Sequential Tasks (
+                                          {node.tasks?.length || 0})
+                                        </span>
+                                      )}
+                                      {node.type === "nested" && (
+                                        <span className="text-[9px] text-purple-400 font-medium">
+                                          Nested Roadmap (/)
+                                        </span>
+                                      )}
+                                    </div>
+                                  </div>
+                                </div>
+
+                                {/* Interactive check or action button */}
+                                {node.type === "single" && (
+                                  <button
+                                    type="button"
+                                    onClick={() =>
+                                      onToggleNodeComplete?.(node.id)
+                                    }
+                                    title={
+                                      node.completed
+                                        ? "Mark incomplete"
+                                        : "Mark completed"
+                                    }
+                                    className={`flex h-6 w-6 shrink-0 items-center justify-center rounded-lg border transition cursor-pointer ${
+                                      node.completed
+                                        ? "border-emerald-500 bg-emerald-500 text-black shadow-sm"
+                                        : "border-white/20 bg-black/40 text-transparent hover:border-white/40"
+                                    }`}
+                                  >
+                                    <Check size={14} strokeWidth={3} />
+                                  </button>
+                                )}
+
+                                {node.type === "nested" && (
+                                  <button
+                                    type="button"
+                                    onClick={() => onOpenNestedRoadmap(node.id)}
+                                    title="Enter Nested Roadmap"
+                                    className="flex h-6 w-6 shrink-0 items-center justify-center rounded-lg border border-purple-500/30 bg-purple-500/15 text-purple-300 hover:bg-purple-500/25 transition cursor-pointer"
+                                  >
+                                    <FolderGit2 size={13} />
+                                  </button>
+                                )}
+                              </div>
+
+                              {/* Node description (if any) */}
+                              {node.description && (
+                                <p className="mt-2 text-[11px] text-gray-400 line-clamp-2">
+                                  {node.description}
+                                </p>
+                              )}
+
+                              {/* Sequential Tasks vertical view */}
+                              {node.type === "sequential" && node.tasks && (
+                                <div className="mt-3 rounded-lg border border-white/5 bg-[#141414] p-2">
+                                  <div className="flex items-center justify-between pb-1.5 border-b border-white/5">
+                                    <span className="text-[10px] font-semibold text-amber-400 flex items-center gap-1">
+                                      <ListOrdered size={12} />
+                                      Sequential Order
                                     </span>
-                                    <h4 className="text-xs font-semibold text-gray-100 truncate">
-                                      {node.title}
-                                    </h4>
+                                    <button
+                                      type="button"
+                                      onClick={() => toggleExpand(node.id)}
+                                      className="text-[10px] text-gray-400 hover:text-white flex items-center gap-0.5 cursor-pointer"
+                                    >
+                                      <span>
+                                        {isExpanded ? "Collapse" : "View Steps"}
+                                      </span>
+                                      {isExpanded ? (
+                                        <ChevronUp size={12} />
+                                      ) : (
+                                        <ChevronDown size={12} />
+                                      )}
+                                    </button>
                                   </div>
 
-                                  {/* Type tag */}
-                                  <div className="mt-0.5 flex items-center gap-1.5">
-                                    {node.type === "single" && (
-                                      <span className="text-[9px] text-blue-400 font-medium">
-                                        Single Milestone
-                                      </span>
-                                    )}
-                                    {node.type === "sequential" && (
-                                      <span className="text-[9px] text-amber-400 font-medium">
-                                        Sequential Tasks (
-                                        {node.tasks?.length || 0})
-                                      </span>
-                                    )}
-                                    {node.type === "nested" && (
-                                      <span className="text-[9px] text-purple-400 font-medium">
-                                        Nested Roadmap (/)
-                                      </span>
+                                  {/* First task or full vertical list */}
+                                  <div className="mt-2 space-y-1.5">
+                                    {(isExpanded
+                                      ? node.tasks
+                                      : node.tasks.slice(0, 2)
+                                    ).map((task, taskIdx) => (
+                                      <div
+                                        key={task.id}
+                                        className="flex items-center justify-between gap-2 text-[11px]"
+                                      >
+                                        <div className="flex items-center gap-2 min-w-0 flex-1">
+                                          <span className="flex h-4 w-4 shrink-0 items-center justify-center rounded-full bg-amber-500/20 text-[9px] font-bold text-amber-400">
+                                            {taskIdx + 1}
+                                          </span>
+                                          <span
+                                            className={`truncate ${
+                                              task.completed
+                                                ? "text-gray-500 line-through"
+                                                : "text-gray-200"
+                                            }`}
+                                          >
+                                            {task.title}
+                                          </span>
+                                        </div>
+
+                                        <button
+                                          type="button"
+                                          onClick={() =>
+                                            onToggleTaskComplete?.(
+                                              node.id,
+                                              task.id,
+                                            )
+                                          }
+                                          className={`flex h-4 w-4 shrink-0 items-center justify-center rounded border transition cursor-pointer ${
+                                            task.completed
+                                              ? "border-emerald-500 bg-emerald-500 text-black"
+                                              : "border-gray-600 bg-black/40 hover:border-gray-400"
+                                          }`}
+                                        >
+                                          {task.completed && (
+                                            <Check size={10} strokeWidth={3} />
+                                          )}
+                                        </button>
+                                      </div>
+                                    ))}
+
+                                    {!isExpanded && node.tasks.length > 2 && (
+                                      <button
+                                        type="button"
+                                        onClick={() => toggleExpand(node.id)}
+                                        className="text-[10px] text-gray-500 hover:text-gray-300 pt-0.5 cursor-pointer"
+                                      >
+                                        +{node.tasks.length - 2} more sequential
+                                        steps...
+                                      </button>
                                     )}
                                   </div>
                                 </div>
-                              </div>
-
-                              {/* Interactive check or action button */}
-                              {node.type === "single" && (
-                                <button
-                                  type="button"
-                                  onClick={() =>
-                                    onToggleNodeComplete?.(node.id)
-                                  }
-                                  title={
-                                    node.completed
-                                      ? "Mark incomplete"
-                                      : "Mark completed"
-                                  }
-                                  className={`flex h-6 w-6 shrink-0 items-center justify-center rounded-lg border transition cursor-pointer ${
-                                    node.completed
-                                      ? "border-emerald-500 bg-emerald-500 text-black shadow-sm"
-                                      : "border-white/20 bg-black/40 text-transparent hover:border-white/40"
-                                  }`}
-                                >
-                                  <Check size={14} strokeWidth={3} />
-                                </button>
                               )}
 
+                              {/* Nested roadmap teaser button */}
                               {node.type === "nested" && (
                                 <button
                                   type="button"
                                   onClick={() => onOpenNestedRoadmap(node.id)}
-                                  title="Enter Nested Roadmap"
-                                  className="flex h-6 w-6 shrink-0 items-center justify-center rounded-lg border border-purple-500/30 bg-purple-500/15 text-purple-300 hover:bg-purple-500/25 transition cursor-pointer"
+                                  className="mt-3 flex w-full items-center justify-between rounded-lg border border-purple-500/20 bg-purple-500/10 px-2.5 py-1.5 text-[11px] text-purple-300 hover:bg-purple-500/20 transition cursor-pointer"
                                 >
-                                  <FolderGit2 size={13} />
+                                  <span>Open Sub-Roadmap</span>
+                                  <ChevronRight size={13} />
                                 </button>
                               )}
                             </div>
 
-                            {/* Node description (if any) */}
-                            {node.description && (
-                              <p className="mt-2 text-[11px] text-gray-400 line-clamp-2">
-                                {node.description}
-                              </p>
-                            )}
-
-                            {/* Sequential Tasks vertical view */}
-                            {node.type === "sequential" && node.tasks && (
-                              <div className="mt-3 rounded-lg border border-white/5 bg-[#141414] p-2">
-                                <div className="flex items-center justify-between pb-1.5 border-b border-white/5">
-                                  <span className="text-[10px] font-semibold text-amber-400 flex items-center gap-1">
-                                    <ListOrdered size={12} />
-                                    Sequential Order
-                                  </span>
-                                  <button
-                                    type="button"
-                                    onClick={() => toggleExpand(node.id)}
-                                    className="text-[10px] text-gray-400 hover:text-white flex items-center gap-0.5 cursor-pointer"
-                                  >
-                                    <span>
-                                      {isExpanded ? "Collapse" : "View Steps"}
+                            {/* Card Bottom: Progress bar */}
+                            <div className="mt-4 pt-2 border-t border-white/6">
+                              <div className="flex items-center justify-between text-[10px] text-gray-400">
+                                <span>
+                                  {isNodeDone ? (
+                                    <span className="text-emerald-400 font-medium">
+                                      ✓ Completed
                                     </span>
-                                    {isExpanded ? (
-                                      <ChevronUp size={12} />
-                                    ) : (
-                                      <ChevronDown size={12} />
-                                    )}
-                                  </button>
-                                </div>
-
-                                {/* First task or full vertical list */}
-                                <div className="mt-2 space-y-1.5">
-                                  {(isExpanded
-                                    ? node.tasks
-                                    : node.tasks.slice(0, 2)
-                                  ).map((task, taskIdx) => (
-                                    <div
-                                      key={task.id}
-                                      className="flex items-center justify-between gap-2 text-[11px]"
-                                    >
-                                      <div className="flex items-center gap-2 min-w-0 flex-1">
-                                        <span className="flex h-4 w-4 shrink-0 items-center justify-center rounded-full bg-amber-500/20 text-[9px] font-bold text-amber-400">
-                                          {taskIdx + 1}
-                                        </span>
-                                        <span
-                                          className={`truncate ${
-                                            task.completed
-                                              ? "text-gray-500 line-through"
-                                              : "text-gray-200"
-                                          }`}
-                                        >
-                                          {task.title}
-                                        </span>
-                                      </div>
-
-                                      <button
-                                        type="button"
-                                        onClick={() =>
-                                          onToggleTaskComplete?.(
-                                            node.id,
-                                            task.id,
-                                          )
-                                        }
-                                        className={`flex h-4 w-4 shrink-0 items-center justify-center rounded border transition cursor-pointer ${
-                                          task.completed
-                                            ? "border-emerald-500 bg-emerald-500 text-black"
-                                            : "border-gray-600 bg-black/40 hover:border-gray-400"
-                                        }`}
-                                      >
-                                        {task.completed && (
-                                          <Check size={10} strokeWidth={3} />
-                                        )}
-                                      </button>
-                                    </div>
-                                  ))}
-
-                                  {!isExpanded && node.tasks.length > 2 && (
-                                    <button
-                                      type="button"
-                                      onClick={() => toggleExpand(node.id)}
-                                      className="text-[10px] text-gray-500 hover:text-gray-300 pt-0.5 cursor-pointer"
-                                    >
-                                      +{node.tasks.length - 2} more sequential
-                                      steps...
-                                    </button>
+                                  ) : (
+                                    <span>In Progress</span>
                                   )}
-                                </div>
+                                </span>
+                                <span
+                                  className="font-semibold"
+                                  style={{ color: node.color }}
+                                >
+                                  {nodePercentage}%
+                                </span>
+                              </div>
+
+                              <div className="mt-1 h-0.75 overflow-hidden rounded-full bg-white/8">
+                                <div
+                                  className="h-full rounded-full transition-all duration-300"
+                                  style={{
+                                    width: `${nodePercentage}%`,
+                                    backgroundColor: node.color,
+                                  }}
+                                />
+                              </div>
+                            </div>
+                          </article>
+                          <React.Fragment key={node.id}>
+                            {nodeIndexInDisplay < displayNodes.length - 1 && (
+                              <div className="flex shrink-0 items-center justify-center">
+                                <ArrowRight
+                                  size={18}
+                                  strokeWidth={2}
+                                  className="text-indigo-400"
+                                />
                               </div>
                             )}
-
-                            {/* Nested roadmap teaser button */}
-                            {node.type === "nested" && (
-                              <button
-                                type="button"
-                                onClick={() => onOpenNestedRoadmap(node.id)}
-                                className="mt-3 flex w-full items-center justify-between rounded-lg border border-purple-500/20 bg-purple-500/10 px-2.5 py-1.5 text-[11px] text-purple-300 hover:bg-purple-500/20 transition cursor-pointer"
-                              >
-                                <span>Open Sub-Roadmap</span>
-                                <ChevronRight size={13} />
-                              </button>
-                            )}
-                          </div>
-
-                          {/* Card Bottom: Progress bar */}
-                          <div className="mt-4 pt-2 border-t border-white/6">
-                            <div className="flex items-center justify-between text-[10px] text-gray-400">
-                              <span>
-                                {isNodeDone ? (
-                                  <span className="text-emerald-400 font-medium">
-                                    ✓ Completed
-                                  </span>
-                                ) : (
-                                  <span>In Progress</span>
-                                )}
-                              </span>
-                              <span
-                                className="font-semibold"
-                                style={{ color: node.color }}
-                              >
-                                {nodePercentage}%
-                              </span>
-                            </div>
-
-                            <div className="mt-1 h-0.75 overflow-hidden rounded-full bg-white/8">
-                              <div
-                                className="h-full rounded-full transition-all duration-300"
-                                style={{
-                                  width: `${nodePercentage}%`,
-                                  backgroundColor: node.color,
-                                }}
-                              />
-                            </div>
-                          </div>
-                        </article>
+                          </React.Fragment>
+                        </div>
                       );
                     })}
                   </div>
 
-                  {/* Horizontal Connector and Vertical Turn to Next Row */}
+                  {/* Curved connector from the upper-right to lower-left */}
                   {!isLastRow && (
-                    <div className="my-3 flex items-center justify-between px-2">
-                      {isEvenRow ? (
-                        <>
-                          <div className="h-0.5 flex-1 bg-linear-to-r from-transparent via-white/10 to-transparent" />
-                          <div className="flex items-center gap-1.5 text-xs text-gray-400 bg-[#161616] px-3 py-1 rounded-full border border-white/10 shadow-sm">
-                            <span>Turn Down &amp; Reverse (Right to Left)</span>
-                            <CornerDownLeft
-                              size={14}
-                              className="text-indigo-400"
-                            />
-                          </div>
-                        </>
-                      ) : (
-                        <>
-                          <div className="flex items-center gap-1.5 text-xs text-gray-400 bg-[#161616] px-3 py-1 rounded-full border border-white/10 shadow-sm">
-                            <CornerDownRight
-                              size={14}
-                              className="text-indigo-400"
-                            />
-                            <span>Turn Down (Left to Right)</span>
-                          </div>
-                          <div className="h-0.5 flex-1 bg-linear-to-r from-transparent via-white/10 to-transparent" />
-                        </>
-                      )}
+                    <div className="flex items-center justify-center w-full">
+                      <svg
+                        xmlns="http://www.w3.org/2000/svg"
+                        viewBox="0 0 800 60"
+                        width="75%"
+                        height="100%"
+                      >
+                        <path
+                          d="M 780,10 L 780,20 Q 780,28 772,28 L 28,28 Q 20,28 20,36 L 20,46"
+                          fill="none"
+                          stroke="#818cf8"
+                          stroke-width="1.5"
+                          stroke-linecap="round"
+                        />
+                        <path
+                          d="M 16,42 L 20,46 L 24,42"
+                          fill="none"
+                          stroke="#818cf8"
+                          stroke-width="1.5"
+                          stroke-linecap="round"
+                          stroke-linejoin="round"
+                        />
+                      </svg>
                     </div>
                   )}
                 </div>

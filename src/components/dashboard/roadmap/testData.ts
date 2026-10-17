@@ -255,5 +255,120 @@ export const initialRootRoadmap: RoadmapData = {
         "Prometheus, Grafana, OpenTelemetry, and structured logging in production.",
       completed: false,
     },
+    // new
+    {
+      id: "node-1",
+      title: "Core Web Fundamentals",
+      type: "single",
+      icon: "🌱",
+      color: "#10b981",
+      description:
+        "Master HTTP/HTTPS, browser rendering, DNS resolution, and security headers.",
+      completed: true,
+    },
+    {
+      id: "node-2",
+      title: "State Management & React Architecture",
+      type: "sequential",
+      icon: "⚛️",
+      color: "#38bdf8",
+      tasks: [
+        {
+          id: "t1",
+          title: "Step 1: Component Lifecycle & Hooks",
+          completed: true,
+        },
+        {
+          id: "t2",
+          title: "Step 2: Global Stores (Redux / Zustand)",
+          completed: true,
+        },
+        {
+          id: "t3",
+          title: "Step 3: Server State & TanStack Query",
+          completed: false,
+        },
+        {
+          id: "t4",
+          title: "Step 4: Performance Profiling & Memoization",
+          completed: false,
+        },
+      ],
+    },
+    {
+      id: "node-3",
+      title: "Backend Services & Microservices",
+      type: "nested",
+      icon: "🏛️",
+      color: "#8b5cf6",
+      nestedRoadmap: {
+        id: "sub-1",
+        title: "Distributed Microservices & APIs",
+        category: "Backend Architecture",
+        icon: "🏛️",
+        color: "#8b5cf6",
+        description:
+          "Deep dive into gRPC, message queues, API gateways, and concurrency.",
+        nodes: [
+          {
+            id: "sub-node-1",
+            title: "REST & gRPC Contracts",
+            type: "single",
+            icon: "📜",
+            color: "#8b5cf6",
+            completed: true,
+          },
+          {
+            id: "sub-node-2",
+            title: "Event-Driven Queues (Kafka / RabbitMQ)",
+            type: "sequential",
+            icon: "⚡",
+            color: "#ec4899",
+            tasks: [
+              {
+                id: "sub-t1",
+                title: "Step 1: Producer / Consumer Patterns",
+                completed: true,
+              },
+              {
+                id: "sub-t2",
+                title: "Step 2: Dead Letter Queues & Retries",
+                completed: false,
+              },
+            ],
+          },
+        ],
+      },
+    },
+    {
+      id: "node-4",
+      title: "SQL & Distributed Database Tuning",
+      type: "sequential",
+      icon: "🗄️",
+      color: "#f59e0b",
+      tasks: [
+        { id: "t4-1", title: "Step 1: Indexing & B-Trees", completed: true },
+        {
+          id: "t4-2",
+          title: "Step 2: ACID Transactions & Locks",
+          completed: false,
+        },
+        {
+          id: "t4-3",
+          title: "Step 3: Sharding & Read Replicas",
+          completed: false,
+        },
+      ],
+    },
+    {
+      id: "node-5",
+      title: "Observability & Tracing",
+      type: "single",
+      icon: "📊",
+      color: "#ec4899",
+      description:
+        "Prometheus, Grafana, OpenTelemetry, and structured logging in production.",
+      completed: false,
+    },
   ],
 };
