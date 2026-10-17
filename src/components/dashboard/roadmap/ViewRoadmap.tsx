@@ -235,12 +235,25 @@ export default function ViewRoadmap({
                         <div className="flex gap-x-2.5 min-h-50">
                           <article
                             key={node.id}
-                            className="group relative w-full flex flex-col justify-between overflow-hidden rounded-xl border border-white/12 bg-[#191919] p-3 transition duration-200 hover:border-white/25 hover:bg-[#1d1d1d] shadow-sm"
+                            className={`group relative w-full flex flex-col justify-between overflow-hidden rounded-xl border transition-all duration-300 p-3 shadow-md
+                              ${
+                                node.status === "completed"
+                                  ? "bg-zinc-900/60 border-zinc-800 hover:border-zinc-700/60 hover:bg-zinc-900/90 shadow-black/20"
+                                  : node.status === "active"
+                                    ? "bg-zinc-900/90 border-white/10 ring-1 ring-white/5 shadow-lg shadow-black/40"
+                                    : "bg-zinc-950/20 border-white/5 opacity-60 grayscale-30 hover:opacity-80 hover:grayscale-0"
+                              }`}
                             style={{
                               borderLeftColor: node.color,
                               borderLeftWidth: "3px",
                             }}
                           >
+                            {node.status === "active" && (
+                              <div
+                                className="absolute inset-0 opacity-[0.03] pointer-events-none transition-opacity duration-300 group-hover:opacity-[0.05]"
+                                style={{ backgroundColor: node.color }}
+                              />
+                            )}
                             {/* Card Top: Node Number, Icon, Title, and Type Badge */}
                             <div>
                               <div className="flex items-start justify-between gap-2">
@@ -455,7 +468,14 @@ export default function ViewRoadmap({
                                 <ArrowRight
                                   size={18}
                                   strokeWidth={2}
-                                  className="text-indigo-400"
+                                  style={{
+                                    color:
+                                      node.status === "completed"
+                                        ? node.color
+                                        : node.status === "active"
+                                          ? "#818cf8"
+                                          : "white",
+                                  }}
                                 />
                               </div>
                             )}
@@ -477,14 +497,30 @@ export default function ViewRoadmap({
                         <path
                           d="M 780,10 L 780,20 Q 780,28 772,28 L 28,28 Q 20,28 20,36 L 20,46"
                           fill="none"
-                          stroke="#818cf8"
+                          // stroke="#818cf8"
+                          stroke={
+                            rowNodes[rowNodes.length - 1].status === "completed"
+                              ? rowNodes[rowNodes.length - 1].color
+                              : rowNodes[rowNodes.length - 1].status ===
+                                  "active"
+                                ? "#818cf8"
+                                : "white"
+                          }
                           stroke-width="1.5"
                           stroke-linecap="round"
                         />
                         <path
                           d="M 16,42 L 20,46 L 24,42"
                           fill="none"
-                          stroke="#818cf8"
+                          // stroke="#818cf8"
+                          stroke={
+                            rowNodes[rowNodes.length - 1].status === "completed"
+                              ? rowNodes[rowNodes.length - 1].color
+                              : rowNodes[rowNodes.length - 1].status ===
+                                  "active"
+                                ? "#818cf8"
+                                : "white"
+                          }
                           stroke-width="1.5"
                           stroke-linecap="round"
                           stroke-linejoin="round"

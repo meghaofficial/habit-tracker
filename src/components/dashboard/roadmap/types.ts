@@ -19,6 +19,7 @@ export type RoadmapNode = {
   tasks?: SequentialTask[];
   // Nested roadmap
   nestedRoadmap?: RoadmapData;
+  status: "completed" | "active" | "pending";
 };
 
 export type RoadmapData = {
