@@ -5,14 +5,12 @@ import {
   FolderGit2,
   ListOrdered,
   Sparkles,
-  CornerDownLeft,
-  CornerDownRight,
   ChevronDown,
   ChevronUp,
   ArrowRight,
-  ArrowLeft,
 } from "lucide-react";
 import type { RoadmapData, RoadmapNode } from "./types";
+import { useNavigate, useParams } from "react-router-dom";
 
 export type ViewRoadmapProps = {
   roadmap: RoadmapData;
@@ -27,6 +25,8 @@ export default function ViewRoadmap({
   onToggleNodeComplete,
   onToggleTaskComplete,
 }: ViewRoadmapProps) {
+  const navigate = useNavigate();
+  const params = useParams();
   // State for expanded sequential task checklists
   const [expandedNodeIds, setExpandedNodeIds] = useState<
     Record<string, boolean>
@@ -88,6 +88,9 @@ export default function ViewRoadmap({
   // const fullDisplayTitle = breadcrumbs
   //   .map((b) => b.title || "Untitled")
   //   .join(" / ");
+
+  const splat = params["*"];
+  const roadmapSteps = splat ? splat.split("/") : [];
 
   return (
     <div>
@@ -318,7 +321,12 @@ export default function ViewRoadmap({
                                 {node.type === "nested" && (
                                   <button
                                     type="button"
-                                    onClick={() => onOpenNestedRoadmap(node.id)}
+                                    onClick={() => {
+                                      navigate(
+                                        `/roadmap/${splat}/${node.title}`,
+                                      );
+                                      onOpenNestedRoadmap(node.id);
+                                    }}
                                     title="Enter Nested Roadmap"
                                     className="flex h-6 w-6 shrink-0 items-center justify-center rounded-lg border border-purple-500/30 bg-purple-500/15 text-purple-300 hover:bg-purple-500/25 transition cursor-pointer"
                                   >
@@ -422,7 +430,10 @@ export default function ViewRoadmap({
                               {node.type === "nested" && (
                                 <button
                                   type="button"
-                                  onClick={() => onOpenNestedRoadmap(node.id)}
+                                  onClick={() => {
+                                    navigate(`/roadmap/${splat}/${node.title}`);
+                                    onOpenNestedRoadmap(node.id);
+                                  }}
                                   className="mt-3 flex w-full items-center justify-between rounded-lg border border-purple-500/20 bg-purple-500/10 px-2.5 py-1.5 text-[11px] text-purple-300 hover:bg-purple-500/20 transition cursor-pointer"
                                 >
                                   <span>Open Sub-Roadmap</span>
@@ -497,7 +508,6 @@ export default function ViewRoadmap({
                         <path
                           d="M 780,10 L 780,20 Q 780,28 772,28 L 28,28 Q 20,28 20,36 L 20,46"
                           fill="none"
-                          // stroke="#818cf8"
                           stroke={
                             rowNodes[rowNodes.length - 1].status === "completed"
                               ? rowNodes[rowNodes.length - 1].color
@@ -512,7 +522,6 @@ export default function ViewRoadmap({
                         <path
                           d="M 16,42 L 20,46 L 24,42"
                           fill="none"
-                          // stroke="#818cf8"
                           stroke={
                             rowNodes[rowNodes.length - 1].status === "completed"
                               ? rowNodes[rowNodes.length - 1].color

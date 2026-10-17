@@ -1,4 +1,10 @@
-import { useMemo, useState } from "react";
+import {
+  useEffect,
+  useMemo,
+  useState,
+  type Dispatch,
+  type SetStateAction,
+} from "react";
 import {
   Check,
   ChevronRight,
@@ -8,30 +14,44 @@ import {
   X,
   RotateCcw,
 } from "lucide-react";
-import { initialRoadmaps, type RoadmapItem } from "./testData";
+import { initialRoadmaps } from "./testData";
 import { useNavigate } from "react-router-dom";
+import type { RoadmapData } from "./types";
+import { roadmapApi } from "../../../api/roadmap.api";
+import RoadmapItemCard from "./components/RoadmapItemCard";
+
+export interface RoadmapItem {
+  id: string;
+  userID?: string;
+  title: string;
+  description?: string;
+  icon?: string;
+  total_nodes_count: number;
+  completed_nodes_count: number;
+  status: "completed" | "in-progress" | "pending";
+  accent_color: string;
+  category: string;
+}
 
 export type RoadmapListProps = {
-  roadmaps?: RoadmapItem[];
-  onSelectRoadmap?: (roadmap: RoadmapItem) => void;
   onAddNewRoadmap?: () => void;
+  setActiveRoadmap: Dispatch<SetStateAction<RoadmapData>>;
 };
 
 export default function RoadmapList({
-  roadmaps: externalRoadmaps,
-  onSelectRoadmap,
   onAddNewRoadmap,
+  setActiveRoadmap,
 }: RoadmapListProps) {
   const navigate = useNavigate();
-  const [roadmaps, setRoadmaps] = useState<RoadmapItem[]>(
-    externalRoadmaps || initialRoadmaps,
-  );
+  const [roadmaps, setRoadmaps] = useState<RoadmapItem[]>();
+  const [loading, setLoading] = useState(true);
   const [search, setSearch] = useState("");
   const [showCompletedOnly, setShowCompletedOnly] = useState(false);
   const [selectedCategory, setSelectedCategory] = useState<string>("all");
 
   // Extract categories for optional filter tabs
   const categories = useMemo(() => {
+    if (!roadmaps) return [];
     const set = new Set<string>();
     roadmaps.slice(0, 5).forEach((r) => {
       if (r.category) set.add(r.category);
@@ -41,14 +61,15 @@ export default function RoadmapList({
 
   // Overall totals and statistics
   const totals = useMemo(() => {
+    if (!roadmaps) return [];
     let completedSteps = 0;
     let totalSteps = 0;
     let completedRoadmapsCount = 0;
 
     roadmaps.forEach((item) => {
-      completedSteps += item.completedProblems;
-      totalSteps += item.totalProblems;
-      if (item.completedProblems === item.totalProblems) {
+      completedSteps += item.completed_nodes_count;
+      totalSteps += item.total_nodes_count;
+      if (item.completed_nodes_count === item.total_nodes_count) {
         completedRoadmapsCount += 1;
       }
     });
@@ -67,16 +88,19 @@ export default function RoadmapList({
 
   // Filtered roadmaps according to search query, completed filter, and category
   const visibleRoadmaps = useMemo(() => {
+    if (!roadmaps) return [];
     const query = search.trim().toLowerCase();
 
     return roadmaps.filter((roadmap) => {
       const matchesSearch =
         !query ||
         roadmap.title.toLowerCase().includes(query) ||
-        roadmap.description.toLowerCase().includes(query) ||
+        (roadmap?.description &&
+          roadmap.description.toLowerCase().includes(query)) ||
         roadmap.category.toLowerCase().includes(query);
 
-      const isCompleted = roadmap.completedProblems === roadmap.totalProblems;
+      const isCompleted =
+        roadmap.completed_nodes_count === roadmap.total_nodes_count;
       const matchesCompleted = !showCompletedOnly || isCompleted;
 
       const matchesCategory =
@@ -88,19 +112,19 @@ export default function RoadmapList({
 
   // Quick increment/toggle helper for testing progress interactively
   const updateProgress = (id: string, delta: number) => {
-    setRoadmaps((prev) =>
-      prev.map((item) => {
-        if (item.id !== id) return item;
-        const nextCompleted = Math.max(
-          0,
-          Math.min(item.totalProblems, item.completedProblems + delta),
-        );
-        return {
-          ...item,
-          completedProblems: nextCompleted,
-        };
-      }),
-    );
+    // setRoadmaps((prev) =>
+    //   prev.map((item) => {
+    //     if (item.id !== id) return item;
+    //     const nextCompleted = Math.max(
+    //       0,
+    //       Math.min(item.total_nodes_count, item.completed_nodes_count + delta),
+    //     );
+    //     return {
+    //       ...item,
+    //       completedProblems: nextCompleted,
+    //     };
+    //   }),
+    // );
   };
 
   const resetFilters = () => {
@@ -108,6 +132,22 @@ export default function RoadmapList({
     setShowCompletedOnly(false);
     setSelectedCategory("all");
   };
+
+  useEffect(() => {
+    const fetchRoadmaps = async () => {
+      try {
+        // Calling the clean API function with query parameters
+        const data = await roadmapApi.getList();
+        setRoadmaps(data?.data);
+      } catch (error) {
+        console.error("Failed to load roadmaps:", error);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchRoadmaps();
+  }, []);
 
   return (
     <div className="w-full text-white rounded-2xl my-4 border border-white/10 bg-black/20">
@@ -212,107 +252,9 @@ export default function RoadmapList({
         {/* Roadmap Cards Grid matching RoadmapsPage.tsx dimensions and look */}
         <div className="mt-6">
           <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-4">
-            {visibleRoadmaps.map((roadmap) => {
-              const percentage = Math.round(
-                (roadmap.completedProblems / roadmap.totalProblems) * 100,
-              );
-              const completed =
-                roadmap.completedProblems === roadmap.totalProblems;
-
-              return (
-                <article
-                  key={roadmap.id}
-                  className="group relative min-h-27 overflow-hidden rounded-xl border border-white/12 bg-[#191919] transition duration-200 hover:border-white/25 hover:bg-[#1d1d1d]"
-                  style={{
-                    borderLeftColor: roadmap.color,
-                    borderLeftWidth: "2px",
-                  }}
-                >
-                  <button
-                    type="button"
-                    onClick={() => onSelectRoadmap?.(roadmap)}
-                    aria-label={`Open ${roadmap.title}`}
-                    className="flex min-h-27 w-full flex-col p-3 text-left"
-                  >
-                    {/* Header: Icon, Title, Chevron */}
-                    <div className="flex items-start gap-2">
-                      <span className="mt-0.5 text-[12px] leading-4">
-                        {completed ? (
-                          <Check size={13} style={{ color: roadmap.color }} />
-                        ) : (
-                          roadmap.icon
-                        )}
-                      </span>
-
-                      <div className="min-w-0 flex-1">
-                        <h3 className="min-w-0 text-[11px] font-semibold leading-normal text-gray-100 line-clamp-2">
-                          {roadmap.title}
-                        </h3>
-                        {roadmap.badge && (
-                          <span className="mt-1 inline-block rounded-full border border-white/10 bg-white/5 px-1.5 py-0.2 text-[9px] font-medium text-gray-400">
-                            {roadmap.badge}
-                          </span>
-                        )}
-                      </div>
-
-                      <ChevronRight
-                        size={13}
-                        className="mt-0.5 shrink-0 text-gray-600 opacity-0 transition group-hover:translate-x-0.5 group-hover:opacity-100"
-                        onClick={() =>
-                          navigate(
-                            `/roadmap/${roadmap.title.toLocaleLowerCase()}`,
-                          )
-                        }
-                      />
-                    </div>
-
-                    {/* Progress Information */}
-                    <div className="mt-auto pt-4">
-                      <div className="flex items-center justify-between gap-2 text-[9px] text-gray-500">
-                        <span>
-                          {roadmap.completedProblems}/{roadmap.totalProblems}{" "}
-                          completed
-                        </span>
-                        <span
-                          className="font-semibold"
-                          style={{ color: roadmap.color }}
-                        >
-                          {percentage}%
-                        </span>
-                      </div>
-
-                      <div className="mt-1.5 h-[3px] overflow-hidden rounded-full bg-white/[0.08]">
-                        <div
-                          className="h-full rounded-full transition-all duration-300"
-                          style={{
-                            width: `${percentage}%`,
-                            backgroundColor: roadmap.color,
-                          }}
-                        />
-                      </div>
-                    </div>
-                  </button>
-
-                  {/* Interactive toggle control for quick progress testing */}
-                  <button
-                    type="button"
-                    title={completed ? "Undo last step" : "Complete one step"}
-                    aria-label={
-                      completed
-                        ? `Undo completion for ${roadmap.title}`
-                        : `Complete one step for ${roadmap.title}`
-                    }
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      updateProgress(roadmap.id, completed ? -1 : 1);
-                    }}
-                    className="absolute bottom-2 right-2 rounded-md p-1 text-gray-600 opacity-0 transition hover:bg-white/10 hover:text-white focus:opacity-100 group-hover:opacity-100"
-                  >
-                    {completed ? <Circle size={12} /> : <Check size={12} />}
-                  </button>
-                </article>
-              );
-            })}
+            {visibleRoadmaps.map((roadmap) => (
+              <RoadmapItemCard roadmap={roadmap} />
+            ))}
           </div>
 
           {/* Empty state matching RoadmapsPage.tsx */}
@@ -340,11 +282,11 @@ export default function RoadmapList({
         </div>
 
         {/* Footer info matching reference */}
-        <footer className="mt-8 border-t border-white/[0.08] pt-4">
+        <footer className="mt-8 border-t border-white/8 pt-4">
           <div className="flex flex-wrap items-center justify-between gap-2 text-[10px] text-gray-500">
             <span>
-              {totals.completedSteps} of {totals.totalSteps} steps completed
-              across {totals.totalRoadmaps} roadmaps
+              {/* {totals.completedSteps} of {totals.totalSteps} steps completed
+              across {totals.totalRoadmaps} roadmaps */}
             </span>
             <span>Continuous learning builds mastery.</span>
           </div>

@@ -137,7 +137,7 @@ function App() {
                     "/calendar",
                     "/history",
                     "/roadmap",
-                    "/roadmap/:name",
+                    "/roadmap/*",
                   ].map((path) => (
                     <Route
                       key={path}

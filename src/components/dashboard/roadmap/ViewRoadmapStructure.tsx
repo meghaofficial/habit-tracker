@@ -3,13 +3,16 @@ import ViewRoadmap from "./ViewRoadmap";
 import type { RoadmapData } from "./types";
 import { initialRootRoadmap } from "./testData";
 import { ArrowLeft } from "lucide-react";
+import { useNavigate, useParams } from "react-router-dom";
 
-const ViewRoadmapStructure = ({ onBack }: { onBack: () => void }) => {
+const ViewRoadmapStructure = () => {
+  const navigate = useNavigate();
+  const params = useParams();
   const [rootRoadmap, setRootRoadmap] =
     useState<RoadmapData>(initialRootRoadmap);
-  // Navigation path for nested roadmaps (array of node IDs)
-  // e.g. [] -> root, ["node-3"] -> nested under node-3
   const [navigationPath, setNavigationPath] = useState<string[]>([]);
+  const splat = params["*"];
+  const roadmapSteps = splat ? splat.split("/") : [];
 
   // Helper: locate active roadmap data based on navigationPath
   const getActiveRoadmapAndTrail = useCallback((): {
@@ -73,12 +76,22 @@ const ViewRoadmapStructure = ({ onBack }: { onBack: () => void }) => {
     setRootRoadmap((prev) => updateRecursive(prev, 0));
   };
 
-  const handleNavigateBreadcrumb = (index: number) => {
-    if (index === 0) {
+  const handleNavigateBreadcrumb = (index: number, title: string) => {
+    const targetIndex = roadmapSteps.indexOf(title);
+    if (targetIndex === -1) {
       setNavigationPath([]);
-    } else {
-      setNavigationPath(navigationPath.slice(0, index));
+      navigate("/roadmap");
+      return;
     }
+    const newPathSegments = roadmapSteps.slice(0, targetIndex + 1);
+    setNavigationPath(newPathSegments);
+    navigate(`/roadmap/${newPathSegments.join("/")}`);
+
+    // if (index === 0) {
+    //   setNavigationPath([]);
+    // } else {
+    //   setNavigationPath(navigationPath.slice(0, index));
+    // }
   };
 
   const handleOpenNestedRoadmap = (nodeId: string) => {
@@ -114,7 +127,7 @@ const ViewRoadmapStructure = ({ onBack }: { onBack: () => void }) => {
       <div className="flex flex-wrap items-center gap-1.5 pb-3 text-xs text-gray-400 border-b border-white/8">
         <button
           type="button"
-          onClick={onBack}
+          onClick={() => navigate("/roadmap")}
           aria-label="Back to roadmaps"
           className="flex items-center gap-1.5 rounded-xl border border-white/10 bg-[#161616] px-3 py-1.5 text-xs font-medium text-gray-300 transition hover:bg-white/10 hover:text-white cursor-pointer"
         >
@@ -127,7 +140,7 @@ const ViewRoadmapStructure = ({ onBack }: { onBack: () => void }) => {
             <React.Fragment key={crumb.id + idx}>
               <button
                 type="button"
-                onClick={() => handleNavigateBreadcrumb(idx)}
+                onClick={() => handleNavigateBreadcrumb(idx, crumb.title)}
                 className={`font-medium transition hover:text-white ${
                   isLast
                     ? "text-emerald-400 font-semibold"

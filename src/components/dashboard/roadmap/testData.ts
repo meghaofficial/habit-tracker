@@ -1,16 +1,4 @@
-import type { RoadmapData } from "./types";
-
-export type RoadmapItem = {
-  id: string;
-  title: string;
-  description: string;
-  category: string;
-  icon: string;
-  totalProblems: number;
-  completedProblems: number;
-  color: string;
-  badge?: string;
-};
+import type { RoadmapData, RoadmapItem } from "./types";
 
 export const initialRoadmaps: RoadmapItem[] = [
   {
