@@ -13,7 +13,12 @@ import {
   X,
   Check,
 } from "lucide-react";
-import type { NodeType, RoadmapData, RoadmapNode, SequentialTask } from "./types";
+import type {
+  NodeType,
+  RoadmapData,
+  RoadmapNode,
+  SequentialTask,
+} from "./types";
 
 export type CreateRoadmapProps = {
   roadmap: RoadmapData;
@@ -35,7 +40,20 @@ const DEFAULT_COLORS = [
   "#14b8a6", // Teal
 ];
 
-const PRESET_ICONS = ["🚀", "🌱", "⚡", "🧩", "🏛️", "🗄️", "🛡️", "📱", "🎯", "🧠", "🔥", "📚"];
+const PRESET_ICONS = [
+  "🚀",
+  "🌱",
+  "⚡",
+  "🧩",
+  "🏛️",
+  "🗄️",
+  "🛡️",
+  "📱",
+  "🎯",
+  "🧠",
+  "🔥",
+  "📚",
+];
 
 export default function CreateRoadmap({
   roadmap,
@@ -63,7 +81,9 @@ export default function CreateRoadmap({
   ]);
   const [newTaskInput, setNewTaskInput] = useState("");
 
-  const fullDisplayTitle = breadcrumbs.map((b) => b.title || "Untitled").join(" / ");
+  const fullDisplayTitle = breadcrumbs
+    .map((b) => b.title || "Untitled")
+    .join(" / ");
 
   // Handle roadmap base field changes
   const updateField = (field: keyof RoadmapData, value: any) => {
@@ -83,8 +103,16 @@ export default function CreateRoadmap({
     setNodeDescription("");
     setNodeCompleted(false);
     setTasks([
-      { id: Date.now() + "-1", title: "Step 1: Prerequisites & Setup", completed: false },
-      { id: Date.now() + "-2", title: "Step 2: Core Concepts & Practice", completed: false },
+      {
+        id: Date.now() + "-1",
+        title: "Step 1: Prerequisites & Setup",
+        completed: false,
+      },
+      {
+        id: Date.now() + "-2",
+        title: "Step 2: Core Concepts & Practice",
+        completed: false,
+      },
     ]);
     setNewTaskInput("");
     setIsNodeModalOpen(true);
@@ -122,7 +150,9 @@ export default function CreateRoadmap({
 
   const handleToggleTaskCompleted = (taskId: string) => {
     setTasks((prev) =>
-      prev.map((t) => (t.id === taskId ? { ...t, completed: !t.completed } : t))
+      prev.map((t) =>
+        t.id === taskId ? { ...t, completed: !t.completed } : t,
+      ),
     );
   };
 
@@ -189,6 +219,7 @@ export default function CreateRoadmap({
           icon: nodeIcon,
           color: nodeColor,
           tasks,
+          status: "pending",
         };
       } else if (nodeType === "nested") {
         newNode = {
@@ -206,6 +237,7 @@ export default function CreateRoadmap({
             description: "Nested roadmap created under " + roadmap.title,
             nodes: [],
           },
+          status: "pending",
         };
       } else {
         newNode = {
@@ -216,6 +248,7 @@ export default function CreateRoadmap({
           color: nodeColor,
           description: nodeDescription.trim(),
           completed: nodeCompleted,
+          status: "pending",
         };
       }
 
@@ -261,7 +294,9 @@ export default function CreateRoadmap({
                 type="button"
                 onClick={() => onNavigateBreadcrumb(idx)}
                 className={`font-medium transition hover:text-white ${
-                  isLast ? "text-indigo-400 font-semibold" : "text-gray-400 hover:underline"
+                  isLast
+                    ? "text-indigo-400 font-semibold"
+                    : "text-gray-400 hover:underline"
                 }`}
               >
                 {crumb.title || "Untitled"}
@@ -318,8 +353,12 @@ export default function CreateRoadmap({
         <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
           <div>
             <div className="mb-1 flex items-center justify-between">
-              <label className="text-xs font-medium text-gray-300">Category</label>
-              <span className="text-[10px] text-gray-500 font-normal">Optional</span>
+              <label className="text-xs font-medium text-gray-300">
+                Category
+              </label>
+              <span className="text-[10px] text-gray-500 font-normal">
+                Optional
+              </span>
             </div>
             <input
               type="text"
@@ -331,7 +370,9 @@ export default function CreateRoadmap({
           </div>
 
           <div>
-            <label className="mb-1 block text-xs font-medium text-gray-300">Icon / Emoji</label>
+            <label className="mb-1 block text-xs font-medium text-gray-300">
+              Icon / Emoji
+            </label>
             <div className="flex items-center gap-1.5">
               <input
                 type="text"
@@ -357,7 +398,9 @@ export default function CreateRoadmap({
 
         {/* Accent Color */}
         <div>
-          <label className="mb-1.5 block text-xs font-medium text-gray-300">Accent Color</label>
+          <label className="mb-1.5 block text-xs font-medium text-gray-300">
+            Accent Color
+          </label>
           <div className="flex flex-wrap items-center gap-2">
             {DEFAULT_COLORS.map((col) => (
               <button
@@ -377,7 +420,9 @@ export default function CreateRoadmap({
 
         {/* Description */}
         <div>
-          <label className="mb-1 block text-xs font-medium text-gray-300">Description</label>
+          <label className="mb-1 block text-xs font-medium text-gray-300">
+            Description
+          </label>
           <textarea
             rows={2}
             value={roadmap.description || ""}
@@ -413,9 +458,12 @@ export default function CreateRoadmap({
         {roadmap.nodes.length === 0 ? (
           <div className="mt-3 flex flex-col items-center justify-center rounded-xl border border-dashed border-white/10 p-6 text-center">
             <Sparkles size={24} className="text-gray-500 mb-2" />
-            <p className="text-xs font-medium text-gray-300">No nodes added yet</p>
+            <p className="text-xs font-medium text-gray-300">
+              No nodes added yet
+            </p>
             <p className="text-[11px] text-gray-500 mt-0.5">
-              Click &quot;Add Node&quot; to add a single node, sequential tasks, or nested roadmap.
+              Click &quot;Add Node&quot; to add a single node, sequential tasks,
+              or nested roadmap.
             </p>
             <button
               type="button"
@@ -469,12 +517,14 @@ export default function CreateRoadmap({
                       <div className="mt-0.5 flex items-center gap-2 text-[10px] text-gray-500">
                         <span>Node #{index + 1}</span>
                         {node.type === "single" && (
-                          <span>{node.completed ? "✓ Marked Done" : "Incomplete"}</span>
+                          <span>
+                            {node.completed ? "✓ Marked Done" : "Incomplete"}
+                          </span>
                         )}
                         {node.type === "sequential" && (
                           <span>
-                            {node.tasks?.filter((t) => t.completed).length || 0}/
-                            {node.tasks?.length || 0} tasks done
+                            {node.tasks?.filter((t) => t.completed).length || 0}
+                            /{node.tasks?.length || 0} tasks done
                           </span>
                         )}
                         {node.type === "nested" && (
@@ -579,8 +629,13 @@ export default function CreateRoadmap({
                       : "border-white/10 bg-[#1b1b1b] text-gray-400 hover:bg-white/5"
                   }`}
                 >
-                  <CheckSquare size={16} className={nodeType === "single" ? "text-blue-400" : ""} />
-                  <span className="mt-1.5 text-xs font-semibold text-white">Single Node</span>
+                  <CheckSquare
+                    size={16}
+                    className={nodeType === "single" ? "text-blue-400" : ""}
+                  />
+                  <span className="mt-1.5 text-xs font-semibold text-white">
+                    Single Node
+                  </span>
                   <span className="text-[10px] text-gray-400 mt-0.5">
                     No sequential tasks, with checkbox
                   </span>
@@ -596,8 +651,15 @@ export default function CreateRoadmap({
                       : "border-white/10 bg-[#1b1b1b] text-gray-400 hover:bg-white/5"
                   }`}
                 >
-                  <ListOrdered size={16} className={nodeType === "sequential" ? "text-amber-400" : ""} />
-                  <span className="mt-1.5 text-xs font-semibold text-white">Sequential Tasks</span>
+                  <ListOrdered
+                    size={16}
+                    className={
+                      nodeType === "sequential" ? "text-amber-400" : ""
+                    }
+                  />
+                  <span className="mt-1.5 text-xs font-semibold text-white">
+                    Sequential Tasks
+                  </span>
                   <span className="text-[10px] text-gray-400 mt-0.5">
                     Step-by-step tasks in vertical order
                   </span>
@@ -613,8 +675,13 @@ export default function CreateRoadmap({
                       : "border-white/10 bg-[#1b1b1b] text-gray-400 hover:bg-white/5"
                   }`}
                 >
-                  <FolderGit2 size={16} className={nodeType === "nested" ? "text-purple-400" : ""} />
-                  <span className="mt-1.5 text-xs font-semibold text-white">Another Roadmap</span>
+                  <FolderGit2
+                    size={16}
+                    className={nodeType === "nested" ? "text-purple-400" : ""}
+                  />
+                  <span className="mt-1.5 text-xs font-semibold text-white">
+                    Another Roadmap
+                  </span>
                   <span className="text-[10px] text-gray-400 mt-0.5">
                     Nested roadmap with &apos;/&apos; breadcrumb
                   </span>
@@ -630,8 +697,8 @@ export default function CreateRoadmap({
                   {nodeType === "nested"
                     ? "Nested Roadmap Title"
                     : nodeType === "sequential"
-                    ? "Module / Topic Title"
-                    : "Node Title"}{" "}
+                      ? "Module / Topic Title"
+                      : "Node Title"}{" "}
                   <span className="text-rose-400">*</span>
                 </label>
                 <input
@@ -647,7 +714,8 @@ export default function CreateRoadmap({
                 />
                 {nodeType === "nested" && (
                   <p className="mt-1 text-[10px] text-purple-400">
-                    Will be accessed as: &quot;{fullDisplayTitle} / {nodeTitle || "Untitled"}&quot;
+                    Will be accessed as: &quot;{fullDisplayTitle} /{" "}
+                    {nodeTitle || "Untitled"}&quot;
                   </p>
                 )}
               </div>
@@ -790,7 +858,9 @@ export default function CreateRoadmap({
                               type="button"
                               onClick={() => handleToggleTaskCompleted(task.id)}
                               className={`flex items-center gap-2 text-left truncate cursor-pointer ${
-                                task.completed ? "text-gray-500 line-through" : "text-gray-200"
+                                task.completed
+                                  ? "text-gray-500 line-through"
+                                  : "text-gray-200"
                               }`}
                             >
                               <div
@@ -800,7 +870,9 @@ export default function CreateRoadmap({
                                     : "border-gray-500 bg-black/40"
                                 }`}
                               >
-                                {task.completed && <Check size={11} strokeWidth={3} />}
+                                {task.completed && (
+                                  <Check size={11} strokeWidth={3} />
+                                )}
                               </div>
                               <span className="truncate">{task.title}</span>
                             </button>
@@ -818,7 +890,8 @@ export default function CreateRoadmap({
 
                       {tasks.length === 0 && (
                         <p className="text-center py-3 text-[11px] text-gray-500">
-                          No sequential tasks added yet. Add at least one task above.
+                          No sequential tasks added yet. Add at least one task
+                          above.
                         </p>
                       )}
                     </div>
@@ -830,14 +903,18 @@ export default function CreateRoadmap({
               {nodeType === "nested" && (
                 <div className="rounded-xl border border-purple-500/20 bg-purple-500/10 p-3 text-xs text-purple-200">
                   <div className="flex items-start gap-2">
-                    <FolderGit2 size={16} className="mt-0.5 text-purple-400 shrink-0" />
+                    <FolderGit2
+                      size={16}
+                      className="mt-0.5 text-purple-400 shrink-0"
+                    />
                     <div>
                       <span className="font-semibold text-purple-300">
                         Nested Roadmap Architecture
                       </span>
                       <p className="mt-0.5 text-[11px] text-purple-300/80 leading-relaxed">
-                        This creates a full sub-roadmap. After saving, you can click &quot;Edit Sub-Roadmap&quot;
-                        to define its internal nodes and milestones under the breadcrumb path:
+                        This creates a full sub-roadmap. After saving, you can
+                        click &quot;Edit Sub-Roadmap&quot; to define its
+                        internal nodes and milestones under the breadcrumb path:
                         <br />
                         <code className="text-[10px] text-white bg-black/40 px-1 py-0.5 rounded mt-1 inline-block">
                           {fullDisplayTitle} / {nodeTitle || "&lt;Title&gt;"}

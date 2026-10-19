@@ -252,3 +252,29 @@ export const initialRootRoadmap: RoadmapData = {
     },
   ],
 };
+
+export const DEFAULT_COLORS = [
+  "#6366f1", // Indigo
+  "#38bdf8", // Sky
+  "#10b981", // Emerald
+  "#f59e0b", // Amber
+  "#ec4899", // Pink
+  "#8b5cf6", // Purple
+  "#f43f5e", // Rose
+  "#14b8a6", // Teal
+];
+
+export const PRESET_ICONS = [
+  "🚀",
+  "🌱",
+  "⚡",
+  "🧩",
+  "🏛️",
+  "🗄️",
+  "🛡️",
+  "📱",
+  "🎯",
+  "🧠",
+  "🔥",
+  "📚",
+];

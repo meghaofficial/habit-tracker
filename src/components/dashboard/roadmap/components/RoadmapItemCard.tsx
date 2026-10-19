@@ -109,7 +109,7 @@ const RoadmapItemCard = ({
               </span>
             )}
             {roadmap.description && (
-              <span className="inline-block truncate text-[9px] mt-2 font-medium text-gray-500">
+              <span className="w-[80%] absolute line-clamp-1 text-[9px] mt-2 font-medium text-gray-500">
                 {roadmap.description}
               </span>
             )}

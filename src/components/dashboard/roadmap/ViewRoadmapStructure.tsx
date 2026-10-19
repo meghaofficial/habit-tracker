@@ -76,7 +76,7 @@ const ViewRoadmapStructure = () => {
     setRootRoadmap((prev) => updateRecursive(prev, 0));
   };
 
-  const handleNavigateBreadcrumb = (index: number, title: string) => {
+  const handleNavigateBreadcrumb = (title: string) => {
     const targetIndex = roadmapSteps.indexOf(title);
     if (targetIndex === -1) {
       setNavigationPath([]);
@@ -86,12 +86,6 @@ const ViewRoadmapStructure = () => {
     const newPathSegments = roadmapSteps.slice(0, targetIndex + 1);
     setNavigationPath(newPathSegments);
     navigate(`/roadmap/${newPathSegments.join("/")}`);
-
-    // if (index === 0) {
-    //   setNavigationPath([]);
-    // } else {
-    //   setNavigationPath(navigationPath.slice(0, index));
-    // }
   };
 
   const handleOpenNestedRoadmap = (nodeId: string) => {
@@ -122,9 +116,9 @@ const ViewRoadmapStructure = () => {
   };
 
   return (
-    <div className="flex h-full flex-col overflow-y-auto rounded-2xl border border-white/10 bg-[#121212] p-4 sm:p-6 shadow-sm mt-4">
+    <div className="flex h-full flex-col overflow-y-auto rounded-2xl border border-white/10 bg-[#121212] shadow-sm mt-4">
       {/* Breadcrumb Bar */}
-      <div className="flex flex-wrap items-center gap-1.5 pb-3 text-xs text-gray-400 border-b border-white/8">
+      <div className="flex flex-wrap items-center gap-3 p-4 text-xs text-gray-400 border-b border-white/8">
         <button
           type="button"
           onClick={() => navigate("/roadmap")}
@@ -140,7 +134,7 @@ const ViewRoadmapStructure = () => {
             <React.Fragment key={crumb.id + idx}>
               <button
                 type="button"
-                onClick={() => handleNavigateBreadcrumb(idx, crumb.title)}
+                onClick={() => handleNavigateBreadcrumb(crumb.title)}
                 className={`font-medium transition hover:text-white ${
                   isLast
                     ? "text-emerald-400 font-semibold"
@@ -154,12 +148,14 @@ const ViewRoadmapStructure = () => {
           );
         })}
       </div>
-      <ViewRoadmap
-        roadmap={activeRoadmap}
-        onOpenNestedRoadmap={handleOpenNestedRoadmap}
-        onToggleNodeComplete={handleToggleNodeComplete}
-        onToggleTaskComplete={handleToggleTaskComplete}
-      />
+      <div className="p-4 sm:p-6">
+        <ViewRoadmap
+          roadmap={activeRoadmap}
+          onOpenNestedRoadmap={handleOpenNestedRoadmap}
+          onToggleNodeComplete={handleToggleNodeComplete}
+          onToggleTaskComplete={handleToggleTaskComplete}
+        />
+      </div>
     </div>
   );
 };

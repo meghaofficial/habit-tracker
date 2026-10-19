@@ -85,17 +85,6 @@ export default function RoadmapList({
     setSelectedCategory("all");
   };
 
-  // const fetchRoadmaps = async () => {
-  //   try {
-  //     const data = await roadmapApi.getList();
-  //     setRoadmaps(data?.data);
-  //   } catch (error) {
-  //     console.error("Failed to load roadmaps:", error);
-  //   } finally {
-  //     setLoading(false);
-  //   }
-  // };
-
   const fetchRoadmaps = async (searchValue = "") => {
     try {
       const data = await roadmapApi.getList({
@@ -165,7 +154,10 @@ export default function RoadmapList({
           {onAddNewRoadmap && (
             <button
               type="button"
-              onClick={onAddNewRoadmap}
+              onClick={() => {
+                onAddNewRoadmap();
+                navigate("/roadmap/create");
+              }}
               className="inline-flex shrink-0 items-center gap-2 self-start rounded-xl bg-indigo-500 px-4 py-2.5 text-xs font-semibold text-white shadow-md shadow-indigo-600/20 transition active:scale-95 sm:self-auto cursor-pointer"
             >
               <Plus size={15} />

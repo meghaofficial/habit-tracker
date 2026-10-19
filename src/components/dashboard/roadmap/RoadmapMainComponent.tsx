@@ -26,7 +26,11 @@ const RoadmapMainComponent = () => {
 
   useEffect(() => {
     if (roadmapSteps.length > 0) {
-      setCurrentView("view");
+      if (roadmapSteps[0] === "create") {
+        setCurrentView("create");
+      } else {
+        setCurrentView("view");
+      }
     } else {
       setCurrentView("list");
     }
@@ -40,9 +44,7 @@ const RoadmapMainComponent = () => {
           setActiveRoadmap={setActiveRoadmap}
         />
       )}
-      {currentView === "create" && (
-        <RoadmapCreation onBack={() => setCurrentView("list")} />
-      )}
+      {currentView === "create" && <RoadmapCreation />}
       {currentView === "view" && <ViewRoadmapStructure />}
     </div>
   );

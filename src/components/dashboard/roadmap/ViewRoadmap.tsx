@@ -90,12 +90,12 @@ export default function ViewRoadmap({
   //   .join(" / ");
 
   const splat = params["*"];
-  const roadmapSteps = splat ? splat.split("/") : [];
+  // const roadmapSteps = splat ? splat.split("/") : [];
 
   return (
     <div>
       {/* Header Preview Info */}
-      <div className="mt-4 flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
+      <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
         <div className="flex items-start gap-3 min-w-0 flex-1">
           <div
             className="flex h-11 w-11 shrink-0 items-center justify-center rounded-2xl text-xl shadow-lg border border-white/10"
