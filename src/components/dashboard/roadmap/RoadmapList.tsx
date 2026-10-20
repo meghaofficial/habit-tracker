@@ -12,6 +12,7 @@ import type { RoadmapData } from "./types";
 import { roadmapApi } from "../../../api/roadmap.api";
 import RoadmapItemCard from "./components/RoadmapItemCard";
 import { notify } from "../../../helper";
+import Pagination from "../../shared/Pagination";
 
 export interface RoadmapItem {
   _id: string;
@@ -42,6 +43,10 @@ export default function RoadmapList({
   const [showCompletedOnly, setShowCompletedOnly] = useState(false);
   const [selectedCategory, setSelectedCategory] = useState<string>("all");
   const [isDeleting, setIsDeleting] = useState(false);
+
+  const [currentPage, setCurrentPage] = useState(1);
+  const [totalPages, setTotalPages] = useState(0);
+  const pageLimit = 8;
 
   const isFirstRender = useRef(true);
 
@@ -89,11 +94,12 @@ export default function RoadmapList({
     try {
       const data = await roadmapApi.getList({
         search: searchValue.trim(),
-        page: 1,
-        // limit: 10,
+        page: currentPage,
+        limit: pageLimit,
       });
 
       setRoadmaps(data?.data ?? []);
+      setTotalPages(data?.pagination?.totalPages);
     } catch (error) {
       console.error("Failed to load roadmaps:", error);
     } finally {
@@ -129,7 +135,7 @@ export default function RoadmapList({
     }, 300);
 
     return () => clearTimeout(timeoutId);
-  }, [search]);
+  }, [search, currentPage]);
 
   return (
     <div className="w-full text-white rounded-2xl my-4 border border-white/10 bg-black/20">
@@ -281,8 +287,16 @@ export default function RoadmapList({
           )}
         </div>
 
+        <div className="my-6">
+          <Pagination
+            currentPage={currentPage}
+            totalPages={totalPages}
+            onPageChange={setCurrentPage}
+          />
+        </div>
+
         {/* Footer info matching reference */}
-        <footer className="mt-8 border-t border-white/8 pt-4">
+        <footer className="border-t border-white/8 pt-4">
           <div className="flex flex-wrap items-center justify-between gap-2 text-[10px] text-gray-500">
             <span>
               {/* {totals.completedSteps} of {totals.totalSteps} steps completed

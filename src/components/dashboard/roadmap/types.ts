@@ -6,18 +6,6 @@ export type SequentialTask = {
   completed: boolean;
 };
 
-// export type RoadmapItem = {
-//   id: string;
-//   title: string;
-//   description: string;
-//   category: string;
-//   icon: string;
-//   totalProblems: number;
-//   completedProblems: number;
-//   color: string;
-//   badge?: string;
-// };
-
 export type RoadmapNode = {
   id: string;
   title: string;
@@ -62,5 +50,6 @@ export interface RoadmapItem {
   accent_color: string;
   category: string;
   type: "list" | "roadmap";
+  parent_id: string | null;
   points?: ListPoint[];
 }

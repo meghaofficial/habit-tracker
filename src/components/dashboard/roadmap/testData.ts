@@ -265,16 +265,53 @@ export const DEFAULT_COLORS = [
 ];
 
 export const PRESET_ICONS = [
-  "🚀",
-  "🌱",
-  "⚡",
-  "🧩",
-  "🏛️",
-  "🗄️",
-  "🛡️",
-  "📱",
+  // Roadmaps & planning
+  "🗺️",
+  "🧭",
   "🎯",
-  "🧠",
-  "🔥",
+  "🚀",
+  "🛤️",
+  "📍",
+  "🏁",
+  "🪜",
+  "🗓️",
+  "📌",
+
+  // Learning & knowledge
   "📚",
-];
+  "📖",
+  "🎓",
+  "🧠",
+  "💡",
+  "✍️",
+  "📝",
+  "🔖",
+  "🔬",
+  "🧪",
+
+  // Software development
+  "💻",
+  "⌨️",
+  "🖥️",
+  "⚙️",
+  "🛠️",
+  "🔧",
+  "🧩",
+  "🌐",
+  "🗄️",
+  "🤖",
+
+  // Data & architecture
+  "📊",
+  "📈",
+  "🔗",
+  "🏗️",
+  "🧱",
+
+  // Goals & productivity
+  "✅",
+  "⚡",
+  "🔥",
+  "💎",
+  "🌱",
+] as const;

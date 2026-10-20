@@ -4,6 +4,7 @@ export interface RoadmapFilters {
   search?: string;
   category?: string;
   page?: number;
+  limit?: number;
 }
 
 export const roadmapApi = {

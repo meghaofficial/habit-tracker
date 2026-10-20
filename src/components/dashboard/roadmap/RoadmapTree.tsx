@@ -2,6 +2,7 @@ import { useState } from "react";
 import type { RoadmapItem } from "./types";
 import CreationForm from "./components/CreationForm";
 import { ChevronRight, ChevronDown } from "lucide-react";
+import IconPickerModal from "./components/IconPickerModal";
 
 type TreeNode = RoadmapItem & {
   parent_id?: string | null;
@@ -17,6 +18,13 @@ export default function RoadmapTree() {
   const [rootFormOpen, setRootFormOpen] = useState(true);
   const [openForms, setOpenForms] = useState<string[]>([]);
   const [expanded, setExpanded] = useState<string[]>([]);
+
+  const [selectedIcon, setSelectedIcon] = useState("🗺️");
+  const [childIcons, setChildIcons] = useState<Record<string, string>>({});
+  const [iconPickerOpen, setIconPickerOpen] = useState(false);
+  const [activeIconParentId, setActiveIconParentId] = useState<string | null>(
+    null,
+  );
 
   const toggleValue = (
     setter: React.Dispatch<React.SetStateAction<string[]>>,
@@ -35,9 +43,28 @@ export default function RoadmapTree() {
         : node.children.map((item) => addChildLocally(item, child)),
   });
 
+  // const createChild = (parent: TreeNode, child: RoadmapItem) => {
+  //   const newNode: TreeNode = {
+  //     ...child,
+  //     parent_id: parent._id,
+  //     type: child.type ?? "roadmap",
+  //     children: [],
+  //   };
+
+  //   setRoot((current) =>
+  //     current ? addChildLocally(current, newNode) : current,
+  //   );
+
+  //   setOpenForms((prev) => prev.filter((id) => id !== parent._id));
+  //   setExpanded((prev) =>
+  //     prev.includes(parent._id) ? prev : [...prev, parent._id],
+  //   );
+  // };
+
   const createChild = (parent: TreeNode, child: RoadmapItem) => {
     const newNode: TreeNode = {
       ...child,
+      icon: childIcons[parent._id] || "🗺️",
       parent_id: parent._id,
       type: child.type ?? "roadmap",
       children: [],
@@ -47,12 +74,18 @@ export default function RoadmapTree() {
       current ? addChildLocally(current, newNode) : current,
     );
 
-    setOpenForms((prev) => prev.filter((id) => id !== parent._id));
+    setChildIcons((prev) => {
+      const updated = { ...prev };
+      delete updated[parent._id];
+      return updated;
+    });
+
+    setOpenForms((prev) => prev.filter((id) => id !== `new:${parent._id}`));
+
     setExpanded((prev) =>
       prev.includes(parent._id) ? prev : [...prev, parent._id],
     );
   };
-
   const renderNode = (
     node: TreeNode,
     parent: TreeNode | null,
@@ -71,7 +104,7 @@ export default function RoadmapTree() {
             borderLeft: `3px solid ${accent}`,
           }}
         >
-          <div className="flex items-center gap-3 px-4 py-3.5">
+          <div className="flex items-start gap-3 px-4 py-3.5">
             <span className="shrink-0 text-lg">{node.icon || "🗺️"}</span>
 
             <div className="min-w-0 flex-1">
@@ -140,7 +173,7 @@ export default function RoadmapTree() {
               type="button"
               onClick={() => toggleValue(setOpenForms, node._id)}
               aria-label={formOpen ? "Close form" : "Edit node"}
-              className={`shrink-0 rounded-md p-1.5 text-sm ${
+              className={`shrink-0 rounded-md py-0.5 px-1.5 text-sm ${
                 formOpen
                   ? "bg-indigo-500/15 text-indigo-300"
                   : "text-gray-500 hover:bg-white/10 hover:text-white"
@@ -176,6 +209,21 @@ export default function RoadmapTree() {
                 onCancel={() =>
                   setOpenForms((prev) => prev.filter((id) => id !== node._id))
                 }
+                onOpenIconPicker={() => setIconPickerOpen(true)}
+                selectedIcon={node.icon || "🗺️"}
+                // onIconChange={(icon) => {
+                //   setRoot((current) => {
+                //     if (!current) return current;
+
+                //     const update = (item: TreeNode): TreeNode => ({
+                //       ...item,
+                //       ...(item._id === node._id ? { icon } : {}),
+                //       children: item.children.map(update),
+                //     });
+
+                //     return update(current);
+                //   });
+                // }}
               />
             </div>
           )}
@@ -199,8 +247,58 @@ export default function RoadmapTree() {
 
         {/* New child form */}
         {openForms.includes(`new:${node._id}`) && (
+          // <div className="mt-2 w-[min(100%,405px)] rounded-xl border border-indigo-500/20 bg-[#171717] p-3">
+          //   <span
+          //     className="text-lg cursor-pointer"
+          //     onClick={() => setIconPickerOpen(true)}
+          //   >
+          //     {selectedIcon || "🗺️"}
+          //   </span>
+          //   <CreationForm
+          //     parentId={node._id}
+          //     parentName={node.title}
+          //     onCreated={(child) => createChild(node, child)}
+          //     onCancel={() =>
+          //       setOpenForms((prev) =>
+          //         prev.filter((id) => id !== `new:${node._id}`),
+          //       )
+          //     }
+          //     onOpenIconPicker={() => setIconPickerOpen(true)}
+          //     selectedIcon={node.icon || "🗺️"}
+          //     // onIconChange={(icon) => {
+          //     //   setRoot((current) => {
+          //     //     if (!current) return current;
+
+          //     //     const update = (item: TreeNode): TreeNode => ({
+          //     //       ...item,
+          //     //       ...(item._id === node._id ? { icon } : {}),
+          //     //       children: item.children.map(update),
+          //     //     });
+
+          //     //     return update(current);
+          //     //   });
+          //     // }}
+          //   />
+          // </div>
           <div className="mt-2 w-[min(100%,405px)] rounded-xl border border-indigo-500/20 bg-[#171717] p-3">
+            <div className="mb-3 flex items-center gap-2">
+              <button
+                type="button"
+                onClick={() => {
+                  setActiveIconParentId(node._id);
+                  setIconPickerOpen(true);
+                }}
+                className="flex size-9 shrink-0 items-center justify-center rounded-lg border border-white/10 bg-white/5 text-xl hover:bg-white/10"
+                title="Choose child icon"
+              >
+                {childIcons[node._id] || "🗺️"}
+              </button>
+
+              <span className="text-xs text-gray-400">Choose child icon</span>
+            </div>
+
             <CreationForm
+              key={node._id}
               parentId={node._id}
               parentName={node.title}
               onCreated={(child) => createChild(node, child)}
@@ -209,6 +307,11 @@ export default function RoadmapTree() {
                   prev.filter((id) => id !== `new:${node._id}`),
                 )
               }
+              onOpenIconPicker={() => {
+                setActiveIconParentId(node._id);
+                setIconPickerOpen(true);
+              }}
+              selectedIcon={childIcons[node._id] || "🗺️"}
             />
           </div>
         )}
@@ -229,17 +332,10 @@ export default function RoadmapTree() {
   };
 
   return (
-    <div className="min-h-screen bg-[#111111] p-4 text-white sm:p-6">
-      <div className="mx-auto max-w-5xl">
-        <div className="mb-6 flex items-center justify-between gap-3">
-          <div>
-            <h1 className="text-lg font-semibold">Roadmap Builder</h1>
-            <p className="mt-1 text-xs text-gray-500">
-              Create nested roadmaps and lists.
-            </p>
-          </div>
-
-          {root && (
+    <div className="min-h-screen bg-[#111111] p-4 text-white">
+      <div className="w-full">
+        {root && (
+          <div className="mb-6 flex items-center justify-between gap-3">
             <button
               type="button"
               onClick={() =>
@@ -255,19 +351,31 @@ export default function RoadmapTree() {
                 ? "Collapse children"
                 : "Expand children"}
             </button>
-          )}
-        </div>
+          </div>
+        )}
 
         {!root ? (
-          <div className="max-w-101.25 rounded-2xl border border-white/10 border-l-[3px] border-l-sky-400 bg-[#1d1d1d] p-4">
-            <h2 className="mb-3 text-sm font-medium">Create root node</h2>
+          <div className="max-w-101.25 rounded-2xl border border-white/10 bg-[#1d1d1d] p-4">
+            <div className="mb-3 text-sm font-medium">
+              <span
+                className="text-lg cursor-pointer"
+                onClick={() => setIconPickerOpen(true)}
+              >
+                {selectedIcon || "🗺️"}
+              </span>
+              <span className="ml-1">Create root node</span>
+            </div>
+
             {rootFormOpen && (
               <CreationForm
                 parentId={null}
                 parentName={null}
+                selectedIcon={selectedIcon}
+                onOpenIconPicker={() => setIconPickerOpen(true)}
                 onCreated={(item) => {
                   setRoot({
                     ...item,
+                    icon: selectedIcon,
                     type: item.type ?? "roadmap",
                     children: [],
                   });
@@ -288,6 +396,41 @@ export default function RoadmapTree() {
           </div>
         ) : (
           renderNode(root, null, 0)
+        )}
+
+        {/* {iconPickerOpen && (
+          <IconPickerModal
+            selectedIcon={selectedIcon}
+            onSelect={setSelectedIcon}
+            onClose={() => setIconPickerOpen(false)}
+          />
+        )} */}
+
+        {iconPickerOpen && (
+          <IconPickerModal
+            selectedIcon={
+              activeIconParentId === null
+                ? selectedIcon
+                : childIcons[activeIconParentId] || "🗺️"
+            }
+            onSelect={(icon) => {
+              if (activeIconParentId === null) {
+                setSelectedIcon(icon);
+              } else {
+                setChildIcons((prev) => ({
+                  ...prev,
+                  [activeIconParentId]: icon,
+                }));
+              }
+
+              setIconPickerOpen(false);
+              setActiveIconParentId(null);
+            }}
+            onClose={() => {
+              setIconPickerOpen(false);
+              setActiveIconParentId(null);
+            }}
+          />
         )}
       </div>
     </div>
