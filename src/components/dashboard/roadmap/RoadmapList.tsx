@@ -1,14 +1,6 @@
-import {
-  useEffect,
-  useMemo,
-  useRef,
-  useState,
-  type Dispatch,
-  type SetStateAction,
-} from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { Check, Plus, Search, X, RotateCcw } from "lucide-react";
 import { useNavigate, useSearchParams } from "react-router-dom";
-import type { RoadmapData } from "./types";
 import { roadmapApi } from "../../../api/roadmap.api";
 import RoadmapItemCard from "./components/RoadmapItemCard";
 import { notify } from "../../../helper";
@@ -29,29 +21,23 @@ export interface RoadmapItem {
 
 export type RoadmapListProps = {
   onAddNewRoadmap?: () => void;
-  setActiveRoadmap: Dispatch<SetStateAction<RoadmapData>>;
 };
 
-export default function RoadmapList({
-  onAddNewRoadmap,
-  setActiveRoadmap,
-}: RoadmapListProps) {
+export default function RoadmapList({ onAddNewRoadmap }: RoadmapListProps) {
   const navigate = useNavigate();
   const [roadmaps, setRoadmaps] = useState<RoadmapItem[]>([]);
   const [loading, setLoading] = useState(true);
-  // const [search, setSearch] = useState("");
   const [showCompletedOnly, setShowCompletedOnly] = useState(false);
   const [selectedCategory, setSelectedCategory] = useState<string>("all");
   const [isDeleting, setIsDeleting] = useState(false);
-
   const [searchParams, setSearchParams] = useSearchParams();
-
   const [search, setSearch] = useState(() => searchParams.get("search") || "");
   const [currentPage, setCurrentPage] = useState(() =>
     Math.max(1, Number(searchParams.get("page")) || 1),
   );
   const [totalPages, setTotalPages] = useState(0);
   const pageLimit = 8;
+  const [categories, setCategories] = useState<string[]>(["All"]);
 
   const isFirstRender = useRef(true);
 
@@ -81,38 +67,14 @@ export default function RoadmapList({
   };
 
   // Extract categories for optional filter tabs
-  const categories = useMemo(() => {
-    if (!roadmaps) return [];
-    const set = new Set<string>();
-    roadmaps.slice(0, 5).forEach((r) => {
-      if (r.category) set.add(r.category);
-    });
-    return ["all", ...Array.from(set)];
-  }, [roadmaps]);
-
-  // Filtered roadmaps according to search query, completed filter, and category
-  // const visibleRoadmaps = useMemo(() => {
+  // const categories = useMemo(() => {
   //   if (!roadmaps) return [];
-  //   const query = search.trim().toLowerCase();
-
-  //   return roadmaps.filter((roadmap) => {
-  //     const matchesSearch =
-  //       !query ||
-  //       roadmap.title.toLowerCase().includes(query) ||
-  //       (roadmap?.description &&
-  //         roadmap.description.toLowerCase().includes(query)) ||
-  //       roadmap.category.toLowerCase().includes(query);
-
-  //     const isCompleted =
-  //       roadmap.completed_nodes_count === roadmap.total_nodes_count;
-  //     const matchesCompleted = !showCompletedOnly || isCompleted;
-
-  //     const matchesCategory =
-  //       selectedCategory === "all" || roadmap.category === selectedCategory;
-
-  //     return matchesSearch && matchesCompleted && matchesCategory;
+  //   const set = new Set<string>();
+  //   roadmaps.slice(0, 5).forEach((r) => {
+  //     if (r.category) set.add(r.category);
   //   });
-  // }, [roadmaps, search, showCompletedOnly, selectedCategory]);
+  //   return ["all", ...Array.from(set)];
+  // }, [roadmaps]);
 
   const resetFilters = () => {
     // setSearch("");
@@ -121,6 +83,7 @@ export default function RoadmapList({
   };
 
   const fetchRoadmaps = async (searchValue = "") => {
+    setLoading(true);
     try {
       const data = await roadmapApi.getList({
         search: searchValue.trim(),
@@ -134,6 +97,20 @@ export default function RoadmapList({
       console.error("Failed to load roadmaps:", error);
     } finally {
       setLoading(false);
+    }
+  };
+
+  const fetchCategories = async () => {
+    try {
+      const data = await roadmapApi.getRoadmapCategories();
+
+      if (data?.success) {
+        setCategories(["All", ...data?.categories]);
+      }
+    } catch (error) {
+      console.error("Failed to load roadmaps:", error);
+    } finally {
+      // setLoading(false);
     }
   };
 
@@ -166,6 +143,10 @@ export default function RoadmapList({
 
     return () => clearTimeout(timeoutId);
   }, [search, currentPage]);
+
+  useEffect(() => {
+    fetchCategories();
+  }, []);
 
   return (
     <div className="w-full text-white rounded-2xl my-4 border border-white/10 bg-black/20">

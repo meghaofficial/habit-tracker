@@ -51,10 +51,7 @@ const RoadmapMainComponent = () => {
   return (
     <div className="w-full">
       {currentView === "list" && (
-        <RoadmapList
-          onAddNewRoadmap={() => setCurrentView("create")}
-          setActiveRoadmap={setActiveRoadmap}
-        />
+        <RoadmapList onAddNewRoadmap={() => setCurrentView("create")} />
       )}
       {currentView === "create" && <RoadmapCreation />}
       {currentView === "view" && <ViewRoadmapStructure />}

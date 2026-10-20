@@ -38,4 +38,9 @@ export const roadmapApi = {
     const response = await axiosPrivate.get(`/api/roadmaps/${id}`);
     return response.data;
   },
+
+  getRoadmapCategories: async () => {
+    const response = await axiosPrivate.get(`/api/roadmaps/categories`);
+    return response.data;
+  },
 };
