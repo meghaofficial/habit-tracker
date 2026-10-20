@@ -36,6 +36,7 @@ export type ListPoint = {
   id: string;
   text: string;
   order: number;
+  completed: boolean;
 };
 
 export interface RoadmapItem {
@@ -49,6 +50,7 @@ export interface RoadmapItem {
   status: "completed" | "in-progress" | "pending";
   accent_color: string;
   category: string;
+  nodes: RoadmapItem[];
   type: "list" | "roadmap";
   parent_id: string | null;
   points?: ListPoint[];

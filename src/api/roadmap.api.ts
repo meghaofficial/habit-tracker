@@ -33,4 +33,9 @@ export const roadmapApi = {
     const response = await axiosPrivate.delete(`/api/roadmaps/${id}`);
     return response.data;
   },
+
+  getRoadmapByID: async (id: string) => {
+    const response = await axiosPrivate.get(`/api/roadmaps/${id}`);
+    return response.data;
+  },
 };

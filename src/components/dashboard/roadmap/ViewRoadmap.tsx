@@ -1,4 +1,4 @@
-import React, { useMemo, useState } from "react";
+import React, { useEffect, useMemo, useState } from "react";
 import {
   Check,
   ChevronRight,
@@ -9,11 +9,12 @@ import {
   ChevronUp,
   ArrowRight,
 } from "lucide-react";
-import type { RoadmapData, RoadmapNode } from "./types";
+import type { RoadmapData, RoadmapItem, RoadmapNode } from "./types";
 import { useNavigate, useParams } from "react-router-dom";
+import { roadmapApi } from "../../../api/roadmap.api";
 
 export type ViewRoadmapProps = {
-  roadmap: RoadmapData;
+  roadmap: RoadmapItem;
   onOpenNestedRoadmap: (nodeId: string) => void;
   onToggleNodeComplete?: (nodeId: string) => void;
   onToggleTaskComplete?: (nodeId: string, taskId: string) => void;
@@ -44,26 +45,26 @@ export default function ViewRoadmap({
     let completedPoints = 0;
     let totalPoints = 0;
 
-    roadmap.nodes.forEach((node) => {
-      if (node.type === "single") {
-        totalPoints += 1;
-        if (node.completed) completedPoints += 1;
-      } else if (node.type === "sequential") {
-        const tasks = node.tasks || [];
-        totalPoints += tasks.length || 1;
-        completedPoints += tasks.filter((t) => t.completed).length;
-      } else if (node.type === "nested") {
-        const subNodes = node.nestedRoadmap?.nodes || [];
-        totalPoints += subNodes.length || 1;
-        // count sub-completed
-        const doneSub = subNodes.filter((sn) =>
-          sn.type === "single"
-            ? sn.completed
-            : sn.tasks?.every((t) => t.completed),
-        ).length;
-        completedPoints += doneSub;
-      }
-    });
+    // roadmap.nodes.forEach((node) => {
+    //   if (node.type === "single") {
+    //     totalPoints += 1;
+    //     if (node.completed) completedPoints += 1;
+    //   } else if (node.type === "sequential") {
+    //     const tasks = node.tasks || [];
+    //     totalPoints += tasks.length || 1;
+    //     completedPoints += tasks.filter((t) => t.completed).length;
+    //   } else if (node.type === "nested") {
+    //     const subNodes = node.nestedRoadmap?.nodes || [];
+    //     totalPoints += subNodes.length || 1;
+    //     // count sub-completed
+    //     const doneSub = subNodes.filter((sn) =>
+    //       sn.type === "single"
+    //         ? sn.completed
+    //         : sn.tasks?.every((t) => t.completed),
+    //     ).length;
+    //     completedPoints += doneSub;
+    //   }
+    // });
 
     const percentage =
       totalPoints > 0 ? Math.round((completedPoints / totalPoints) * 100) : 0;
@@ -78,19 +79,43 @@ export default function ViewRoadmap({
   // Organize nodes into rows for horizontal zigzag (serpentine) layout
   const NODES_PER_ROW = 3;
   const rows = useMemo(() => {
-    const result: RoadmapNode[][] = [];
+    const result: RoadmapItem[][] = [];
     for (let i = 0; i < roadmap.nodes.length; i += NODES_PER_ROW) {
       result.push(roadmap.nodes.slice(i, i + NODES_PER_ROW));
     }
     return result;
   }, [roadmap.nodes]);
+  console.log();
 
   // const fullDisplayTitle = breadcrumbs
   //   .map((b) => b.title || "Untitled")
   //   .join(" / ");
 
   const splat = params["*"];
+  // const [loading, setLoading] = useState(false);
+
   // const roadmapSteps = splat ? splat.split("/") : [];
+
+  // useEffect(() => {
+  //   const fetchRoadmap = async () => {
+  //     if (!params?.parentID) return;
+  //     try {
+  //       setLoading(true);
+
+  //       const response = await roadmapApi.getRoadmapByID(params?.parentID);
+
+  //       // setRoadmap(response.data);
+  //     } catch (error) {
+  //       console.error("Failed to fetch roadmap:", error);
+  //     } finally {
+  //       setLoading(false);
+  //     }
+  //   };
+
+  //   fetchRoadmap();
+  // }, [params?.parentID]);
+
+  console.log("roadmap", roadmap);
 
   return (
     <div>
@@ -99,7 +124,7 @@ export default function ViewRoadmap({
         <div className="flex items-start gap-3 min-w-0 flex-1">
           <div
             className="flex h-11 w-11 shrink-0 items-center justify-center rounded-2xl text-xl shadow-lg border border-white/10"
-            style={{ backgroundColor: `${roadmap.color}25` }}
+            // style={{ backgroundColor: `${roadmap.color}25` }}
           >
             {roadmap.icon || "🚀"}
           </div>
@@ -145,401 +170,529 @@ export default function ViewRoadmap({
       </div>
 
       {/* Zigzag Serpentine Path View */}
-      <div className="mt-6 flex-1">
-        <div className="mb-4 flex items-center justify-between">
-          <div className="flex items-center gap-2">
-            <h3 className="text-xs font-semibold uppercase tracking-wider text-gray-400">
-              Interactive Roadmap Path
-            </h3>
-            <span className="rounded-full bg-emerald-500/10 border border-emerald-500/20 px-2 py-0.5 text-[10px] text-emerald-400">
-              Horizontal Zigzag
-            </span>
-          </div>
+      <div>
+        {roadmap.type === "roadmap" ? (
+          <div className="mt-6 flex-1">
+            <div className="mb-4 flex items-center justify-between">
+              <div className="flex items-center gap-2">
+                <h3 className="text-xs font-semibold uppercase tracking-wider text-gray-400">
+                  Interactive Roadmap Path
+                </h3>
+                <span className="rounded-full bg-emerald-500/10 border border-emerald-500/20 px-2 py-0.5 text-[10px] text-emerald-400">
+                  Horizontal Zigzag
+                </span>
+              </div>
 
-          <span className="text-[11px] text-gray-500">
-            {roadmap.nodes.length} nodes in sequence
-          </span>
-        </div>
+              <span className="text-[11px] text-gray-500">
+                {roadmap.nodes.length} nodes in sequence
+              </span>
+            </div>
+            {roadmap.nodes.length === 0 ? (
+              <div className="flex flex-col items-center justify-center rounded-2xl border border-dashed border-white/10 p-12 text-center">
+                <Sparkles size={32} className="text-gray-600 mb-2" />
+                <h4 className="text-sm font-semibold text-gray-300">
+                  Your roadmap canvas is empty
+                </h4>
+                <p className="mt-1 text-xs text-gray-500 max-w-sm">
+                  Add nodes on the left panel to see them flow horizontally in a
+                  zigzag pattern across the screen.
+                </p>
+              </div>
+            ) : (
+              <div className="">
+                {rows.map((rowNodes, rowIndex) => {
+                  const isEvenRow = rowIndex % 2 === 0;
+                  const isLastRow = rowIndex === rows.length - 1;
 
-        {roadmap.nodes.length === 0 ? (
-          <div className="flex flex-col items-center justify-center rounded-2xl border border-dashed border-white/10 p-12 text-center">
-            <Sparkles size={32} className="text-gray-600 mb-2" />
-            <h4 className="text-sm font-semibold text-gray-300">
-              Your roadmap canvas is empty
-            </h4>
-            <p className="mt-1 text-xs text-gray-500 max-w-sm">
-              Add nodes on the left panel to see them flow horizontally in a
-              zigzag pattern across the screen.
-            </p>
-          </div>
-        ) : (
-          <div className="">
-            {rows.map((rowNodes, rowIndex) => {
-              const isEvenRow = rowIndex % 2 === 0;
-              const isLastRow = rowIndex === rows.length - 1;
+                  // Row nodes: if odd row, reverse them visually to go Right -> Left
+                  // while preserving their sequential logic
+                  const displayNodes = isEvenRow
+                    ? rowNodes
+                    : [...rowNodes].reverse();
 
-              // Row nodes: if odd row, reverse them visually to go Right -> Left
-              // while preserving their sequential logic
-              const displayNodes = isEvenRow
-                ? rowNodes
-                : [...rowNodes].reverse();
+                  return (
+                    <div key={"row-" + rowIndex} className="relative">
+                      {/* Nodes in this row */}
+                      <div
+                        className={`grid gap-x-2.5 ${
+                          rowNodes.length === 1
+                            ? "grid-cols-1 sm:grid-cols-3"
+                            : rowNodes.length === 2
+                              ? "grid-cols-1 sm:grid-cols-2 lg:grid-cols-3"
+                              : "grid-cols-1 sm:grid-cols-2 lg:grid-cols-3"
+                        }`}
+                      >
+                        {displayNodes.map((node, nodeIndexInDisplay) => {
+                          // Determine actual sequence index
+                          const actualIndex = isEvenRow
+                            ? rowIndex * NODES_PER_ROW + nodeIndexInDisplay
+                            : rowIndex * NODES_PER_ROW +
+                              (rowNodes.length - 1 - nodeIndexInDisplay);
 
-              return (
-                <div key={"row-" + rowIndex} className="relative">
-                  {/* Nodes in this row */}
-                  <div
-                    className={`grid gap-x-2.5 ${
-                      rowNodes.length === 1
-                        ? "grid-cols-1 sm:grid-cols-3"
-                        : rowNodes.length === 2
-                          ? "grid-cols-1 sm:grid-cols-2 lg:grid-cols-3"
-                          : "grid-cols-1 sm:grid-cols-2 lg:grid-cols-3"
-                    }`}
-                  >
-                    {displayNodes.map((node, nodeIndexInDisplay) => {
-                      // Determine actual sequence index
-                      const actualIndex = isEvenRow
-                        ? rowIndex * NODES_PER_ROW + nodeIndexInDisplay
-                        : rowIndex * NODES_PER_ROW +
-                          (rowNodes.length - 1 - nodeIndexInDisplay);
+                          // Calculate node specific progress
+                          let nodePercentage = 0;
+                          let isNodeDone = false;
 
-                      // Calculate node specific progress
-                      let nodePercentage = 0;
-                      let isNodeDone = false;
+                          if (node.type === "list") {
+                            const total = node.nodes?.length || 0;
+                            const done =
+                              node.points?.filter((t) => t.completed).length ||
+                              0;
+                            nodePercentage =
+                              total > 0 ? Math.round((done / total) * 100) : 0;
+                            isNodeDone = total > 0 && done === total;
+                          } else {
+                            // const subNodes = node.nestedRoadmap?.nodes || [];
+                            // const done = subNodes.filter((sn) =>
+                            //   sn.type === "single"
+                            //     ? sn.completed
+                            //     : sn.tasks?.every((t) => t.completed),
+                            // ).length;
+                            // nodePercentage =
+                            //   subNodes.length > 0
+                            //     ? Math.round((done / subNodes.length) * 100)
+                            //     : 0;
+                            // isNodeDone =
+                            //   subNodes.length > 0 && done === subNodes.length;
+                          }
 
-                      if (node.type === "single") {
-                        nodePercentage = node.completed ? 100 : 0;
-                        isNodeDone = !!node.completed;
-                      } else if (node.type === "sequential") {
-                        const total = node.tasks?.length || 0;
-                        const done =
-                          node.tasks?.filter((t) => t.completed).length || 0;
-                        nodePercentage =
-                          total > 0 ? Math.round((done / total) * 100) : 0;
-                        isNodeDone = total > 0 && done === total;
-                      } else if (node.type === "nested") {
-                        const subNodes = node.nestedRoadmap?.nodes || [];
-                        const done = subNodes.filter((sn) =>
-                          sn.type === "single"
-                            ? sn.completed
-                            : sn.tasks?.every((t) => t.completed),
-                        ).length;
-                        nodePercentage =
-                          subNodes.length > 0
-                            ? Math.round((done / subNodes.length) * 100)
-                            : 0;
-                        isNodeDone =
-                          subNodes.length > 0 && done === subNodes.length;
-                      }
+                          const isExpanded = !!expandedNodeIds[node._id];
 
-                      const isExpanded = !!expandedNodeIds[node.id];
-
-                      return (
-                        <div className="flex gap-x-2.5 min-h-50">
-                          <article
-                            key={node.id}
-                            className={`group relative w-full flex flex-col justify-between overflow-hidden rounded-xl border transition-all duration-300 p-3 shadow-md
+                          return (
+                            <div className="flex gap-x-2.5 min-h-50">
+                              <article
+                                key={node._id}
+                                className={`group relative w-full flex flex-col justify-between overflow-hidden rounded-xl border transition-all duration-300 p-3 shadow-md
                               ${
                                 node.status === "completed"
                                   ? "bg-zinc-900/60 border-zinc-800 hover:border-zinc-700/60 hover:bg-zinc-900/90 shadow-black/20"
-                                  : node.status === "active"
+                                  : node.status === "in-progress"
                                     ? "bg-zinc-900/90 border-white/10 ring-1 ring-white/5 shadow-lg shadow-black/40"
                                     : "bg-zinc-950/20 border-white/5 opacity-60 grayscale-30 hover:opacity-80 hover:grayscale-0"
                               }`}
-                            style={{
-                              borderLeftColor: node.color,
-                              borderLeftWidth: "3px",
-                            }}
-                          >
-                            {node.status === "active" && (
-                              <div
-                                className="absolute inset-0 opacity-[0.03] pointer-events-none transition-opacity duration-300 group-hover:opacity-[0.05]"
-                                style={{ backgroundColor: node.color }}
-                              />
-                            )}
-                            {/* Card Top: Node Number, Icon, Title, and Type Badge */}
-                            <div>
-                              <div className="flex items-start justify-between gap-2">
-                                <div className="flex items-center gap-2 min-w-0 flex-1">
-                                  <span className="flex h-7 w-7 shrink-0 items-center justify-center rounded-lg bg-white/5 text-sm">
-                                    {node.icon}
-                                  </span>
-                                  <div className="min-w-0 flex-1">
-                                    <div className="flex items-center gap-1.5">
-                                      <span className="text-[10px] font-bold text-gray-500">
-                                        #{actualIndex + 1}
-                                      </span>
-                                      <h4 className="text-xs font-semibold text-gray-100 truncate">
-                                        {node.title}
-                                      </h4>
-                                    </div>
-
-                                    {/* Type tag */}
-                                    <div className="mt-0.5 flex items-center gap-1.5">
-                                      {node.type === "single" && (
-                                        <span className="text-[9px] text-blue-400 font-medium">
-                                          Single Milestone
-                                        </span>
-                                      )}
-                                      {node.type === "sequential" && (
-                                        <span className="text-[9px] text-amber-400 font-medium">
-                                          Sequential Tasks (
-                                          {node.tasks?.length || 0})
-                                        </span>
-                                      )}
-                                      {node.type === "nested" && (
-                                        <span className="text-[9px] text-purple-400 font-medium">
-                                          Nested Roadmap (/)
-                                        </span>
-                                      )}
-                                    </div>
-                                  </div>
-                                </div>
-
-                                {/* Interactive check or action button */}
-                                {node.type === "single" && (
-                                  <button
-                                    type="button"
-                                    onClick={() =>
-                                      onToggleNodeComplete?.(node.id)
-                                    }
-                                    title={
-                                      node.completed
-                                        ? "Mark incomplete"
-                                        : "Mark completed"
-                                    }
-                                    className={`flex h-6 w-6 shrink-0 items-center justify-center rounded-lg border transition cursor-pointer ${
-                                      node.completed
-                                        ? "border-emerald-500 bg-emerald-500 text-black shadow-sm"
-                                        : "border-white/20 bg-black/40 text-transparent hover:border-white/40"
-                                    }`}
-                                  >
-                                    <Check size={14} strokeWidth={3} />
-                                  </button>
-                                )}
-
-                                {node.type === "nested" && (
-                                  <button
-                                    type="button"
-                                    onClick={() => {
-                                      navigate(
-                                        `/roadmap/${splat}/${node.title}`,
-                                      );
-                                      onOpenNestedRoadmap(node.id);
+                                style={{
+                                  borderLeftColor: node.accent_color,
+                                  borderLeftWidth: "3px",
+                                }}
+                              >
+                                {node.status === "in-progress" && (
+                                  <div
+                                    className="absolute inset-0 opacity-[0.03] pointer-events-none transition-opacity duration-300 group-hover:opacity-[0.05]"
+                                    style={{
+                                      backgroundColor: node.accent_color,
                                     }}
-                                    title="Enter Nested Roadmap"
-                                    className="flex h-6 w-6 shrink-0 items-center justify-center rounded-lg border border-purple-500/30 bg-purple-500/15 text-purple-300 hover:bg-purple-500/25 transition cursor-pointer"
-                                  >
-                                    <FolderGit2 size={13} />
-                                  </button>
+                                  />
                                 )}
-                              </div>
-
-                              {/* Node description (if any) */}
-                              {node.description && (
-                                <p className="mt-2 text-[11px] text-gray-400 line-clamp-2">
-                                  {node.description}
-                                </p>
-                              )}
-
-                              {/* Sequential Tasks vertical view */}
-                              {node.type === "sequential" && node.tasks && (
-                                <div className="mt-3 rounded-lg border border-white/5 bg-[#141414] p-2">
-                                  <div className="flex items-center justify-between pb-1.5 border-b border-white/5">
-                                    <span className="text-[10px] font-semibold text-amber-400 flex items-center gap-1">
-                                      <ListOrdered size={12} />
-                                      Sequential Order
-                                    </span>
-                                    <button
-                                      type="button"
-                                      onClick={() => toggleExpand(node.id)}
-                                      className="text-[10px] text-gray-400 hover:text-white flex items-center gap-0.5 cursor-pointer"
-                                    >
-                                      <span>
-                                        {isExpanded ? "Collapse" : "View Steps"}
+                                {/* Card Top: Node Number, Icon, Title, and Type Badge */}
+                                <div>
+                                  <div className="flex items-start justify-between gap-2">
+                                    <div className="flex items-center gap-2 min-w-0 flex-1">
+                                      <span className="flex h-7 w-7 shrink-0 items-center justify-center rounded-lg bg-white/5 text-sm">
+                                        {node.icon}
                                       </span>
-                                      {isExpanded ? (
-                                        <ChevronUp size={12} />
-                                      ) : (
-                                        <ChevronDown size={12} />
-                                      )}
-                                    </button>
-                                  </div>
-
-                                  {/* First task or full vertical list */}
-                                  <div className="mt-2 space-y-1.5">
-                                    {(isExpanded
-                                      ? node.tasks
-                                      : node.tasks.slice(0, 2)
-                                    ).map((task, taskIdx) => (
-                                      <div
-                                        key={task.id}
-                                        className="flex items-center justify-between gap-2 text-[11px]"
-                                      >
-                                        <div className="flex items-center gap-2 min-w-0 flex-1">
-                                          <span className="flex h-4 w-4 shrink-0 items-center justify-center rounded-full bg-amber-500/20 text-[9px] font-bold text-amber-400">
-                                            {taskIdx + 1}
+                                      <div className="min-w-0 flex-1">
+                                        <div className="flex items-center gap-1.5">
+                                          <span className="text-[10px] font-bold text-gray-500">
+                                            #{actualIndex + 1}
                                           </span>
-                                          <span
-                                            className={`truncate ${
-                                              task.completed
-                                                ? "text-gray-500 line-through"
-                                                : "text-gray-200"
-                                            }`}
-                                          >
-                                            {task.title}
-                                          </span>
+                                          <h4 className="text-xs font-semibold text-gray-100 truncate">
+                                            {node.title}
+                                          </h4>
                                         </div>
 
-                                        <button
-                                          type="button"
-                                          onClick={() =>
-                                            onToggleTaskComplete?.(
-                                              node.id,
-                                              task.id,
-                                            )
-                                          }
-                                          className={`flex h-4 w-4 shrink-0 items-center justify-center rounded border transition cursor-pointer ${
-                                            task.completed
-                                              ? "border-emerald-500 bg-emerald-500 text-black"
-                                              : "border-gray-600 bg-black/40 hover:border-gray-400"
-                                          }`}
-                                        >
-                                          {task.completed && (
-                                            <Check size={10} strokeWidth={3} />
+                                        {/* Type tag */}
+                                        <div className="mt-0.5 flex items-center gap-1.5">
+                                          {node.type === "list" && (
+                                            <span className="text-[9px] text-amber-400 font-medium">
+                                              Sequential Tasks (
+                                              {node.points?.length || 0})
+                                            </span>
                                           )}
-                                        </button>
+                                          {node.type === "roadmap" && (
+                                            <span className="text-[9px] text-purple-400 font-medium">
+                                              Nested Roadmap (/)
+                                            </span>
+                                          )}
+                                        </div>
                                       </div>
-                                    ))}
+                                    </div>
 
-                                    {!isExpanded && node.tasks.length > 2 && (
+                                    {node.type === "roadmap" && (
                                       <button
                                         type="button"
-                                        onClick={() => toggleExpand(node.id)}
-                                        className="text-[10px] text-gray-500 hover:text-gray-300 pt-0.5 cursor-pointer"
+                                        onClick={() => {
+                                          navigate(
+                                            `/roadmap/${splat}/${node.title}`,
+                                          );
+                                          onOpenNestedRoadmap(node._id);
+                                        }}
+                                        title="Enter Nested Roadmap"
+                                        className="flex h-6 w-6 shrink-0 items-center justify-center rounded-lg border border-purple-500/30 bg-purple-500/15 text-purple-300 hover:bg-purple-500/25 transition cursor-pointer"
                                       >
-                                        +{node.tasks.length - 2} more sequential
-                                        steps...
+                                        <FolderGit2 size={13} />
                                       </button>
                                     )}
                                   </div>
-                                </div>
-                              )}
 
-                              {/* Nested roadmap teaser button */}
-                              {node.type === "nested" && (
-                                <button
-                                  type="button"
-                                  onClick={() => {
-                                    navigate(`/roadmap/${splat}/${node.title}`);
-                                    onOpenNestedRoadmap(node.id);
-                                  }}
-                                  className="mt-3 flex w-full items-center justify-between rounded-lg border border-purple-500/20 bg-purple-500/10 px-2.5 py-1.5 text-[11px] text-purple-300 hover:bg-purple-500/20 transition cursor-pointer"
-                                >
-                                  <span>Open Sub-Roadmap</span>
-                                  <ChevronRight size={13} />
-                                </button>
-                              )}
-                            </div>
-
-                            {/* Card Bottom: Progress bar */}
-                            <div className="mt-4 pt-2 border-t border-white/6">
-                              <div className="flex items-center justify-between text-[10px] text-gray-400">
-                                <span>
-                                  {isNodeDone ? (
-                                    <span className="text-emerald-400 font-medium">
-                                      ✓ Completed
-                                    </span>
-                                  ) : (
-                                    <span>In Progress</span>
+                                  {/* Node description (if any) */}
+                                  {node.description && (
+                                    <p className="mt-2 text-[11px] text-gray-400 line-clamp-2">
+                                      {node.description}
+                                    </p>
                                   )}
-                                </span>
-                                <span
-                                  className="font-semibold"
-                                  style={{ color: node.color }}
-                                >
-                                  {nodePercentage}%
-                                </span>
-                              </div>
 
-                              <div className="mt-1 h-0.75 overflow-hidden rounded-full bg-white/8">
-                                <div
-                                  className="h-full rounded-full transition-all duration-300"
-                                  style={{
-                                    width: `${nodePercentage}%`,
-                                    backgroundColor: node.color,
-                                  }}
-                                />
-                              </div>
+                                  {/* Sequential Tasks vertical view */}
+                                  {node.type === "list" && node.points && (
+                                    <div className="mt-3 rounded-lg border border-white/5 bg-[#141414] p-2">
+                                      <div className="flex items-center justify-between pb-1.5 border-b border-white/5">
+                                        <span className="text-[10px] font-semibold text-amber-400 flex items-center gap-1">
+                                          <ListOrdered size={12} />
+                                          Sequential Order
+                                        </span>
+                                        <button
+                                          type="button"
+                                          onClick={() => toggleExpand(node._id)}
+                                          className="text-[10px] text-gray-400 hover:text-white flex items-center gap-0.5 cursor-pointer"
+                                        >
+                                          <span>
+                                            {isExpanded
+                                              ? "Collapse"
+                                              : "View Steps"}
+                                          </span>
+                                          {isExpanded ? (
+                                            <ChevronUp size={12} />
+                                          ) : (
+                                            <ChevronDown size={12} />
+                                          )}
+                                        </button>
+                                      </div>
+
+                                      {/* First task or full vertical list */}
+                                      <div className="mt-2 space-y-1.5">
+                                        {(isExpanded
+                                          ? node.points
+                                          : node.points.slice(0, 2)
+                                        ).map((task, taskIdx) => (
+                                          <div
+                                            key={task.id}
+                                            className="flex items-center justify-between gap-2 text-[11px]"
+                                          >
+                                            <div className="flex items-center gap-2 min-w-0 flex-1">
+                                              <span className="flex h-4 w-4 shrink-0 items-center justify-center rounded-full bg-amber-500/20 text-[9px] font-bold text-amber-400">
+                                                {taskIdx + 1}
+                                              </span>
+                                              <span
+                                                className={`truncate ${
+                                                  task.completed
+                                                    ? "text-gray-500 line-through"
+                                                    : "text-gray-200"
+                                                }`}
+                                              >
+                                                {task.text}
+                                              </span>
+                                            </div>
+
+                                            <button
+                                              type="button"
+                                              onClick={() =>
+                                                onToggleTaskComplete?.(
+                                                  node._id,
+                                                  task.id,
+                                                )
+                                              }
+                                              className={`flex h-4 w-4 shrink-0 items-center justify-center rounded border transition cursor-pointer ${
+                                                task.completed
+                                                  ? "border-emerald-500 bg-emerald-500 text-black"
+                                                  : "border-gray-600 bg-black/40 hover:border-gray-400"
+                                              }`}
+                                            >
+                                              {task.completed && (
+                                                <Check
+                                                  size={10}
+                                                  strokeWidth={3}
+                                                />
+                                              )}
+                                            </button>
+                                          </div>
+                                        ))}
+
+                                        {!isExpanded &&
+                                          node.points.length > 2 && (
+                                            <button
+                                              type="button"
+                                              onClick={() =>
+                                                toggleExpand(node._id)
+                                              }
+                                              className="text-[10px] text-gray-500 hover:text-gray-300 pt-0.5 cursor-pointer"
+                                            >
+                                              +{node.points.length - 2} more
+                                              sequential steps...
+                                            </button>
+                                          )}
+                                      </div>
+                                    </div>
+                                  )}
+
+                                  {/* Nested roadmap teaser button */}
+                                  {node.type === "roadmap" && (
+                                    <button
+                                      type="button"
+                                      onClick={() => {
+                                        navigate(
+                                          `/roadmap/${splat}/${node.title}`,
+                                        );
+                                        onOpenNestedRoadmap(node._id);
+                                      }}
+                                      className="mt-3 flex w-full items-center justify-between rounded-lg border border-purple-500/20 bg-purple-500/10 px-2.5 py-1.5 text-[11px] text-purple-300 hover:bg-purple-500/20 transition cursor-pointer"
+                                    >
+                                      <span>Open Sub-Roadmap</span>
+                                      <ChevronRight size={13} />
+                                    </button>
+                                  )}
+                                </div>
+
+                                {/* Card Bottom: Progress bar */}
+                                <div className="mt-4 pt-2 border-t border-white/6">
+                                  <div className="flex items-center justify-between text-[10px] text-gray-400">
+                                    <span>
+                                      {isNodeDone ? (
+                                        <span className="text-emerald-400 font-medium">
+                                          ✓ Completed
+                                        </span>
+                                      ) : (
+                                        <span>In Progress</span>
+                                      )}
+                                    </span>
+                                    <span
+                                      className="font-semibold"
+                                      style={{ color: node.accent_color }}
+                                    >
+                                      {nodePercentage}%
+                                    </span>
+                                  </div>
+
+                                  <div className="mt-1 h-0.75 overflow-hidden rounded-full bg-white/8">
+                                    <div
+                                      className="h-full rounded-full transition-all duration-300"
+                                      style={{
+                                        width: `${nodePercentage}%`,
+                                        backgroundColor: node.accent_color,
+                                      }}
+                                    />
+                                  </div>
+                                </div>
+                              </article>
+                              <React.Fragment key={node._id}>
+                                {nodeIndexInDisplay <
+                                  displayNodes.length - 1 && (
+                                  <div className="flex shrink-0 items-center justify-center">
+                                    <ArrowRight
+                                      size={18}
+                                      strokeWidth={2}
+                                      style={{
+                                        color:
+                                          node.status === "completed"
+                                            ? node.accent_color
+                                            : node.status === "in-progress"
+                                              ? "#818cf8"
+                                              : "white",
+                                      }}
+                                    />
+                                  </div>
+                                )}
+                              </React.Fragment>
                             </div>
-                          </article>
-                          <React.Fragment key={node.id}>
-                            {nodeIndexInDisplay < displayNodes.length - 1 && (
-                              <div className="flex shrink-0 items-center justify-center">
-                                <ArrowRight
-                                  size={18}
-                                  strokeWidth={2}
-                                  style={{
-                                    color:
-                                      node.status === "completed"
-                                        ? node.color
-                                        : node.status === "active"
-                                          ? "#818cf8"
-                                          : "white",
-                                  }}
-                                />
-                              </div>
-                            )}
-                          </React.Fragment>
-                        </div>
-                      );
-                    })}
-                  </div>
+                          );
+                        })}
+                      </div>
 
-                  {/* Curved connector from the upper-right to lower-left */}
-                  {!isLastRow && (
-                    <div className="flex items-center justify-center w-full">
-                      <svg
-                        xmlns="http://www.w3.org/2000/svg"
-                        viewBox="0 0 800 60"
-                        width="75%"
-                        height="100%"
-                      >
-                        <path
-                          d="M 780,10 L 780,20 Q 780,28 772,28 L 28,28 Q 20,28 20,36 L 20,46"
-                          fill="none"
-                          stroke={
-                            rowNodes[rowNodes.length - 1].status === "completed"
-                              ? rowNodes[rowNodes.length - 1].color
-                              : rowNodes[rowNodes.length - 1].status ===
-                                  "active"
-                                ? "#818cf8"
-                                : "white"
-                          }
-                          stroke-width="1.5"
-                          stroke-linecap="round"
-                        />
-                        <path
-                          d="M 16,42 L 20,46 L 24,42"
-                          fill="none"
-                          stroke={
-                            rowNodes[rowNodes.length - 1].status === "completed"
-                              ? rowNodes[rowNodes.length - 1].color
-                              : rowNodes[rowNodes.length - 1].status ===
-                                  "active"
-                                ? "#818cf8"
-                                : "white"
-                          }
-                          stroke-width="1.5"
-                          stroke-linecap="round"
-                          stroke-linejoin="round"
-                        />
-                      </svg>
+                      {/* Curved connector from the upper-right to lower-left */}
+                      {!isLastRow && (
+                        <div className="flex items-center justify-center w-full">
+                          <svg
+                            xmlns="http://www.w3.org/2000/svg"
+                            viewBox="0 0 800 60"
+                            width="75%"
+                            height="100%"
+                          >
+                            <path
+                              d="M 780,10 L 780,20 Q 780,28 772,28 L 28,28 Q 20,28 20,36 L 20,46"
+                              fill="none"
+                              stroke={
+                                rowNodes[rowNodes.length - 1].status ===
+                                "completed"
+                                  ? rowNodes[rowNodes.length - 1].accent_color
+                                  : rowNodes[rowNodes.length - 1].status ===
+                                      "in-progress"
+                                    ? "#818cf8"
+                                    : "white"
+                              }
+                              stroke-width="1.5"
+                              stroke-linecap="round"
+                            />
+                            <path
+                              d="M 16,42 L 20,46 L 24,42"
+                              fill="none"
+                              stroke={
+                                rowNodes[rowNodes.length - 1].status ===
+                                "completed"
+                                  ? rowNodes[rowNodes.length - 1].accent_color
+                                  : rowNodes[rowNodes.length - 1].status ===
+                                      "in-progress"
+                                    ? "#818cf8"
+                                    : "white"
+                              }
+                              stroke-width="1.5"
+                              stroke-linecap="round"
+                              stroke-linejoin="round"
+                            />
+                          </svg>
+                        </div>
+                      )}
                     </div>
-                  )}
+                  );
+                })}
+              </div>
+            )}
+          </div>
+        ) : (
+          <div className="mt-6 flex-1">
+            <div className="mb-4 flex items-center justify-between">
+              <div className="flex items-center gap-2">
+                <h3 className="text-xs font-semibold uppercase tracking-wider text-gray-400">
+                  Task List
+                </h3>
+                <span className="rounded-full border border-amber-500/20 bg-amber-500/10 px-2 py-0.5 text-[10px] text-amber-400">
+                  Sequential
+                </span>
+              </div>
+
+              <span className="text-[11px] text-gray-500">
+                {roadmap.points?.length || 0} tasks
+              </span>
+            </div>
+
+            {!roadmap.points || roadmap.points.length === 0 ? (
+              <div className="rounded-2xl border border-dashed border-white/10 p-10 text-center">
+                <ListOrdered size={30} className="mx-auto mb-2 text-gray-600" />
+                <h4 className="text-sm font-semibold text-gray-300">
+                  Your list is empty
+                </h4>
+                <p className="mt-1 text-xs text-gray-500">
+                  Add tasks to get started.
+                </p>
+              </div>
+            ) : (
+              <div className="rounded-xl border border-white/10 bg-zinc-900/60 p-4">
+                {/* List header */}
+                <div className="mb-4 flex items-center justify-between">
+                  <div className="flex items-center gap-3">
+                    <span className="flex h-10 w-10 items-center justify-center rounded-xl bg-white/5 text-lg">
+                      {roadmap.icon || "📋"}
+                    </span>
+
+                    <div>
+                      <h4 className="text-sm font-semibold text-gray-100">
+                        {roadmap.title}
+                      </h4>
+                      {roadmap.description && (
+                        <p className="mt-1 text-xs text-gray-400">
+                          {roadmap.description}
+                        </p>
+                      )}
+                    </div>
+                  </div>
                 </div>
-              );
-            })}
+
+                {/* Progress */}
+                {(() => {
+                  const points = [...roadmap.points].sort(
+                    (a, b) => a.order - b.order,
+                  );
+                  const completed = points.filter(
+                    (point) => point.completed,
+                  ).length;
+                  const percentage = Math.round(
+                    (completed / points.length) * 100,
+                  );
+
+                  return (
+                    <>
+                      <div className="mb-2 flex items-center justify-between text-[10px]">
+                        <span className="text-gray-400">
+                          {completed} of {points.length} completed
+                        </span>
+                        <span
+                          className="font-semibold"
+                          style={{ color: roadmap.accent_color }}
+                        >
+                          {percentage}%
+                        </span>
+                      </div>
+
+                      <div className="mb-4 h-1.5 overflow-hidden rounded-full bg-white/5">
+                        <div
+                          className="h-full rounded-full transition-all duration-300"
+                          style={{
+                            width: `${percentage}%`,
+                            backgroundColor: roadmap.accent_color,
+                          }}
+                        />
+                      </div>
+
+                      {/* Points */}
+                      <div className="space-y-2">
+                        {points.map((point, index) => (
+                          <div
+                            key={point.id}
+                            className="flex items-center gap-3 rounded-lg border border-white/5 bg-black/20 px-3 py-3 transition hover:bg-white/[0.03]"
+                          >
+                            <span
+                              className="flex h-7 w-7 shrink-0 items-center justify-center rounded-lg text-xs font-semibold"
+                              style={{
+                                backgroundColor: `${roadmap.accent_color}20`,
+                                color: roadmap.accent_color,
+                              }}
+                            >
+                              {index + 1}
+                            </span>
+
+                            <span
+                              className={`min-w-0 flex-1 text-sm ${
+                                point.completed
+                                  ? "text-gray-500 line-through"
+                                  : "text-gray-200"
+                              }`}
+                            >
+                              {point.text}
+                            </span>
+
+                            <button
+                              type="button"
+                              onClick={() =>
+                                onToggleTaskComplete?.(roadmap._id, point.id)
+                              }
+                              aria-label={
+                                point.completed
+                                  ? "Mark task incomplete"
+                                  : "Mark task complete"
+                              }
+                              className={`flex h-5 w-5 shrink-0 items-center justify-center rounded-md border transition ${
+                                point.completed
+                                  ? "border-emerald-500 bg-emerald-500 text-black"
+                                  : "border-gray-600 text-transparent hover:border-emerald-500 hover:text-emerald-400"
+                              }`}
+                            >
+                              <Check size={12} strokeWidth={3} />
+                            </button>
+                          </div>
+                        ))}
+                      </div>
+                    </>
+                  );
+                })()}
+              </div>
+            )}
           </div>
         )}
       </div>

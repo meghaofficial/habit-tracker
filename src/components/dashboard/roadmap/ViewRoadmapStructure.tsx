@@ -1,9 +1,10 @@
-import React, { useCallback, useState } from "react";
+import React, { useCallback, useEffect, useState } from "react";
 import ViewRoadmap from "./ViewRoadmap";
-import type { RoadmapData } from "./types";
+import { type RoadmapItem, type RoadmapData } from "./types";
 import { initialRootRoadmap } from "./testData";
 import { ArrowLeft } from "lucide-react";
 import { useNavigate, useParams } from "react-router-dom";
+import { roadmapApi } from "../../../api/roadmap.api";
 
 const ViewRoadmapStructure = () => {
   const navigate = useNavigate();
@@ -13,6 +14,9 @@ const ViewRoadmapStructure = () => {
   const [navigationPath, setNavigationPath] = useState<string[]>([]);
   const splat = params["*"];
   const roadmapSteps = splat ? splat.split("/") : [];
+
+  const [loading, setLoading] = useState(false);
+  const [rows, setRows] = useState<RoadmapItem[]>([]);
 
   // Helper: locate active roadmap data based on navigationPath
   const getActiveRoadmapAndTrail = useCallback((): {
@@ -35,7 +39,8 @@ const ViewRoadmapStructure = () => {
     return { activeRoadmap: current, trail };
   }, [rootRoadmap, navigationPath]);
 
-  const { activeRoadmap, trail } = getActiveRoadmapAndTrail();
+  // const { activeRoadmap, trail } = getActiveRoadmapAndTrail();
+  const { trail } = getActiveRoadmapAndTrail();
 
   const handleUpdateActiveRoadmap = (updated: RoadmapData) => {
     if (navigationPath.length === 0) {
@@ -93,27 +98,62 @@ const ViewRoadmapStructure = () => {
   };
 
   const handleToggleNodeComplete = (nodeId: string) => {
-    const updatedNodes = activeRoadmap.nodes.map((n) => {
-      if (n.id === nodeId) {
-        return { ...n, completed: !n.completed };
-      }
-      return n;
-    });
-    handleUpdateActiveRoadmap({ ...activeRoadmap, nodes: updatedNodes });
+    // const updatedNodes = activeRoadmap.nodes.map((n) => {
+    //   if (n.id === nodeId) {
+    //     return { ...n, completed: !n.completed };
+    //   }
+    //   return n;
+    // });
+    // handleUpdateActiveRoadmap({ ...activeRoadmap, nodes: updatedNodes });
   };
 
   const handleToggleTaskComplete = (nodeId: string, taskId: string) => {
-    const updatedNodes = activeRoadmap.nodes.map((n) => {
-      if (n.id === nodeId && n.tasks) {
-        const updatedTasks = n.tasks.map((t) =>
-          t.id === taskId ? { ...t, completed: !t.completed } : t,
-        );
-        return { ...n, tasks: updatedTasks };
-      }
-      return n;
-    });
-    handleUpdateActiveRoadmap({ ...activeRoadmap, nodes: updatedNodes });
+    // const updatedNodes = activeRoadmap.nodes.map((n) => {
+    //   if (n.id === nodeId && n.tasks) {
+    //     const updatedTasks = n.tasks.map((t) =>
+    //       t.id === taskId ? { ...t, completed: !t.completed } : t,
+    //     );
+    //     return { ...n, tasks: updatedTasks };
+    //   }
+    //   return n;
+    // });
+    // handleUpdateActiveRoadmap({ ...activeRoadmap, nodes: updatedNodes });
   };
+
+  const [activeRoadmap, setActiveRoadmap] = useState<RoadmapItem>({
+    _id: "",
+    title: "",
+    description: "",
+    icon: "",
+    total_nodes_count: 0,
+    completed_nodes_count: 0,
+    status: "pending",
+    accent_color: "",
+    category: "",
+    nodes: [],
+    type: "roadmap",
+    parent_id: null,
+    points: [],
+  });
+
+  useEffect(() => {
+    const fetchRoadmap = async () => {
+      if (!params?.parentID) return;
+      try {
+        setLoading(true);
+
+        const response = await roadmapApi.getRoadmapByID(params?.parentID);
+
+        setActiveRoadmap(response?.data);
+      } catch (error) {
+        console.error("Failed to fetch roadmap:", error);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchRoadmap();
+  }, [params?.parentID]);
 
   return (
     <div className="flex h-full flex-col overflow-y-auto rounded-2xl border border-white/10 bg-[#121212] shadow-sm mt-4">

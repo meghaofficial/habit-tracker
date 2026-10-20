@@ -20,7 +20,6 @@ type CreationFormProps = {
   ) => void | Promise<void>;
 
   selectedIcon: string;
-  onOpenIconPicker: () => void;
 };
 
 const CreationForm = ({
@@ -30,7 +29,6 @@ const CreationForm = ({
   onCreated,
   onCancel,
   selectedIcon,
-  onOpenIconPicker,
 }: CreationFormProps) => {
   const [loading, setLoading] = useState(false);
 
@@ -44,6 +42,7 @@ const CreationForm = ({
     status: "pending",
     accent_color: DEFAULT_COLORS[0] ?? "#6366f1",
     category: "",
+    nodes: [],
     type: "roadmap",
     parent_id: null,
     points: [],
@@ -111,6 +110,7 @@ const CreationForm = ({
         id: crypto.randomUUID(),
         text: "",
         order: points.length,
+        completed: false,
       },
     ];
 
@@ -157,8 +157,6 @@ const CreationForm = ({
       icon: selectedIcon,
     }));
   }, [selectedIcon]);
-
-  console.log("roadmapco", roadmapConfig);
 
   return (
     <div className="space-y-2.5">

@@ -131,20 +131,29 @@ function App() {
                     path="/"
                     element={<Navigate to="/monthly-habit" replace />}
                   />
-                  {[
-                    "/monthly-habit",
-                    "/analysis",
-                    "/calendar",
-                    "/history",
-                    "/roadmap",
-                    "/roadmap/*",
-                  ].map((path) => (
-                    <Route
-                      key={path}
-                      path={path}
-                      element={isLogin ? <Dashboard /> : <HomePage />}
-                    />
-                  ))}
+                  {["/monthly-habit", "/analysis", "/calendar", "/history"].map(
+                    (path) => (
+                      <Route
+                        key={path}
+                        path={path}
+                        element={isLogin ? <Dashboard /> : <HomePage />}
+                      />
+                    ),
+                  )}
+                  <Route
+                    path="/roadmap"
+                    element={isLogin ? <Dashboard /> : <HomePage />}
+                  />
+
+                  <Route
+                    path="/roadmap/:parentID"
+                    element={isLogin ? <Dashboard /> : <HomePage />}
+                  />
+
+                  <Route
+                    path="/roadmap/*"
+                    element={isLogin ? <Dashboard /> : <HomePage />}
+                  />
                   <Route
                     path="/settings"
                     element={

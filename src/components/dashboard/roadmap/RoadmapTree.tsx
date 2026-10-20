@@ -209,7 +209,7 @@ export default function RoadmapTree() {
                 onCancel={() =>
                   setOpenForms((prev) => prev.filter((id) => id !== node._id))
                 }
-                onOpenIconPicker={() => setIconPickerOpen(true)}
+                // onOpenIconPicker={() => setIconPickerOpen(true)}
                 selectedIcon={node.icon || "🗺️"}
                 // onIconChange={(icon) => {
                 //   setRoot((current) => {
@@ -247,39 +247,6 @@ export default function RoadmapTree() {
 
         {/* New child form */}
         {openForms.includes(`new:${node._id}`) && (
-          // <div className="mt-2 w-[min(100%,405px)] rounded-xl border border-indigo-500/20 bg-[#171717] p-3">
-          //   <span
-          //     className="text-lg cursor-pointer"
-          //     onClick={() => setIconPickerOpen(true)}
-          //   >
-          //     {selectedIcon || "🗺️"}
-          //   </span>
-          //   <CreationForm
-          //     parentId={node._id}
-          //     parentName={node.title}
-          //     onCreated={(child) => createChild(node, child)}
-          //     onCancel={() =>
-          //       setOpenForms((prev) =>
-          //         prev.filter((id) => id !== `new:${node._id}`),
-          //       )
-          //     }
-          //     onOpenIconPicker={() => setIconPickerOpen(true)}
-          //     selectedIcon={node.icon || "🗺️"}
-          //     // onIconChange={(icon) => {
-          //     //   setRoot((current) => {
-          //     //     if (!current) return current;
-
-          //     //     const update = (item: TreeNode): TreeNode => ({
-          //     //       ...item,
-          //     //       ...(item._id === node._id ? { icon } : {}),
-          //     //       children: item.children.map(update),
-          //     //     });
-
-          //     //     return update(current);
-          //     //   });
-          //     // }}
-          //   />
-          // </div>
           <div className="mt-2 w-[min(100%,405px)] rounded-xl border border-indigo-500/20 bg-[#171717] p-3">
             <div className="mb-3 flex items-center gap-2">
               <button
@@ -307,10 +274,6 @@ export default function RoadmapTree() {
                   prev.filter((id) => id !== `new:${node._id}`),
                 )
               }
-              onOpenIconPicker={() => {
-                setActiveIconParentId(node._id);
-                setIconPickerOpen(true);
-              }}
               selectedIcon={childIcons[node._id] || "🗺️"}
             />
           </div>
@@ -371,7 +334,6 @@ export default function RoadmapTree() {
                 parentId={null}
                 parentName={null}
                 selectedIcon={selectedIcon}
-                onOpenIconPicker={() => setIconPickerOpen(true)}
                 onCreated={(item) => {
                   setRoot({
                     ...item,

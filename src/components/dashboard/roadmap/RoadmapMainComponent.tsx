@@ -24,17 +24,29 @@ const RoadmapMainComponent = () => {
   const splat = params["*"];
   const roadmapSteps = splat ? splat.split("/") : [];
 
+  console.log("roadmapSteps", params?.parentID);
+
+  // useEffect(() => {
+  //   if (roadmapSteps.length > 0) {
+  //     if (roadmapSteps[0] === "create" && !params?.parentID) {
+  //       setCurrentView("create");
+  //     } else if (params?.parentID) {
+  //       setCurrentView("view");
+  //     }
+  //   } else {
+  //     setCurrentView("list");
+  //   }
+  // }, [params]);
+
   useEffect(() => {
-    if (roadmapSteps.length > 0) {
-      if (roadmapSteps[0] === "create") {
-        setCurrentView("create");
-      } else {
-        setCurrentView("view");
-      }
+    if (params.parentID === "create" || roadmapSteps[0] === "create") {
+      setCurrentView("create");
+    } else if (params.parentID) {
+      setCurrentView("view");
     } else {
       setCurrentView("list");
     }
-  }, [params]);
+  }, [params.parentID, params["*"]]);
 
   return (
     <div className="w-full">
