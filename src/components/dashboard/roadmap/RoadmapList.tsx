@@ -7,7 +7,7 @@ import {
   type SetStateAction,
 } from "react";
 import { Check, Plus, Search, X, RotateCcw } from "lucide-react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useSearchParams } from "react-router-dom";
 import type { RoadmapData } from "./types";
 import { roadmapApi } from "../../../api/roadmap.api";
 import RoadmapItemCard from "./components/RoadmapItemCard";
@@ -39,16 +39,46 @@ export default function RoadmapList({
   const navigate = useNavigate();
   const [roadmaps, setRoadmaps] = useState<RoadmapItem[]>([]);
   const [loading, setLoading] = useState(true);
-  const [search, setSearch] = useState("");
+  // const [search, setSearch] = useState("");
   const [showCompletedOnly, setShowCompletedOnly] = useState(false);
   const [selectedCategory, setSelectedCategory] = useState<string>("all");
   const [isDeleting, setIsDeleting] = useState(false);
 
-  const [currentPage, setCurrentPage] = useState(1);
+  const [searchParams, setSearchParams] = useSearchParams();
+
+  const [search, setSearch] = useState(() => searchParams.get("search") || "");
+  const [currentPage, setCurrentPage] = useState(() =>
+    Math.max(1, Number(searchParams.get("page")) || 1),
+  );
   const [totalPages, setTotalPages] = useState(0);
   const pageLimit = 8;
 
   const isFirstRender = useRef(true);
+
+  const updateSearch = (value: string) => {
+    setSearch(value);
+
+    const params = new URLSearchParams(searchParams);
+    params.set("page", "1");
+
+    if (value.trim()) {
+      params.set("search", value.trim());
+    } else {
+      params.delete("search");
+    }
+
+    setCurrentPage(1);
+    setSearchParams(params);
+  };
+
+  const updatePage = (newPage: number) => {
+    setCurrentPage(newPage);
+
+    const params = new URLSearchParams(searchParams);
+    params.set("page", String(newPage));
+
+    setSearchParams(params);
+  };
 
   // Extract categories for optional filter tabs
   const categories = useMemo(() => {
@@ -85,7 +115,7 @@ export default function RoadmapList({
   // }, [roadmaps, search, showCompletedOnly, selectedCategory]);
 
   const resetFilters = () => {
-    setSearch("");
+    // setSearch("");
     setShowCompletedOnly(false);
     setSelectedCategory("all");
   };
@@ -183,7 +213,7 @@ export default function RoadmapList({
               />
               <input
                 value={search}
-                onChange={(e) => setSearch(e.target.value)}
+                onChange={(e) => updateSearch(e.target.value)}
                 placeholder="Find a roadmap..."
                 aria-label="Search roadmaps"
                 className="w-full rounded-lg border border-white/10 bg-[#111111] py-2 pl-9 pr-8 text-xs text-white outline-none placeholder:text-gray-600 focus:border-white/25 transition duration-150"
@@ -191,7 +221,7 @@ export default function RoadmapList({
               {search && (
                 <button
                   type="button"
-                  onClick={() => setSearch("")}
+                  onClick={() => updateSearch("")}
                   aria-label="Clear search"
                   className="absolute right-2.5 top-1/2 -translate-y-1/2 rounded p-0.5 text-gray-500 hover:text-white"
                 >
@@ -291,7 +321,7 @@ export default function RoadmapList({
           <Pagination
             currentPage={currentPage}
             totalPages={totalPages}
-            onPageChange={setCurrentPage}
+            onPageChange={updatePage}
           />
         </div>
 
