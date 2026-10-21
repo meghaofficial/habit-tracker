@@ -115,8 +115,6 @@ export default function ViewRoadmap({
   //   fetchRoadmap();
   // }, [params?.parentID]);
 
-  console.log("roadmap", roadmap);
-
   return (
     <div>
       {/* Header Preview Info */}

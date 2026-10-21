@@ -6,17 +6,11 @@ import IconPickerModal from "./components/IconPickerModal";
 import { useParams } from "react-router-dom";
 import { roadmapApi } from "../../../api/roadmap.api";
 
-// type TreeNode = Omit<RoadmapItem, "nodes"> & {
-//   children: TreeNode[];
-// };
-
-type TreeNode = RoadmapItem;
-
 const DEFAULT_ACCENT = "#38bdf8";
 
 export default function RoadmapTree() {
   const params = useParams();
-  const [root, setRoot] = useState<TreeNode | null>(null);
+  const [root, setRoot] = useState<RoadmapItem | null>(null);
   const [rootFormOpen, setRootFormOpen] = useState(true);
   const [openForms, setOpenForms] = useState<string[]>([]);
   const [expanded, setExpanded] = useState<string[]>([]);
@@ -37,7 +31,10 @@ export default function RoadmapTree() {
     );
   };
 
-  const addChildLocally = (node: TreeNode, child: TreeNode): TreeNode => ({
+  const addChildLocally = (
+    node: RoadmapItem,
+    child: RoadmapItem,
+  ): RoadmapItem => ({
     ...node,
     nodes:
       node._id === child.parent_id
@@ -45,8 +42,8 @@ export default function RoadmapTree() {
         : node.nodes.map((item) => addChildLocally(item, child)),
   });
 
-  const createChild = (parent: TreeNode, child: RoadmapItem) => {
-    const newNode: TreeNode = {
+  const createChild = (parent: RoadmapItem, child: RoadmapItem) => {
+    const newNode: RoadmapItem = {
       ...child,
       icon: childIcons[parent._id] || "🚀",
       parent_id: parent._id,
@@ -122,8 +119,8 @@ export default function RoadmapTree() {
   }, [params]);
 
   const renderNode = (
-    node: TreeNode,
-    parent: TreeNode | null,
+    node: RoadmapItem,
+    parent: RoadmapItem | null,
     depth: number,
   ): React.ReactNode => {
     const formOpen = openForms.includes(node._id);
@@ -134,7 +131,7 @@ export default function RoadmapTree() {
       <div key={node._id} className="min-w-0">
         {/* Compact node card */}
         <article
-          className="w-[min(100%,405px)] overflow-hidden rounded-2xl border border-white/10 bg-[#1d1d1d] transition-colors"
+          className="w-[min(100%,350px)] overflow-hidden rounded-xl border border-white/10 bg-[#1d1d1d] transition-colors"
           style={{
             borderLeft: `3px solid ${accent}`,
           }}
@@ -143,26 +140,22 @@ export default function RoadmapTree() {
             <span className="shrink-0 text-lg">{node.icon || "🚀"}</span>
 
             <div className="min-w-0 flex-1">
-              <button
-                type="button"
-                onClick={() => toggleValue(setOpenForms, node._id)}
-                className="block max-w-full truncate text-left text-sm font-semibold text-white hover:text-indigo-300"
-                title="Edit node"
-              >
-                {node.title || "Untitled node"}
-              </button>
+              <div className="flex items-center gap-2">
+                <button
+                  type="button"
+                  onClick={() => toggleValue(setOpenForms, node._id)}
+                  className="block max-w-full truncate text-left text-[12px] font-semibold text-white hover:text-indigo-300"
+                  title="Edit node"
+                >
+                  {node.title || "Untitled node"}
+                </button>
 
-              {node.category && (
-                <span className="mt-1 inline-flex rounded-full border border-white/10 px-2 py-0.5 text-[10px] text-gray-400">
-                  {node.category}
-                </span>
-              )}
-
-              {node.description && (
-                <p className="mt-2 line-clamp-2 text-xs leading-5 text-gray-500">
-                  {node.description}
-                </p>
-              )}
+                {node.category && (
+                  <span className="inline-flex rounded-full border border-white/10 px-1 py-0.2 text-[10px] text-gray-400">
+                    {node.category}
+                  </span>
+                )}
+              </div>
 
               <div className="mt-2 text-[10px] text-gray-500">
                 {node.completed_nodes_count ?? 0}/{node.total_nodes_count ?? 0}{" "}
@@ -230,7 +223,7 @@ export default function RoadmapTree() {
                   setRoot((current) => {
                     if (!current) return current;
 
-                    const update = (item: TreeNode): TreeNode => ({
+                    const update = (item: RoadmapItem): RoadmapItem => ({
                       ...item,
                       ...(item._id === updated._id ? updated : {}),
                       nodes: item.nodes.map(update),
@@ -250,7 +243,7 @@ export default function RoadmapTree() {
                 //   setRoot((current) => {
                 //     if (!current) return current;
 
-                //     const update = (item: TreeNode): TreeNode => ({
+                //     const update = (item: RoadmapItem): RoadmapItem => ({
                 //       ...item,
                 //       ...(item._id === node._id ? { icon } : {}),
                 //       children: item.children.map(update),
@@ -266,14 +259,14 @@ export default function RoadmapTree() {
           {/* Add child */}
           <div className="flex items-center justify-between border-t border-white/6 px-4 py-2">
             <span className="text-[10px] text-gray-500">
-              {/* {node.children.length} child
-              {node.children.length !== 1 ? "ren" : ""} */}
+              {node?.nodes?.length || 0} child
+              {(node?.nodes?.length || 0) !== 1 ? "ren" : ""}
             </span>
 
             <button
               type="button"
               onClick={() => toggleValue(setOpenForms, `new:${node._id}`)}
-              className="rounded-md px-2 py-1 text-[11px] text-indigo-300 hover:bg-indigo-500/10"
+              className="rounded-md text-[11px] text-indigo-300 hover:bg-indigo-500/10"
             >
               + Add child
             </button>
@@ -330,10 +323,10 @@ export default function RoadmapTree() {
   };
 
   return (
-    <div className="min-h-screen bg-[#111111] p-4 text-white">
+    <div className="min-h-screen relative bg-[#111111] p-4 text-white">
       <div className="w-full">
         {root && (
-          <div className="mb-6 flex items-center justify-between gap-3">
+          <div className="flex items-center justify-between gap-3 absolute right-0 -top-18">
             <button
               type="button"
               onClick={() =>
@@ -343,7 +336,7 @@ export default function RoadmapTree() {
                     : [...prev, root._id],
                 )
               }
-              className="rounded-lg border border-white/10 px-3 py-2 text-xs text-gray-300 hover:bg-white/5"
+              className="rounded-lg border border-white/10 px-3 py-2 text-xs text-gray-300 hover:bg-white/5 "
             >
               {expanded.includes(root._id)
                 ? "Collapse children"
