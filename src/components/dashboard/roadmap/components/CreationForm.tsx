@@ -4,6 +4,7 @@ import { notify } from "../../../../helper";
 import { roadmapApi } from "../../../../api/roadmap.api";
 import { DEFAULT_COLORS } from "../testData";
 import CircleLoader from "../../../loaders/CircleLoader";
+import { useNavigate, useParams } from "react-router-dom";
 
 type ListPointAction = "add" | "update" | "delete" | "reorder";
 
@@ -30,6 +31,7 @@ const CreationForm = ({
   onCancel,
   selectedIcon,
 }: CreationFormProps) => {
+  const navigate = useNavigate();
   const [loading, setLoading] = useState(false);
 
   const [roadmapConfig, setRoadmapConfig] = useState<RoadmapItem>({
@@ -71,11 +73,13 @@ const CreationForm = ({
         parent_id: parentId,
       });
 
-      // Adjust this path if your API wrapper returns a different shape.
       const createdItem = response.data?.data?.data ?? response.data?.data;
 
       if (!createdItem?._id) {
         throw new Error("Created item ID was not returned by the API");
+      }
+      if (!parentId) {
+        navigate(`/roadmap/create/${createdItem?._id}`);
       }
 
       notify.success("Created successfully");

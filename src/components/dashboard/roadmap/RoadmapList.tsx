@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { Check, Plus, Search, X, RotateCcw } from "lucide-react";
 import { useNavigate, useSearchParams } from "react-router-dom";
 import { roadmapApi } from "../../../api/roadmap.api";
@@ -37,7 +37,7 @@ export default function RoadmapList({ onAddNewRoadmap }: RoadmapListProps) {
   );
   const [totalPages, setTotalPages] = useState(0);
   const pageLimit = 8;
-  const [categories, setCategories] = useState<string[]>(["All"]);
+  const [categories, setCategories] = useState<string[]>([]);
 
   const isFirstRender = useRef(true);
 
@@ -77,7 +77,7 @@ export default function RoadmapList({ onAddNewRoadmap }: RoadmapListProps) {
   // }, [roadmaps]);
 
   const resetFilters = () => {
-    // setSearch("");
+    setSearch("");
     setShowCompletedOnly(false);
     setSelectedCategory("all");
   };
@@ -103,9 +103,12 @@ export default function RoadmapList({ onAddNewRoadmap }: RoadmapListProps) {
   const fetchCategories = async () => {
     try {
       const data = await roadmapApi.getRoadmapCategories();
-
       if (data?.success) {
-        setCategories(["All", ...data?.categories]);
+        if (data?.categories?.length > 0) {
+          setCategories(["All", ...data?.categories]);
+        } else {
+          setCategories([]);
+        }
       }
     } catch (error) {
       console.error("Failed to load roadmaps:", error);
@@ -120,6 +123,7 @@ export default function RoadmapList({ onAddNewRoadmap }: RoadmapListProps) {
       await roadmapApi.delete(id);
       notify.success("Roadmap deleted successfully.");
       await fetchRoadmaps();
+      await fetchCategories();
     } catch (error) {
       console.error("Failed to delete roadmap:", error);
       notify.error("Could not delete the roadmap. Please try again.");
@@ -255,7 +259,7 @@ export default function RoadmapList({ onAddNewRoadmap }: RoadmapListProps) {
         <div className="mt-6">
           <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-4">
             {loading ? (
-              Array.from({ length: 6 }).map((_, index) => (
+              Array.from({ length: 8 }).map((_, index) => (
                 <div
                   className="w-full h-30 bg-white/5 rounded-xl animate-pulse"
                   key={index}

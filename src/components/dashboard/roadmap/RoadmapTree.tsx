@@ -1,25 +1,27 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import type { RoadmapItem } from "./types";
 import CreationForm from "./components/CreationForm";
 import { ChevronRight, ChevronDown } from "lucide-react";
 import IconPickerModal from "./components/IconPickerModal";
+import { useParams } from "react-router-dom";
+import { roadmapApi } from "../../../api/roadmap.api";
 
-type TreeNode = RoadmapItem & {
-  parent_id?: string | null;
-  type?: "roadmap" | "list";
-  nodes?: string[];
-  children: TreeNode[];
-};
+// type TreeNode = Omit<RoadmapItem, "nodes"> & {
+//   children: TreeNode[];
+// };
+
+type TreeNode = RoadmapItem;
 
 const DEFAULT_ACCENT = "#38bdf8";
 
 export default function RoadmapTree() {
+  const params = useParams();
   const [root, setRoot] = useState<TreeNode | null>(null);
   const [rootFormOpen, setRootFormOpen] = useState(true);
   const [openForms, setOpenForms] = useState<string[]>([]);
   const [expanded, setExpanded] = useState<string[]>([]);
 
-  const [selectedIcon, setSelectedIcon] = useState("🗺️");
+  const [selectedIcon, setSelectedIcon] = useState("🚀");
   const [childIcons, setChildIcons] = useState<Record<string, string>>({});
   const [iconPickerOpen, setIconPickerOpen] = useState(false);
   const [activeIconParentId, setActiveIconParentId] = useState<string | null>(
@@ -37,37 +39,19 @@ export default function RoadmapTree() {
 
   const addChildLocally = (node: TreeNode, child: TreeNode): TreeNode => ({
     ...node,
-    children:
+    nodes:
       node._id === child.parent_id
-        ? [...node.children, child]
-        : node.children.map((item) => addChildLocally(item, child)),
+        ? [...node.nodes, child]
+        : node.nodes.map((item) => addChildLocally(item, child)),
   });
-
-  // const createChild = (parent: TreeNode, child: RoadmapItem) => {
-  //   const newNode: TreeNode = {
-  //     ...child,
-  //     parent_id: parent._id,
-  //     type: child.type ?? "roadmap",
-  //     children: [],
-  //   };
-
-  //   setRoot((current) =>
-  //     current ? addChildLocally(current, newNode) : current,
-  //   );
-
-  //   setOpenForms((prev) => prev.filter((id) => id !== parent._id));
-  //   setExpanded((prev) =>
-  //     prev.includes(parent._id) ? prev : [...prev, parent._id],
-  //   );
-  // };
 
   const createChild = (parent: TreeNode, child: RoadmapItem) => {
     const newNode: TreeNode = {
       ...child,
-      icon: childIcons[parent._id] || "🗺️",
+      icon: childIcons[parent._id] || "🚀",
       parent_id: parent._id,
       type: child.type ?? "roadmap",
-      children: [],
+      nodes: [],
     };
 
     setRoot((current) =>
@@ -86,6 +70,57 @@ export default function RoadmapTree() {
       prev.includes(parent._id) ? prev : [...prev, parent._id],
     );
   };
+
+  useEffect(() => {
+    const fetchFullRoadmap = async () => {
+      if (!params?.roadmapID) return;
+      // setLoading(true);
+
+      try {
+        const response = await roadmapApi.getFullRoadmapByID(params?.roadmapID);
+
+        if (response?.success) {
+          const {
+            _id,
+            title,
+            description,
+            icon,
+            total_nodes_count,
+            completed_nodes_count,
+            status,
+            accent_color,
+            category,
+            nodes,
+            type,
+            parent_id,
+            points,
+          } = response?.roadmap;
+          setRoot({
+            _id,
+            title,
+            description,
+            icon,
+            total_nodes_count,
+            completed_nodes_count,
+            status,
+            accent_color,
+            category,
+            type,
+            parent_id,
+            points,
+            nodes,
+          });
+        }
+      } catch (error) {
+        console.error("Failed to fetch full roadmap:", error);
+      } finally {
+        // setLoading(false);
+      }
+    };
+
+    void fetchFullRoadmap();
+  }, [params]);
+
   const renderNode = (
     node: TreeNode,
     parent: TreeNode | null,
@@ -105,7 +140,7 @@ export default function RoadmapTree() {
           }}
         >
           <div className="flex items-start gap-3 px-4 py-3.5">
-            <span className="shrink-0 text-lg">{node.icon || "🗺️"}</span>
+            <span className="shrink-0 text-lg">{node.icon || "🚀"}</span>
 
             <div className="min-w-0 flex-1">
               <button
@@ -198,7 +233,7 @@ export default function RoadmapTree() {
                     const update = (item: TreeNode): TreeNode => ({
                       ...item,
                       ...(item._id === updated._id ? updated : {}),
-                      children: item.children.map(update),
+                      nodes: item.nodes.map(update),
                     });
 
                     return update(current);
@@ -210,7 +245,7 @@ export default function RoadmapTree() {
                   setOpenForms((prev) => prev.filter((id) => id !== node._id))
                 }
                 // onOpenIconPicker={() => setIconPickerOpen(true)}
-                selectedIcon={node.icon || "🗺️"}
+                selectedIcon={node.icon || "🚀"}
                 // onIconChange={(icon) => {
                 //   setRoot((current) => {
                 //     if (!current) return current;
@@ -231,8 +266,8 @@ export default function RoadmapTree() {
           {/* Add child */}
           <div className="flex items-center justify-between border-t border-white/6 px-4 py-2">
             <span className="text-[10px] text-gray-500">
-              {node.children.length} child
-              {node.children.length !== 1 ? "ren" : ""}
+              {/* {node.children.length} child
+              {node.children.length !== 1 ? "ren" : ""} */}
             </span>
 
             <button
@@ -258,7 +293,7 @@ export default function RoadmapTree() {
                 className="flex size-9 shrink-0 items-center justify-center rounded-lg border border-white/10 bg-white/5 text-xl hover:bg-white/10"
                 title="Choose child icon"
               >
-                {childIcons[node._id] || "🗺️"}
+                {childIcons[node._id] || "🚀"}
               </button>
 
               <span className="text-xs text-gray-400">Choose child icon</span>
@@ -274,15 +309,15 @@ export default function RoadmapTree() {
                   prev.filter((id) => id !== `new:${node._id}`),
                 )
               }
-              selectedIcon={childIcons[node._id] || "🗺️"}
+              selectedIcon={childIcons[node._id] || "🚀"}
             />
           </div>
         )}
 
         {/* Nested children, sequentially */}
-        {isExpanded && node.children.length > 0 && (
+        {isExpanded && node.nodes.length > 0 && (
           <div className="ml-4 mt-3 space-y-4 border-l border-white/10 pl-4 sm:ml-6 sm:pl-5">
-            {node.children.map((child) => (
+            {node.nodes.map((child) => (
               <div key={child._id} className="relative">
                 <div className="absolute -left-4 top-5 w-4 border-t border-white/10 sm:-left-5 sm:w-5" />
                 {renderNode(child, node, depth + 1)}
@@ -324,7 +359,7 @@ export default function RoadmapTree() {
                 className="text-lg cursor-pointer"
                 onClick={() => setIconPickerOpen(true)}
               >
-                {selectedIcon || "🗺️"}
+                {selectedIcon || "🚀"}
               </span>
               <span className="ml-1">Create root node</span>
             </div>
@@ -339,7 +374,7 @@ export default function RoadmapTree() {
                     ...item,
                     icon: selectedIcon,
                     type: item.type ?? "roadmap",
-                    children: [],
+                    nodes: [],
                   });
                   setRootFormOpen(false);
                 }}
@@ -360,20 +395,12 @@ export default function RoadmapTree() {
           renderNode(root, null, 0)
         )}
 
-        {/* {iconPickerOpen && (
-          <IconPickerModal
-            selectedIcon={selectedIcon}
-            onSelect={setSelectedIcon}
-            onClose={() => setIconPickerOpen(false)}
-          />
-        )} */}
-
         {iconPickerOpen && (
           <IconPickerModal
             selectedIcon={
               activeIconParentId === null
                 ? selectedIcon
-                : childIcons[activeIconParentId] || "🗺️"
+                : childIcons[activeIconParentId] || "🚀"
             }
             onSelect={(icon) => {
               if (activeIconParentId === null) {

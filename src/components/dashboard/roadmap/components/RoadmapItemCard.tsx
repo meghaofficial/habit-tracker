@@ -24,14 +24,12 @@ export interface RoadmapItem {
 
 interface RoadmapItemCardProps {
   roadmap: RoadmapItem;
-  onEdit?: (roadmap: RoadmapItem) => void;
   deleteRoadmap: (id: string) => void;
   isDeleting: boolean;
 }
 
 const RoadmapItemCard = ({
   roadmap,
-  onEdit,
   deleteRoadmap,
   isDeleting,
 }: RoadmapItemCardProps) => {
@@ -190,7 +188,7 @@ const RoadmapItemCard = ({
                 type="button"
                 onClick={() => {
                   setMenuOpen(false);
-                  onEdit?.(roadmap);
+                  navigate(`/roadmap/create/${roadmap?._id}`);
                 }}
                 className="flex w-full items-center gap-2 rounded-md px-2 py-2 text-left text-[11px] text-gray-300 transition hover:bg-white/8 hover:text-white"
               >

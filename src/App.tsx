@@ -65,7 +65,7 @@ function App() {
   useEffect(() => {
     if (user?.id) {
       socket.connect();
-      // socket.emit("join-user", user.id);/
+      // socket.emit("join-user", user.id);
       socket.on("connect", () => {
         socket.emit("join-user", user.id);
       });
@@ -142,6 +142,11 @@ function App() {
                   )}
                   <Route
                     path="/roadmap"
+                    element={isLogin ? <Dashboard /> : <HomePage />}
+                  />
+
+                  <Route
+                    path="/roadmap/create/:roadmapID"
                     element={isLogin ? <Dashboard /> : <HomePage />}
                   />
 

@@ -24,8 +24,6 @@ const RoadmapMainComponent = () => {
   const splat = params["*"];
   const roadmapSteps = splat ? splat.split("/") : [];
 
-  console.log("roadmapSteps", params?.parentID);
-
   // useEffect(() => {
   //   if (roadmapSteps.length > 0) {
   //     if (roadmapSteps[0] === "create" && !params?.parentID) {
@@ -39,14 +37,18 @@ const RoadmapMainComponent = () => {
   // }, [params]);
 
   useEffect(() => {
-    if (params.parentID === "create" || roadmapSteps[0] === "create") {
+    if (
+      params.parentID === "create" ||
+      roadmapSteps[0] === "create" ||
+      params.roadmapID
+    ) {
       setCurrentView("create");
     } else if (params.parentID) {
       setCurrentView("view");
     } else {
       setCurrentView("list");
     }
-  }, [params.parentID, params["*"]]);
+  }, [params.parentID, params["*"], params.roadmapID]);
 
   return (
     <div className="w-full">
