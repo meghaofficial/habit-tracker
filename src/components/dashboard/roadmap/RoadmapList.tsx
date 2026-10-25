@@ -66,16 +66,6 @@ export default function RoadmapList({ onAddNewRoadmap }: RoadmapListProps) {
     setSearchParams(params);
   };
 
-  // Extract categories for optional filter tabs
-  // const categories = useMemo(() => {
-  //   if (!roadmaps) return [];
-  //   const set = new Set<string>();
-  //   roadmaps.slice(0, 5).forEach((r) => {
-  //     if (r.category) set.add(r.category);
-  //   });
-  //   return ["all", ...Array.from(set)];
-  // }, [roadmaps]);
-
   const resetFilters = () => {
     setSearch("");
     setShowCompletedOnly(false);
@@ -85,11 +75,24 @@ export default function RoadmapList({ onAddNewRoadmap }: RoadmapListProps) {
   const fetchRoadmaps = async (searchValue = "") => {
     setLoading(true);
     try {
-      const data = await roadmapApi.getList({
+      interface RoadmapListParams {
+        search: string;
+        page: number;
+        limit: number;
+        completed?: boolean;
+      }
+
+      const params: RoadmapListParams = {
         search: searchValue.trim(),
         page: currentPage,
         limit: pageLimit,
-      });
+      };
+
+      if (showCompletedOnly) {
+        params.completed = true;
+      }
+
+      const data = await roadmapApi.getList(params);
 
       setRoadmaps(data?.data ?? []);
       setTotalPages(data?.pagination?.totalPages);
@@ -146,7 +149,7 @@ export default function RoadmapList({ onAddNewRoadmap }: RoadmapListProps) {
     }, 300);
 
     return () => clearTimeout(timeoutId);
-  }, [search, currentPage]);
+  }, [search, currentPage, showCompletedOnly]);
 
   useEffect(() => {
     fetchCategories();
@@ -218,7 +221,9 @@ export default function RoadmapList({ onAddNewRoadmap }: RoadmapListProps) {
             {/* Completed only button matching RoadmapsPage.tsx reference */}
             <button
               type="button"
-              onClick={() => setShowCompletedOnly((value) => !value)}
+              onClick={() => {
+                setShowCompletedOnly((value) => !value);
+              }}
               aria-pressed={showCompletedOnly}
               className={`inline-flex items-center justify-center gap-2 self-start rounded-lg border px-3 py-2 text-xs transition duration-150 sm:self-auto ${
                 showCompletedOnly

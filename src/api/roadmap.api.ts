@@ -2,9 +2,9 @@ import { axiosPrivate } from "./axios";
 
 export interface RoadmapFilters {
   search?: string;
-  category?: string;
   page?: number;
   limit?: number;
+  completed?: boolean;
 }
 
 export const roadmapApi = {
