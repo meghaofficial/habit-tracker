@@ -67,9 +67,9 @@ export default function RoadmapList({ onAddNewRoadmap }: RoadmapListProps) {
   };
 
   const resetFilters = () => {
-    setSearch("");
+    updateSearch("");
     setShowCompletedOnly(false);
-    setSelectedCategory("all");
+    setSelectedCategory("");
   };
 
   const fetchRoadmaps = async (searchValue = "") => {
@@ -201,7 +201,10 @@ export default function RoadmapList({ onAddNewRoadmap }: RoadmapListProps) {
               />
               <input
                 value={search}
-                onChange={(e) => updateSearch(e.target.value)}
+                onChange={(e) => {
+                  updateSearch(e.target.value);
+                  setSelectedCategory("");
+                }}
                 placeholder="Find a roadmap..."
                 aria-label="Search roadmaps"
                 className="w-full rounded-lg border border-white/10 bg-[#111111] py-2 pl-9 pr-8 text-xs text-white outline-none placeholder:text-gray-600 focus:border-white/25 transition duration-150"
@@ -250,10 +253,11 @@ export default function RoadmapList({ onAddNewRoadmap }: RoadmapListProps) {
                   key={category}
                   type="button"
                   onClick={() => {
-                    setSelectedCategory(category);
                     if (category === "All") {
+                      setSelectedCategory("");
                       setSearch("");
                     } else {
+                      setSelectedCategory(category);
                       setSearch(category);
                     }
                   }}
