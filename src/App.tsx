@@ -150,10 +150,10 @@ function App() {
                     element={isLogin ? <Dashboard /> : <HomePage />}
                   />
 
-                  <Route
+                  {/* <Route
                     path="/roadmap/:parentID"
                     element={isLogin ? <Dashboard /> : <HomePage />}
-                  />
+                  /> */}
 
                   <Route
                     path="/roadmap/*"

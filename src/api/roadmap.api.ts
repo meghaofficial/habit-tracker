@@ -48,4 +48,9 @@ export const roadmapApi = {
     const response = await axiosPrivate.get(`/api/roadmaps/${id}/full`);
     return response.data;
   },
+
+  getRoadmapTrail: async (ids: string[]) => {
+    const response = await axiosPrivate.post(`/api/roadmaps/trail`, { ids });
+    return response.data;
+  },
 };

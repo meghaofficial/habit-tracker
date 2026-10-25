@@ -73,7 +73,10 @@ export default function ViewRoadmap({
         <div className="flex items-start gap-3 min-w-0 flex-1">
           <div
             className="flex h-11 w-11 shrink-0 items-center justify-center rounded-2xl text-xl shadow-lg border border-white/10"
-            // style={{ backgroundColor: `${roadmap.color}25` }}
+            // style={{
+            //   backgroundColor: `${roadmap.accent_color}25`,
+            //   borderColor: `${roadmap.accent_color}`,
+            // }}
           >
             {roadmap.icon || "🚀"}
           </div>
@@ -271,7 +274,7 @@ export default function ViewRoadmap({
                                         type="button"
                                         onClick={() => {
                                           navigate(
-                                            `/roadmap/${splat}/${node.title}`,
+                                            `/roadmap/${splat ? `${splat}/` : ""}${node._id}`,
                                           );
                                           onOpenNestedRoadmap(node._id);
                                         }}
@@ -388,7 +391,7 @@ export default function ViewRoadmap({
                                       type="button"
                                       onClick={() => {
                                         navigate(
-                                          `/roadmap/${splat}/${node.title}`,
+                                          `/roadmap/${splat ? `${splat}/` : ""}${node._id}`,
                                         );
                                         onOpenNestedRoadmap(node._id);
                                       }}

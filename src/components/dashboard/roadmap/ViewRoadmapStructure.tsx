@@ -80,15 +80,33 @@ const ViewRoadmapStructure = () => {
     setRootRoadmap((prev) => updateRecursive(prev, 0));
   };
 
-  const handleNavigateBreadcrumb = (title: string) => {
-    const targetIndex = roadmapSteps.indexOf(title);
+  // const handleNavigateBreadcrumb = (title: string) => {
+  //   const targetIndex = roadmapSteps.indexOf(title);
+  //   if (targetIndex === -1) {
+  //     setNavigationPath([]);
+  //     navigate("/roadmap");
+  //     return;
+  //   }
+  //   const newPathSegments = roadmapSteps.slice(0, targetIndex + 1);
+  //   setNavigationPath(newPathSegments);
+  //   navigate(`/roadmap/${newPathSegments.join("/")}`);
+  // };
+
+  const handleNavigateBreadcrumb = (id: string) => {
+    const targetIndex = roadmapTrail.findIndex((crumb) => crumb._id === id);
+
     if (targetIndex === -1) {
       setNavigationPath([]);
       navigate("/roadmap");
       return;
     }
-    const newPathSegments = roadmapSteps.slice(0, targetIndex + 1);
+
+    const newPathSegments = roadmapTrail
+      .slice(0, targetIndex + 1)
+      .map((crumb) => crumb._id);
+
     setNavigationPath(newPathSegments);
+
     navigate(`/roadmap/${newPathSegments.join("/")}`);
   };
 
@@ -137,11 +155,15 @@ const ViewRoadmapStructure = () => {
 
   useEffect(() => {
     const fetchRoadmap = async () => {
-      if (!params?.parentID) return;
+      const pathSegments = params["*"]?.split("/").filter(Boolean) || [];
+      const parentID = pathSegments[pathSegments.length - 1];
+
+      if (!parentID || parentID === "create") return;
+
       try {
         setLoading(true);
 
-        const response = await roadmapApi.getRoadmapByID(params?.parentID);
+        const response = await roadmapApi.getRoadmapByID(parentID);
 
         setActiveRoadmap(response?.data);
       } catch (error) {
@@ -152,49 +174,123 @@ const ViewRoadmapStructure = () => {
     };
 
     fetchRoadmap();
-  }, [params?.parentID]);
+  }, [params["*"]]);
+
+  // Trail
+  const [roadmapTrail, setRoadmapTrail] = useState<
+    {
+      _id: string;
+      title: string;
+      accent_color: string;
+    }[]
+  >([]);
+
+  useEffect(() => {
+    const fetchTrail = async () => {
+      const ids = params["*"]?.split("/").filter(Boolean) || [];
+      const validIDs = ids.filter((id) => id !== "create");
+
+      if (validIDs.length === 0) {
+        setRoadmapTrail([]);
+        return;
+      }
+
+      try {
+        const response = await roadmapApi.getRoadmapTrail(validIDs);
+        setRoadmapTrail(response.data);
+      } catch (error) {
+        console.error("Failed to fetch roadmap trail:", error);
+      }
+    };
+
+    fetchTrail();
+  }, [params["*"]]);
 
   return (
-    <div className="flex h-full flex-col overflow-y-auto rounded-2xl border border-white/10 bg-[#121212] shadow-sm mt-4">
+    <div className="flex h-full flex-col overflow-y-auto rounded-2xl border border-white/10 bg-[#121212] shadow-sm my-4">
       {/* Breadcrumb Bar */}
       <div className="flex flex-wrap items-center gap-3 p-4 text-xs text-gray-400 border-b border-white/8">
         <button
           type="button"
-          onClick={() => navigate("/roadmap")}
+          onClick={() => {
+            if (roadmapTrail.length <= 1) {
+              setNavigationPath([]);
+              navigate("/roadmap");
+              return;
+            }
+
+            const parentPath = roadmapTrail
+              .slice(0, -1)
+              .map((crumb) => crumb._id);
+
+            setNavigationPath(parentPath);
+            navigate(`/roadmap/${parentPath.join("/")}`);
+          }}
           aria-label="Back to roadmaps"
           className="flex items-center gap-1.5 rounded-xl border border-white/10 bg-[#161616] px-3 py-1.5 text-xs font-medium text-gray-300 transition hover:bg-white/10 hover:text-white cursor-pointer"
         >
           <ArrowLeft size={14} />
           <span>Back</span>
         </button>
-        {trail.map((crumb, idx) => {
-          const isLast = idx === trail.length - 1;
+        {roadmapTrail.map((crumb, idx) => {
+          const isLast = idx === roadmapTrail.length - 1;
+
           return (
-            <React.Fragment key={crumb.id + idx}>
+            <React.Fragment key={crumb._id + idx}>
               <button
                 type="button"
-                onClick={() => handleNavigateBreadcrumb(crumb.title)}
-                className={`font-medium transition hover:text-white ${
-                  isLast
-                    ? "text-emerald-400 font-semibold"
-                    : "text-gray-400 hover:underline"
+                onClick={() => handleNavigateBreadcrumb(crumb._id)}
+                style={{ color: crumb.accent_color || "#34d399" }}
+                className={`font-medium transition hover:opacity-80 ${
+                  isLast ? "font-semibold" : "hover:underline"
                 }`}
               >
                 {crumb.title || "Untitled"}
               </button>
+
               {!isLast && <span className="text-gray-600 font-bold">/</span>}
             </React.Fragment>
           );
         })}
       </div>
       <div className="p-4 sm:p-6">
-        <ViewRoadmap
-          roadmap={activeRoadmap}
-          onOpenNestedRoadmap={handleOpenNestedRoadmap}
-          onToggleNodeComplete={handleToggleNodeComplete}
-          onToggleTaskComplete={handleToggleTaskComplete}
-        />
+        {loading ? (
+          <div>
+            <SkeletonLoader />
+          </div>
+        ) : (
+          <ViewRoadmap
+            roadmap={activeRoadmap}
+            onOpenNestedRoadmap={handleOpenNestedRoadmap}
+            onToggleNodeComplete={handleToggleNodeComplete}
+            onToggleTaskComplete={handleToggleTaskComplete}
+          />
+        )}
       </div>
+    </div>
+  );
+};
+
+const SkeletonLoader = () => {
+  return (
+    <div>
+      {/* Header Preview Info */}
+      <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
+        <div className="flex items-start gap-3 min-w-0 flex-1">
+          <div className="flex h-11 w-11 animate-pulse bg-white/5 shrink-0 items-center justify-center rounded-2xl text-xl shadow-lg"></div>
+
+          <div className="min-w-0 flex-1">
+            <h1 className="text-base font-bold h-10 w-30 rounded-xl animate-pulse bg-white/5 text-white tracking-tight sm:text-lg"></h1>
+
+            <p className="mt-1 text-xs animate-pulse bg-white/10 text-gray-400 line-clamp-2"></p>
+          </div>
+        </div>
+
+        {/* Overall progress indicator */}
+        <div className="rounded-xl h-15 w-35 animate-pulse bg-white/5 px-3.5 py-2.5 shrink-0 min-w-[160px]40"></div>
+      </div>
+
+      <div className="animate-pulse bg-white/5 mt-6 rounded-2xl h-60"></div>
     </div>
   );
 };

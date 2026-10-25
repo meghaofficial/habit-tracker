@@ -25,30 +25,35 @@ const RoadmapMainComponent = () => {
   const roadmapSteps = splat ? splat.split("/") : [];
 
   // useEffect(() => {
-  //   if (roadmapSteps.length > 0) {
-  //     if (roadmapSteps[0] === "create" && !params?.parentID) {
-  //       setCurrentView("create");
-  //     } else if (params?.parentID) {
-  //       setCurrentView("view");
-  //     }
+  //   if (
+  //     params.parentID === "create" ||
+  //     roadmapSteps[0] === "create" ||
+  //     params.roadmapID
+  //   ) {
+  //     setCurrentView("create");
+  //   } else if (params.parentID) {
+  //     setCurrentView("view");
   //   } else {
   //     setCurrentView("list");
   //   }
-  // }, [params]);
+  // }, [params.parentID, params["*"], params.roadmapID]);
 
   useEffect(() => {
+    const pathSegments = params["*"]?.split("/").filter(Boolean) || [];
+    const parentID = pathSegments[pathSegments.length - 1];
+
     if (
-      params.parentID === "create" ||
-      roadmapSteps[0] === "create" ||
+      parentID === "create" ||
+      pathSegments[0] === "create" ||
       params.roadmapID
     ) {
       setCurrentView("create");
-    } else if (params.parentID) {
+    } else if (parentID) {
       setCurrentView("view");
     } else {
       setCurrentView("list");
     }
-  }, [params.parentID, params["*"], params.roadmapID]);
+  }, [params["*"], params.roadmapID]);
 
   return (
     <div className="w-full">
