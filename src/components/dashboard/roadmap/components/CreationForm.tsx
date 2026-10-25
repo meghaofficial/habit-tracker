@@ -4,7 +4,7 @@ import { notify } from "../../../../helper";
 import { roadmapApi } from "../../../../api/roadmap.api";
 import { DEFAULT_COLORS } from "../testData";
 import CircleLoader from "../../../loaders/CircleLoader";
-import { useNavigate, useParams } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 
 type ListPointAction = "add" | "update" | "delete" | "reorder";
 
@@ -50,6 +50,7 @@ const CreationForm = ({
     points: [],
     ...initialData,
   });
+  const [deleteLoading, setDeleteLoading] = useState(false);
 
   const points = roadmapConfig.points ?? [];
 
@@ -161,6 +162,22 @@ const CreationForm = ({
       icon: selectedIcon,
     }));
   }, [selectedIcon]);
+
+  const deleteRoadmap = async (id: string, title: string) => {
+    if (!window.confirm(`Delete "${title}"? This action cannot be undone.`)) {
+      return;
+    }
+    try {
+      setDeleteLoading(true);
+      await roadmapApi.delete(id);
+      notify.success("Roadmap deleted successfully.");
+    } catch (error) {
+      console.error("Failed to delete roadmap:", error);
+      notify.error("Could not delete the roadmap. Please try again.");
+    } finally {
+      setDeleteLoading(false);
+    }
+  };
 
   return (
     <div className="space-y-2.5">
@@ -362,6 +379,14 @@ const CreationForm = ({
       </div>
 
       <div className="flex justify-end gap-2 pt-1">
+        <button
+          type="button"
+          disabled={deleteLoading}
+          onClick={() => deleteRoadmap(roadmapConfig._id, roadmapConfig.title)}
+          className="flex min-w-14 items-center justify-center rounded-lg bg-red-500 px-3 py-1.5 text-xs font-medium text-white hover:bg-red-600 disabled:opacity-60"
+        >
+          {deleteLoading ? <CircleLoader className="h-4 w-4" /> : "Delete"}
+        </button>
         <button
           type="button"
           onClick={onCancel}

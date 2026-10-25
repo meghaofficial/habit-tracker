@@ -1,4 +1,4 @@
-import React, { useEffect, useMemo, useState } from "react";
+import React, { useMemo, useState } from "react";
 import {
   Check,
   ChevronRight,
@@ -9,9 +9,8 @@ import {
   ChevronUp,
   ArrowRight,
 } from "lucide-react";
-import type { RoadmapData, RoadmapItem, RoadmapNode } from "./types";
+import type { RoadmapItem } from "./types";
 import { useNavigate, useParams } from "react-router-dom";
-import { roadmapApi } from "../../../api/roadmap.api";
 
 export type ViewRoadmapProps = {
   roadmap: RoadmapItem;
@@ -45,27 +44,6 @@ export default function ViewRoadmap({
     let completedPoints = 0;
     let totalPoints = 0;
 
-    // roadmap.nodes.forEach((node) => {
-    //   if (node.type === "single") {
-    //     totalPoints += 1;
-    //     if (node.completed) completedPoints += 1;
-    //   } else if (node.type === "sequential") {
-    //     const tasks = node.tasks || [];
-    //     totalPoints += tasks.length || 1;
-    //     completedPoints += tasks.filter((t) => t.completed).length;
-    //   } else if (node.type === "nested") {
-    //     const subNodes = node.nestedRoadmap?.nodes || [];
-    //     totalPoints += subNodes.length || 1;
-    //     // count sub-completed
-    //     const doneSub = subNodes.filter((sn) =>
-    //       sn.type === "single"
-    //         ? sn.completed
-    //         : sn.tasks?.every((t) => t.completed),
-    //     ).length;
-    //     completedPoints += doneSub;
-    //   }
-    // });
-
     const percentage =
       totalPoints > 0 ? Math.round((completedPoints / totalPoints) * 100) : 0;
 
@@ -85,35 +63,8 @@ export default function ViewRoadmap({
     }
     return result;
   }, [roadmap.nodes]);
-  console.log();
-
-  // const fullDisplayTitle = breadcrumbs
-  //   .map((b) => b.title || "Untitled")
-  //   .join(" / ");
 
   const splat = params["*"];
-  // const [loading, setLoading] = useState(false);
-
-  // const roadmapSteps = splat ? splat.split("/") : [];
-
-  // useEffect(() => {
-  //   const fetchRoadmap = async () => {
-  //     if (!params?.parentID) return;
-  //     try {
-  //       setLoading(true);
-
-  //       const response = await roadmapApi.getRoadmapByID(params?.parentID);
-
-  //       // setRoadmap(response.data);
-  //     } catch (error) {
-  //       console.error("Failed to fetch roadmap:", error);
-  //     } finally {
-  //       setLoading(false);
-  //     }
-  //   };
-
-  //   fetchRoadmap();
-  // }, [params?.parentID]);
 
   return (
     <div>
@@ -643,7 +594,7 @@ export default function ViewRoadmap({
                         {points.map((point, index) => (
                           <div
                             key={point.id}
-                            className="flex items-center gap-3 rounded-lg border border-white/5 bg-black/20 px-3 py-3 transition hover:bg-white/[0.03]"
+                            className="flex items-center gap-3 rounded-lg border border-white/5 bg-black/20 px-3 py-3 transition hover:bg-white/3"
                           >
                             <span
                               className="flex h-7 w-7 shrink-0 items-center justify-center rounded-lg text-xs font-semibold"

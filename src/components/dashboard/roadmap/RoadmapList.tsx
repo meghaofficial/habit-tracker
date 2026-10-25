@@ -28,7 +28,7 @@ export default function RoadmapList({ onAddNewRoadmap }: RoadmapListProps) {
   const [roadmaps, setRoadmaps] = useState<RoadmapItem[]>([]);
   const [loading, setLoading] = useState(true);
   const [showCompletedOnly, setShowCompletedOnly] = useState(false);
-  const [selectedCategory, setSelectedCategory] = useState<string>("all");
+  const [selectedCategory, setSelectedCategory] = useState<string>("");
   const [isDeleting, setIsDeleting] = useState(false);
   const [searchParams, setSearchParams] = useSearchParams();
   const [search, setSearch] = useState(() => searchParams.get("search") || "");
@@ -234,14 +234,24 @@ export default function RoadmapList({ onAddNewRoadmap }: RoadmapListProps) {
           {/* Category Pills (Horizontal scrollable) */}
           <section className="mt-3 flex items-center gap-1.5 overflow-x-auto max-w-160 pb-1 text-xs">
             {categories.map((category) => {
-              const isSelected = selectedCategory === category;
+              const isSelected =
+                category === "All"
+                  ? selectedCategory === ""
+                  : selectedCategory === category;
               const label = category === "all" ? "All Roadmaps" : category;
 
               return (
                 <button
                   key={category}
                   type="button"
-                  onClick={() => setSelectedCategory(category)}
+                  onClick={() => {
+                    setSelectedCategory(category);
+                    if (category === "All") {
+                      setSearch("");
+                    } else {
+                      setSearch(category);
+                    }
+                  }}
                   className={`whitespace-nowrap rounded-lg px-2.5 py-1 text-[11px] font-medium transition ${
                     isSelected
                       ? "bg-white/15 text-white"

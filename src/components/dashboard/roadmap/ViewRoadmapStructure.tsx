@@ -16,7 +16,6 @@ const ViewRoadmapStructure = () => {
   const roadmapSteps = splat ? splat.split("/") : [];
 
   const [loading, setLoading] = useState(false);
-  const [rows, setRows] = useState<RoadmapItem[]>([]);
 
   // Helper: locate active roadmap data based on navigationPath
   const getActiveRoadmapAndTrail = useCallback((): {
