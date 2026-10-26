@@ -1,13 +1,13 @@
 import { useState } from "react";
 import {
   Check,
-  ChevronRight,
   MoreVertical,
   Pencil,
   Trash2,
   ExternalLink,
 } from "lucide-react";
 import { useNavigate } from "react-router-dom";
+import { roadmapApi } from "../../../../api/roadmap.api";
 
 export interface RoadmapItem {
   _id: string;
@@ -106,19 +106,13 @@ const RoadmapItemCard = ({
                 {roadmap.category}
               </span>
             )}
+
             {roadmap.description && (
               <span className="w-[80%] absolute line-clamp-1 text-[9px] mt-2 font-medium text-gray-500">
                 {roadmap.description}
               </span>
             )}
           </div>
-
-          {!isDeleting && (
-            <ChevronRight
-              size={13}
-              className="mt-0.5 shrink-0 text-gray-600 transition group-hover:translate-x-0.5 group-hover:text-gray-300"
-            />
-          )}
         </div>
 
         {/* Progress */}

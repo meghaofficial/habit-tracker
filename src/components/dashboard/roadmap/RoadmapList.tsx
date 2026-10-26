@@ -5,19 +5,7 @@ import { roadmapApi } from "../../../api/roadmap.api";
 import RoadmapItemCard from "./components/RoadmapItemCard";
 import { notify } from "../../../helper";
 import Pagination from "../../shared/Pagination";
-
-export interface RoadmapItem {
-  _id: string;
-  userID?: string;
-  title: string;
-  description?: string;
-  icon?: string;
-  total_nodes_count: number;
-  completed_nodes_count: number;
-  status: "completed" | "in-progress" | "pending";
-  accent_color: string;
-  category: string;
-}
+import type { RoadmapItem } from "./types";
 
 export type RoadmapListProps = {
   onAddNewRoadmap?: () => void;

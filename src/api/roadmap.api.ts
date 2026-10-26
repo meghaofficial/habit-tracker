@@ -53,4 +53,20 @@ export const roadmapApi = {
     const response = await axiosPrivate.post(`/api/roadmaps/trail`, { ids });
     return response.data;
   },
+
+  updateRoadmapStatus: async (
+    id: string,
+    status: "pending" | "in_progress",
+  ) => {
+    return axiosPrivate.patch(`/api/roadmaps/${id}/status`, {
+      status,
+    });
+  },
+
+  startRoadmap: async (parentID: string, childID: string) => {
+    return axiosPrivate.patch("/api/roadmaps/start", {
+      parentID,
+      childID,
+    });
+  },
 };

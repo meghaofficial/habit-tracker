@@ -1,28 +1,37 @@
-import React, { useMemo, useState } from "react";
+import React, {
+  useMemo,
+  useState,
+  type Dispatch,
+  type SetStateAction,
+} from "react";
 import {
   Check,
   ChevronRight,
-  FolderGit2,
   ListOrdered,
   Sparkles,
   ChevronDown,
   ChevronUp,
   ArrowRight,
+  Play,
 } from "lucide-react";
 import type { RoadmapItem } from "./types";
 import { useNavigate, useParams } from "react-router-dom";
+import { roadmapApi } from "../../../api/roadmap.api";
+import CircleLoader from "../../loaders/CircleLoader";
 
 export type ViewRoadmapProps = {
   roadmap: RoadmapItem;
+  setRoadmap: Dispatch<SetStateAction<RoadmapItem>>;
   onOpenNestedRoadmap: (nodeId: string) => void;
-  onToggleNodeComplete?: (nodeId: string) => void;
   onToggleTaskComplete?: (nodeId: string, taskId: string) => void;
 };
 
+const FADE_ARROW_COLOR = "#FFFFFF80";
+
 export default function ViewRoadmap({
   roadmap,
+  setRoadmap,
   onOpenNestedRoadmap,
-  onToggleNodeComplete,
   onToggleTaskComplete,
 }: ViewRoadmapProps) {
   const navigate = useNavigate();
@@ -31,6 +40,7 @@ export default function ViewRoadmap({
   const [expandedNodeIds, setExpandedNodeIds] = useState<
     Record<string, boolean>
   >({});
+  const [loading, setLoading] = useState(false);
 
   const toggleExpand = (nodeId: string) => {
     setExpandedNodeIds((prev) => ({
@@ -55,7 +65,7 @@ export default function ViewRoadmap({
   }, [roadmap.nodes]);
 
   // Organize nodes into rows for horizontal zigzag (serpentine) layout
-  const NODES_PER_ROW = 3;
+  const NODES_PER_ROW = 4;
   const rows = useMemo(() => {
     const result: RoadmapItem[][] = [];
     for (let i = 0; i < roadmap.nodes.length; i += NODES_PER_ROW) {
@@ -65,6 +75,26 @@ export default function ViewRoadmap({
   }, [roadmap.nodes]);
 
   const splat = params["*"];
+
+  const handleStatusChange = async (parentID: string, childID: string) => {
+    try {
+      setLoading(true);
+
+      await roadmapApi.startRoadmap(parentID, childID);
+
+      setRoadmap((prev: RoadmapItem) => ({
+        ...prev,
+        status: "in-progress",
+        nodes: prev.nodes.map((node, index) =>
+          index === 0 ? { ...node, status: "in-progress" } : node,
+        ),
+      }));
+    } catch (error) {
+      console.error("Failed to start roadmap:", error);
+    } finally {
+      setLoading(false);
+    }
+  };
 
   return (
     <div>
@@ -98,47 +128,57 @@ export default function ViewRoadmap({
             </p>
           </div>
         </div>
+        {roadmap.nodes.length > 0 && (
+          <>
+            {roadmap.status === "in-progress" ? (
+              <div className="shrink-0 min-w-40 rounded-xl border border-white/8 bg-[#171717] px-3.5 py-2.5">
+                <div className="flex items-center justify-between text-[11px]">
+                  <span className="font-medium text-gray-400">Progress</span>
+                  <span className="font-bold text-emerald-400">
+                    {stats.percentage}%
+                  </span>
+                </div>
 
-        {/* Overall progress indicator */}
-        <div className="rounded-xl border border-white/8 bg-[#171717] px-3.5 py-2.5 shrink-0 min-w-[160px]40">
-          <div className="flex items-center justify-between text-[11px]">
-            <span className="text-gray-400 font-medium">Progress</span>
-            <span className="font-bold text-emerald-400">
-              {stats.percentage}%
-            </span>
-          </div>
+                <div className="mt-1.5 h-1.5 overflow-hidden rounded-full bg-white/8">
+                  <div
+                    className="h-full rounded-full bg-emerald-400 transition-all duration-300"
+                    style={{ width: `${stats.percentage}%` }}
+                  />
+                </div>
 
-          <div className="mt-1.5 h-1.5 overflow-hidden rounded-full bg-white/8">
-            <div
-              className="h-full rounded-full bg-emerald-400 transition-all duration-300"
-              style={{ width: `${stats.percentage}%` }}
-            />
-          </div>
-
-          <div className="mt-1 text-right text-[9px] text-gray-500">
-            {stats.completedPoints}/{stats.totalPoints} milestones completed
-          </div>
-        </div>
+                <div className="mt-1 text-right text-[9px] text-gray-500">
+                  {stats.completedPoints}/{stats.totalPoints} milestones
+                  completed
+                </div>
+              </div>
+            ) : (
+              <button
+                type="button"
+                onClick={() => {
+                  if (!loading) {
+                    handleStatusChange(roadmap._id, roadmap.nodes[0]._id);
+                  }
+                }}
+                className="shrink-0 flex items-center justify-center gap-1.5 rounded-xl border border-emerald-400/20 bg-emerald-400/10 px-2.5 py-1.5 min-w-25 text-[11px] font-semibold text-emerald-400 transition hover:bg-emerald-400/20"
+              >
+                {loading ? (
+                  <CircleLoader className="h-4 w-4" />
+                ) : (
+                  <>
+                    <Play size={13} />
+                    Start Roadmap
+                  </>
+                )}
+              </button>
+            )}
+          </>
+        )}
       </div>
 
       {/* Zigzag Serpentine Path View */}
       <div>
         {roadmap.type === "roadmap" ? (
-          <div className="mt-6 flex-1">
-            <div className="mb-4 flex items-center justify-between">
-              <div className="flex items-center gap-2">
-                <h3 className="text-xs font-semibold uppercase tracking-wider text-gray-400">
-                  Interactive Roadmap Path
-                </h3>
-                <span className="rounded-full bg-emerald-500/10 border border-emerald-500/20 px-2 py-0.5 text-[10px] text-emerald-400">
-                  Horizontal Zigzag
-                </span>
-              </div>
-
-              <span className="text-[11px] text-gray-500">
-                {roadmap.nodes.length} nodes in sequence
-              </span>
-            </div>
+          <div className="mt-3 flex-1">
             {roadmap.nodes.length === 0 ? (
               <div className="flex flex-col items-center justify-center rounded-2xl border border-dashed border-white/10 p-12 text-center">
                 <Sparkles size={32} className="text-gray-600 mb-2" />
@@ -171,7 +211,7 @@ export default function ViewRoadmap({
                             ? "grid-cols-1 sm:grid-cols-3"
                             : rowNodes.length === 2
                               ? "grid-cols-1 sm:grid-cols-2 lg:grid-cols-3"
-                              : "grid-cols-1 sm:grid-cols-2 lg:grid-cols-3"
+                              : "grid-cols-1 sm:grid-cols-2 lg:grid-cols-4"
                         }`}
                       >
                         {displayNodes.map((node, nodeIndexInDisplay) => {
@@ -211,7 +251,7 @@ export default function ViewRoadmap({
                           const isExpanded = !!expandedNodeIds[node._id];
 
                           return (
-                            <div className="flex gap-x-2.5 min-h-50">
+                            <div className="flex gap-x-2.5 min-h-30">
                               <article
                                 key={node._id}
                                 className={`group relative w-full flex flex-col justify-between overflow-hidden rounded-xl border transition-all duration-300 p-3 shadow-md
@@ -260,30 +300,37 @@ export default function ViewRoadmap({
                                               {node.points?.length || 0})
                                             </span>
                                           )}
-                                          {node.type === "roadmap" && (
-                                            <span className="text-[9px] text-purple-400 font-medium">
-                                              Nested Roadmap (/)
-                                            </span>
-                                          )}
+                                          {node.type === "roadmap" &&
+                                            node.nodes.length > 0 && (
+                                              <span className="text-[9px] text-purple-400 font-medium">
+                                                Nested Roadmap (/)
+                                              </span>
+                                            )}
                                         </div>
                                       </div>
                                     </div>
 
-                                    {node.type === "roadmap" && (
-                                      <button
-                                        type="button"
-                                        onClick={() => {
-                                          navigate(
-                                            `/roadmap/${splat ? `${splat}/` : ""}${node._id}`,
-                                          );
-                                          onOpenNestedRoadmap(node._id);
-                                        }}
-                                        title="Enter Nested Roadmap"
-                                        className="flex h-6 w-6 shrink-0 items-center justify-center rounded-lg border border-purple-500/30 bg-purple-500/15 text-purple-300 hover:bg-purple-500/25 transition cursor-pointer"
-                                      >
-                                        <FolderGit2 size={13} />
-                                      </button>
-                                    )}
+                                    {node.type === "roadmap" &&
+                                      node.nodes.length <= 0 && (
+                                        <button
+                                          type="button"
+                                          // onClick={() =>
+                                          //   onToggleTaskComplete?.(roadmap._id, point.id)
+                                          // }
+                                          aria-label={
+                                            node.status === "completed"
+                                              ? "Mark task incomplete"
+                                              : "Mark task complete"
+                                          }
+                                          className={`flex h-5 w-5 shrink-0 items-center justify-center rounded-md border transition ${
+                                            node.status === "completed"
+                                              ? "border-emerald-500 bg-emerald-500 text-black"
+                                              : "border-gray-600 text-transparent hover:border-emerald-500 hover:text-emerald-400"
+                                          }`}
+                                        >
+                                          <Check size={12} strokeWidth={3} />
+                                        </button>
+                                      )}
                                   </div>
 
                                   {/* Node description (if any) */}
@@ -386,21 +433,22 @@ export default function ViewRoadmap({
                                   )}
 
                                   {/* Nested roadmap teaser button */}
-                                  {node.type === "roadmap" && (
-                                    <button
-                                      type="button"
-                                      onClick={() => {
-                                        navigate(
-                                          `/roadmap/${splat ? `${splat}/` : ""}${node._id}`,
-                                        );
-                                        onOpenNestedRoadmap(node._id);
-                                      }}
-                                      className="mt-3 flex w-full items-center justify-between rounded-lg border border-purple-500/20 bg-purple-500/10 px-2.5 py-1.5 text-[11px] text-purple-300 hover:bg-purple-500/20 transition cursor-pointer"
-                                    >
-                                      <span>Open Sub-Roadmap</span>
-                                      <ChevronRight size={13} />
-                                    </button>
-                                  )}
+                                  {node.type === "roadmap" &&
+                                    node.nodes.length > 0 && (
+                                      <button
+                                        type="button"
+                                        onClick={() => {
+                                          navigate(
+                                            `/roadmap/${splat ? `${splat}/` : ""}${node._id}`,
+                                          );
+                                          onOpenNestedRoadmap(node._id);
+                                        }}
+                                        className="mt-3 flex w-full items-center justify-between rounded-lg border border-purple-500/20 bg-purple-500/10 px-2.5 py-1.5 text-[11px] text-purple-300 hover:bg-purple-500/20 transition cursor-pointer"
+                                      >
+                                        <span>Open Sub-Roadmap</span>
+                                        <ChevronRight size={13} />
+                                      </button>
+                                    )}
                                 </div>
 
                                 {/* Card Bottom: Progress bar */}
@@ -447,7 +495,7 @@ export default function ViewRoadmap({
                                             ? node.accent_color
                                             : node.status === "in-progress"
                                               ? "#818cf8"
-                                              : "white",
+                                              : FADE_ARROW_COLOR,
                                       }}
                                     />
                                   </div>
@@ -477,7 +525,7 @@ export default function ViewRoadmap({
                                   : rowNodes[rowNodes.length - 1].status ===
                                       "in-progress"
                                     ? "#818cf8"
-                                    : "white"
+                                    : FADE_ARROW_COLOR
                               }
                               stroke-width="1.5"
                               stroke-linecap="round"
@@ -492,7 +540,7 @@ export default function ViewRoadmap({
                                   : rowNodes[rowNodes.length - 1].status ===
                                       "in-progress"
                                     ? "#818cf8"
-                                    : "white"
+                                    : FADE_ARROW_COLOR
                               }
                               stroke-width="1.5"
                               stroke-linecap="round"

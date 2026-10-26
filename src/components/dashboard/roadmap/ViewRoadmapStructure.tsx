@@ -1,7 +1,6 @@
-import React, { useCallback, useEffect, useState } from "react";
+import React, { useEffect, useState } from "react";
 import ViewRoadmap from "./ViewRoadmap";
-import { type RoadmapItem, type RoadmapData } from "./types";
-import { initialRootRoadmap } from "./testData";
+import { type RoadmapItem } from "./types";
 import { ArrowLeft } from "lucide-react";
 import { useNavigate, useParams } from "react-router-dom";
 import { roadmapApi } from "../../../api/roadmap.api";
@@ -9,88 +8,8 @@ import { roadmapApi } from "../../../api/roadmap.api";
 const ViewRoadmapStructure = () => {
   const navigate = useNavigate();
   const params = useParams();
-  const [rootRoadmap, setRootRoadmap] =
-    useState<RoadmapData>(initialRootRoadmap);
   const [navigationPath, setNavigationPath] = useState<string[]>([]);
-  const splat = params["*"];
-  const roadmapSteps = splat ? splat.split("/") : [];
-
   const [loading, setLoading] = useState(false);
-
-  // Helper: locate active roadmap data based on navigationPath
-  const getActiveRoadmapAndTrail = useCallback((): {
-    activeRoadmap: RoadmapData;
-    trail: { id: string; title: string }[];
-  } => {
-    let current = rootRoadmap;
-    const trail = [{ id: rootRoadmap.id, title: rootRoadmap.title }];
-
-    for (const nodeId of navigationPath) {
-      const foundNode = current.nodes.find((n) => n.id === nodeId);
-      if (foundNode && foundNode.nestedRoadmap) {
-        current = foundNode.nestedRoadmap;
-        trail.push({ id: current.id, title: current.title });
-      } else {
-        break;
-      }
-    }
-
-    return { activeRoadmap: current, trail };
-  }, [rootRoadmap, navigationPath]);
-
-  // const { activeRoadmap, trail } = getActiveRoadmapAndTrail();
-  const { trail } = getActiveRoadmapAndTrail();
-
-  const handleUpdateActiveRoadmap = (updated: RoadmapData) => {
-    if (navigationPath.length === 0) {
-      setRootRoadmap(updated);
-      return;
-    }
-
-    // Recursively update nested roadmap in tree
-    const updateRecursive = (
-      current: RoadmapData,
-      pathIndex: number,
-    ): RoadmapData => {
-      const targetNodeId = navigationPath[pathIndex];
-      const newNodes = current.nodes.map((node) => {
-        if (node.id !== targetNodeId) return node;
-
-        if (pathIndex === navigationPath.length - 1) {
-          // Reached target
-          return {
-            ...node,
-            title: updated.title,
-            icon: updated.icon,
-            color: updated.color,
-            nestedRoadmap: updated,
-          };
-        } else if (node.nestedRoadmap) {
-          return {
-            ...node,
-            nestedRoadmap: updateRecursive(node.nestedRoadmap, pathIndex + 1),
-          };
-        }
-        return node;
-      });
-
-      return { ...current, nodes: newNodes };
-    };
-
-    setRootRoadmap((prev) => updateRecursive(prev, 0));
-  };
-
-  // const handleNavigateBreadcrumb = (title: string) => {
-  //   const targetIndex = roadmapSteps.indexOf(title);
-  //   if (targetIndex === -1) {
-  //     setNavigationPath([]);
-  //     navigate("/roadmap");
-  //     return;
-  //   }
-  //   const newPathSegments = roadmapSteps.slice(0, targetIndex + 1);
-  //   setNavigationPath(newPathSegments);
-  //   navigate(`/roadmap/${newPathSegments.join("/")}`);
-  // };
 
   const handleNavigateBreadcrumb = (id: string) => {
     const targetIndex = roadmapTrail.findIndex((crumb) => crumb._id === id);
@@ -112,16 +31,6 @@ const ViewRoadmapStructure = () => {
 
   const handleOpenNestedRoadmap = (nodeId: string) => {
     setNavigationPath((prev) => [...prev, nodeId]);
-  };
-
-  const handleToggleNodeComplete = (nodeId: string) => {
-    // const updatedNodes = activeRoadmap.nodes.map((n) => {
-    //   if (n.id === nodeId) {
-    //     return { ...n, completed: !n.completed };
-    //   }
-    //   return n;
-    // });
-    // handleUpdateActiveRoadmap({ ...activeRoadmap, nodes: updatedNodes });
   };
 
   const handleToggleTaskComplete = (nodeId: string, taskId: string) => {
@@ -261,8 +170,8 @@ const ViewRoadmapStructure = () => {
         ) : (
           <ViewRoadmap
             roadmap={activeRoadmap}
+            setRoadmap={setActiveRoadmap}
             onOpenNestedRoadmap={handleOpenNestedRoadmap}
-            onToggleNodeComplete={handleToggleNodeComplete}
             onToggleTaskComplete={handleToggleTaskComplete}
           />
         )}
